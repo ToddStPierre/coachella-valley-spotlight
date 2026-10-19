@@ -1,0 +1,140 @@
+/* Coachella Valley Spotlight: renders listings from the files in /data. */
+(function () {
+  var D = window.CVS || {};
+  var today = new Date(); today.setHours(0, 0, 0, 0);
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var MONTHS_LONG = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  function parse(d) { if (!d) return null; var p = d.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function fmt(d) { return MONTHS[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear(); }
+  function sample(x) { return x.sample ? '<span class="sample">SAMPLE</span>' : ""; }
+  function link(url, label) { return url ? '<a class="card-link" href="' + esc(url) + '" target="_blank" rel="noopener">' + label + ' &rarr;</a>' : ""; }
+
+  var events = (D.events || []).filter(function (e) { var d = parse(e.date); return d && d >= today; })
+    .sort(function (a, b) { return parse(a.date) - parse(b.date); });
+  var deals = (D.deals || []).filter(function (x) { var d = parse(x.expires); return !d || d >= today; });
+  var news = (D.news || []).slice().sort(function (a, b) { return parse(b.date) - parse(a.date); });
+  var directory = (D.directory || []).slice().sort(function (a, b) { return (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || a.name.localeCompare(b.name); });
+
+  var R = {
+    event: function (e) {
+      var d = parse(e.date);
+      return '<article class="card event">' + sample(e) +
+        '<div class="date-tile"><span>' + MONTHS[d.getMonth()] + '</span><b>' + d.getDate() + '</b><span>' + ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()] + '</span></div>' +
+        '<div style="display:grid;gap:6px"><span class="meta">' + esc(e.city) + (e.time ? ' &middot; ' + esc(e.time) : '') + '</span>' +
+        '<h3>' + esc(e.title) + '</h3><p>' + esc(e.venue) + (e.price ? ' &middot; ' + esc(e.price) : '') + '</p>' +
+        (e.category ? '<span class="tag">' + esc(e.category) + '</span>' : '') + link(e.url, "Event details") + '</div></article>';
+    },
+    deal: function (x) {
+      var d = parse(x.expires);
+      return '<article class="card deal">' + sample(x) + '<span class="meta">' + esc(x.business) + ' &middot; ' + esc(x.city) + '</span>' +
+        '<div class="offer">' + esc(x.offer) + '</div><p>' + esc(x.details) + '</p>' +
+        '<span class="meta">' + (d ? 'Good through ' + fmt(d) : 'Ongoing') + '</span>' + link(x.url, "Get this deal") + '</article>';
+    },
+    news: function (n) {
+      var d = parse(n.date);
+      return '<article class="card story">' + sample(n) + '<span class="meta">' + esc(n.city) + (d ? ' &middot; ' + fmt(d) : '') + '</span>' +
+        '<h3>' + esc(n.title) + '</h3><p>' + esc(n.summary) + '</p>' +
+        (n.source ? '<span class="meta">Source: ' + esc(n.source) + '</span>' : '') + link(n.url, "Read more") + '</article>';
+    },
+    directory: function (b) {
+      return '<article class="card' + (b.featured ? ' featured' : '') + '">' + sample(b) + '<span class="meta">' + esc(b.category) + ' &middot; ' + esc(b.city) + '</span>' +
+        '<h3>' + esc(b.name) + '</h3><p>' + esc(b.blurb) + '</p>' +
+        (b.featured ? '<span class="tag">Featured on the postcard</span>' : '') +
+        (b.phone ? '<a class="card-link" href="tel:' + esc(b.phone.replace(/[^\d+]/g, "")) + '">' + esc(b.phone) + '</a>' : '') + link(b.url, "Visit website") + '</article>';
+    }
+  };
+
+  var SETS = { events: events, deals: deals, news: news, directory: directory };
+  var TYPE = { events: "event", deals: "deal", news: "news", directory: "directory" };
+
+  function text(item) { return Object.keys(item).map(function (k) { return typeof item[k] === "string" ? item[k] : ""; }).join(" ").toLowerCase(); }
+
+  // Small blocks: <div data-list="events" data-limit="4"></div>
+  document.querySelectorAll("[data-list]").forEach(function (el) {
+    var key = el.getAttribute("data-list"), limit = +el.getAttribute("data-limit") || 999;
+    var items = SETS[key].slice(0, limit);
+    el.innerHTML = items.length ? items.map(R[TYPE[key]]).join("") : '<div class="empty">Nothing here yet. Check back soon.</div>';
+  });
+
+  // Full list pages with filters: <div data-browse="events"></div>
+  var browse = document.querySelector("[data-browse]");
+  if (browse) {
+    var key = browse.getAttribute("data-browse"), all = SETS[key];
+    var q = document.getElementById("f-q"), city = document.getElementById("f-city"), cat = document.getElementById("f-cat");
+    function fill(sel, field) {
+      if (!sel) return;
+      var vals = all.map(function (x) { return x[field]; }).filter(Boolean);
+      vals.filter(function (v, i) { return vals.indexOf(v) === i; }).sort().forEach(function (v) {
+        var o = document.createElement("option"); o.value = v; o.textContent = v; sel.appendChild(o);
+      });
+    }
+    fill(city, "city"); fill(cat, "category");
+    var params = new URLSearchParams(location.search);
+    if (q && params.get("q")) q.value = params.get("q");
+    if (cat && params.get("category")) cat.value = params.get("category");
+    function draw() {
+      var term = q ? q.value.trim().toLowerCase() : "";
+      var items = all.filter(function (x) {
+        return (!term || text(x).indexOf(term) > -1) && (!city || !city.value || x.city === city.value) && (!cat || !cat.value || x.category === cat.value);
+      });
+      if (!items.length) { browse.innerHTML = '<div class="empty">No matches. Try a different city or search word.</div>'; return; }
+      if (key === "events") {
+        var html = "", last = "";
+        items.forEach(function (e) {
+          var d = parse(e.date), m = MONTHS_LONG[d.getMonth()] + " " + d.getFullYear();
+          if (m !== last) { html += (last ? "</div>" : "") + '<h2 class="month-head"><span class="stripe-mini"></span>' + m + '</h2><div class="grid-2">'; last = m; }
+          html += R.event(e);
+        });
+        browse.innerHTML = html + "</div>";
+      } else {
+        browse.innerHTML = '<div class="' + (key === "news" ? "grid-2" : "grid") + '">' + items.map(R[TYPE[key]]).join("") + "</div>";
+      }
+    }
+    [q, city, cat].forEach(function (el) { if (el) el.addEventListener("input", draw); });
+    draw();
+  }
+
+  // Home page search: searches everything at once
+  var hs = document.getElementById("home-search");
+  if (hs) {
+    var out = document.getElementById("search-results");
+    hs.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var term = hs.q.value.trim().toLowerCase();
+      if (!term) { out.hidden = true; return; }
+      var html = "", total = 0;
+      [["events", "Events"], ["deals", "Deals"], ["news", "Local news"], ["directory", "Businesses"]].forEach(function (pair) {
+        var hits = SETS[pair[0]].filter(function (x) { return text(x).indexOf(term) > -1; });
+        total += hits.length;
+        if (hits.length) html += '<h3 class="month-head"><span class="stripe-mini"></span>' + pair[1] + '</h3><div class="grid">' + hits.slice(0, 6).map(R[TYPE[pair[0]]]).join("") + '</div>';
+      });
+      out.innerHTML = '<p class="meta" style="font-family:var(--mono)">' + total + ' result' + (total === 1 ? '' : 's') + ' for &ldquo;' + esc(term) + '&rdquo;</p>' + (html || '<div class="empty">Nothing matched. Try a city name or a word like &ldquo;pool&rdquo; or &ldquo;tacos&rdquo;.</div>');
+      out.hidden = false;
+      out.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  // Mobile menu
+  var t = document.querySelector(".menu-toggle");
+  if (t) t.addEventListener("click", function () {
+    var nav = t.closest(".nav"); var open = nav.classList.toggle("open"); t.setAttribute("aria-expanded", open);
+  });
+
+  // Forms: post to Formspree without leaving the page
+  document.querySelectorAll("form[data-ajax]").forEach(function (f) {
+    f.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var status = f.querySelector(".form-status"), btn = f.querySelector("button[type=submit]");
+      btn.disabled = true; status.textContent = "Sending...";
+      fetch(f.action, { method: "POST", body: new FormData(f), headers: { Accept: "application/json" } })
+        .then(function (r) {
+          if (!r.ok) throw new Error();
+          f.reset(); status.textContent = f.getAttribute("data-thanks") || "Got it. Thank you!";
+        })
+        .catch(function () { status.textContent = "That did not go through. Please call or text (760) 422-5475."; })
+        .finally(function () { btn.disabled = false; });
+    });
+  });
+})();
