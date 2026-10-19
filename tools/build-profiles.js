@@ -15,7 +15,7 @@ const footer = tpl.slice(tpl.indexOf('<footer class="site-footer">'), tpl.indexO
 
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const slugOf = b => b.slug || String(b.name).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const outbound = u => { try { const x = new URL(u); x.searchParams.set("utm_source", "coachellavalleyspotlight"); x.searchParams.set("utm_medium", "profile"); return x.toString(); } catch { return u; } };
+const outbound = u => { try { const x = new URL(u); x.searchParams.set("utm_source", "coachellavalleylocalspotlight"); x.searchParams.set("utm_medium", "profile"); return x.toString(); } catch { return u; } };
 
 fs.rmSync(path.join(root, "business"), { recursive: true, force: true });
 for (const b of list) {
@@ -28,7 +28,7 @@ for (const b of list) {
   const offer = prem && b.offer && b.offer.title && (!b.offer.expires || b.offer.expires >= today) ? b.offer : null;
   const rows = [["Area served", b.area], ["Address", b.address], ["Hours", prem && b.hours]].filter(r => r[1]);
   const gallery = prem ? (b.gallery || []) : [];
-  const html = `${head}<title>${esc(b.name)} | ${esc(b.category)} in ${esc(b.city)} | Coachella Valley Spotlight</title>
+  const html = `${head}<title>${esc(b.name)} | ${esc(b.category)} in ${esc(b.city)} | Coachella Valley Local Spotlight</title>
 <meta name="description" content="${esc(desc)}">
 <meta property="og:title" content="${esc(b.name)}">
 <meta property="og:description" content="${esc(desc)}">
@@ -52,7 +52,7 @@ ${rows.length ? `<dl class="facts">${rows.map(r => `<dt>${r[0]}</dt><dd>${esc(r[
 ${tel ? `<a class="btn" href="tel:${tel}" data-track="call">Call ${esc(b.phone)}</a>` : ""}
 ${b.url ? `<a class="btn btn-ghost" href="${esc(outbound(b.url))}" target="_blank" rel="noopener" data-track="website">Visit website &rarr;</a>` : ""}
 </div>
-<p class="risk">Tell them you found them on Coachella Valley Spotlight.</p>
+<p class="risk">Tell them you found them on Coachella Valley Local Spotlight.</p>
 </div>
 ${prem && b.image ? `<figure class="profile-ad"><img src="${esc(b.image)}" alt="${esc(b.imageAlt || b.name + " ad")}"><figcaption>As seen on the Spotlight postcard</figcaption></figure>` : ""}
 </div>

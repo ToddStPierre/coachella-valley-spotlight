@@ -1,4 +1,4 @@
-/* Coachella Valley Spotlight: renders listings from the files in /data. */
+/* Coachella Valley Local Spotlight: renders listings from the files in /data. */
 (function () {
   var D = window.CVS || {};
   var today = new Date(); today.setHours(0, 0, 0, 0);
@@ -11,7 +11,7 @@
   function sample(x) { return x.sample ? '<span class="sample">SAMPLE</span>' : ""; }
   var ROOT = document.documentElement.getAttribute("data-root") || "";
   function slugOf(b) { return b.slug || String(b.name).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
-  function outbound(u) { try { var x = new URL(u); x.searchParams.set("utm_source", "coachellavalleyspotlight"); x.searchParams.set("utm_medium", "directory"); return x.toString(); } catch (e) { return u; } }
+  function outbound(u) { try { var x = new URL(u); x.searchParams.set("utm_source", "coachellavalleylocalspotlight"); x.searchParams.set("utm_medium", "directory"); return x.toString(); } catch (e) { return u; } }
   function liveOffer(o) { if (!o || !o.title) return null; var d = parse(o.expires); return !d || d >= today ? o : null; }
   function link(url, label) { return url ? '<a class="card-link" href="' + esc(url) + '" target="_blank" rel="noopener">' + label + ' &rarr;</a>' : ""; }
 
@@ -50,8 +50,6 @@
         '<h3>' + name + '</h3><p>' + esc(b.blurb) + '</p>' +
         (b.postcard ? '<span class="tag">On the Spotlight postcard</span>' : prem ? '<span class="tag">Premium listing</span>' : '') +
         (off ? '<div class="offer-box"><b>' + esc(off.title) + '</b>' + (off.details ? '<span>' + esc(off.details) + '</span>' : '') + '</div>' : '') +
-        (b.phone ? '<a class="card-link" href="tel:' + esc(b.phone.replace(/[^\d+]/g, "")) + '" data-track="call">' + esc(b.phone) + '</a>' : '') +
-        (b.url ? '<a class="card-link" href="' + esc(outbound(b.url)) + '" target="_blank" rel="noopener" data-track="website">Visit website &rarr;</a>' : '') +
         (slug ? '<a class="card-link" href="' + ROOT + 'business/' + slug + '/">View profile &rarr;</a>' : '') + '</article>';
     }
   };
