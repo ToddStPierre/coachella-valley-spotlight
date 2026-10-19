@@ -251,3 +251,19 @@ p { margin: 0 0 var(--s2); }
 .hero-biz { margin-top: var(--s2); font-size: 16.5px; color: var(--ink-2); }
 .hero-biz a { font-weight: 600; text-decoration: none; white-space: nowrap; }
 .hero-biz a:hover { text-decoration: underline; }
+.route-map { margin: var(--s4) 0 0; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; box-shadow: var(--shadow); max-width: 760px; }
+.route-map img { border-radius: 10px; width: 100%; }
+.route-map figcaption { font-size: 13px; color: var(--ink-2); padding-top: 8px; }
+.route-link { display: inline-flex; align-self: flex-start; margin-top: 14px; background: #fff; color: var(--palm); font-weight: 700; font-size: 15px; text-decoration: none; padding: 10px 18px; border-radius: 999px; transition: transform .15s ease; }
+.route-link:hover { transform: translateY(-1px); }
+@media (max-width: 640px) { .stats[style*="repeat(3"] { grid-template-columns: repeat(2, 1fr) !important; } .stats[style*="repeat(4"] { grid-template-columns: repeat(2, 1fr) !important; } }
+.advertisers { padding: var(--s4) 0 var(--s5); }
+.advertisers h2 { margin-bottom: 6px; }
+.advertisers-strip { overflow: hidden; margin-top: var(--s3); -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+.advertisers-track { display: flex; gap: 20px; width: max-content; animation: advertisers-scroll 40s linear infinite; }
+.advertisers-strip:hover .advertisers-track, .advertisers-strip:focus-within .advertisers-track { animation-play-state: paused; }
+.advertiser-card { flex: none; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 10px; box-shadow: var(--shadow); }
+.advertiser-card img { display: block; height: 170px; width: auto; border-radius: 8px; }
+@keyframes advertisers-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (max-width: 640px) { .advertiser-card img { height: 128px; } }
+@media (prefers-reduced-motion: reduce) { .advertisers-track { animation: none; overflow-x: auto; scroll-snap-type: x proximity; padding-bottom: 10px; } .advertiser-card { scroll-snap-align: start; } }
