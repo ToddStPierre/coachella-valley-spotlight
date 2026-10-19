@@ -15,6 +15,7 @@ const footer = tpl.slice(tpl.indexOf('<footer class="site-footer">'), tpl.indexO
 
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const slugOf = b => b.slug || String(b.name).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const nice = d => { const [y, m, dd] = d.split("-").map(Number); return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m - 1] + " " + dd + ", " + y; };
 const outbound = u => { try { const x = new URL(u); x.searchParams.set("utm_source", "coachellavalleylocalspotlight"); x.searchParams.set("utm_medium", "profile"); return x.toString(); } catch { return u; } };
 
 fs.rmSync(path.join(root, "business"), { recursive: true, force: true });
@@ -46,7 +47,7 @@ ${header}
 <h1>${esc(b.name)}</h1>
 ${b.postcard || prem ? '<span class="tag" style="display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:999px;background:#fde8bf;color:#7a4a00;margin-bottom:16px">' + (b.postcard ? "On the Spotlight postcard" : "Premium listing") + '</span>' : ""}
 <p>${esc(prem ? (b.about || b.blurb) : b.blurb)}</p>
-${offer ? `<div class="offer-box" style="max-width:640px;margin-bottom:16px"><b>${esc(offer.title)}</b>${offer.details ? `<span>${esc(offer.details)}</span>` : ""}${offer.expires ? `<span>Good through ${esc(offer.expires)}</span>` : ""}</div>` : ""}
+${offer ? `<div class="offer-box" style="max-width:640px;margin-bottom:16px"><b>${esc(offer.title)}</b>${offer.details ? `<span>${esc(offer.details)}</span>` : ""}${offer.expires ? `<span>Good through ${esc(nice(offer.expires))}</span>` : ""}</div>` : ""}
 ${rows.length ? `<dl class="facts">${rows.map(r => `<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl>` : ""}
 <div class="cta-row">
 ${tel ? `<a class="btn" href="tel:${tel}" data-track="call">Call ${esc(b.phone)}</a>` : ""}
