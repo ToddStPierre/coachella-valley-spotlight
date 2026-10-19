@@ -23,7 +23,11 @@ for (const b of list) {
   const tel = b.phone ? b.phone.replace(/[^\d+]/g, "") : "";
   const desc = `${b.name}: ${b.category} in ${b.city}. ${b.blurb || ""}`.slice(0, 300);
   const schema = { "@context": "https://schema.org", "@type": "LocalBusiness", name: b.name, description: b.about || b.blurb, telephone: b.phone || undefined, url: b.url || undefined, address: { "@type": "PostalAddress", streetAddress: b.address || undefined, addressLocality: b.city, addressRegion: "CA", addressCountry: "US" }, areaServed: b.area || "Coachella Valley" };
-  const rows = [["Area served", b.area], ["Address", b.address], ["Hours", b.hours]].filter(r => r[1]);
+  const prem = !!(b.premium || b.featured);
+  const today = new Date().toISOString().slice(0, 10);
+  const offer = prem && b.offer && b.offer.title && (!b.offer.expires || b.offer.expires >= today) ? b.offer : null;
+  const rows = [["Area served", b.area], ["Address", b.address], ["Hours", prem && b.hours]].filter(r => r[1]);
+  const gallery = prem ? (b.gallery || []) : [];
   const html = `${head}<title>${esc(b.name)} | ${esc(b.category)} in ${esc(b.city)} | Coachella Valley Spotlight</title>
 <meta name="description" content="${esc(desc)}">
 <meta property="og:title" content="${esc(b.name)}">
@@ -40,8 +44,9 @@ ${header}
 <div>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>${esc(b.category)} &middot; ${esc(b.city)}</span>
 <h1>${esc(b.name)}</h1>
-${b.featured ? '<span class="tag" style="display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:999px;background:#fde8bf;color:#7a4a00;margin-bottom:16px">Featured on the Spotlight postcard</span>' : ""}
-<p>${esc(b.about || b.blurb)}</p>
+${b.postcard || prem ? '<span class="tag" style="display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:999px;background:#fde8bf;color:#7a4a00;margin-bottom:16px">' + (b.postcard ? "On the Spotlight postcard" : "Premium listing") + '</span>' : ""}
+<p>${esc(prem ? (b.about || b.blurb) : b.blurb)}</p>
+${offer ? `<div class="offer-box" style="max-width:640px;margin-bottom:16px"><b>${esc(offer.title)}</b>${offer.details ? `<span>${esc(offer.details)}</span>` : ""}${offer.expires ? `<span>Good through ${esc(offer.expires)}</span>` : ""}</div>` : ""}
 ${rows.length ? `<dl class="facts">${rows.map(r => `<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl>` : ""}
 <div class="cta-row">
 ${tel ? `<a class="btn" href="tel:${tel}" data-track="call">Call ${esc(b.phone)}</a>` : ""}
@@ -49,10 +54,11 @@ ${b.url ? `<a class="btn btn-ghost" href="${esc(outbound(b.url))}" target="_blan
 </div>
 <p class="risk">Tell them you found them on Coachella Valley Spotlight.</p>
 </div>
-${b.image ? `<figure class="profile-ad"><img src="${esc(b.image)}" alt="${esc(b.imageAlt || b.name + " ad")}"><figcaption>As seen on the Spotlight postcard</figcaption></figure>` : ""}
+${prem && b.image ? `<figure class="profile-ad"><img src="${esc(b.image)}" alt="${esc(b.imageAlt || b.name + " ad")}"><figcaption>As seen on the Spotlight postcard</figcaption></figure>` : ""}
 </div>
+${gallery.length ? `<h2 class="month-head" style="margin-top:48px"><span class="stripe-mini"></span>Photos</h2><div class="gallery">${gallery.map((g, i) => `<img src="${esc(g)}" alt="${esc(b.name)} photo ${i + 1}" loading="lazy">`).join("")}</div>` : ""}
 </div></section>
-<div class="wrap"><div class="biz-band"><p><strong>Own a local business?</strong><br>Get a featured profile like this one when you advertise on the card.</p><a class="btn" href="advertise.html">See how the card works</a></div></div>
+<div class="wrap"><div class="biz-band"><p><strong>Own a local business?</strong><br>List it free, or go Premium for photos, hours, offers and monthly stats.</p><a class="btn" href="advertise.html#plans">See listing plans</a></div></div>
 </main>
 ${footer}
 <script src="assets/app.js"></script>

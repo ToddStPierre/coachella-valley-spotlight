@@ -12,13 +12,14 @@
   var ROOT = document.documentElement.getAttribute("data-root") || "";
   function slugOf(b) { return b.slug || String(b.name).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
   function outbound(u) { try { var x = new URL(u); x.searchParams.set("utm_source", "coachellavalleyspotlight"); x.searchParams.set("utm_medium", "directory"); return x.toString(); } catch (e) { return u; } }
+  function liveOffer(o) { if (!o || !o.title) return null; var d = parse(o.expires); return !d || d >= today ? o : null; }
   function link(url, label) { return url ? '<a class="card-link" href="' + esc(url) + '" target="_blank" rel="noopener">' + label + ' &rarr;</a>' : ""; }
 
   var events = (D.events || []).filter(function (e) { var d = parse(e.date); return d && d >= today; })
     .sort(function (a, b) { return parse(a.date) - parse(b.date); });
   var deals = (D.deals || []).filter(function (x) { var d = parse(x.expires); return !d || d >= today; });
   var news = (D.news || []).slice().sort(function (a, b) { return parse(b.date) - parse(a.date); });
-  var directory = (D.directory || []).slice().sort(function (a, b) { return (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || a.name.localeCompare(b.name); });
+  var directory = (D.directory || []).slice().sort(function (a, b) { return ((b.premium || b.featured) ? 1 : 0) - ((a.premium || a.featured) ? 1 : 0) || (a.sample ? 1 : 0) - (b.sample ? 1 : 0) || a.name.localeCompare(b.name); });
 
   var R = {
     event: function (e) {
@@ -44,9 +45,11 @@
     directory: function (b) {
       var slug = !b.sample && slugOf(b);
       var name = slug ? '<a href="' + ROOT + 'business/' + slug + '/" data-track="profile-link" style="color:inherit;text-decoration:none">' + esc(b.name) + '</a>' : esc(b.name);
-      return '<article class="card' + (b.featured ? ' featured' : '') + '"' + (slug ? ' data-biz="' + slug + '"' : '') + '>' + sample(b) + '<span class="meta">' + esc(b.category) + ' &middot; ' + esc(b.city) + '</span>' +
+      var prem = b.premium || b.featured, off = prem && liveOffer(b.offer);
+      return '<article class="card' + (prem ? ' featured' : '') + '"' + (slug ? ' data-biz="' + slug + '"' : '') + '>' + sample(b) + '<span class="meta">' + esc(b.category) + ' &middot; ' + esc(b.city) + '</span>' +
         '<h3>' + name + '</h3><p>' + esc(b.blurb) + '</p>' +
-        (b.featured ? '<span class="tag">Featured on the postcard</span>' : '') +
+        (b.postcard ? '<span class="tag">On the Spotlight postcard</span>' : prem ? '<span class="tag">Premium listing</span>' : '') +
+        (off ? '<div class="offer-box"><b>' + esc(off.title) + '</b>' + (off.details ? '<span>' + esc(off.details) + '</span>' : '') + '</div>' : '') +
         (b.phone ? '<a class="card-link" href="tel:' + esc(b.phone.replace(/[^\d+]/g, "")) + '" data-track="call">' + esc(b.phone) + '</a>' : '') +
         (b.url ? '<a class="card-link" href="' + esc(outbound(b.url)) + '" target="_blank" rel="noopener" data-track="website">Visit website &rarr;</a>' : '') +
         (slug ? '<a class="card-link" href="' + ROOT + 'business/' + slug + '/">View profile &rarr;</a>' : '') + '</article>';
@@ -148,6 +151,10 @@
   });
   var prof = document.body.getAttribute("data-profile");
   if (prof) track(prof, "profile");
+
+  // Pre-pick the listing type on the submit form from ?plan=
+  var plan = new URLSearchParams(location.search).get("plan"), planSel = document.getElementById("plan");
+  if (plan && planSel) { planSel.value = plan === "premium" ? "Premium listing" : "Basic listing (free)"; var ty = document.getElementById("type"); if (ty) ty.value = "A business listing"; }
 
   // Mobile menu
   var t = document.querySelector(".menu-toggle");

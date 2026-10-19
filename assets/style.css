@@ -229,3 +229,22 @@ p { margin: 0 0 var(--s2); }
 .stats-table th, .stats-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); }
 .stats-table th { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); font-weight: 500; }
 .table-scroll { overflow-x: auto; }
+
+.offer-box { background: #fff4e8; border: 1.5px dashed var(--sun); border-radius: 12px; padding: 10px 14px; display: grid; gap: 2px; margin-top: 4px; }
+.offer-box b { font-family: var(--display); font-size: 18px; color: var(--sun-deep); font-weight: 600; }
+.offer-box span { font-size: 14.5px; color: var(--ink-2); }
+.gallery { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.gallery img { border-radius: 12px; aspect-ratio: 4 / 3; object-fit: cover; width: 100%; border: 1px solid var(--line); }
+.plans { display: grid; gap: var(--s3); grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-top: var(--s3); }
+.plan { background: var(--paper); border: 1.5px solid var(--line); border-radius: 20px; padding: var(--s4) var(--s3); display: flex; flex-direction: column; gap: 14px; box-shadow: var(--shadow); }
+.plan.premium { border: 2px solid var(--ink); box-shadow: 8px 8px 0 var(--gold); position: relative; }
+.plan h3 { margin: 0; font-size: 24px; }
+.plan .amount { font-family: var(--display); font-size: 48px; font-weight: 700; line-height: 1; }
+.plan .amount small { font-family: var(--body); font-size: 16px; font-weight: 500; color: var(--ink-2); }
+.plan .alt { font-family: var(--mono); font-size: 13px; color: var(--palm); letter-spacing: .03em; }
+.plan ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.plan li { padding-left: 28px; position: relative; }
+.plan li::before { content: ""; position: absolute; left: 0; top: 7px; width: 16px; height: 10px; border-left: 3px solid var(--palm); border-bottom: 3px solid var(--palm); transform: rotate(-45deg); }
+.plan .btn { margin-top: auto; align-self: flex-start; }
+.plan .note { font-size: 14.5px; color: var(--ink-2); margin: 0; }
+.plan-flag { position: absolute; top: -14px; left: 24px; background: var(--ink); color: var(--gold); font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; }
