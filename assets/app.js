@@ -9,6 +9,9 @@
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function fmt(d) { return MONTHS[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear(); }
   function sample(x) { return x.sample ? '<span class="sample">SAMPLE</span>' : ""; }
+  var ROOT = document.documentElement.getAttribute("data-root") || "";
+  function slugOf(b) { return b.slug || String(b.name).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+  function outbound(u) { try { var x = new URL(u); x.searchParams.set("utm_source", "coachellavalleyspotlight"); x.searchParams.set("utm_medium", "directory"); return x.toString(); } catch (e) { return u; } }
   function link(url, label) { return url ? '<a class="card-link" href="' + esc(url) + '" target="_blank" rel="noopener">' + label + ' &rarr;</a>' : ""; }
 
   var events = (D.events || []).filter(function (e) { var d = parse(e.date); return d && d >= today; })
@@ -39,10 +42,14 @@
         (n.source ? '<span class="meta">Source: ' + esc(n.source) + '</span>' : '') + link(n.url, "Read more") + '</article>';
     },
     directory: function (b) {
-      return '<article class="card' + (b.featured ? ' featured' : '') + '">' + sample(b) + '<span class="meta">' + esc(b.category) + ' &middot; ' + esc(b.city) + '</span>' +
-        '<h3>' + esc(b.name) + '</h3><p>' + esc(b.blurb) + '</p>' +
+      var slug = !b.sample && slugOf(b);
+      var name = slug ? '<a href="' + ROOT + 'business/' + slug + '/" data-track="profile-link" style="color:inherit;text-decoration:none">' + esc(b.name) + '</a>' : esc(b.name);
+      return '<article class="card' + (b.featured ? ' featured' : '') + '"' + (slug ? ' data-biz="' + slug + '"' : '') + '>' + sample(b) + '<span class="meta">' + esc(b.category) + ' &middot; ' + esc(b.city) + '</span>' +
+        '<h3>' + name + '</h3><p>' + esc(b.blurb) + '</p>' +
         (b.featured ? '<span class="tag">Featured on the postcard</span>' : '') +
-        (b.phone ? '<a class="card-link" href="tel:' + esc(b.phone.replace(/[^\d+]/g, "")) + '">' + esc(b.phone) + '</a>' : '') + link(b.url, "Visit website") + '</article>';
+        (b.phone ? '<a class="card-link" href="tel:' + esc(b.phone.replace(/[^\d+]/g, "")) + '" data-track="call">' + esc(b.phone) + '</a>' : '') +
+        (b.url ? '<a class="card-link" href="' + esc(outbound(b.url)) + '" target="_blank" rel="noopener" data-track="website">Visit website &rarr;</a>' : '') +
+        (slug ? '<a class="card-link" href="' + ROOT + 'business/' + slug + '/">View profile &rarr;</a>' : '') + '</article>';
     }
   };
 
@@ -115,6 +122,32 @@
       out.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
+
+  // Listing tracking: counts views, profile views, calls and website clicks per business.
+  var TRACK = "https://cvs-tracker.toddstpierre.workers.dev/t";
+  function track(slug, type) {
+    if (!slug || /localhost|127\.0\.0\.1|^file/.test(location.href)) return;
+    var body = JSON.stringify({ b: slug, e: type });
+    try { if (navigator.sendBeacon && navigator.sendBeacon(TRACK, body)) return; } catch (e) {}
+    try { fetch(TRACK, { method: "POST", body: body, keepalive: true, mode: "no-cors" }); } catch (e) {}
+  }
+  var seen = {};
+  var io = "IntersectionObserver" in window && new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      var slug = en.target.getAttribute("data-biz");
+      if (en.isIntersecting && !seen[slug]) { seen[slug] = 1; track(slug, "impression"); io.unobserve(en.target); }
+    });
+  }, { threshold: 0.5 });
+  function watch() { if (io) document.querySelectorAll("[data-biz]:not([data-noimp])").forEach(function (el) { io.observe(el); }); }
+  watch();
+  new MutationObserver(watch).observe(document.body, { childList: true, subtree: true });
+  document.addEventListener("click", function (ev) {
+    var a = ev.target.closest("[data-track]"); if (!a) return;
+    var host = a.closest("[data-biz]"), type = a.getAttribute("data-track");
+    if (host && (type === "call" || type === "website")) track(host.getAttribute("data-biz"), type);
+  });
+  var prof = document.body.getAttribute("data-profile");
+  if (prof) track(prof, "profile");
 
   // Mobile menu
   var t = document.querySelector(".menu-toggle");

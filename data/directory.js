@@ -1,8 +1,12 @@
 /* BUSINESS DIRECTORY
-   featured: true puts a business at the top with a gold border (a perk for postcard advertisers). */
+   featured: true puts a business at the top with a gold border (a perk for postcard advertisers).
+   slug: the business's web address and stats ID, e.g. business/reliable-roofing/. Set it once and never change it,
+         or its click counts start over. Lowercase letters, numbers and dashes only.
+   image: optional, a picture of their postcard ad, shown on their profile page (put the file in assets/img/ads/).
+   about, hours, address, area: optional extra lines for the profile page. */
 window.CVS = window.CVS || {};
 window.CVS.directory = [
-  { name: "Reliable Roofing by TGY", category: "Home services", city: "Palm Desert", blurb: "Residential, commercial and mobile home roofing: new roofs, re-roofs, repairs and leaks. Serving the valley since 1987. CA Lic #764608.", phone: "(760) 568-1673", url: "https://www.reliableroofingbytgy.com", featured: true },
+  { slug: "reliable-roofing", name: "Reliable Roofing by TGY", category: "Home services", city: "Palm Desert", blurb: "Residential, commercial and mobile home roofing: new roofs, re-roofs, repairs and leaks. Serving the valley since 1987. CA Lic #764608.", phone: "(760) 568-1673", url: "https://www.reliableroofingbytgy.com", featured: true, image: "assets/img/ads/reliable-roofing.jpg", imageAlt: "Reliable Roofing ad from the El Paseo Spotlight card", about: "Family-run roofing contractor in Palm Desert, owned by Todd Gregory Young. Shingles, tile, torch down, flat roofs, urethane foam, waterproofing, sno coats, leak repairs and insurance work for homes, businesses and mobile homes.", area: "Palm Desert and the Coachella Valley" },
   { name: "Sample Plumbing Co.", category: "Home services", city: "Palm Desert", blurb: "Replace with a one-line description of what the business does best.", phone: "", url: "", featured: true, sample: true },
   { name: "Sample Taqueria", category: "Restaurants", city: "Coachella", blurb: "Family-owned spot. One line about why people go.", phone: "", url: "", featured: true, sample: true },
   { name: "Sample Landscaping", category: "Home services", city: "La Quinta", blurb: "Desert landscaping and irrigation.", phone: "", url: "", sample: true },

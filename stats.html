@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listing Stats | Coachella Valley Spotlight</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Listing stats for businesses in the Coachella Valley Spotlight directory.">
+<meta property="og:title" content="Privacy and Terms | Coachella Valley Spotlight">
+<meta property="og:description" content="Privacy policy, terms and disclaimer.">
+<meta property="og:image" content="assets/img/real-cards.jpg">
+<link rel="icon" href="assets/img/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site-header"><div class="stripe"></div><nav class="nav wrap" aria-label="Main">
+<a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><defs><clipPath id="sunc"><circle cx="20" cy="22" r="13"/></clipPath></defs>
+<g clip-path="url(#sunc)"><rect x="0" y="9" width="40" height="5" fill="#f0a33a"/><rect x="0" y="15" width="40" height="4" fill="#d9552b"/><rect x="0" y="20" width="40" height="3" fill="#c9667a"/><rect x="0" y="24" width="40" height="2" fill="#5b4a7a"/></g>
+<path d="M2 36 L13 24 L19 30 L26 21 L38 36 Z" fill="#221c18"/></svg><span>Coachella Valley<small>Spotlight</small></span></a>
+<button class="menu-toggle" aria-expanded="false">Menu</button>
+<ul class="nav-links"><li><a href="news.html">News</a></li><li><a href="events.html">Events</a></li><li><a href="deals.html">Deals</a></li><li><a href="directory.html">Directory</a></li><li><a href="advertise.html">Advertise</a></li></ul>
+<a class="btn btn-nav" href="advertise.html#reserve">Reserve a spot</a>
+</nav></header>
+<main>
+<section class="page-hero"><div class="wrap">
+<span class="eyebrow"><span class="stripe-mini"></span>Listing stats</span>
+<h1 id="st-title">Your listing numbers</h1>
+<p id="st-sub">How many neighbors saw your listing, opened your profile, called you and visited your website from Coachella Valley Spotlight.</p>
+<div id="st-out"><div class="empty">Loading your numbers...</div></div>
+<p class="risk" style="margin-top:24px">Counts come from this site only. Bots and people who block tracking are not counted, so real numbers run a little higher. Times are Pacific.</p>
+</div></section>
+<script>
+(function () {
+  var API = "https://cvs-tracker.toddstpierre.workers.dev";
+  var LABELS = [["impression", "Listing seen", "Times your listing showed up on someone's screen"], ["profile", "Profile views", "Visits to your profile page"], ["call", "Calls tapped", "Taps on your phone number"], ["website", "Website visits", "Clicks through to your website"]];
+  var out = document.getElementById("st-out"), q = new URLSearchParams(location.search);
+  var dir = (window.CVS && window.CVS.directory) || [];
+  function slugOf(b) { return b.slug || String(b.name).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+  function nameOf(s) { var b = dir.filter(function (x) { return !x.sample && slugOf(x) === s; })[0]; return b ? b.name : s; }
+  function monthName(ym) { var p = ym.split("-"); return new Date(+p[0], +p[1] - 1, 1).toLocaleString("en-US", { month: "long", year: "numeric" }); }
+  function tiles(set) { return '<div class="stats" style="margin-bottom:16px">' + LABELS.map(function (l) { return '<div class="stat"><b>' + (set[l[0]] || 0).toLocaleString() + '</b><span>' + l[1] + '</span></div>'; }).join("") + '</div>'; }
+  function fail(msg) { out.innerHTML = '<div class="empty">' + msg + '</div>'; }
+
+  if (q.get("admin")) {
+    document.getElementById("st-title").textContent = "All listings";
+    document.getElementById("st-sub").textContent = "Every real business in the directory. Copy a business's private link to send them their numbers.";
+    var slugs = dir.filter(function (x) { return !x.sample; }).map(slugOf).join(",");
+    fetch(API + "/stats/all?key=" + encodeURIComponent(q.get("admin")) + "&slugs=" + slugs).then(function (r) { return r.json(); }).then(function (d) {
+      if (d.error) return fail("That admin link is not valid.");
+      var base = location.href.split("?")[0];
+      var rows = d.businesses.sort(function (a, b) { return nameOf(a.slug).localeCompare(nameOf(b.slug)); }).map(function (b) {
+        var link = base + "?b=" + b.slug + "&key=" + b.key;
+        return "<tr><td><strong>" + nameOf(b.slug) + "</strong></td>" + LABELS.map(function (l) { return "<td>" + b.thisMonth[l[0]] + " <span style='color:var(--ink-2)'>/ " + b.lastMonth[l[0]] + "</span></td>"; }).join("") +
+          '<td><a href="' + link + '" target="_blank" rel="noopener">Open</a> &middot; <a href="#" data-copy="' + link + '">Copy link</a></td></tr>';
+      }).join("");
+      out.innerHTML = '<p class="meta" style="font-family:var(--mono);font-size:13px">THIS MONTH / LAST MONTH</p><div class="table-scroll"><table class="stats-table"><thead><tr><th>Business</th>' + LABELS.map(function (l) { return "<th>" + l[1] + "</th>"; }).join("") + "<th>Private link</th></tr></thead><tbody>" + (rows || '<tr><td colspan="6">No businesses yet.</td></tr>') + "</tbody></table></div>";
+      out.addEventListener("click", function (e) { var a = e.target.closest("[data-copy]"); if (!a) return; e.preventDefault(); navigator.clipboard.writeText(a.getAttribute("data-copy")); a.textContent = "Copied"; });
+    }).catch(function () { fail("Could not load the numbers. Try again in a minute."); });
+    return;
+  }
+
+  var slug = q.get("b"), key = q.get("key");
+  if (!slug || !key) return fail("This page needs the private link we sent you.");
+  fetch(API + "/stats?b=" + encodeURIComponent(slug) + "&key=" + encodeURIComponent(key)).then(function (r) { return r.json(); }).then(function (d) {
+    if (d.error) return fail("That link is not valid. Ask us for a fresh one.");
+    document.getElementById("st-title").textContent = nameOf(slug);
+    var months = Object.keys(d.months).sort().reverse();
+    out.innerHTML =
+      '<h2 class="month-head"><span class="stripe-mini"></span>' + monthName(d.labels.thisMonth) + ' so far</h2>' + tiles(d.thisMonth) +
+      '<h2 class="month-head"><span class="stripe-mini"></span>' + monthName(d.labels.lastMonth) + '</h2>' + tiles(d.lastMonth) +
+      '<h2 class="month-head"><span class="stripe-mini"></span>Last 30 days</h2>' + tiles(d.last30) +
+      (months.length ? '<h2 class="month-head"><span class="stripe-mini"></span>Month by month</h2><div class="table-scroll"><table class="stats-table"><thead><tr><th>Month</th>' + LABELS.map(function (l) { return "<th>" + l[1] + "</th>"; }).join("") + '</tr></thead><tbody>' +
+        months.map(function (m) { return "<tr><td>" + monthName(m) + "</td>" + LABELS.map(function (l) { return "<td>" + d.months[m][l[0]] + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>" : "") +
+      '<dl class="facts" style="margin-top:24px">' + LABELS.map(function (l) { return "<dt>" + l[1] + "</dt><dd>" + l[2] + "</dd>"; }).join("") + "</dl>";
+  }).catch(function () { fail("Could not load your numbers. Try again in a minute."); });
+})();
+</script>
+</main>
+<footer class="site-footer"><div class="stripe"></div><div class="wrap">
+<div class="footer-grid">
+<div><a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><defs><clipPath id="sunc"><circle cx="20" cy="22" r="13"/></clipPath></defs>
+<g clip-path="url(#sunc)"><rect x="0" y="9" width="40" height="5" fill="#f0a33a"/><rect x="0" y="15" width="40" height="4" fill="#d9552b"/><rect x="0" y="20" width="40" height="3" fill="#c9667a"/><rect x="0" y="24" width="40" height="2" fill="#5b4a7a"/></g>
+<path d="M2 36 L13 24 L19 30 L26 21 L38 36 Z" fill="#221c18"/></svg><span>Coachella Valley<small>Spotlight</small></span></a>
+<p style="margin-top:16px;max-width:320px">Events, deals, local news and the businesses your neighbors use, from Palm Springs to Coachella.</p></div>
+<div><h4>Explore</h4><ul><li><a href="events.html">Events</a></li><li><a href="deals.html">Deals</a></li><li><a href="news.html">Local news</a></li><li><a href="directory.html">Directory</a></li></ul></div>
+<div><h4>Businesses</h4><ul><li><a href="advertise.html">Advertise on the card</a></li><li><a href="advertise.html#routes">Mailing routes</a></li><li><a href="submit.html">Add a free listing</a></li><li><a href="submit.html">Submit an event or deal</a></li></ul></div>
+<div><h4>Contact</h4><ul><li><a href="tel:+17604225475">(760) 422-5475</a></li><li><a href="submit.html">Send a news tip</a></li><li><a href="legal.html">Privacy and terms</a></li></ul></div>
+</div>
+<div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight. Made in the desert.</span><span><a href="legal.html#privacy">Privacy</a> &middot; <a href="legal.html#terms">Terms</a> &middot; <a href="legal.html#disclaimer">Disclaimer</a></span></div>
+</div></footer>
+<script src="data/directory.js"></script><script src="assets/app.js"></script>
+</body>
+</html>
