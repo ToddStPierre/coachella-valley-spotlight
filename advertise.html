@@ -118,7 +118,38 @@
 <section id="reserve"><div class="wrap"><div class="final">
 <span class="eyebrow" style="color:var(--gold)">Hold your spot</span>
 <h2>Be the One Business Your Neighbors See for <span class="grad">Your Category.</span></h2>
-<p style="max-width:640px">Fill this out and we will call you to confirm your route, your category and the mailing date. No payment until your ad is approved and invoiced.</p>
+<p style="max-width:640px">Pick your route, tap an open spot, and it&rsquo;s held for you. No payment until your ad is approved and invoiced.</p>
+<div class="picker" id="picker">
+<div class="picker-head">Select the postcard campaign below</div>
+<div class="picker-tabs" role="tablist">
+<button class="picker-tab active" data-route="el-paseo" type="button" role="tab" aria-selected="true">El Paseo</button>
+<button class="picker-tab" data-route="sun-city-palm-desert" type="button" role="tab" aria-selected="false">Sun City Palm Desert</button>
+</div>
+<div class="picker-date">Next mailing date: 10/30/26</div>
+<div class="picker-count" id="picker-count">Loading availability&hellip;</div>
+<p class="picker-status" id="picker-status">Loading spots&hellip;</p>
+<div class="picker-legend"><span class="lg open"><i></i>Open, tap to hold it</span><span class="lg pending"><i></i>Pending</span><span class="lg sold"><i></i>Sold</span></div>
+<p class="picker-dims">Each ad spot is 2.7&Prime; x 2.5&Prime;</p>
+<div class="picker-side"><span class="picker-side-label">Front of card</span><div class="picker-grid" id="picker-front"></div></div>
+<div class="picker-side"><span class="picker-side-label">Back of card</span><div class="picker-grid" id="picker-back"></div></div>
+<div class="picker-form" id="picker-form-shell" hidden>
+<h3 id="picker-form-title">Hold a spot</h3>
+<p class="picker-form-sub">This holds the spot and lets us know you want it. We&rsquo;ll email you to arrange payment and lock it in.</p>
+<form class="form" id="picker-form">
+<label class="full">Business category<select id="pf-category" name="category" required><option value="" disabled selected>Select your category&hellip;</option></select></label>
+<label>Your name<input name="name" required autocomplete="name"></label>
+<label>Business name<input name="business" required autocomplete="organization"></label>
+<label>Email<input name="email" type="email" required autocomplete="email"></label>
+<label>Phone (optional)<input name="phone" type="tel" autocomplete="tel"></label>
+<label class="full">Notes or special requests (optional)<textarea name="notes" rows="3"></textarea></label>
+<div class="full cta-row" style="margin-top:0"><button class="btn" type="submit">Hold this spot</button><button class="btn btn-ghost" type="button" id="picker-cancel">Cancel</button></div>
+<p class="form-status" id="picker-msg" role="status"></p>
+</form>
+</div>
+<noscript><p class="picker-status">Turn on JavaScript to see open spots, or call (760) 422-5475.</p></noscript>
+</div>
+<h3 style="color:#fff;margin-top:40px">Not sure yet, or want a different area?</h3>
+<p style="max-width:640px">Send a note and we will call you to talk it through.</p>
 <form class="form" action="https://formspree.io/f/myezyype" method="POST" data-ajax data-thanks="Got it. We will call you within 1 business day to confirm your spot.">
 <input type="hidden" name="_subject" value="Coachella Valley Spotlight: postcard spot request">
 <input type="hidden" name="source" value="Coachella Valley Spotlight / advertise">
@@ -149,5 +180,6 @@
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight. Made in the desert.</span><span><a href="legal.html#privacy">Privacy</a> &middot; <a href="legal.html#terms">Terms</a> &middot; <a href="legal.html#disclaimer">Disclaimer</a></span></div>
 </div></footer>
 <script src="data/events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/directory.js"></script><script src="assets/app.js"></script>
+<script src="assets/picker.js"></script>
 </body>
 </html>
