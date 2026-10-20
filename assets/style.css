@@ -267,3 +267,6 @@ p { margin: 0 0 var(--s2); }
 @keyframes advertisers-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @media (max-width: 640px) { .advertiser-card img { height: 128px; } }
 @media (prefers-reduced-motion: reduce) { .advertisers-track { animation: none; overflow-x: auto; scroll-snap-type: x proximity; padding-bottom: 10px; } .advertiser-card { scroll-snap-align: start; } }
+
+/* News is hidden until there are real stories. Delete this rule to bring it back everywhere. */
+.news-link { display: none !important; }
