@@ -1,4 +1,4 @@
-# Coachella Valley Local Spotlight
+# Coachella Valley Spotlight
 
 A local hub for the Coachella Valley: events, deals, local news, a business directory, and the shared postcard ad offer.
 
