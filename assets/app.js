@@ -15,7 +15,7 @@
   function liveOffer(o) { if (!o || !o.title) return null; var d = parse(o.expires); return !d || d >= today ? o : null; }
   function link(url, label) { return url ? '<a class="card-link" href="' + esc(url) + '" target="_blank" rel="noopener">' + label + ' &rarr;</a>' : ""; }
 
-  var events = (D.events || []).filter(function (e) { var d = parse(e.date); return d && d >= today; })
+  var events = (D.events || []).filter(function (e) { var d = parse(e.endDate || e.date); return d && d >= today; })
     .sort(function (a, b) { return parse(a.date) - parse(b.date); });
   var deals = (D.deals || []).filter(function (x) { var d = parse(x.expires); return !d || d >= today; });
   var news = (D.news || []).slice().sort(function (a, b) { return parse(b.date) - parse(a.date); });
@@ -25,9 +25,10 @@
     event: function (e) {
       var d = parse(e.date);
       return '<article class="card event">' + sample(e) +
-        '<div class="date-tile"><span>' + MONTHS[d.getMonth()] + '</span><b>' + d.getDate() + '</b><span>' + ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()] + '</span></div>' +
+        '<div class="date-tile"><span>' + MONTHS[d.getMonth()] + '</span><b>' + d.getDate() + '</b><span>' + (e.endDate ? 'to ' + parse(e.endDate).getDate() : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()]) + '</span></div>' +
         '<div style="display:grid;gap:6px"><span class="meta">' + esc(e.city) + (e.time ? ' &middot; ' + esc(e.time) : '') + '</span>' +
         '<h3>' + esc(e.title) + '</h3><p>' + esc(e.venue) + (e.price ? ' &middot; ' + esc(e.price) : '') + '</p>' +
+        (e.description ? '<p>' + esc(e.description) + '</p>' : '') +
         (e.category ? '<span class="tag">' + esc(e.category) + '</span>' : '') + link(e.url, "Event details") + '</div></article>';
     },
     deal: function (x) {
