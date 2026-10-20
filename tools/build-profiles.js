@@ -34,7 +34,7 @@ for (const b of list) {
 <meta property="og:title" content="${esc(b.name)}">
 <meta property="og:description" content="${esc(desc)}">
 <base href="../../">
-${headRest}<script type="application/ld+json">${JSON.stringify(schema)}</script>
+${headRest}<script type="application/ld+json">${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>
 </head>
 <body data-profile="${slug}">
 ${header}
@@ -54,6 +54,7 @@ ${tel ? `<a class="btn" href="tel:${tel}" data-track="call">Call ${esc(b.phone)}
 ${b.url ? `<a class="btn btn-ghost" href="${esc(outbound(b.url))}" target="_blank" rel="noopener" data-track="website">Visit website &rarr;</a>` : ""}
 </div>
 <p class="risk">Tell them you found them on Coachella Valley Spotlight.</p>
+${b.claimed ? '<p class="claim-line"><span class="claimed-badge">&#10003; Claimed by the owner</span></p>' : `<p class="claim-line"><a href="claim.html?b=${slug}">Is this your business? Claim this listing &rarr;</a></p>`}
 </div>
 ${prem && b.image ? `<figure class="profile-ad"><img src="${esc(b.image)}" alt="${esc(b.imageAlt || b.name + " ad")}"><figcaption>As seen on the Spotlight postcard</figcaption></figure>` : ""}
 </div>

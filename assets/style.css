@@ -317,3 +317,18 @@ button.spot:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgb
 .live-pill-foot b { color: #6fd38a; }
 .site-header .live-pill { display: none; }
 @media (min-width: 1180px) { .site-header .live-pill:not([hidden]) { display: inline-flex; } .live-pill-foot { display: none !important; } }
+/* Claims + owner dashboard */
+.claim-line { margin-top: 18px; font-size: 15.5px; }
+.claim-line a { font-weight: 600; }
+.claimed-badge { display: inline-block; font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--palm); background: var(--palm-soft); padding: 5px 12px; border-radius: 999px; }
+.ow-help { font-weight: 400; color: var(--ink-2); font-size: 13px; }
+.ow-offer { border: 1.5px dashed var(--sun); border-radius: 14px; padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 0; }
+.ow-offer legend { font-weight: 600; padding: 0 6px; }
+.ow-photos { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+.ow-photos figure { margin: 0; display: grid; gap: 8px; }
+.ow-photos img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); background: var(--sand); }
+.ow-photos .ow-pending img { visibility: hidden; }
+.ow-photos .ow-pending::before { content: "Processing, refresh in a minute"; font-size: 13px; color: var(--ink-2); }
+.ow-photos .btn { padding: 8px 14px; font-size: 14px; }
+.stats-table .btn { padding: 8px 14px; font-size: 14px; }
+@media (max-width: 640px) { .ow-offer { grid-template-columns: 1fr; } }
