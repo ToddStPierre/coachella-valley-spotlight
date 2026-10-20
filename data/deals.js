@@ -1,10 +1,9 @@
 /* DEALS
    offer: the short headline of the deal. details: the fine print.
-   expires: YYYY-MM-DD or "". Expired deals hide themselves automatically. */
+   expires: YYYY-MM-DD or "". Expired deals hide themselves automatically.
+   url: where "Get this deal" goes. Use the business's profile page (business/<slug>/) or an outside link. */
 window.CVS = window.CVS || {};
 window.CVS.deals = [
-  { offer: "Sample: 15% off your first service", business: "Sample Pool Service", city: "Palm Desert", category: "Home services", details: "New customers only. Mention this site when you call.", expires: "2026-12-31", url: "", sample: true },
-  { offer: "Sample: Happy hour 3 to 6 PM daily", business: "Sample Bistro", city: "Palm Springs", category: "Restaurants", details: "Half-price appetizers at the bar.", expires: "", url: "", sample: true },
-  { offer: "Sample: Free AC tune-up check", business: "Sample Heating and Air", city: "Indio", category: "Home services", details: "With any repair over $150.", expires: "2026-11-30", url: "", sample: true },
-  { offer: "Sample: $20 off a first visit", business: "Sample Day Spa", city: "La Quinta", category: "Health and beauty", details: "Weekdays only.", expires: "", url: "", sample: true }
+  { offer: "First pest treatment for $82", business: "Antex Exterminating", city: "Palm Desert", category: "Home services", details: "Initial treatment for $82, regularly $120. Mention Coachella Valley Spotlight when you call (760) 503-5664.", expires: "", url: "business/antex-exterminating/" },
+  { offer: "Free dessert for the table", business: "Ristorante Mamma Gina", city: "Palm Desert", category: "Restaurants", details: "With the purchase of 2 entrees. Show the ad. One per table, dine-in only, not valid with other offers.", expires: "2026-10-31", url: "business/ristorante-mamma-gina/" }
 ];
