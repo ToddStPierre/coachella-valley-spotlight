@@ -302,3 +302,18 @@ button.spot:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgb
 .final .picker .form label { color: var(--ink); }
 .final .picker .form input, .final .picker .form select, .final .picker .form textarea { border-color: var(--line); }
 @media (max-width: 640px) { .picker { padding: var(--s3) 14px; } .picker-grid { grid-template-columns: repeat(2, 1fr); } }
+/* Visitor pill */
+.live-pill { display: inline-flex; align-items: center; gap: 6px; margin-left: 18px; padding: 7px 14px; border: 1.5px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink-2); font-size: 14px; text-decoration: none; white-space: nowrap; }
+.live-pill[hidden] { display: none; }
+.live-pill b { color: #1f8a3b; font-weight: 700; }
+.live-pill .sep { color: #b9ab99; }
+.live-pill .live-cta { color: var(--ink); font-weight: 600; }
+.live-pill:hover { border-color: var(--palm); }
+.live-dot { width: 9px; height: 9px; border-radius: 50%; background: #22a447; box-shadow: 0 0 0 4px rgba(34, 164, 71, .18); animation: live-pulse 2.4s ease-in-out infinite; }
+@keyframes live-pulse { 50% { box-shadow: 0 0 0 7px rgba(34, 164, 71, .06); } }
+@media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
+.live-pill-foot { margin-left: 0; white-space: normal; flex-wrap: wrap; row-gap: 2px; max-width: 100%; background: transparent; border-color: #3a302a; color: #d9cdbd; }
+.live-pill-foot .live-cta { color: #fff; }
+.live-pill-foot b { color: #6fd38a; }
+.site-header .live-pill { display: none; }
+@media (min-width: 1180px) { .site-header .live-pill:not([hidden]) { display: inline-flex; } .live-pill-foot { display: none !important; } }

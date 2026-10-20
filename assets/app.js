@@ -152,6 +152,23 @@
     var host = a.closest("[data-biz]"), type = a.getAttribute("data-track");
     if (host && (type === "call" || type === "website")) track(host.getAttribute("data-biz"), type);
   });
+  // Site visitors: count each browser once per day, then show today's and this month's totals.
+  var VAPI = "https://cvs-tracker.toddstpierre.workers.dev";
+  var pDay = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Los_Angeles" }).format(new Date());
+  var lastDay = null;
+  try { lastDay = localStorage.getItem("cvs_visit_day"); } catch (e) {}
+  if (lastDay !== pDay) { track("cvs-site", "visit"); try { localStorage.setItem("cvs_visit_day", pDay); } catch (e) {} }
+  var pills = document.querySelectorAll("[data-visitors]");
+  if (pills.length) setTimeout(function () {
+    fetch(VAPI + "/visitors").then(function (r) { return r.json(); }).then(function (v) {
+      pills.forEach(function (p) {
+        p.querySelector('[data-v="today"]').textContent = (v.today || 0).toLocaleString();
+        p.querySelector('[data-v="month"]').textContent = (v.month || 0).toLocaleString();
+        p.hidden = false;
+      });
+    }).catch(function () {});
+  }, 600);
+
   var prof = document.body.getAttribute("data-profile");
   if (prof) track(prof, "profile");
 
