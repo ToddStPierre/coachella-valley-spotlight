@@ -9,10 +9,12 @@
   function fail(m) { out.innerHTML = '<div class="empty">' + m + '</div>'; }
   if (!slug || !key) return fail("This page needs the private dashboard link we sent you.");
 
+  // Formspree drops emails sent from the tracker's servers, so the browser sends the tracker's email notice.
+  function mailTodd(n) { if (!n) return; var fd = new FormData(); Object.keys(n).forEach(function (k) { if (n[k] != null) fd.append(k, String(n[k])); }); fetch("https://formspree.io/f/myezyype", { method: "POST", headers: { Accept: "application/json" }, body: fd }).catch(function () {}); }
   function post(path, body) {
     body.b = slug; body.key = key;
     return fetch(API + path, { method: "POST", body: JSON.stringify(body) })
-      .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || "Something went wrong."); return d; }); });
+      .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || "Something went wrong."); mailTodd(d.notice); return d; }); });
   }
 
   function tiles(set) {

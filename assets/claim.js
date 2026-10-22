@@ -1,6 +1,8 @@
 /* Claim a listing: sends the request to the tracker, Todd approves it. */
 (function () {
   var API = "https://cvs-tracker.toddstpierre.workers.dev";
+  // Formspree drops emails sent from the tracker's servers, so the browser sends the tracker's email notice.
+  function mailTodd(n) { if (!n) return; var fd = new FormData(); Object.keys(n).forEach(function (k) { if (n[k] != null) fd.append(k, String(n[k])); }); fetch("https://formspree.io/f/myezyype", { method: "POST", headers: { Accept: "application/json" }, body: fd }).catch(function () {}); }
   var slug = new URLSearchParams(location.search).get("b") || "";
   var biz = ((window.CVS && window.CVS.directory) || []).filter(function (b) { return b.slug === slug; })[0];
   var form = document.getElementById("claim-form"), msg = document.getElementById("cl-msg");
@@ -15,6 +17,7 @@
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (r) {
         if (!r.ok) { msg.textContent = r.d.error || "That didn’t go through. Please try again."; btn.disabled = false; return; }
+        mailTodd(r.d.notice);
         form.innerHTML = '<p class="full" style="font-size:18px"><strong>Got it, thank you!</strong> We&rsquo;ll give the business a quick call to confirm, then email you your private dashboard link.</p>';
       })
       .catch(function () { msg.textContent = "That didn’t go through. Please call or text (760) 422-5475."; btn.disabled = false; });

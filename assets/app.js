@@ -203,7 +203,7 @@
       btn.disabled = true; status.textContent = "Sending...";
       fetch(VAPI + "/submission", { method: "POST", body: JSON.stringify(body) })
         .then(function (r) {
-          if (r.ok) return;
+          if (r.ok) return r.json().then(function (d) { mailTodd(d.notice); }, function () {});
           if (r.status === 400 || r.status === 429) return r.json().then(function (d) { throw new Error(d.error || ""); });
           return direct();
         }, direct)
@@ -212,6 +212,9 @@
         .finally(function () { btn.disabled = false; });
     });
   });
+
+  // Formspree drops emails sent from the tracker's servers, so the browser sends the tracker's email notice.
+  function mailTodd(n) { if (!n) return; var fd = new FormData(); Object.keys(n).forEach(function (k) { if (n[k] != null) fd.append(k, String(n[k])); }); fetch("https://formspree.io/f/myezyype", { method: "POST", headers: { Accept: "application/json" }, body: fd }).catch(function () {}); }
 
   // Email signups (footer) and the La Quinta / Indio route waitlist: saved by the tracker
   var SIGNUP_THANKS = { news: "You're on the list. Thanks, neighbor!", waitlist: "You're on the waitlist. We'll reach out before the first La Quinta or Indio card goes out." };
@@ -225,7 +228,7 @@
       Array.prototype.forEach.call(f.elements, function (el) { if (el.name) body[el.name] = el.value; });
       btn.disabled = true; status.textContent = "Sending...";
       fetch(VAPI + "/signup", { method: "POST", body: JSON.stringify(body) })
-        .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || ""); }); })
+        .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || ""); mailTodd(d.notice); }); })
         .then(function () { f.reset(); status.textContent = SIGNUP_THANKS[kind]; })
         .catch(function (err) { status.textContent = err.message || "That did not go through. Please call or text (760) 422-5475."; })
         .finally(function () { btn.disabled = false; });
