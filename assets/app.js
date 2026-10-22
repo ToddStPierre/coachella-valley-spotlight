@@ -199,4 +199,23 @@
         .finally(function () { btn.disabled = false; });
     });
   });
+
+  // Email signups (footer) and the La Quinta / Indio route waitlist: saved by the tracker
+  var SIGNUP_THANKS = { news: "You're on the list. Thanks, neighbor!", waitlist: "You're on the waitlist. We'll reach out before the first La Quinta or Indio card goes out." };
+  document.querySelectorAll("form[data-signup]").forEach(function (f) {
+    f.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var kind = f.getAttribute("data-signup"), status = f.querySelector(".form-status"), btn = f.querySelector("button[type=submit]");
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email.value.trim())) { status.textContent = "Please add a valid email."; f.email.focus(); return; }
+      if (f.business && !f.business.value.trim()) { status.textContent = "Please add your business name."; f.business.focus(); return; }
+      var body = { kind: kind, page: location.pathname };
+      Array.prototype.forEach.call(f.elements, function (el) { if (el.name) body[el.name] = el.value; });
+      btn.disabled = true; status.textContent = "Sending...";
+      fetch(VAPI + "/signup", { method: "POST", body: JSON.stringify(body) })
+        .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || ""); }); })
+        .then(function () { f.reset(); status.textContent = SIGNUP_THANKS[kind]; })
+        .catch(function (err) { status.textContent = err.message || "That did not go through. Please call or text (760) 422-5475."; })
+        .finally(function () { btn.disabled = false; });
+    });
+  });
 })();
