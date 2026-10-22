@@ -1,0 +1,82 @@
+/* Shared helpers for the build scripts (build-profiles.js and build-seo.js). */
+const fs = require("fs"), path = require("path"), vm = require("vm");
+const root = path.join(__dirname, "..");
+const SITE = "https://coachellavalleyspotlight.com";
+
+function loadData() {
+  const ctx = { window: {} };
+  for (const f of ["directory", "events", "deals", "news", "places"]) {
+    const p = path.join(root, "data", f + ".js");
+    if (fs.existsSync(p)) vm.runInNewContext(fs.readFileSync(p, "utf8"), ctx);
+  }
+  return ctx.window.CVS;
+}
+
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const slugify = s => String(s).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const slugOf = b => b.slug || slugify(b.name);
+const ldjson = o => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`;
+
+/* City and category landing pages under /local/.
+   Rules, so Google never sees near-empty pages:
+   - a page is built only when it has 2 or more listings;
+   - it is marked index (and goes in the sitemap) only at 3 or more;
+   - city + category pages are only built when that category exists in more than one city
+     (otherwise the page would be a copy of the category page). */
+const BUILD_MIN = 2, INDEX_MIN = 3;
+function landingPages(list) {
+  const pages = [], by = (k) => list.reduce((m, b) => ((m[b[k]] = m[b[k]] || []).push(b), m), {});
+  const cities = by("city"), cats = by("category");
+  for (const [city, items] of Object.entries(cities)) {
+    if (items.length >= BUILD_MIN) pages.push({ kind: "city", city, items, path: `local/${slugify(city)}/` });
+  }
+  for (const [cat, items] of Object.entries(cats)) {
+    if (items.length < BUILD_MIN) continue;
+    pages.push({ kind: "category", category: cat, items, path: `local/${slugify(cat)}/` });
+    const inCities = items.reduce((m, b) => ((m[b.city] = m[b.city] || []).push(b), m), {});
+    if (Object.keys(inCities).length > 1) {
+      for (const [city, sub] of Object.entries(inCities)) {
+        if (sub.length >= BUILD_MIN) pages.push({ kind: "combo", city, category: cat, items: sub, path: `local/${slugify(city)}/${slugify(cat)}/` });
+      }
+    }
+  }
+  pages.forEach(p => { p.index = p.items.length >= INDEX_MIN; });
+  return pages;
+}
+
+/* Pieces of index.html reused as the page shell for generated pages. */
+function shell() {
+  const tpl = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  return {
+    head: tpl.slice(0, tpl.indexOf("<title>")),
+    headRest: tpl.slice(tpl.indexOf('<link rel="icon"'), tpl.indexOf("</head>")).replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\n?/g, ""),
+    header: tpl.slice(tpl.indexOf('<header class="site-header">'), tpl.indexOf("</header>") + 9),
+    footer: tpl.slice(tpl.indexOf('<footer class="site-footer">'), tpl.indexOf("</footer>") + 9)
+  };
+}
+
+/* Social and canonical tags for a generated page. url is the path from the site root, e.g. "business/x/". */
+function metaTags({ title, description, url, image, noindex }) {
+  const abs = SITE + "/" + url;
+  const img = /^https?:/.test(image || "") ? image : SITE + "/" + (image || "assets/img/real-cards.jpg");
+  return `<title>${esc(title)}</title>
+<meta name="description" content="${esc(description)}">
+<link rel="canonical" href="${esc(abs)}">
+${noindex ? '<meta name="robots" content="noindex, follow">\n' : ""}<meta property="og:type" content="website">
+<meta property="og:site_name" content="Coachella Valley Spotlight">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(description)}">
+<meta property="og:url" content="${esc(abs)}">
+<meta property="og:image" content="${esc(img)}">
+<meta name="twitter:card" content="summary_large_image">
+`;
+}
+
+function breadcrumbs(trail) {
+  return {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    itemListElement: trail.map((t, i) => ({ "@type": "ListItem", position: i + 1, name: t[0], item: SITE + "/" + t[1] }))
+  };
+}
+
+module.exports = { root, SITE, loadData, esc, slugify, slugOf, ldjson, landingPages, shell, metaTags, breadcrumbs };

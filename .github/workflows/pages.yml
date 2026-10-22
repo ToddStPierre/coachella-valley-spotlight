@@ -3,6 +3,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: "17 9 * * *"   # daily, about 2 AM Pacific: drops past events from the HTML, event pages and sitemap
 permissions:
   contents: read
   pages: write
@@ -22,6 +24,7 @@ jobs:
         with:
           node-version: 20
       - run: node tools/build-profiles.js
+      - run: node tools/build-seo.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

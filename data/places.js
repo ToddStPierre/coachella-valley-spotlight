@@ -1,0 +1,25 @@
+/* CITY AND CATEGORY INTROS
+   Used by tools/build-seo.js for the city and category pages under /local/
+   (for example /local/palm-desert/ and /local/palm-desert/home-services/).
+   A page is only made once it has at least 2 listings. Google is only asked to index it at 3 or more.
+   Plain text only. Keep each intro true and specific to the place. */
+window.CVS = window.CVS || {};
+window.CVS.places = {
+  cities: {
+    "Palm Springs": "Palm Springs sits at the west end of the Coachella Valley, under Mount San Jacinto. It is known for mid-century modern homes, the shops and restaurants along Palm Canyon Drive, and the Aerial Tramway up the mountain. Locals and seasonal residents keep a steady stream of work going for contractors, salons, restaurants and service pros all year.",
+    "Cathedral City": "Cathedral City sits between Palm Springs and Rancho Mirage, along Highway 111 and Date Palm Drive. It is one of the valley's more affordable places to live, with a lot of full-time residents and family-run businesses. Many of the trades and service companies that work across the west valley are based here.",
+    "Rancho Mirage": "Rancho Mirage is home to resorts, country clubs, Sunnylands and Eisenhower Health. It has a lot of seasonal homes and gated communities, and people here lean on trusted local pros for pools, landscaping, home care and dining.",
+    "Palm Desert": "Palm Desert is the middle of the Coachella Valley and its main shopping and dining hub. It has El Paseo, the McCallum Theatre, The Living Desert and College of the Desert, plus neighborhoods like Sun City Palm Desert. Its residents call local businesses for everything from roofing and air conditioning to dinner on El Paseo.",
+    "Indian Wells": "Indian Wells is a small, mostly residential city known for golf resorts and the Indian Wells Tennis Garden. Many homes here are in country club communities, and owners want reliable, well-reviewed local service pros.",
+    "La Quinta": "La Quinta runs from Highway 111 south into the Santa Rosa Mountains. It is known for PGA West, Old Town La Quinta and a lot of newer neighborhoods, and many full-time families and seasonal residents look for local trades, health and dining here.",
+    "Indio": "Indio is the largest city in the Coachella Valley. It hosts the Coachella and Stagecoach festivals at the Empire Polo Club and the Riverside County Fair and National Date Festival. It has a big, growing population of full-time residents and a lot of local, family-owned businesses.",
+    "Coachella": "The city of Coachella is in the east valley. It is surrounded by farms and date groves and has a fast-growing, mostly full-time population. Local restaurants, markets and service companies here serve families across the east valley.",
+    "Desert Hot Springs": "Desert Hot Springs is on the north side of Interstate 10. It is known for natural hot mineral water and the spa hotels built on it. It is a growing city of full-time residents, and many trades that work valley-wide are based here.",
+    "Thousand Palms": "Thousand Palms is an unincorporated community north of Interstate 10. It is home to Acrisure Arena and the Coachella Valley Preserve."
+  },
+  categories: {
+    "Home services": "Home services covers the trades that keep a desert home running: plumbing, air conditioning, roofing, pest control, flooring, solar panel cleaning and more. Summer heat, hard water and dust are tough on houses here, so it pays to have a local pro's number before you need it.",
+    "Health and beauty": "Health and beauty covers local clinics, acupuncture, weight loss, salons, spas and wellness practices. These are independent, locally run practices, not national chains.",
+    "Restaurants": "Restaurants covers locally owned places to eat, from long-running family dining rooms to newer spots. Many offer deals listed here when you mention Coachella Valley Spotlight."
+  }
+};

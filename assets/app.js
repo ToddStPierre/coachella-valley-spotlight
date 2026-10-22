@@ -10,6 +10,7 @@
   function fmt(d) { return MONTHS[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear(); }
   function sample(x) { return x.sample ? '<span class="sample">SAMPLE</span>' : ""; }
   var ROOT = document.documentElement.getAttribute("data-root") || "";
+  function eventSlug(e) { return (String(e.title).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").replace(/^(.{80}[^-]*).*$/, "$1")) + "-" + e.date; }
   function slugOf(b) { return b.slug || String(b.name).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
   function outbound(u) { try { var x = new URL(u); x.searchParams.set("utm_source", "coachellavalleyspotlight"); x.searchParams.set("utm_medium", "directory"); return x.toString(); } catch (e) { return u; } }
   function liveOffer(o) { if (!o || !o.title) return null; var d = parse(o.expires); return !d || d >= today ? o : null; }
@@ -31,9 +32,9 @@
       return '<article class="card event">' + sample(e) +
         '<div class="date-tile"><span>' + MONTHS[d.getMonth()] + '</span><b>' + d.getDate() + '</b><span>' + (e.endDate ? 'to ' + parse(e.endDate).getDate() : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()]) + '</span></div>' +
         '<div style="display:grid;gap:6px"><span class="meta">' + esc(e.city) + (e.time ? ' &middot; ' + esc(e.time) : '') + '</span>' +
-        '<h3>' + esc(e.title) + '</h3><p>' + esc(e.venue) + (e.price ? ' &middot; ' + esc(e.price) : '') + '</p>' +
+        '<h3><a href="' + ROOT + 'event/' + eventSlug(e) + '/" style="color:inherit;text-decoration:none">' + esc(e.title) + '</a></h3><p>' + esc(e.venue) + (e.price ? ' &middot; ' + esc(e.price) : '') + '</p>' +
         (e.description ? '<p>' + esc(e.description) + '</p>' : '') +
-        (e.category ? '<span class="tag">' + esc(e.category) + '</span>' : '') + link(e.url, "Event details") + '</div></article>';
+        (e.category ? '<span class="tag">' + esc(e.category) + '</span>' : '') + '<a class="card-link" href="' + ROOT + 'event/' + eventSlug(e) + '/">Event details &rarr;</a>' + '</div></article>';
     },
     deal: function (x) {
       var d = parse(x.expires);
@@ -59,6 +60,7 @@
     }
   };
 
+  /* PRERENDER-END: tools/build-seo.js runs everything above this line at build time to put the same cards in the HTML. */
   var SETS = { events: events, deals: deals, news: news, directory: directory };
   var TYPE = { events: "event", deals: "deal", news: "news", directory: "directory" };
 

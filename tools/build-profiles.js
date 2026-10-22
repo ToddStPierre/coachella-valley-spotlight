@@ -1,20 +1,11 @@
 /* Builds a profile page for every real (non-sample) business in data/directory.js
    at business/<slug>/index.html, using index.html's header and footer.
    Runs automatically on GitHub when you push. Run it locally with: node tools/build-profiles.js */
-const fs = require("fs"), path = require("path"), vm = require("vm");
-const root = path.join(__dirname, "..");
-const ctx = { window: {} };
-vm.runInNewContext(fs.readFileSync(path.join(root, "data/directory.js"), "utf8"), ctx);
-const list = (ctx.window.CVS.directory || []).filter(b => !b.sample);
-
-const tpl = fs.readFileSync(path.join(root, "index.html"), "utf8");
-const head = tpl.slice(0, tpl.indexOf("<title>"));
-const headRest = tpl.slice(tpl.indexOf('<link rel="icon"'), tpl.indexOf("</head>"));
-const header = tpl.slice(tpl.indexOf('<header class="site-header">'), tpl.indexOf("</header>") + 9);
-const footer = tpl.slice(tpl.indexOf('<footer class="site-footer">'), tpl.indexOf("</footer>") + 9);
-
-const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const slugOf = b => b.slug || String(b.name).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const fs = require("fs"), path = require("path");
+const { root, SITE, loadData, esc, slugOf, ldjson, landingPages, shell, metaTags, breadcrumbs } = require("./lib");
+const list = (loadData().directory || []).filter(b => !b.sample);
+const { head, headRest, header, footer } = shell();
+const landing = landingPages(list);
 const nice = d => { const [y, m, dd] = d.split("-").map(Number); return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m - 1] + " " + dd + ", " + y; };
 const outbound = u => { try { const x = new URL(u); x.searchParams.set("utm_source", "coachellavalleyspotlight"); x.searchParams.set("utm_medium", "profile"); return x.toString(); } catch { return u; } };
 
@@ -23,24 +14,24 @@ for (const b of list) {
   const slug = slugOf(b);
   const tel = b.phone ? b.phone.replace(/[^\d+]/g, "") : "";
   const desc = `${b.name}: ${b.category} in ${b.city}. ${b.blurb || ""}`.slice(0, 300);
-  const schema = { "@context": "https://schema.org", "@type": "LocalBusiness", name: b.name, description: b.about || b.blurb, telephone: b.phone || undefined, url: b.url || undefined, address: { "@type": "PostalAddress", streetAddress: b.address || undefined, addressLocality: b.city, addressRegion: "CA", addressCountry: "US" }, areaServed: b.area || "Coachella Valley" };
+  const url = `business/${slug}/`;
+  const cityPage = landing.find(p => p.kind === "city" && p.city === b.city);
+  const catPage = landing.find(p => p.kind === "combo" && p.city === b.city && p.category === b.category) || landing.find(p => p.kind === "category" && p.category === b.category);
+  const trail = [["Home", ""], ["Directory", "directory"]].concat(cityPage ? [[b.city, cityPage.path]] : []).concat([[b.name, url]]);
+  const schema = { "@context": "https://schema.org", "@type": "LocalBusiness", "@id": SITE + "/" + url + "#business", name: b.name, image: b.image ? SITE + "/" + b.image : undefined, description: b.about || b.blurb, telephone: b.phone || undefined, url: b.url || undefined, address: { "@type": "PostalAddress", streetAddress: b.address || undefined, addressLocality: b.city, addressRegion: "CA", addressCountry: "US" }, areaServed: b.area || "Coachella Valley" };
   const prem = !!(b.premium || b.featured);
   const today = new Date().toISOString().slice(0, 10);
   const offer = prem && b.offer && b.offer.title && (!b.offer.expires || b.offer.expires >= today) ? b.offer : null;
   const rows = [["Area served", b.area], ["Address", b.address], ["Hours", prem && b.hours]].filter(r => r[1]);
   const gallery = prem ? (b.gallery || []) : [];
-  const html = `${head}<title>${esc(b.name)} | ${esc(b.category)} in ${esc(b.city)} | Coachella Valley Spotlight</title>
-<meta name="description" content="${esc(desc)}">
-<meta property="og:title" content="${esc(b.name)}">
-<meta property="og:description" content="${esc(desc)}">
-<base href="../../">
-${headRest}<script type="application/ld+json">${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>
+  const html = `${head}${metaTags({ title: `${b.name} | ${b.category} in ${b.city}, CA`, description: desc, url, image: prem && b.image })}<base href="../../">
+${headRest}${ldjson(schema)}${ldjson(breadcrumbs(trail))}
 </head>
 <body data-profile="${slug}">
 ${header}
 <main>
 <section class="page-hero"><div class="wrap">
-<a class="more" href="directory.html">&larr; Back to the directory</a>
+<nav class="crumbs" aria-label="Breadcrumb"><a href="directory">Directory</a>${cityPage ? ` &rsaquo; <a href="${cityPage.path}">${esc(b.city)}</a>` : ""}${catPage ? ` &rsaquo; <a href="${catPage.path}">${esc(b.category)}</a>` : ""}</nav>
 <div class="profile" data-biz="${slug}" data-noimp>
 <div>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>${esc(b.category)} &middot; ${esc(b.city)}</span>
@@ -60,7 +51,7 @@ ${prem && b.image ? `<figure class="profile-ad"><img src="${esc(b.image)}" alt="
 </div>
 ${gallery.length ? `<h2 class="month-head" style="margin-top:48px"><span class="stripe-mini"></span>Photos</h2><div class="gallery">${gallery.map((g, i) => `<img src="${esc(g)}" alt="${esc(b.name)} photo ${i + 1}" loading="lazy">`).join("")}</div>` : ""}
 </div></section>
-<div class="wrap"><div class="biz-band"><p><strong>Own a local business?</strong><br>List it free, or go Premium for photos, hours, offers and monthly stats.</p><a class="btn" href="advertise.html#plans">See listing plans</a></div></div>
+<div class="wrap"><div class="biz-band"><p><strong>Own a local business?</strong><br>List it free, or go Premium for photos, hours, offers and monthly stats.</p><a class="btn" href="advertise#plans">See listing plans</a></div></div>
 </main>
 ${footer}
 <script src="assets/app.js"></script>
