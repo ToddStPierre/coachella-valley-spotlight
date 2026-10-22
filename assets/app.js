@@ -72,7 +72,9 @@
   // Small blocks: <div data-list="events" data-limit="4"></div>
   document.querySelectorAll("[data-list]").forEach(function (el) {
     var key = el.getAttribute("data-list"), limit = +el.getAttribute("data-limit") || 999;
-    var items = SETS[key].slice(0, limit);
+    var per = el.getAttribute("data-per"), seen = {};
+    // data-per="city": only the newest item from each city (the lists are already newest first)
+    var items = SETS[key].filter(function (x) { if (!per) return true; var v = x[per] || ""; if (seen[v]) return false; seen[v] = 1; return true; }).slice(0, limit);
     el.innerHTML = items.length ? items.map(R[TYPE[key]]).join("") : '<div class="empty">Nothing here yet. Check back soon.</div>';
   });
 
