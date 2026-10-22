@@ -366,5 +366,6 @@ button.spot:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgb
 .headline h3 a:hover { text-decoration: underline; }
 .headline { overflow: hidden; }
 .headline-img { display: block; width: calc(100% + 2 * var(--s3) + 4px); max-width: none; aspect-ratio: 16 / 9; height: auto; object-fit: cover; margin: calc(-1 * var(--s3)) calc(-1 * var(--s3)) 10px calc(-1 * var(--s3) - 4px); background: var(--sand); }
-.photo-credit { font-size: 12px; color: var(--ink-2); margin-left: 6px; }
+.photo-credit { font-size: 12px; color: var(--ink-2); }
+.photo-credit-row { margin: 16px 0 0; text-align: right; }
 .more-links { display: flex; gap: 20px; flex-wrap: wrap; }
