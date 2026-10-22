@@ -4,7 +4,8 @@
   var q = new URLSearchParams(location.search), slug = q.get("b") || "", key = q.get("key") || "";
   var out = document.getElementById("ow-out");
   var flash = "";
-  var LABELS = [["impression", "Listing seen"], ["profile", "Profile views"], ["call", "Calls tapped"], ["website", "Website visits"]];
+  var LABELS = [["impression", "Listing seen", "Times your listing showed up on someone's screen"], ["profile", "Profile views", "Visits to your profile page"], ["call", "Calls tapped", "Taps on your phone number"], ["website", "Website visits", "Clicks through to your website"]];
+  function monthName(ym) { var p = ym.split("-"); return new Date(+p[0], +p[1] - 1, 1).toLocaleString("en-US", { month: "long", year: "numeric" }); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function fail(m) { out.innerHTML = '<div class="empty">' + m + '</div>'; }
   if (!slug || !key) return fail("This page needs the private dashboard link we sent you.");
@@ -37,14 +38,20 @@
     html += '<p class="meta" style="font-family:var(--mono);font-size:13px;margin:0 0 8px">' + esc(L.category) + ' &middot; ' + esc(L.city) + ' &middot; ' + (L.premium ? '<span style="color:#7a4a00">PREMIUM LISTING</span>' : 'BASIC LISTING') + '</p>';
 
     if (L.premium && d.stats) {
-      html += '<h2 class="month-head"><span class="stripe-mini"></span>Your numbers this month</h2>' + tiles(d.stats.thisMonth);
-      html += '<p class="risk" style="margin:0 0 8px">Last 30 days: ' + LABELS.map(function (l) { return (d.stats.last30[l[0]] || 0) + ' ' + l[1].toLowerCase(); }).join(" &middot; ") + '</p>';
+      var S = d.stats, months = Object.keys(S.months || {}).sort().reverse();
+      html += '<h2 class="month-head"><span class="stripe-mini"></span>Your numbers: ' + monthName(S.labels.thisMonth) + ' so far</h2>' + tiles(S.thisMonth);
+      html += '<h2 class="month-head"><span class="stripe-mini"></span>' + monthName(S.labels.lastMonth) + '</h2>' + tiles(S.lastMonth);
+      html += '<h2 class="month-head"><span class="stripe-mini"></span>Last 30 days</h2>' + tiles(S.last30);
+      if (months.length) html += '<details style="margin:8px 0 16px"><summary style="cursor:pointer;font-weight:600">Month by month</summary><div class="table-scroll" style="margin-top:12px"><table class="stats-table"><thead><tr><th>Month</th>' + LABELS.map(function (l) { return "<th>" + l[1] + "</th>"; }).join("") + '</tr></thead><tbody>' +
+        months.map(function (m) { return "<tr><td>" + monthName(m) + "</td>" + LABELS.map(function (l) { return "<td>" + (S.months[m][l[0]] || 0) + "</td>"; }).join("") + "</tr>"; }).join("") + '</tbody></table></div></details>';
+      html += '<details style="margin:0 0 8px"><summary style="cursor:pointer;font-weight:600">What these numbers mean</summary><dl class="facts" style="margin-top:12px">' + LABELS.map(function (l) { return "<dt>" + l[1] + "</dt><dd>" + l[2] + "</dd>"; }).join("") + '</dl>' +
+        '<p class="risk">Counts come from this site only. Bots and people who block tracking are not counted, so real numbers run a little higher. Times are Pacific.</p></details>';
     }
 
     html += '<h2 class="month-head"><span class="stripe-mini"></span>Your details</h2><div class="card" style="padding:28px"><form class="form" id="ow-form">';
     html += field("blurb", "Short description (shows on the directory card)", L.blurb, { full: true, area: true, max: 220, rows: 2, help: "Up to 220 characters." });
     html += field("phone", "Phone", L.phone, { type: "tel", max: 25 });
-    html += field("url", "Website", L.url, { type: "url", max: 200, ph: "https://" });
+    html += field("url", "Website", L.url, { max: 200, ph: "yourbusiness.com" });
     html += field("address", "Address (optional)", L.address, { full: true, max: 150 });
     if (L.premium) {
       html += field("about", "About your business (shows on your profile page)", L.about, { full: true, area: true, max: 900, rows: 5, help: "Up to 900 characters." });
