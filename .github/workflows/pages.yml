@@ -4,7 +4,7 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: "17 9 * * *"   # daily, about 2 AM Pacific: drops past events from the HTML, event pages and sitemap
+    - cron: "17 */3 * * *"   # every 3 hours: refreshes valley headlines; the first run after midnight Pacific also drops past events
 permissions:
   contents: read
   pages: write
@@ -24,6 +24,8 @@ jobs:
         with:
           node-version: 20
       - run: node tools/build-profiles.js
+      - run: node tools/build-headlines.js
+        continue-on-error: true
       - run: node tools/build-seo.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

@@ -269,7 +269,6 @@ p { margin: 0 0 var(--s2); }
 @media (prefers-reduced-motion: reduce) { .advertisers-track { animation: none; overflow-x: auto; scroll-snap-type: x proximity; padding-bottom: 10px; } .advertiser-card { scroll-snap-align: start; } }
 
 /* News is hidden until there are real stories. Delete this rule to bring it back everywhere. */
-.news-link { display: none !important; }
 /* Postcard spot picker */
 .picker { background: var(--paper); color: var(--ink); border-radius: 20px; padding: var(--s4) var(--s3); margin-top: var(--s3); }
 .picker-head { font-family: var(--display); font-size: 24px; font-weight: 600; margin-bottom: 14px; }
@@ -359,3 +358,9 @@ button.spot:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgb
 .waitlist .meta { color: var(--palm); font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
 .waitlist h3 { margin: 6px 0 8px; }
 .waitlist .form { margin-top: 16px; }
+
+/* Valley headlines pulled from local newsrooms (tools/build-headlines.js) */
+.headline { border-left-color: var(--palm); }
+.headline h3 { font-size: 19px; line-height: 1.3; }
+.headline h3 a { color: inherit; text-decoration: none; }
+.headline h3 a:hover { text-decoration: underline; }

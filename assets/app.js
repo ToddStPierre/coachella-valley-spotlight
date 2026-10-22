@@ -23,7 +23,7 @@
   var events = (D.events || []).filter(function (e) { var d = parse(e.endDate || e.date); return d && d >= today; })
     .sort(function (a, b) { return parse(a.date) - parse(b.date); });
   var deals = (D.deals || []).filter(function (x) { var d = parse(x.expires); return !d || d >= today; });
-  var news = (D.news || []).slice().sort(function (a, b) { return parse(b.date) - parse(a.date); });
+  var news = (D.news || []).concat(D.headlines || []).sort(function (a, b) { return parse(b.date) - parse(a.date); });
   var directory = (D.directory || []).slice().sort(function (a, b) { return ((b.premium || b.featured) ? 1 : 0) - ((a.premium || a.featured) ? 1 : 0) || (a.sample ? 1 : 0) - (b.sample ? 1 : 0) || a.name.localeCompare(b.name); });
 
   var R = {
@@ -44,6 +44,9 @@
     },
     news: function (n) {
       var d = parse(n.date);
+      if (n.feed) return '<article class="card story headline"><span class="meta">' + esc(n.city) + (d ? ' &middot; ' + fmt(d) : '') + '</span>' +
+        '<h3><a href="' + esc(n.url) + '" target="_blank" rel="noopener nofollow">' + esc(n.title) + '</a></h3>' +
+        '<a class="card-link" href="' + esc(n.url) + '" target="_blank" rel="noopener nofollow">Read it at ' + esc(n.source) + ' &rarr;</a></article>';
       return '<article class="card story">' + sample(n) + '<span class="meta">' + esc(n.city) + (d ? ' &middot; ' + fmt(d) : '') + '</span>' +
         '<h3>' + esc(n.title) + '</h3><p>' + esc(n.summary) + '</p>' +
         (n.source ? '<span class="meta">Source: ' + esc(n.source) + '</span>' : '') + link(n.url, "Read more") + '</article>';
