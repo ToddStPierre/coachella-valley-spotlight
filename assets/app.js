@@ -14,6 +14,9 @@
   function slugOf(b) { return b.slug || String(b.name).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
   function outbound(u) { try { var x = new URL(u); x.searchParams.set("utm_source", "coachellavalleyspotlight"); x.searchParams.set("utm_medium", "directory"); return x.toString(); } catch (e) { return u; } }
   function liveOffer(o) { if (!o || !o.title) return null; var d = parse(o.expires); return !d || d >= today ? o : null; }
+  // One photo per city for home page headline cards (assets/img/cities/, credits on legal.html#photos)
+  var CITY_PHOTOS = ["palm-springs", "desert-hot-springs", "cathedral-city", "rancho-mirage", "palm-desert", "indian-wells", "la-quinta", "indio", "coachella", "thousand-palms", "thermal", "mecca"];
+  function cityPhoto(city) { var s = String(city || "").toLowerCase().replace(/[^a-z]+/g, "-"); return CITY_PHOTOS.indexOf(s) > -1 ? s : "valley-wide"; }
   function link(url, label) {
     if (!url) return "";
     var outside = /^https?:/i.test(url);
@@ -42,9 +45,9 @@
         '<div class="offer">' + esc(x.offer) + '</div><p>' + esc(x.details) + '</p>' +
         '<span class="meta">' + (d ? 'Good through ' + fmt(d) : 'Ongoing') + '</span>' + link(x.url, "Get this deal") + '</article>';
     },
-    news: function (n) {
+    news: function (n, opt) {
       var d = parse(n.date);
-      if (n.feed) return '<article class="card story headline"><span class="meta">' + esc(n.city) + (d ? ' &middot; ' + fmt(d) : '') + '</span>' +
+      if (n.feed) return '<article class="card story headline">' + (opt && opt.img ? '<img class="headline-img" src="' + ROOT + 'assets/img/cities/' + cityPhoto(n.city) + '.jpg" alt="" loading="lazy" width="800" height="450">' : '') + '<span class="meta">' + esc(n.city) + (d ? ' &middot; ' + fmt(d) : '') + '</span>' +
         '<h3><a href="' + esc(n.url) + '" target="_blank" rel="noopener nofollow">' + esc(n.title) + '</a></h3>' +
         '<a class="card-link" href="' + esc(n.url) + '" target="_blank" rel="noopener nofollow">Read it at ' + esc(n.source) + ' &rarr;</a></article>';
       return '<article class="card story">' + sample(n) + '<span class="meta">' + esc(n.city) + (d ? ' &middot; ' + fmt(d) : '') + '</span>' +
@@ -75,7 +78,8 @@
     var per = el.getAttribute("data-per"), seen = {};
     // data-per="city": only the newest item from each city (the lists are already newest first)
     var items = SETS[key].filter(function (x) { if (!per) return true; var v = x[per] || ""; if (seen[v]) return false; seen[v] = 1; return true; }).slice(0, limit);
-    el.innerHTML = items.length ? items.map(R[TYPE[key]]).join("") : '<div class="empty">Nothing here yet. Check back soon.</div>';
+    var opt = { img: el.hasAttribute("data-img") };
+    el.innerHTML = items.length ? items.map(function (x) { return R[TYPE[key]](x, opt); }).join("") : '<div class="empty">Nothing here yet. Check back soon.</div>';
   });
 
   // Full list pages with filters: <div data-browse="events"></div>
