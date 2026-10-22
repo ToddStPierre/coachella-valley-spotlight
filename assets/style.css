@@ -347,7 +347,7 @@ button.spot:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgb
 .foot-signup { display: grid; grid-template-columns: 1fr 1.2fr; gap: var(--s4); align-items: center; padding: var(--s5) 0 var(--s4); border-bottom: 1px solid #3a302a; }
 .foot-signup h4 { font-family: var(--display); font-size: 24px; color: #fff; margin: 0 0 6px; font-weight: 600; }
 .foot-signup p { margin: 0; }
-.signup-form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.hp, .signup-form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 .foot-signup .signup-form { display: grid; grid-template-columns: 1.4fr 1fr auto; gap: 10px; }
 .foot-signup input, .foot-signup select { font: inherit; padding: 12px 14px; border: 1.5px solid #4a3f38; border-radius: 12px; background: #fff; color: var(--ink); width: 100%; min-width: 0; }
 .foot-signup .form-status { grid-column: 1 / -1; color: var(--gold); min-height: 0; }

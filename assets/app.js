@@ -193,18 +193,22 @@
     var nav = t.closest(".nav"); var open = nav.classList.toggle("open"); t.setAttribute("aria-expanded", open);
   });
 
-  // Forms: post to Formspree without leaving the page
+  // Forms: saved by the tracker (shows on the admin page) and emailed to Todd. If the tracker can't be reached, send straight to Formspree.
   document.querySelectorAll("form[data-ajax]").forEach(function (f) {
     f.addEventListener("submit", function (ev) {
       ev.preventDefault();
       var status = f.querySelector(".form-status"), btn = f.querySelector("button[type=submit]");
+      var body = {}; new FormData(f).forEach(function (v, k) { if (typeof v === "string") body[k] = v; });
+      function direct() { return fetch(f.action, { method: "POST", body: new FormData(f), headers: { Accept: "application/json" } }).then(function (r) { if (!r.ok) throw new Error(""); }); }
       btn.disabled = true; status.textContent = "Sending...";
-      fetch(f.action, { method: "POST", body: new FormData(f), headers: { Accept: "application/json" } })
+      fetch(VAPI + "/submission", { method: "POST", body: JSON.stringify(body) })
         .then(function (r) {
-          if (!r.ok) throw new Error();
-          f.reset(); status.textContent = f.getAttribute("data-thanks") || "Got it. Thank you!";
-        })
-        .catch(function () { status.textContent = "That did not go through. Please call or text (760) 422-5475."; })
+          if (r.ok) return;
+          if (r.status === 400 || r.status === 429) return r.json().then(function (d) { throw new Error(d.error || ""); });
+          return direct();
+        }, direct)
+        .then(function () { f.reset(); status.textContent = f.getAttribute("data-thanks") || "Got it. Thank you!"; })
+        .catch(function (err) { status.textContent = err.message || "That did not go through. Please call or text (760) 422-5475."; })
         .finally(function () { btn.disabled = false; });
     });
   });
