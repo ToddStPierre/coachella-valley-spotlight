@@ -145,7 +145,7 @@ for (const file of ["index.html", "directory.html", "deals.html", "events.html"]
 }
 
 /* 4. Sitemap */
-const urls = ["", "directory", "deals", "events", "advertise", "submit", "mailing-area-el-paseo", "mailing-area-sun-city", "legal"]
+const urls = ["", "directory", "deals", "events", "advertise", "submit", "story", "mailing-area-el-paseo", "mailing-area-sun-city", "legal"]
   .concat(list.map(b => `business/${b.slug}/`), eventPaths, landing.filter(p => p.index).map(p => p.path));
 fs.writeFileSync(path.join(root, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
