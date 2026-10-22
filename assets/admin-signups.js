@@ -1,4 +1,4 @@
-/* Admin: resident email signups and the La Quinta / Indio route waitlist. Shown on stats.html?admin=KEY */
+/* Admin: site visitors, resident email signups and the La Quinta / Indio route waitlist. Shown on stats.html?admin=KEY */
 (function () {
   var API = "https://cvs-tracker.toddstpierre.workers.dev";
   var admin = new URLSearchParams(location.search).get("admin"); if (!admin) return;
@@ -6,6 +6,16 @@
   function csv(rows, cols) {
     return [cols.join(",")].concat(rows.map(function (r) { return cols.map(function (c) { return '"' + String(r[c] == null ? "" : r[c]).replace(/"/g, '""') + '"'; }).join(","); })).join("\n");
   }
+  // Site visitors (counted by app.js on every page; no longer shown publicly)
+  var vis = document.createElement("div"); vis.id = "visitors-admin"; vis.style.marginBottom = "40px";
+  document.getElementById("st-out").before(vis);
+  fetch(API + "/visitors?v=" + Date.now()).then(function (r) { return r.json(); }).then(function (v) {
+    vis.innerHTML = '<h2 class="month-head"><span class="stripe-mini"></span>Site visitors</h2>' +
+      '<div class="stats"><div class="stat"><b>' + (v.today || 0).toLocaleString() + '</b><span>Visitors today</span></div>' +
+      '<div class="stat"><b>' + (v.month || 0).toLocaleString() + '</b><span>Visits this month</span></div></div>' +
+      '<p class="risk" style="margin-top:12px">Today counts each browser once. This month adds up each day&rsquo;s visitors, so someone who came on 3 days counts 3 times. Bots are not counted. Pacific time.</p>';
+  }).catch(function () {});
+
   var box = document.createElement("div"); box.id = "signups-admin"; box.style.marginTop = "48px";
   document.getElementById("st-out").after(box);
   fetch(API + "/admin/signups?key=" + encodeURIComponent(admin)).then(function (r) { return r.json(); }).then(function (d) {
