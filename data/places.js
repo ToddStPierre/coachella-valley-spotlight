@@ -19,11 +19,13 @@ window.CVS.places = {
     "Thousand Palms": "Thousand Palms is an unincorporated community north of Interstate 10. It is home to Acrisure Arena and the Coachella Valley Preserve."
   },
   categories: {
+    "Automotive": "Automotive covers local businesses that sell, service and rent vehicles, including the golf cars that are a common way to get around the valley's country clubs and gated communities.",
     "Home services": "Home services covers the trades that keep a desert home running: plumbing, air conditioning, roofing, pest control, flooring, solar panel cleaning and more. Summer heat, hard water and dust are tough on houses here, so it pays to have a local pro's number before you need it.",
     "Health and beauty": "Health and beauty covers local clinics, acupuncture, weight loss, salons, spas and wellness practices. These are independent, locally run practices, not national chains.",
     "Restaurants": "Restaurants covers locally owned places to eat, from long-running family dining rooms to newer spots. Many offer deals listed here when you mention Coachella Valley Spotlight."
   },
   services: {
+    "Golf cars": "Golf car dealers sell new and used carts, handle service and repairs, and rent carts by the day, week or season. Demand picks up every fall when seasonal residents come back.",
     "Plumbing": "Plumbers here deal with a lot of hard water, slab leaks, water heaters that wear out early in the heat, and drains and sewer lines that need clearing. A local plumber who knows desert homes can usually get to you the same day.",
     "Roofing": "Desert sun is hard on roofs. Tile underlayment wears out, flat roofs need coating, and monsoon storms find every weak spot. Local roofers handle repairs, re-roofs and inspections for homes, businesses and mobile homes.",
     "Heating and air conditioning": "Air conditioning is not optional here, with summer days well over 110 degrees. Local HVAC companies handle repairs, tune-ups, maintenance plans and new systems, and the good ones answer the phone in July.",
