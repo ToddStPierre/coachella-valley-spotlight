@@ -11,7 +11,7 @@
   document.getElementById("st-out").before(vis);
   fetch(API + "/visitors?v=" + Date.now()).then(function (r) { return r.json(); }).then(function (v) {
     vis.innerHTML = '<h2 class="month-head"><span class="stripe-mini"></span>Site visitors</h2>' +
-      '<div class="stats"><div class="stat"><b>' + (v.today || 0).toLocaleString() + '</b><span>Visitors today</span></div>' +
+      '<div class="stats" style="grid-template-columns:repeat(2,1fr);max-width:600px"><div class="stat"><b>' + (v.today || 0).toLocaleString() + '</b><span>Visitors today</span></div>' +
       '<div class="stat"><b>' + (v.month || 0).toLocaleString() + '</b><span>Visits this month</span></div></div>' +
       '<p class="risk" style="margin-top:12px">Today counts each browser once. This month adds up each day&rsquo;s visitors, so someone who came on 3 days counts 3 times. Bots are not counted. Pacific time.</p>';
   }).catch(function () {});
