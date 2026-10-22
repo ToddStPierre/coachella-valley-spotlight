@@ -14,7 +14,7 @@ const holesLine = c => c.holes + " holes" + (c.courses.length > 1 ? " &middot; "
 const ACCESS = { Public: "Open to the public", Private: "Private club" };
 
 /* One card. The same markup is drawn by the filter script on the list page (keep the two in sync). */
-const card = c => `<article class="card golf-card" data-city="${esc(c.city)}" data-access="${c.access}" data-text="${esc((c.name + " " + c.city + " " + c.courses.map(x => x.name).join(" ")).toLowerCase())}">
+const card = c => `<article class="card golf-card" data-courses="${c.courses.length}" data-city="${esc(c.city)}" data-access="${c.access}" data-text="${esc((c.name + " " + c.city + " " + c.courses.map(x => x.name).join(" ")).toLowerCase())}">
 <span class="meta">${esc(c.city)}</span><span class="golf-access ${c.access.toLowerCase()}">${ACCESS[c.access]}</span>
 <h3><a href="golf/${c.slug}/">${esc(c.name)}</a></h3><p class="golf-holes">${holesLine(c)}</p>
 <a class="card-link" href="golf/${c.slug}/">Course details &rarr;</a></article>`;
@@ -26,7 +26,9 @@ const submitBand = `<div class="biz-band" style="margin-top:48px"><p><strong>Run
 /* 1. The list page */
 const cities = [...new Set(list.map(c => c.city))].sort();
 const pub = list.filter(c => c.access === "Public").length;
-write("golf/", `${head}${metaTags({ title: "Golf Courses in the Coachella Valley | Coachella Valley Spotlight", description: `All ${list.length} golf clubs and courses in the Coachella Valley, from Palm Springs to Indio and La Quinta. See which are open to the public, with phone numbers and websites.`, url: "golf/" })}<base href="../">
+const nCourses = list.reduce((n, c) => n + c.courses.length, 0);
+const countLine = (clubs, courses) => clubs + (clubs === 1 ? " golf club" : " golf clubs") + " &middot; " + courses + (courses === 1 ? " course" : " courses");
+write("golf/", `${head}${metaTags({ title: "Golf Courses in the Coachella Valley | Coachella Valley Spotlight", description: `All ${list.length} golf clubs (${nCourses} courses) in the Coachella Valley, from Palm Springs to Indio and La Quinta. See which are open to the public, with phone numbers and websites.`, url: "golf/" })}<base href="../">
 ${headRest}${ldjson({ "@context": "https://schema.org", "@type": "ItemList", name: "Golf courses in the Coachella Valley", numberOfItems: list.length, itemListElement: list.map((c, i) => ({ "@type": "ListItem", position: i + 1, url: SITE + "/golf/" + c.slug + "/", name: c.name })) })}
 </head>
 <body>
@@ -34,12 +36,12 @@ ${header}
 <main>
 <section class="page-hero"><div class="wrap"><span class="eyebrow"><span class="stripe-mini"></span>Golf</span>
 <h1>Golf Courses in the <span class="grad">Coachella Valley.</span></h1>
-<p>Every golf club and course in the valley, ${list.length} in all. ${pub} are open to the public, and the rest are private clubs. Filter by city, or show only the courses you can book.</p></div></section>
+<p>Every golf club in the valley: ${list.length} clubs with ${nCourses} courses between them. ${pub} clubs are open to the public, and the rest are private clubs. Filter by city, or show only the courses you can book.</p></div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
 <div class="filters"><label class="sr-only" for="g-q">Search</label><input id="g-q" type="search" placeholder="Search courses">
 <label class="sr-only" for="g-city">City</label><select id="g-city"><option value="">All cities</option>${cities.map(c => `<option>${esc(c)}</option>`).join("")}</select>
 <label class="sr-only" for="g-access">Access</label><select id="g-access"><option value="">Public and private</option><option value="Public">Open to the public</option><option value="Private">Private clubs</option></select></div>
-<p class="golf-count" id="g-count">${list.length} courses</p>
+<p class="golf-count" id="g-count">${countLine(list.length, nCourses)}</p>
 <div class="grid" id="g-list">${list.map(card).join("\n")}</div>
 <p class="risk" style="margin-top:24px">Course details change. Call ahead to confirm tee times, guest rules and rates. Course data from public sources, including OpenStreetMap (&copy; OpenStreetMap contributors).</p>
 ${submitBand}
@@ -55,12 +57,12 @@ ${footer}
   if (p.get("access")) acc.value = p.get("access");
   if (p.get("city")) city.value = p.get("city");
   function draw() {
-    var t = q.value.trim().toLowerCase(), n = 0;
+    var t = q.value.trim().toLowerCase(), n = 0, m = 0;
     cards.forEach(function (c) {
       var ok = (!t || c.getAttribute("data-text").indexOf(t) > -1) && (!city.value || c.getAttribute("data-city") === city.value) && (!acc.value || c.getAttribute("data-access") === acc.value);
-      c.hidden = !ok; if (ok) n++;
+      c.hidden = !ok; if (ok) { n++; m += +c.getAttribute("data-courses"); }
     });
-    count.textContent = n + (n === 1 ? " course" : " courses");
+    count.innerHTML = n + (n === 1 ? " golf club" : " golf clubs") + " &middot; " + m + (m === 1 ? " course" : " courses");
   }
   [q, city, acc].forEach(function (el) { el.addEventListener("input", draw); });
   draw();
@@ -109,4 +111,4 @@ ${footer}
 </body>
 </html>`);
 }
-console.log("golf: " + list.length + " course pages + golf/index.html");
+console.log("golf: " + list.length + " club pages + golf/index.html");
