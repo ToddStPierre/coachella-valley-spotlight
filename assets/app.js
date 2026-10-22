@@ -186,6 +186,14 @@
   // Pre-pick the listing type on the submit form from ?plan=
   var plan = new URLSearchParams(location.search).get("plan"), planSel = document.getElementById("plan");
   if (plan && planSel) { planSel.value = plan === "premium" ? "Premium listing" : "Basic listing (free)"; var ty = document.getElementById("type"); if (ty) ty.value = "A business listing"; }
+  // Golf: submit?type=golf&name=<course> pre-picks "A golf course" (and the course name when sending an update)
+  var sp = new URLSearchParams(location.search), tySel = document.getElementById("type");
+  if (sp.get("type") === "golf" && tySel) {
+    tySel.value = "A golf course";
+    var bz = document.querySelector('#form input[name="business"]'), tt = document.querySelector('#form input[name="title"]');
+    if (sp.get("name")) { if (bz) bz.value = sp.get("name"); if (tt) tt.value = "Update for " + sp.get("name"); }
+    else if (tt) tt.placeholder = "Course name";
+  }
 
   // Mobile menu
   var t = document.querySelector(".menu-toggle");

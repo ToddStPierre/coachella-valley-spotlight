@@ -145,8 +145,11 @@ for (const file of ["index.html", "directory.html", "deals.html", "events.html"]
 }
 
 /* 4. Sitemap */
-const urls = ["", "directory", "deals", "events", "advertise", "submit", "story", "mailing-area-el-paseo", "mailing-area-sun-city", "legal"]
-  .concat(list.map(b => `business/${b.slug}/`), eventPaths, landing.filter(p => p.index).map(p => p.path));
+const golfCtx = { window: {} };
+if (fs.existsSync(path.join(root, "data", "golf.js"))) require("vm").runInNewContext(fs.readFileSync(path.join(root, "data", "golf.js"), "utf8"), golfCtx);
+const golfPaths = ((golfCtx.window.CVS || {}).golf || []).map(c => `golf/${c.slug}/`);
+const urls = ["", "directory", "deals", "events", "golf/", "advertise", "submit", "story", "mailing-area-el-paseo", "mailing-area-sun-city", "legal"]
+  .concat(list.map(b => `business/${b.slug}/`), eventPaths, landing.filter(p => p.index).map(p => p.path), golfPaths);
 fs.writeFileSync(path.join(root, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(u => `  <url><loc>${esc(SITE + "/" + u)}</loc></url>`).join("\n")}
