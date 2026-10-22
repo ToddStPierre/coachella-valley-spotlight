@@ -52,8 +52,12 @@
 <label>What are you sending?<select id="type" name="type" required><option value="">Pick one</option><option>An event</option><option>A deal</option><option>A business listing</option></select></label>
 <label>Listing type (for businesses)<select id="plan" name="plan"><option value="">Not a business listing</option><option>Basic listing (free)</option><option>Premium listing</option></select></label>
 <label>Your name<input name="name" required autocomplete="name"></label>
-<label>Email<input name="email" type="email" required autocomplete="email"></label>
+<label>Your email<input name="email" type="email" required autocomplete="email"></label>
 <label>Business or organization<input name="business" autocomplete="organization"></label>
+<label>Business phone<input name="business_phone" type="tel" placeholder="The number customers should call"></label>
+<label>Website<input name="website_url" inputmode="url" placeholder="yourbusiness.com"></label>
+<label>Street address<input name="address" placeholder="Leave blank if you come to the customer"></label>
+<label>Type of business<input name="business_type" placeholder="Plumbing, dentist, Italian restaurant..."></label>
 <label>City<select name="city"><option value="">Pick a city</option><option>Palm Springs</option><option>Cathedral City</option><option>Rancho Mirage</option><option>Palm Desert</option><option>Indian Wells</option><option>La Quinta</option><option>Indio</option><option>Coachella</option><option>Desert Hot Springs</option><option>Other</option></select></label>
 <label>Title or offer<input name="title" placeholder="Event name, deal headline or business name" required></label>
 <label>Date (events) or end date (deals)<input name="date" type="date"></label>
