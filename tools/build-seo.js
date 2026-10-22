@@ -88,7 +88,7 @@ fs.rmSync(path.join(root, "local"), { recursive: true, force: true });
 for (const p of landing) {
   const items = C.directory.filter(b => p.items.includes(b));
   const heading = p.kind === "city" ? `Local Businesses in ${p.city}, CA` : p.kind === "category" ? `${p.category} in the Coachella Valley` : `${p.category} in ${p.city}, CA`;
-  const intro = [p.city && places.cities[p.city], p.category && places.categories[p.category]].filter(Boolean);
+  const intro = [p.city && places.cities[p.city], p.category && ((places.categories || {})[p.category] || (places.services || {})[p.category])].filter(Boolean);
   const names = items.slice(0, 3).map(b => b.name);
   const countLine = `${items.length} ${p.category ? p.category.toLowerCase() + " businesses are" : "local businesses are"} listed${p.city ? " in " + p.city : " across the valley"} right now, including ${andList(names)}. Each one has its own page with the phone number, website and details, and premium listings show current offers.`;
   const related = landing.filter(o => o !== p && (

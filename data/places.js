@@ -1,6 +1,7 @@
 /* CITY AND CATEGORY INTROS
    Used by tools/build-seo.js for the city and category pages under /local/
    (for example /local/palm-desert/ and /local/palm-desert/home-services/).
+   services: intro for each specific service (the "service" field in directory.js). Add one when you add a new service.
    A page is only made once it has at least 2 listings. Google is only asked to index it at 3 or more.
    Plain text only. Keep each intro true and specific to the place. */
 window.CVS = window.CVS || {};
@@ -21,5 +22,17 @@ window.CVS.places = {
     "Home services": "Home services covers the trades that keep a desert home running: plumbing, air conditioning, roofing, pest control, flooring, solar panel cleaning and more. Summer heat, hard water and dust are tough on houses here, so it pays to have a local pro's number before you need it.",
     "Health and beauty": "Health and beauty covers local clinics, acupuncture, weight loss, salons, spas and wellness practices. These are independent, locally run practices, not national chains.",
     "Restaurants": "Restaurants covers locally owned places to eat, from long-running family dining rooms to newer spots. Many offer deals listed here when you mention Coachella Valley Spotlight."
+  },
+  services: {
+    "Plumbing": "Plumbers here deal with a lot of hard water, slab leaks, water heaters that wear out early in the heat, and drains and sewer lines that need clearing. A local plumber who knows desert homes can usually get to you the same day.",
+    "Roofing": "Desert sun is hard on roofs. Tile underlayment wears out, flat roofs need coating, and monsoon storms find every weak spot. Local roofers handle repairs, re-roofs and inspections for homes, businesses and mobile homes.",
+    "Heating and air conditioning": "Air conditioning is not optional here, with summer days well over 110 degrees. Local HVAC companies handle repairs, tune-ups, maintenance plans and new systems, and the good ones answer the phone in July.",
+    "Pest control": "Desert homes see scorpions, roaches, ants, spiders, rodents and gophers. Local pest control companies offer one-time treatments and regular service for homes and businesses.",
+    "Flooring": "Local flooring companies install tile, vinyl, carpet and wood-look floors, and many offer free in-home estimates. Tile and luxury vinyl are popular here because they hold up to heat, sand and pets.",
+    "Solar panel cleaning": "Dust and wind leave a film on solar panels that cuts how much power they make. Local crews clean panels and pressure wash driveways, patios and buildings for homes and businesses.",
+    "Wallpaper installation": "Wallpaper installers hang everything from a single accent wall to murals and premium wallcoverings, and prep the walls so it lasts.",
+    "Acupuncture": "Local acupuncturists offer acupuncture and herbal medicine for pain, stress, autoimmune conditions and overall wellness. These are licensed, independent practices.",
+    "Weight loss": "Local medical weight loss clinics offer physician-supervised programs, including GLP-1 medications, B12 injections and nutrition guidance.",
+    "Italian restaurants": "Locally owned Italian restaurants serving pasta, pizza and dinner with a bar, from long-running family dining rooms to newer spots."
   }
 };

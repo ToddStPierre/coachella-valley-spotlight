@@ -30,19 +30,25 @@ function landingPages(list) {
   for (const [city, items] of Object.entries(cities)) {
     if (items.length >= BUILD_MIN) pages.push({ kind: "city", city, items, path: `local/${slugify(city)}/` });
   }
-  for (const [cat, items] of Object.entries(cats)) {
-    if (items.length < BUILD_MIN) continue;
-    pages.push({ kind: "category", category: cat, items, path: `local/${slugify(cat)}/` });
+  /* Same rules for the broad category ("Home services") and the specific service ("Plumbing"). */
+  const groups = Object.entries(cats).map(e => [...e, "category"]).concat(Object.entries(by("service")).filter(e => e[0] !== "undefined").map(e => [...e, "service"]));
+  for (const [cat, items, field] of groups) {
+    if (items.length < BUILD_MIN || (field === "service" && pages.some(p => p.path === `local/${slugify(cat)}/`))) continue;
+    pages.push({ kind: "category", field, category: cat, items, path: `local/${slugify(cat)}/` });
     const inCities = items.reduce((m, b) => ((m[b.city] = m[b.city] || []).push(b), m), {});
     if (Object.keys(inCities).length > 1) {
       for (const [city, sub] of Object.entries(inCities)) {
-        if (sub.length >= BUILD_MIN) pages.push({ kind: "combo", city, category: cat, items: sub, path: `local/${slugify(city)}/${slugify(cat)}/` });
+        if (sub.length >= BUILD_MIN) pages.push({ kind: "combo", field, city, category: cat, items: sub, path: `local/${slugify(city)}/${slugify(cat)}/` });
       }
     }
   }
   pages.forEach(p => { p.index = p.items.length >= INDEX_MIN; });
   return pages;
 }
+
+/* The most specific schema.org type for a listing's service. */
+const SCHEMA_TYPES = { "Plumbing": "Plumber", "Roofing": "RoofingContractor", "Heating and air conditioning": "HVACBusiness", "Electrical": "Electrician", "Painting": "HousePainter", "Locksmith": "Locksmith", "Italian restaurants": "Restaurant", "Restaurants": "Restaurant", "Acupuncture": "MedicalBusiness", "Weight loss": "MedicalClinic", "Pest control": "HomeAndConstructionBusiness", "Flooring": "HomeAndConstructionBusiness", "Wallpaper installation": "HomeAndConstructionBusiness", "Solar panel cleaning": "HomeAndConstructionBusiness", "Home services": "HomeAndConstructionBusiness" };
+const schemaType = b => SCHEMA_TYPES[b.service] || SCHEMA_TYPES[b.category] || "LocalBusiness";
 
 /* Pieces of index.html reused as the page shell for generated pages. */
 function shell() {
@@ -79,4 +85,4 @@ function breadcrumbs(trail) {
   };
 }
 
-module.exports = { root, SITE, loadData, esc, slugify, slugOf, ldjson, landingPages, shell, metaTags, breadcrumbs };
+module.exports = { schemaType, root, SITE, loadData, esc, slugify, slugOf, ldjson, landingPages, shell, metaTags, breadcrumbs };

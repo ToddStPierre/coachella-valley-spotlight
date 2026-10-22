@@ -2,7 +2,7 @@
    at business/<slug>/index.html, using index.html's header and footer.
    Runs automatically on GitHub when you push. Run it locally with: node tools/build-profiles.js */
 const fs = require("fs"), path = require("path");
-const { root, SITE, loadData, esc, slugOf, ldjson, landingPages, shell, metaTags, breadcrumbs } = require("./lib");
+const { schemaType, root, SITE, loadData, esc, slugOf, ldjson, landingPages, shell, metaTags, breadcrumbs } = require("./lib");
 const list = (loadData().directory || []).filter(b => !b.sample);
 const { head, headRest, header, footer } = shell();
 const landing = landingPages(list);
@@ -13,28 +13,29 @@ fs.rmSync(path.join(root, "business"), { recursive: true, force: true });
 for (const b of list) {
   const slug = slugOf(b);
   const tel = b.phone ? b.phone.replace(/[^\d+]/g, "") : "";
-  const desc = `${b.name}: ${b.category} in ${b.city}. ${b.blurb || ""}`.slice(0, 300);
+  const desc = `${b.name}: ${b.service || b.category} in ${b.city}. ${b.blurb || ""}`.slice(0, 300);
   const url = `business/${slug}/`;
   const cityPage = landing.find(p => p.kind === "city" && p.city === b.city);
-  const catPage = landing.find(p => p.kind === "combo" && p.city === b.city && p.category === b.category) || landing.find(p => p.kind === "category" && p.category === b.category);
+  const catPage = [b.service, b.category].filter(Boolean).map(t => landing.find(p => p.kind === "combo" && p.city === b.city && p.category === t) || landing.find(p => p.kind === "category" && p.category === t)).find(Boolean);
+  const kind = b.service || b.category;
   const trail = [["Home", ""], ["Directory", "directory"]].concat(cityPage ? [[b.city, cityPage.path]] : []).concat([[b.name, url]]);
-  const schema = { "@context": "https://schema.org", "@type": "LocalBusiness", "@id": SITE + "/" + url + "#business", name: b.name, image: b.image ? SITE + "/" + b.image : undefined, description: b.about || b.blurb, telephone: b.phone || undefined, url: b.url || undefined, address: { "@type": "PostalAddress", streetAddress: b.address || undefined, addressLocality: b.city, addressRegion: "CA", addressCountry: "US" }, areaServed: b.area || "Coachella Valley" };
+  const schema = { "@context": "https://schema.org", "@type": schemaType(b), "@id": SITE + "/" + url + "#business", name: b.name, image: b.image ? SITE + "/" + b.image : undefined, description: b.about || b.blurb, telephone: b.phone || undefined, url: b.url || undefined, address: { "@type": "PostalAddress", streetAddress: b.address || undefined, addressLocality: b.city, addressRegion: "CA", addressCountry: "US" }, areaServed: b.area || "Coachella Valley" };
   const prem = !!(b.premium || b.featured);
   const today = new Date().toISOString().slice(0, 10);
   const offer = prem && b.offer && b.offer.title && (!b.offer.expires || b.offer.expires >= today) ? b.offer : null;
   const rows = [["Area served", b.area], ["Address", b.address], ["Hours", prem && b.hours]].filter(r => r[1]);
   const gallery = prem ? (b.gallery || []) : [];
-  const html = `${head}${metaTags({ title: `${b.name} | ${b.category} in ${b.city}, CA`, description: desc, url, image: prem && b.image })}<base href="../../">
+  const html = `${head}${metaTags({ title: `${b.name} | ${kind} in ${b.city}, CA`, description: desc, url, image: prem && b.image })}<base href="../../">
 ${headRest}${ldjson(schema)}${ldjson(breadcrumbs(trail))}
 </head>
 <body data-profile="${slug}">
 ${header}
 <main>
 <section class="page-hero"><div class="wrap">
-<nav class="crumbs" aria-label="Breadcrumb"><a href="directory">Directory</a>${cityPage ? ` &rsaquo; <a href="${cityPage.path}">${esc(b.city)}</a>` : ""}${catPage ? ` &rsaquo; <a href="${catPage.path}">${esc(b.category)}</a>` : ""}</nav>
+<nav class="crumbs" aria-label="Breadcrumb"><a href="directory">Directory</a>${cityPage ? ` &rsaquo; <a href="${cityPage.path}">${esc(b.city)}</a>` : ""}${catPage ? ` &rsaquo; <a href="${catPage.path}">${esc(catPage.category)}</a>` : ""}</nav>
 <div class="profile" data-biz="${slug}" data-noimp>
 <div>
-<span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>${esc(b.category)} &middot; ${esc(b.city)}</span>
+<span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>${esc(kind)} &middot; ${esc(b.city)}</span>
 <h1>${esc(b.name)}</h1>
 ${b.postcard || prem ? '<span class="tag" style="display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:999px;background:#fde8bf;color:#7a4a00;margin-bottom:16px">' + (b.postcard ? "On the Spotlight postcard" : "Premium listing") + '</span>' : ""}
 <p>${esc(prem ? (b.about || b.blurb) : b.blurb)}</p>
