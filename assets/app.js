@@ -113,13 +113,19 @@
         });
         browse.innerHTML = html + "</div>";
       } else if (key === "directory") {
-        // Group by category, A to Z. Each group keeps the usual order (premium first, then by name).
+        // With "All categories": postcard advertisers get their own Featured section on top,
+        // then everyone else grouped by category, A to Z (each group keeps the usual order).
+        var allCats = !cat || !cat.value;
+        var feat = allCats ? items.filter(function (b) { return b.postcard; }) : [];
         var groups = {}, names = [];
-        items.forEach(function (b) { var c = b.category || "Other"; if (!groups[c]) { groups[c] = []; names.push(c); } groups[c].push(b); });
+        items.forEach(function (b) { if (allCats && b.postcard) return; var c = b.category || "Other"; if (!groups[c]) { groups[c] = []; names.push(c); } groups[c].push(b); });
         names.sort();
         var anchor = function (c) { return "cat-" + c.toLowerCase().replace(/[^a-z0-9]+/g, "-"); };
-        browse.innerHTML = (names.length > 1 ? '<p class="cat-jump">' + names.map(function (c) { return '<a href="#' + anchor(c) + '">' + esc(c) + ' (' + groups[c].length + ')</a>'; }).join("") + '</p>' : '') +
-          names.map(function (c) { return '<h2 class="month-head" id="' + anchor(c) + '"><span class="stripe-mini"></span>' + esc(c) + ' <span class="cat-count">' + groups[c].length + '</span></h2><div class="grid">' + groups[c].map(R.directory).join("") + '</div>'; }).join("");
+        var head = function (id, label, n) { return '<h2 class="month-head" id="' + id + '"><span class="stripe-mini"></span>' + esc(label) + ' <span class="cat-count">' + n + '</span></h2>'; };
+        var jumps = (feat.length ? ['<a href="#cat-featured">Featured (' + feat.length + ')</a>'] : []).concat(names.map(function (c) { return '<a href="#' + anchor(c) + '">' + esc(c) + ' (' + groups[c].length + ')</a>'; }));
+        browse.innerHTML = (jumps.length > 1 ? '<p class="cat-jump">' + jumps.join("") + '</p>' : '') +
+          (feat.length ? '<section class="featured-band">' + head("cat-featured", "Featured Listings", feat.length) + '<p class="featured-note">Local businesses on the current Spotlight postcard.</p><div class="grid">' + feat.map(R.directory).join("") + '</div></section>' : '') +
+          names.map(function (c) { return head(anchor(c), c, groups[c].length) + '<div class="grid">' + groups[c].map(R.directory).join("") + '</div>'; }).join("");
       } else {
         browse.innerHTML = '<div class="' + (key === "news" ? "grid-2" : "grid") + '">' + items.map(R[TYPE[key]]).join("") + "</div>";
       }

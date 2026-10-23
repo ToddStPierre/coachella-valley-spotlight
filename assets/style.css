@@ -384,3 +384,7 @@ button.spot:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgb
 .cat-jump a { display: inline-block; padding: 7px 14px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); text-decoration: none; color: var(--ink); font-size: 14.5px; font-weight: 500; }
 .cat-count { font-family: var(--body); font-size: 15px; font-weight: 500; opacity: .6; margin-left: 10px; }
 [id^="cat-"] { scroll-margin-top: 90px; }
+/* Directory: Featured Listings (postcard advertisers) */
+.featured-band { margin-top: var(--s3); }
+.featured-note { margin: -8px 0 var(--s2); opacity: .75; }
+[id="cat-featured"] { margin-top: var(--s2); }
