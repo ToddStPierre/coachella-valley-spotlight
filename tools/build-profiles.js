@@ -7,8 +7,8 @@ const list = (loadData().directory || []).filter(b => !b.sample);
 const { head, headRest, header, footer } = shell();
 const landing = landingPages(list);
 const nice = d => { const [y, m, dd] = d.split("-").map(Number); return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m - 1] + " " + dd + ", " + y; };
-// Free Google Maps search link (no API key). A "googlePlaceId" on the listing pins it to the exact place.
-const googleReviews = b => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([b.name, b.address || b.city + ", CA"].join(", ")) + (b.googlePlaceId ? "&query_place_id=" + encodeURIComponent(b.googlePlaceId) : "");
+// Free Google Maps search link (no API key). "googleUrl" (an exact Maps link) wins, then "googlePlaceId" pins the search to the exact place.
+const googleReviews = b => b.googleUrl || "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([b.name, b.address || b.city + ", CA"].join(", ")) + (b.googlePlaceId ? "&query_place_id=" + encodeURIComponent(b.googlePlaceId) : "");
 const outbound = u => { try { const x = new URL(u); x.searchParams.set("utm_source", "coachellavalleyspotlight"); x.searchParams.set("utm_medium", "profile"); return x.toString(); } catch { return u; } };
 
 fs.rmSync(path.join(root, "business"), { recursive: true, force: true });
