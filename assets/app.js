@@ -112,6 +112,14 @@
           html += R.event(e);
         });
         browse.innerHTML = html + "</div>";
+      } else if (key === "directory") {
+        // Group by category, A to Z. Each group keeps the usual order (premium first, then by name).
+        var groups = {}, names = [];
+        items.forEach(function (b) { var c = b.category || "Other"; if (!groups[c]) { groups[c] = []; names.push(c); } groups[c].push(b); });
+        names.sort();
+        var anchor = function (c) { return "cat-" + c.toLowerCase().replace(/[^a-z0-9]+/g, "-"); };
+        browse.innerHTML = (names.length > 1 ? '<p class="cat-jump">' + names.map(function (c) { return '<a href="#' + anchor(c) + '">' + esc(c) + ' (' + groups[c].length + ')</a>'; }).join("") + '</p>' : '') +
+          names.map(function (c) { return '<h2 class="month-head" id="' + anchor(c) + '"><span class="stripe-mini"></span>' + esc(c) + ' <span class="cat-count">' + groups[c].length + '</span></h2><div class="grid">' + groups[c].map(R.directory).join("") + '</div>'; }).join("");
       } else {
         browse.innerHTML = '<div class="' + (key === "news" ? "grid-2" : "grid") + '">' + items.map(R[TYPE[key]]).join("") + "</div>";
       }

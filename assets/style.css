@@ -379,3 +379,8 @@ button.spot:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgb
 .golf-holes { margin: 0; color: var(--ink-2); }
 .golf-count { font-family: var(--mono); font-size: 13px; color: var(--ink-2); margin: 0 0 16px; }
 .golf-card[hidden] { display: none; }
+/* Directory: category jump links and group counts */
+.cat-jump { display: flex; flex-wrap: wrap; gap: 8px; margin: var(--s2) 0 0; }
+.cat-jump a { display: inline-block; padding: 7px 14px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); text-decoration: none; color: var(--ink); font-size: 14.5px; font-weight: 500; }
+.cat-count { font-family: var(--body); font-size: 15px; font-weight: 500; opacity: .6; margin-left: 10px; }
+[id^="cat-"] { scroll-margin-top: 90px; }

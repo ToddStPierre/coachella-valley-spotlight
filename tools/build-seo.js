@@ -128,6 +128,14 @@ function eventsByMonth(items) {
   }
   return html + "</div>";
 }
+/* Directory groups, same as the live page in app.js: one heading per category, A to Z. */
+function byCategory(items) {
+  const groups = {};
+  for (const b of items) (groups[b.category || "Other"] = groups[b.category || "Other"] || []).push(b);
+  const names = Object.keys(groups).sort(), id = c => "cat-" + c.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  return (names.length > 1 ? `<p class="cat-jump">${names.map(c => `<a href="#${id(c)}">${esc(c)} (${groups[c].length})</a>`).join("")}</p>` : "") +
+    names.map(c => `<h2 class="month-head" id="${id(c)}"><span class="stripe-mini"></span>${esc(c)} <span class="cat-count">${groups[c].length}</span></h2><div class="grid">${cards("directory", groups[c])}</div>`).join("");
+}
 const browseLinks = landing.length ? `<div class="browse-links"><h2 class="month-head"><span class="stripe-mini"></span>Browse by city and category</h2><ul class="link-list">${landing.map(o => `<li><a href="${o.path}">${esc(o.kind === "city" ? "Businesses in " + o.city : o.kind === "category" ? o.category : o.category + " in " + o.city)}</a></li>`).join("")}</ul></div>` : "";
 for (const file of ["index.html", "directory.html", "deals.html", "events.html"]) {
   const p = path.join(root, file);
@@ -137,7 +145,7 @@ for (const file of ["index.html", "directory.html", "deals.html", "events.html"]
     const items = C[key].slice(0, +limit || 999);
     if (!items.length) return open + empty;
     if (mode === "list") return open + cards(key, items);
-    return open + (key === "events" ? eventsByMonth(items) : `<div class="grid">${cards(key, items)}</div>`);
+    return open + (key === "events" ? eventsByMonth(items) : key === "directory" ? byCategory(items) : `<div class="grid">${cards(key, items)}</div>`);
   });
   html = html.replace("<!--browse-links-->", browseLinks);
   fs.writeFileSync(p, html);
