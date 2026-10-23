@@ -20,6 +20,7 @@ window.CVS.places = {
     "Thousand Palms": "Thousand Palms is an unincorporated community north of Interstate 10. It is home to Acrisure Arena and the Coachella Valley Preserve."
   },
   categories: {
+    "Legal": "Legal covers locally based law firms and attorneys: estate planning, family law, criminal defense, bankruptcy, personal injury and business and real estate law. These are firms based in the valley, not national advertising networks. A listing here is not a recommendation or legal advice.",
     "Pets": "Pets covers the valley's independent veterinary clinics and animal hospitals: locally run practices, not the corporate chains.",
     "Fitness": "Fitness covers the valley's independent gyms, CrossFit boxes, personal training studios and boxing and martial arts academies. These are locally owned, not the national chains.",
     "Automotive": "Automotive covers local businesses that sell, service and rent vehicles, including the golf cars that are a common way to get around the valley's country clubs and gated communities.",
@@ -30,6 +31,12 @@ window.CVS.places = {
   services: {
     "Pool service": "With a pool in so many desert backyards, local pool companies handle weekly cleaning and chemicals, pump and filter repairs, tile cleaning and calcium removal.",
     "Landscaping": "Local landscapers design and maintain desert yards: drought-smart planting, hardscape, fire features, artificial turf, palms and irrigation.",
+    "Estate planning": "Local estate planning attorneys draft trusts, wills and powers of attorney and handle trust administration and probate. With so many retirees and second homes in the valley, this is one of the most common legal needs here.",
+    "Family law": "Local family law attorneys handle divorce, child custody and support, mediation and prenuptial agreements. Cases from the valley are heard at the Riverside County courthouse in Indio.",
+    "Criminal defense": "Local criminal defense attorneys handle DUI, domestic violence, drug and felony cases. Most valley cases go through the Larson Justice Center in Indio.",
+    "Bankruptcy": "Local bankruptcy attorneys help people and businesses with Chapter 7, Chapter 13 and other debt relief.",
+    "Personal injury": "Local personal injury attorneys handle car and truck accidents, dog bites, falls and wrongful death claims, usually on a contingency fee.",
+    "Business and real estate law": "Local business and real estate attorneys handle company formation, contracts, property deals, landlord and tenant matters, HOAs and business disputes.",
     "Veterinarians": "Independent veterinarians and animal hospitals for checkups, vaccines, surgery and urgent care.",
     "Dentists": "Independent dental practices across the valley offering family, cosmetic and restorative dentistry. These are locally run offices, not the big dental chains.",
     "Orthodontists": "Local orthodontists offering braces and clear aligners for kids and adults.",
