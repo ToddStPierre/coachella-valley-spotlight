@@ -23,7 +23,7 @@ for (const b of list) {
   const prem = !!(b.premium || b.featured);
   const today = new Date().toISOString().slice(0, 10);
   const offer = prem && b.offer && b.offer.title && (!b.offer.expires || b.offer.expires >= today) ? b.offer : null;
-  const rows = [["Area served", b.area], ["Address", b.address], ["Hours", prem && b.hours]].filter(r => r[1]);
+  const rows = [["Area served", b.area], ["Address", b.address], ["Hours", prem && b.hours], ["Happy hour", b.happyHour]].filter(r => r[1]);
   const gallery = prem ? (b.gallery || []) : [];
   const html = `${head}${metaTags({ title: `${b.name} | ${kind} in ${b.city}, CA`, description: desc, url, image: prem && b.image })}<base href="../../">
 ${headRest}${ldjson(schema)}${ldjson(breadcrumbs(trail))}

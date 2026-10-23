@@ -132,6 +132,7 @@ function eventsByMonth(items) {
 function byCategory(items) {
   const feat = items.filter(b => b.postcard), groups = {};
   for (const b of items) if (!b.postcard) (groups[b.category || "Other"] = groups[b.category || "Other"] || []).push(b);
+  const hh = items.filter(b => b.happyHour); if (hh.length) groups["Happy hours"] = hh;
   const names = Object.keys(groups).sort(), id = c => "cat-" + c.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   const head = (i, label, n) => `<h2 class="month-head" id="${i}"><span class="stripe-mini"></span>${esc(label)} <span class="cat-count">${n}</span></h2>`;
   const jumps = (feat.length ? [`<a href="#cat-featured">Featured (${feat.length})</a>`] : []).concat(names.map(c => `<a href="#${id(c)}">${esc(c)} (${groups[c].length})</a>`));

@@ -388,3 +388,6 @@ button.spot:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgb
 .featured-band { margin-top: var(--s3); }
 .featured-note { margin: -8px 0 var(--s2); opacity: .75; }
 [id="cat-featured"] { margin-top: var(--s2); }
+/* Directory: happy hour line on cards */
+.card .hh { margin: 0; font-size: 15px; }
+.card .hh b { color: var(--palm); font-weight: 600; }

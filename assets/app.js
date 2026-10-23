@@ -61,7 +61,7 @@
       var name = slug ? '<a href="' + ROOT + 'business/' + slug + '/" data-track="profile-link" style="color:inherit;text-decoration:none">' + esc(b.name) + '</a>' : esc(b.name);
       var prem = b.premium || b.featured, off = prem && liveOffer(b.offer);
       return '<article class="card' + (prem ? ' featured' : '') + '"' + (slug ? ' data-biz="' + slug + '"' : '') + '>' + sample(b) + '<span class="meta">' + esc(b.service || b.category) + ' &middot; ' + esc(b.city) + '</span>' +
-        '<h3>' + name + '</h3><p>' + esc(b.blurb) + '</p>' +
+        '<h3>' + name + '</h3><p>' + esc(b.blurb) + '</p>' + (b.happyHour ? '<p class="hh"><b>Happy hour:</b> ' + esc(b.happyHour) + '</p>' : '') +
         (b.postcard ? '<span class="tag">On the Spotlight postcard</span>' : prem ? '<span class="tag">Premium listing</span>' : '') +
         (off ? '<div class="offer-box"><b>' + esc(off.title) + '</b>' + (off.details ? '<span>' + esc(off.details) + '</span>' : '') + '</div>' : '') +
         (slug ? '<a class="card-link" href="' + ROOT + 'business/' + slug + '/">View profile &rarr;</a>' : '') + '</article>';
@@ -97,13 +97,15 @@
       });
     }
     fill(city, "city"); fill(cat, "category");
+    // Happy hours is an extra group: any listing with a happyHour shows there as well as in its own category.
+    if (cat && key === "directory" && all.some(function (x) { return x.happyHour; })) { var hho = document.createElement("option"); hho.value = hho.textContent = "Happy hours"; cat.appendChild(hho); }
     var params = new URLSearchParams(location.search);
     if (q && params.get("q")) q.value = params.get("q");
     if (cat && params.get("category")) cat.value = params.get("category");
     function draw() {
       var term = q ? q.value.trim().toLowerCase() : "";
       var items = all.filter(function (x) {
-        return (!term || text(x).indexOf(term) > -1) && (!city || !city.value || x.city === city.value) && (!cat || !cat.value || x.category === cat.value);
+        return (!term || text(x).indexOf(term) > -1) && (!city || !city.value || x.city === city.value) && (!cat || !cat.value || x.category === cat.value || (cat.value === "Happy hours" && x.happyHour));
       });
       if (!items.length) { browse.innerHTML = '<div class="empty">No matches. Try a different city or search word.</div>'; return; }
       if (key === "events") {
@@ -121,6 +123,9 @@
         var feat = allCats ? items.filter(function (b) { return b.postcard; }) : [];
         var groups = {}, names = [];
         items.forEach(function (b) { if (allCats && b.postcard) return; var c = b.category || "Other"; if (!groups[c]) { groups[c] = []; names.push(c); } groups[c].push(b); });
+        var hhList = items.filter(function (b) { return b.happyHour; });
+        if (allCats && hhList.length) { groups["Happy hours"] = hhList; names.push("Happy hours"); }
+        if (cat && cat.value === "Happy hours") { groups = { "Happy hours": hhList }; names = ["Happy hours"]; }
         names.sort();
         var anchor = function (c) { return "cat-" + c.toLowerCase().replace(/[^a-z0-9]+/g, "-"); };
         var head = function (id, label, n) { return '<h2 class="month-head" id="' + id + '"><span class="stripe-mini"></span>' + esc(label) + ' <span class="cat-count">' + n + '</span></h2>'; };
