@@ -20,6 +20,7 @@ window.CVS.places = {
     "Thousand Palms": "Thousand Palms is an unincorporated community north of Interstate 10. It is home to Acrisure Arena and the Coachella Valley Preserve."
   },
   categories: {
+    "Pets": "Pets covers the valley's independent veterinary clinics and animal hospitals: locally run practices, not the corporate chains.",
     "Fitness": "Fitness covers the valley's independent gyms, CrossFit boxes, personal training studios and boxing and martial arts academies. These are locally owned, not the national chains.",
     "Automotive": "Automotive covers local businesses that sell, service and rent vehicles, including the golf cars that are a common way to get around the valley's country clubs and gated communities.",
     "Home services": "Home services covers the trades that keep a desert home running: plumbing, air conditioning, roofing, pest control, flooring, solar panel cleaning and more. Summer heat, hard water and dust are tough on houses here, so it pays to have a local pro's number before you need it.",
@@ -27,6 +28,9 @@ window.CVS.places = {
     "Restaurants": "Restaurants covers locally owned places to eat, from long-running family dining rooms to newer spots. Many offer deals listed here when you mention Coachella Valley Spotlight."
   },
   services: {
+    "Pool service": "With a pool in so many desert backyards, local pool companies handle weekly cleaning and chemicals, pump and filter repairs, tile cleaning and calcium removal.",
+    "Landscaping": "Local landscapers design and maintain desert yards: drought-smart planting, hardscape, fire features, artificial turf, palms and irrigation.",
+    "Veterinarians": "Independent veterinarians and animal hospitals for checkups, vaccines, surgery and urgent care.",
     "Dentists": "Independent dental practices across the valley offering family, cosmetic and restorative dentistry. These are locally run offices, not the big dental chains.",
     "Orthodontists": "Local orthodontists offering braces and clear aligners for kids and adults.",
     "Electrical": "Local electricians handle panel upgrades, lighting, repairs, EV chargers and new work for homes and businesses. Desert heat puts a heavy load on wiring and panels, so upgrades are common.",
