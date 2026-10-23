@@ -27,6 +27,8 @@ window.CVS.places = {
     "Restaurants": "Restaurants covers locally owned places to eat, from long-running family dining rooms to newer spots. Many offer deals listed here when you mention Coachella Valley Spotlight."
   },
   services: {
+    "Dentists": "Independent dental practices across the valley offering family, cosmetic and restorative dentistry. These are locally run offices, not the big dental chains.",
+    "Orthodontists": "Local orthodontists offering braces and clear aligners for kids and adults.",
     "Electrical": "Local electricians handle panel upgrades, lighting, repairs, EV chargers and new work for homes and businesses. Desert heat puts a heavy load on wiring and panels, so upgrades are common.",
     "Gyms": "Independent gyms with memberships, open gym, classes and personal training, including several open 24 hours.",
     "CrossFit gyms": "CrossFit boxes run by local coaches, with group classes, open gym and drop-ins for visitors.",
