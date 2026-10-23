@@ -7,6 +7,8 @@ const list = (loadData().directory || []).filter(b => !b.sample);
 const { head, headRest, header, footer } = shell();
 const landing = landingPages(list);
 const nice = d => { const [y, m, dd] = d.split("-").map(Number); return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m - 1] + " " + dd + ", " + y; };
+// Free Google Maps search link (no API key). A "googlePlaceId" on the listing pins it to the exact place.
+const googleReviews = b => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([b.name, b.address || b.city + ", CA"].join(", ")) + (b.googlePlaceId ? "&query_place_id=" + encodeURIComponent(b.googlePlaceId) : "");
 const outbound = u => { try { const x = new URL(u); x.searchParams.set("utm_source", "coachellavalleyspotlight"); x.searchParams.set("utm_medium", "profile"); return x.toString(); } catch { return u; } };
 
 fs.rmSync(path.join(root, "business"), { recursive: true, force: true });
@@ -44,6 +46,7 @@ ${rows.length ? `<dl class="facts">${rows.map(r => `<dt>${r[0]}</dt><dd>${esc(r[
 <div class="cta-row">
 ${tel ? `<a class="btn" href="tel:${tel}" data-track="call">Call ${esc(b.phone)}</a>` : ""}
 ${b.url ? `<a class="btn btn-ghost" href="${esc(outbound(b.url))}" target="_blank" rel="noopener" data-track="website">Visit website &rarr;</a>` : ""}
+<a class="btn btn-ghost" href="${esc(googleReviews(b))}" target="_blank" rel="noopener">See Google reviews &rarr;</a>
 </div>
 <p class="risk">Tell them you found them on Coachella Valley Spotlight.</p>
 ${b.claimed ? '<p class="claim-line"><span class="claimed-badge">&#10003; Claimed by the owner</span></p>' : `<p class="claim-line"><a href="claim.html?b=${slug}">Is this your business? Claim this listing &rarr;</a></p>`}

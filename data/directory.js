@@ -10,6 +10,7 @@
    blurb, phone, url, address:            Basic fields (owners can edit).
    about, hours, offer, gallery:          Premium fields (owners can edit). offer = {"title","details","expires":"YYYY-MM-DD"}.
    happyHour: text like "Every day, 3 to 6 PM". Puts the business in the Happy hours group and filter too (on top of its own category).
+   googlePlaceId: optional. The Google place ID, so "See Google reviews" opens the exact business instead of a Maps search.
    service:   the specific trade under the category, e.g. "Plumbing" under "Home services". Builds pages like local/palm-desert/plumbing/.
    name, category, service, city, image, area:     set by Todd only. */
 window.CVS = window.CVS || {};
