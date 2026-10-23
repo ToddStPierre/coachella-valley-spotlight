@@ -51,7 +51,7 @@ function isoStart(e) {
 const niceDate = d => d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
 const eventPaths = [];
 fs.rmSync(path.join(root, "event"), { recursive: true, force: true });
-for (const e of C.events) {
+for (const e of C.events.filter(e => !e.feed)) {
   const slug = C.eventSlug(e), url = `event/${slug}/`;
   eventPaths.push(url);
   const start = C.parse(e.date), end = e.endDate && C.parse(e.endDate);

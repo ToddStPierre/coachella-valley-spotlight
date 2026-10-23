@@ -5,7 +5,7 @@ const SITE = "https://coachellavalleyspotlight.com";
 
 function loadData() {
   const ctx = { window: {} };
-  for (const f of ["directory", "events", "deals", "news", "places"]) {
+  for (const f of ["directory", "events", "feed-events", "deals", "news", "places"]) {
     const p = path.join(root, "data", f + ".js");
     if (fs.existsSync(p)) vm.runInNewContext(fs.readFileSync(p, "utf8"), ctx);
   }

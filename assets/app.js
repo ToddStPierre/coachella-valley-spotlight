@@ -23,7 +23,7 @@
     return '<a class="card-link" href="' + esc(outside ? url : ROOT + url) + '"' + (outside ? ' target="_blank" rel="noopener"' : '') + '>' + label + ' &rarr;</a>';
   }
 
-  var events = (D.events || []).filter(function (e) { var d = parse(e.endDate || e.date); return d && d >= today; })
+  var events = (D.events || []).concat(D.feedEvents || []).filter(function (e) { var d = parse(e.endDate || e.date); return d && d >= today; })
     .sort(function (a, b) { return parse(a.date) - parse(b.date); });
   var deals = (D.deals || []).filter(function (x) { var d = parse(x.expires); return !d || d >= today; });
   var news = (D.news || []).concat(D.headlines || []).sort(function (a, b) { return parse(b.date) - parse(a.date); });
@@ -35,9 +35,11 @@
       return '<article class="card event">' + sample(e) +
         '<div class="date-tile"><span>' + MONTHS[d.getMonth()] + '</span><b>' + d.getDate() + '</b><span>' + (e.endDate ? 'to ' + parse(e.endDate).getDate() : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()]) + '</span></div>' +
         '<div style="display:grid;gap:6px"><span class="meta">' + esc(e.city) + (e.time ? ' &middot; ' + esc(e.time) : '') + '</span>' +
-        '<h3><a href="' + ROOT + 'event/' + eventSlug(e) + '/" style="color:inherit;text-decoration:none">' + esc(e.title) + '</a></h3><p>' + esc(e.venue) + (e.price ? ' &middot; ' + esc(e.price) : '') + '</p>' +
+        // Pulled events (feed: true) have no page here; they link to the source's own page.
+        '<h3><a href="' + (e.feed ? esc(e.url) + '" target="_blank" rel="noopener' : ROOT + 'event/' + eventSlug(e) + '/') + '" style="color:inherit;text-decoration:none">' + esc(e.title) + '</a></h3><p>' + esc(e.venue) + (e.price ? ' &middot; ' + esc(e.price) : '') + '</p>' +
         (e.description ? '<p>' + esc(e.description) + '</p>' : '') +
-        (e.category ? '<span class="tag">' + esc(e.category) + '</span>' : '') + '<a class="card-link" href="' + ROOT + 'event/' + eventSlug(e) + '/">Event details &rarr;</a>' + '</div></article>';
+        (e.category ? '<span class="tag">' + esc(e.category) + '</span>' : '') +
+        (e.feed ? '<a class="card-link" href="' + esc(e.url) + '" target="_blank" rel="noopener">Details at ' + esc(e.source) + ' &rarr;</a>' : '<a class="card-link" href="' + ROOT + 'event/' + eventSlug(e) + '/">Event details &rarr;</a>') + '</div></article>';
     },
     deal: function (x) {
       var d = parse(x.expires);
