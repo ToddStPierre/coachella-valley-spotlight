@@ -16,15 +16,21 @@ window.CVS.places = {
     "Indio": "Indio is the largest city in the Coachella Valley. It hosts the Coachella and Stagecoach festivals at the Empire Polo Club and the Riverside County Fair and National Date Festival. It has a big, growing population of full-time residents and a lot of local, family-owned businesses.",
     "Coachella": "The city of Coachella is in the east valley. It is surrounded by farms and date groves and has a fast-growing, mostly full-time population. Local restaurants, markets and service companies here serve families across the east valley.",
     "Desert Hot Springs": "Desert Hot Springs is on the north side of Interstate 10. It is known for natural hot mineral water and the spa hotels built on it. It is a growing city of full-time residents, and many trades that work valley-wide are based here.",
+    "Bermuda Dunes": "Bermuda Dunes is an unincorporated community between Palm Desert and Indio, built around the Bermuda Dunes Country Club and the small Bermuda Dunes Airport.",
     "Thousand Palms": "Thousand Palms is an unincorporated community north of Interstate 10. It is home to Acrisure Arena and the Coachella Valley Preserve."
   },
   categories: {
+    "Fitness": "Fitness covers the valley's independent gyms, CrossFit boxes, personal training studios and boxing and martial arts academies. These are locally owned, not the national chains.",
     "Automotive": "Automotive covers local businesses that sell, service and rent vehicles, including the golf cars that are a common way to get around the valley's country clubs and gated communities.",
     "Home services": "Home services covers the trades that keep a desert home running: plumbing, air conditioning, roofing, pest control, flooring, solar panel cleaning and more. Summer heat, hard water and dust are tough on houses here, so it pays to have a local pro's number before you need it.",
     "Health and beauty": "Health and beauty covers local clinics, acupuncture, weight loss, salons, spas and wellness practices. These are independent, locally run practices, not national chains.",
     "Restaurants": "Restaurants covers locally owned places to eat, from long-running family dining rooms to newer spots. Many offer deals listed here when you mention Coachella Valley Spotlight."
   },
   services: {
+    "Gyms": "Independent gyms with memberships, open gym, classes and personal training, including several open 24 hours.",
+    "CrossFit gyms": "CrossFit boxes run by local coaches, with group classes, open gym and drop-ins for visitors.",
+    "Personal training": "Personal training studios offering one-on-one sessions, small groups and bootcamps.",
+    "Boxing and martial arts": "Boxing clubs and martial arts academies teaching boxing, Brazilian jiu-jitsu, Muay Thai and MMA to kids and adults.",
     "Mexican restaurants": "Mexican food runs deep in the Coachella Valley, from family taquerias and birria spots in Coachella and Indio to long-running dining rooms in Palm Springs and Rancho Mirage. Many of these are family owned and have been open for decades.",
     "American restaurants": "Locally owned American restaurants: diners, bistros, grills and dinner spots serving burgers, steaks, breakfast and comfort food across the valley.",
     "Seafood restaurants": "Local seafood restaurants, from Mexican mariscos to fresh fish and sushi on El Paseo.",
