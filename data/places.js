@@ -27,6 +27,7 @@ window.CVS.places = {
     "Restaurants": "Restaurants covers locally owned places to eat, from long-running family dining rooms to newer spots. Many offer deals listed here when you mention Coachella Valley Spotlight."
   },
   services: {
+    "Electrical": "Local electricians handle panel upgrades, lighting, repairs, EV chargers and new work for homes and businesses. Desert heat puts a heavy load on wiring and panels, so upgrades are common.",
     "Gyms": "Independent gyms with memberships, open gym, classes and personal training, including several open 24 hours.",
     "CrossFit gyms": "CrossFit boxes run by local coaches, with group classes, open gym and drop-ins for visitors.",
     "Personal training": "Personal training studios offering one-on-one sessions, small groups and bootcamps.",
