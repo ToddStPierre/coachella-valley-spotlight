@@ -391,3 +391,7 @@ button.spot:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgb
 /* Directory: happy hour line on cards */
 .card .hh { margin: 0; font-size: 15px; }
 .card .hh b { color: var(--palm); font-weight: 600; }
+/* Events: add-to-calendar links */
+.cal-links { font-size: 14px; color: var(--ink-2); }
+.cal-links a { color: var(--palm); font-weight: 600; text-decoration: none; }
+.cal-links a:hover { text-decoration: underline; }

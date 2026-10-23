@@ -18,7 +18,16 @@ const DAYS = 60, MAX = 250, MAX_PAGES = 12;
 
 // default venue/city is for feeds that leave the venue blank (The Living Desert does).
 // delay: The Living Desert's robots.txt asks for 10 seconds between requests.
+// type "tribe" (default) = WordPress Events Calendar JSON. The other types read the venue's own
+// public listing page (allowed by each site's robots.txt). Venue sources come first: when the same
+// show is in a venue list and a tourism feed, the venue's own link wins.
 const SOURCES = [
+  { name: "Acrisure Arena", type: "acrisure", url: "https://www.acrisurearena.com/events/all" },
+  { name: "Agua Caliente", type: "agua", url: "https://www.aguacalientecasinos.com/entertainment" },
+  { name: "Fantasy Springs", type: "fantasy", url: "https://www.fantasyspringsresort.com/entertainment" },
+  { name: "Spotlight 29", type: "spotlight29", url: "https://www.spotlight29.com/entertainment" },
+  { name: "VillageFest", base: "https://villagefest.org", venue: "Palm Canyon Drive", city: "Palm Springs" },
+  { name: "Palm Springs Air Museum", base: "https://www.palmspringsairmuseum.org", venue: "Palm Springs Air Museum", city: "Palm Springs" },
   { name: "Discover Palm Desert", base: "https://discoverpalmdesert.com" },
   { name: "Discover Cathedral City", base: "https://www.discovercathedralcity.com" },
   { name: "The Living Desert", base: "https://www.livingdesert.org", venue: "The Living Desert", city: "Palm Desert", delay: 10000 },
@@ -32,7 +41,7 @@ const SKIP = /\b(class(es)?|support group|workshop|club|meeting|mixer|leads lunc
 const VENUE_CITY = [[/acrisure arena/i, "Thousand Palms"]];
 // Their category names -> ours.
 const CATS = [[/concert|music|symphony|jazz/i, "Music"], [/theat|comedy|dance|perform|broadway|film|movie/i, "Theater"],
-  [/sport|golf|tennis|hockey|race|run\b|marathon/i, "Sports"], [/art|exhibit|museum|gallery/i, "Arts"],
+  [/sport|golf|tennis|hockey|race|run\b|marathon|\bvs\.?\s|firebirds|boxing|basketball|wrestling|ufc|rodeo/i, "Sports"], [/art|exhibit|museum|gallery/i, "Arts"],
   [/family|kid|child|zoo|animal/i, "Family"], [/night|club|dj/i, "Nightlife"]];
 
 function decode(s) {
@@ -55,7 +64,75 @@ async function get(url) {
   return r.text();
 }
 
+const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+const pad = n => String(n).padStart(2, "0");
+// "Nov", "November" + day (+ year if given; otherwise the next time that day comes around).
+function toDate(mon, day, year, from) {
+  const m = MONTHS.indexOf(String(mon).slice(0, 3).toLowerCase()); if (m < 0 || !+day) return "";
+  if (year) return `${year}-${pad(m + 1)}-${pad(+day)}`;
+  const y = +from.slice(0, 4); let d = `${y}-${pad(m + 1)}-${pad(+day)}`;
+  if (d < ymd(new Date(Date.parse(from) - 2 * 86400000))) d = `${y + 1}-${pad(m + 1)}-${pad(+day)}`;
+  return d;
+}
+function timeOf(s) { const m = String(s).match(/(\d{1,2})(?::(\d\d))?\s*([AP])\.?M/i); return m ? `${+m[1]}:${m[2] || "00"} ${m[3].toUpperCase()}M` : ""; }
+const catOf = (title, fallback) => (CATS.find(([re]) => re.test(title)) || [0, fallback])[1];
+const show = (src, o) => Object.assign({ category: catOf(o.title, "Music"), source: src.name, feed: true }, o);
+
+// Venue list pages. Each returns the same shape as the tribe reader.
+const VENUES = {
+  async acrisure(src, from) {
+    const html = await get(src.url), out = [];
+    for (const b of html.split('<div class="eventItem').slice(1)) {
+      const a = b.match(/<h3[^>]*>\s*<a href="([^"]+)"[^>]*>([^<]+)<\/a>/), ds = [...b.matchAll(/m-date__month">\s*(\w+)[\s\S]*?m-date__day">\s*(\d+)[\s\S]*?m-date__year">[,\s]*(\d{4})/g)];
+      if (!a || !ds.length) continue;
+      const e = show(src, { title: decode(a[2]), venue: "Acrisure Arena", city: "Thousand Palms", date: toDate(ds[0][1], ds[0][2], ds[0][3]), time: "", url: a[1] });
+      const last = ds.length > 1 ? toDate(ds[ds.length - 1][1], ds[ds.length - 1][2], ds[ds.length - 1][3]) : "";
+      if (last > e.date) e.endDate = last;
+      out.push(e);
+    }
+    return out;
+  },
+  async agua(src, from) {
+    const html = (await get(src.url)).replace(/\\"/g, '"').replace(/\\\//g, "/"), out = [], seen = new Set();
+    const VEN = { "Rancho Mirage": "Agua Caliente Resort Casino Spa", "Palm Springs": "Agua Caliente Casino Palm Springs", "Cathedral City": "Agua Caliente Casino Cathedral City" };
+    for (const m of html.matchAll(/"title":"((?:[^"\\]|\\.)+)","category_text":"([^"]*)","permalink":"([^"]+agua-event[^"]+)","card_image_url":"[^"]*","card_text":"((?:[^"\\]|\\.)*)"/g)) {
+      const un = x => { try { return JSON.parse('"' + x + '"'); } catch (e) { return x; } };
+      const title = decode(un(m[1])), text = decode(un(m[4]).replace(/<br>/gi, " | ")), city = m[2], url = m[3].replace("//cms.", "//www.");
+      const d = text.match(/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2})/);
+      if (!d || !VEN[city] || seen.has(url)) continue;
+      seen.add(url);
+      out.push(show(src, { title, venue: VEN[city], city, date: toDate(d[1], d[2], "", from), time: timeOf(text), url }));
+    }
+    return out;
+  },
+  async fantasy(src, from) {
+    const html = await get(src.url), out = [];
+    for (const m of html.matchAll(/data-title="([^"]+)" data-description="([^"]*)" data-thumb="[^"]*" data-link="([^"]*)"/g)) {
+      const d = m[2].match(/([A-Z]{3})\w*\s+(\d{1,2})(?:\s*-\s*(\d{1,2}))?/);
+      if (!d || !m[3]) continue;
+      const e = show(src, { title: decode(m[1]), venue: "Fantasy Springs Resort Casino", city: "Indio", date: toDate(d[1], d[2], "", from), time: timeOf(m[2]), url: (m[3].startsWith("//") ? "https:" : "") + m[3] });
+      if (d[3]) e.endDate = toDate(d[1], d[3], "", from);
+      out.push(e);
+    }
+    return out;
+  },
+  async spotlight29(src, from) {
+    const html = await get(src.url), out = [];
+    const links = {};
+    try { for (const p of JSON.parse(await get("https://www.spotlight29.com/wp-json/wp/v2/entertainment?per_page=100"))) links[decode(p.title.rendered).toLowerCase()] = p.link; } catch (e) {}
+    const text = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, "").replace(/<[^>]+>/g, "\n").split("\n").map(decode).filter(Boolean);
+    text.forEach((l, i) => {
+      const d = l.match(/^(?:\w+day)\s+(\w+)\s+(\d{1,2}),\s*(\d{4})$/); if (!d) return;
+      const title = text[i - 1]; if (!title || !links[title.toLowerCase()]) return; // only real shows from their own show list
+      const doors = /doors/i.test(text[i + 2] || "") ? "Doors " + timeOf(text[i + 2]) : "";
+      out.push(show(src, { title, venue: "Spotlight 29 Casino", city: "Coachella", date: toDate(d[1], d[2], d[3]), time: doors, url: links[title.toLowerCase()] }));
+    });
+    return out;
+  }
+};
+
 async function readSource(src, from, to) {
+  if (src.type && VENUES[src.type]) return (await VENUES[src.type](src, from)).filter(e => e.date && e.date >= from && e.date <= to && !SKIP.test(e.title));
   const out = [];
   let url = `${src.base}/wp-json/tribe/events/v1/events?per_page=50&start_date=${from}&end_date=${to}`;
   for (let page = 0; url && page < MAX_PAGES; page++) {
@@ -104,18 +181,19 @@ async function live() {
   }
 
   // Fold repeat showings (same title at the same venue) into the first upcoming one.
-  fresh.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  const rank = Object.fromEntries(SOURCES.map((s, i) => [s.name, i]));
+  fresh.sort((a, b) => a.date.localeCompare(b.date) || rank[a.source] - rank[b.source] || a.time.localeCompare(b.time));
   const runs = new Map();
   for (const e of fresh) {
     const key = e.title.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim() + "|" + e.venue.toLowerCase();
-    if (!runs.has(key)) runs.set(key, { first: e, last: e.date, n: 1 });
-    else { const r = runs.get(key); r.n++; if (e.date > r.last) r.last = e.date; }
+    if (!runs.has(key)) runs.set(key, { first: e, last: e.date, n: 1, dates: [e.date] });
+    else { const r = runs.get(key); r.n++; if (e.date > r.last) r.last = e.date; if (!r.dates.includes(e.date)) r.dates.push(e.date); }
   }
   // Drop anything already entered by hand, or already pulled from another feed on the same day.
-  const hand = handEntered().map(h => ({ w: words(h.title), from: h.date, to: h.endDate || h.date }));
+  const hand = handEntered().map(h => ({ w: words(h.title), from: h.date || h.from || today, to: h.endDate || h.until || h.date || to })); // weekly events cover their whole season
   const kept = [], list = [];
-  for (const { first: e, last, n } of runs.values()) {
-    if (n > 1 && last > e.date && !e.endDate) e.time += " · more dates through " + shortDate(last);
+  for (const { first: e, last, n, dates } of runs.values()) {
+    if (n > 1 && last > e.date && !e.endDate) { e.time = (e.time ? e.time + " · " : "") + "more dates through " + shortDate(last); e.dates = dates.slice(0, 40); } // dates: for the "This weekend" filter
     const w = words(e.title);
     if (hand.some(h => sameTitle(h.w, w) && e.date <= h.to && (e.endDate || e.date) >= h.from)) continue;
     if (kept.some(k => k.date === e.date && sameTitle(k.w, w))) continue;

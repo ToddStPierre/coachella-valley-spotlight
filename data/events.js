@@ -2,7 +2,9 @@
    One entry per event. Copy a block, change the details, save.
    date: YYYY-MM-DD (start day). endDate: optional last day for multi-day events.
    url: the official page for more details or tickets. Leave "" if there isn't one and no link shows.
-   Events hide themselves after their last day. */
+   Events hide themselves after their last day.
+   WEEKLY events: leave out date and add weekly: "Saturday" (the day name), plus optional from/until (YYYY-MM-DD).
+   The site always shows the next date with "Every Saturday", and add-to-calendar saves it as a repeating event. */
 window.CVS = window.CVS || {};
 window.CVS.events = [
   { title: "Coachella Valley Firebirds vs. Henderson Silver Knights: Dia de los Muertos", venue: "Acrisure Arena", city: "Thousand Palms", date: "2026-10-30", time: "7:00 PM", category: "Sports", description: "Firebirds hockey with Dia de los Muertos themed celebrations and festivities. Luchador mask giveaway.", url: "https://cvfirebirds.com/schedule/theme-nights-schedule/" },
@@ -11,5 +13,9 @@ window.CVS.events = [
   { title: "Greater Palm Springs Pride", venue: "Various locations, including Arenas Road", city: "Palm Springs", date: "2026-11-06", endDate: "2026-11-08", time: "All weekend", category: "Community", description: "A big, inclusive weekend celebration with a parade, live entertainment and community events.", url: "https://www.pspride.org/" },
   { title: "Indigo Girls", venue: "McCallum Theatre", city: "Palm Desert", date: "2026-11-07", time: "5:00 PM", category: "Music", description: "The folk rock duo brings their harmonies and decades of beloved songs to the McCallum stage. Ticketed show.", url: "https://www.mccallumtheatre.org/" },
   { title: "The Street Fair at College of the Desert", venue: "College of the Desert", city: "Palm Desert", date: "2026-10-24", endDate: "2026-10-25", time: "From 8:00 AM", category: "Community", description: "An open-air market with more than 300 merchants, live entertainment and a farmers' market.", url: "" },
-  { title: "Coachella Valley Days of Los Muertos", venue: "Sunnylands Center & Gardens", city: "Rancho Mirage", date: "2026-11-04", endDate: "2026-11-08", time: "From 8:45 AM", category: "Community", description: "A free outdoor celebration in the gardens with ofrendas, crafts and an evening screening of Coco.", url: "https://sunnylands.org/" }
+  { title: "Coachella Valley Days of Los Muertos", venue: "Sunnylands Center & Gardens", city: "Rancho Mirage", date: "2026-11-04", endDate: "2026-11-08", time: "From 8:45 AM", category: "Community", description: "A free outdoor celebration in the gardens with ofrendas, crafts and an evening screening of Coco.", url: "https://sunnylands.org/" },
+  { title: "Palm Springs Certified Farmers Market", venue: "Palm Springs Cultural Center, 2300 E Baristo Rd", city: "Palm Springs", weekly: "Saturday", until: "2027-05-29", time: "8 AM to 1 PM", category: "Community", description: "Local farmers and food makers every Saturday morning, October to May. Moves indoors to the Palm Springs Pavilion June to September.", url: "https://certifiedfarmersmarkets.org/" },
+  { title: "Indian Wells Certified Farmers Market", venue: "Southwest Church, 44-175 Washington St", city: "Indian Wells", weekly: "Thursday", until: "2027-05-27", time: "8 AM to 2 PM", category: "Community", description: "Weekly certified farmers market with local produce and food vendors, October to May.", url: "https://cvcfm.org/" },
+  { title: "Rancho Mirage Certified Farmers Market", venue: "Rancho Mirage Community Park, 71560 San Jacinto Dr", city: "Rancho Mirage", weekly: "Friday", until: "2027-05-28", time: "8 AM to 2 PM", category: "Community", description: "Friday morning farmers market in the park, with local growers, food vendors and live music, October to May.", url: "https://cvcfm.org/" },
+  { title: "La Quinta Certified Farmers Market", venue: "Old Town La Quinta, 78100 Main St", city: "La Quinta", weekly: "Sunday", until: "2027-05-30", time: "8 AM to 1 PM", category: "Community", description: "Sunday farmers market in Old Town La Quinta, October to May.", url: "https://cvcfm.org/la-quinta/" },
 ];

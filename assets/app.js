@@ -10,7 +10,56 @@
   function fmt(d) { return MONTHS[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear(); }
   function sample(x) { return x.sample ? '<span class="sample">SAMPLE</span>' : ""; }
   var ROOT = document.documentElement.getAttribute("data-root") || "";
-  function eventSlug(e) { return (String(e.title).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").replace(/^(.{80}[^-]*).*$/, "$1")) + "-" + e.date; }
+  function eventSlug(e) { return (String(e.title).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").replace(/^(.{80}[^-]*).*$/, "$1")) + "-" + (e.weekly ? "weekly" : e.date); }
+  function iso(d) { return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  var WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  // Weekly events (weekly: "Saturday", optional from/until): show the next date, plus the next few for the date filter.
+  function nextWeekly(e) {
+    if (!e.weekly) return e;
+    var dow = WEEKDAYS.indexOf(e.weekly), d = new Date(Math.max(today, parse(e.from) || today)), until = parse(e.until);
+    if (dow < 0) return null;
+    while (d.getDay() !== dow) d.setDate(d.getDate() + 1);
+    if (until && d > until) return null;
+    var dates = [];
+    for (var x = new Date(d), i = 0; i < 10 && (!until || x <= until); i++, x.setDate(x.getDate() + 7)) dates.push(iso(x));
+    var out = {}; for (var k in e) out[k] = e[k];
+    out.date = iso(d); out.dates = dates; out.recurring = "Every " + e.weekly;
+    return out;
+  }
+  // Add to calendar. Times like "7:00 PM", "8 AM to 1 PM", "Doors 7PM"; no time = all-day.
+  function calTimes(e) {
+    var m = String(e.time || "").match(/(\d{1,2})(?::(\d\d))?\s*([AP])\.?M\b(?:[^0-9]{1,6}(\d{1,2})(?::(\d\d))?\s*([AP])\.?M\b)?/i);
+    if (!m || e.endDate) return null;
+    var h = function (hh, ap) { return (+hh % 12) + (/p/i.test(ap) ? 12 : 0); };
+    var s = h(m[1], m[3]) * 60 + (+m[2] || 0), en = m[4] ? h(m[4], m[6]) * 60 + (+m[5] || 0) : s + 120;
+    if (en <= s) en = s + 120;
+    var f = function (t) { return ("0" + Math.floor(t / 60) % 24).slice(-2) + ("0" + t % 60).slice(-2) + "00"; };
+    return { start: f(s), end: en >= 1440 ? "235900" : f(en) };
+  }
+  function calInfo(e) {
+    var t = calTimes(e), d = e.date.replace(/-/g, ""), last = parse(e.endDate || e.date); last.setDate(last.getDate() + 1);
+    return { t: t, start: t ? d + "T" + t.start : d, end: t ? d + "T" + t.end : iso(last).replace(/-/g, ""),
+      where: [e.venue, e.city ? e.city + ", CA" : ""].filter(Boolean).join(", "),
+      more: e.feed ? e.url : "https://coachellavalleyspotlight.com/event/" + eventSlug(e) + "/",
+      rule: e.weekly ? "RRULE:FREQ=WEEKLY" + (e.until ? ";UNTIL=" + e.until.replace(/-/g, "") + "T235959Z" : "") : "" };
+  }
+  function googleCal(e) {
+    var c = calInfo(e);
+    return "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(e.title) + "&dates=" + c.start + "/" + c.end +
+      (c.t ? "&ctz=America/Los_Angeles" : "") + "&location=" + encodeURIComponent(c.where) + "&details=" + encodeURIComponent("Details: " + c.more) + (c.rule ? "&recur=" + encodeURIComponent(c.rule) : "");
+  }
+  function icsText(e) {
+    var c = calInfo(e), x = function (s) { return String(s).replace(/[\\;,]/g, "\\$&").replace(/\n/g, "\\n"); };
+    var tz = c.t ? ";TZID=America/Los_Angeles:" : ";VALUE=DATE:";
+    return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Coachella Valley Spotlight//Events//EN", "CALSCALE:GREGORIAN",
+      c.t ? "BEGIN:VTIMEZONE\r\nTZID:America/Los_Angeles\r\nBEGIN:DAYLIGHT\r\nTZOFFSETFROM:-0800\r\nTZOFFSETTO:-0700\r\nTZNAME:PDT\r\nDTSTART:19700308T020000\r\nRRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU\r\nEND:DAYLIGHT\r\nBEGIN:STANDARD\r\nTZOFFSETFROM:-0700\r\nTZOFFSETTO:-0800\r\nTZNAME:PST\r\nDTSTART:19701101T020000\r\nRRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU\r\nEND:STANDARD\r\nEND:VTIMEZONE" : "",
+      "BEGIN:VEVENT", "UID:" + eventSlug(e) + "@coachellavalleyspotlight.com", "DTSTAMP:" + new Date().toISOString().replace(/[-:]/g, "").slice(0, 15) + "Z",
+      "DTSTART" + tz + c.start, "DTEND" + tz + c.end, c.rule, "SUMMARY:" + x(e.title), "LOCATION:" + x(c.where), "DESCRIPTION:" + x("Details: " + c.more), "URL:" + c.more,
+      "END:VEVENT", "END:VCALENDAR"].filter(Boolean).join("\r\n");
+  }
+  function calLinks(e) {
+    return '<span class="cal-links">Add to calendar: <a href="' + esc(googleCal(e)) + '" target="_blank" rel="noopener">Google</a> &middot; <a href="#" data-ics="' + esc(eventSlug(e)) + '">Apple / Outlook</a></span>';
+  }
   function slugOf(b) { return b.slug || String(b.name).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
   function outbound(u) { try { var x = new URL(u); x.searchParams.set("utm_source", "coachellavalleyspotlight"); x.searchParams.set("utm_medium", "directory"); return x.toString(); } catch (e) { return u; } }
   function liveOffer(o) { if (!o || !o.title) return null; var d = parse(o.expires); return !d || d >= today ? o : null; }
@@ -23,7 +72,7 @@
     return '<a class="card-link" href="' + esc(outside ? url : ROOT + url) + '"' + (outside ? ' target="_blank" rel="noopener"' : '') + '>' + label + ' &rarr;</a>';
   }
 
-  var events = (D.events || []).concat(D.feedEvents || []).filter(function (e) { var d = parse(e.endDate || e.date); return d && d >= today; })
+  var events = (D.events || []).concat(D.feedEvents || []).map(nextWeekly).filter(function (e) { var d = e && parse(e.endDate || e.date); return d && d >= today; })
     .sort(function (a, b) { return parse(a.date) - parse(b.date); });
   var deals = (D.deals || []).filter(function (x) { var d = parse(x.expires); return !d || d >= today; });
   var news = (D.news || []).concat(D.headlines || []).sort(function (a, b) { return parse(b.date) - parse(a.date); });
@@ -34,12 +83,12 @@
       var d = parse(e.date);
       return '<article class="card event">' + sample(e) +
         '<div class="date-tile"><span>' + MONTHS[d.getMonth()] + '</span><b>' + d.getDate() + '</b><span>' + (e.endDate ? 'to ' + parse(e.endDate).getDate() : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()]) + '</span></div>' +
-        '<div style="display:grid;gap:6px"><span class="meta">' + esc(e.city) + (e.time ? ' &middot; ' + esc(e.time) : '') + '</span>' +
+        '<div style="display:grid;gap:6px"><span class="meta">' + esc(e.city) + (e.recurring ? ' &middot; ' + esc(e.recurring) : '') + (e.time ? ' &middot; ' + esc(e.time) : '') + '</span>' +
         // Pulled events (feed: true) have no page here; they link to the source's own page.
         '<h3><a href="' + (e.feed ? esc(e.url) + '" target="_blank" rel="noopener' : ROOT + 'event/' + eventSlug(e) + '/') + '" style="color:inherit;text-decoration:none">' + esc(e.title) + '</a></h3><p>' + esc(e.venue) + (e.price ? ' &middot; ' + esc(e.price) : '') + '</p>' +
         (e.description ? '<p>' + esc(e.description) + '</p>' : '') +
         (e.category ? '<span class="tag">' + esc(e.category) + '</span>' : '') +
-        (e.feed ? '<a class="card-link" href="' + esc(e.url) + '" target="_blank" rel="noopener">Details at ' + esc(e.source) + ' &rarr;</a>' : '<a class="card-link" href="' + ROOT + 'event/' + eventSlug(e) + '/">Event details &rarr;</a>') + '</div></article>';
+        (e.feed ? '<a class="card-link" href="' + esc(e.url) + '" target="_blank" rel="noopener">Details at ' + esc(e.source) + ' &rarr;</a>' : '<a class="card-link" href="' + ROOT + 'event/' + eventSlug(e) + '/">Event details &rarr;</a>') + calLinks(e) + '</div></article>';
     },
     deal: function (x) {
       var d = parse(x.expires);
@@ -88,7 +137,21 @@
   var browse = document.querySelector("[data-browse]");
   if (browse) {
     var key = browse.getAttribute("data-browse"), all = SETS[key];
-    var q = document.getElementById("f-q"), city = document.getElementById("f-city"), cat = document.getElementById("f-cat");
+    var q = document.getElementById("f-q"), city = document.getElementById("f-city"), cat = document.getElementById("f-cat"), when = document.getElementById("f-when");
+    // Date window for the events "When" filter: [from, to] as YYYY-MM-DD, or null for any date.
+    function windowFor(v) {
+      if (!v) return null;
+      var a = new Date(today), b = new Date(today), dow = today.getDay();
+      if (v === "weekend") { if (dow >= 1 && dow <= 4) a.setDate(a.getDate() + (5 - dow)); b = new Date(a); b.setDate(a.getDate() + (7 - a.getDay()) % 7); }
+      else if (v === "week") b.setDate(b.getDate() + 6);
+      else if (v === "month") b = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      return [iso(a), iso(b)];
+    }
+    function inWindow(e, w) {
+      if (!w) return true;
+      if (e.dates) return e.dates.some(function (d) { return d >= w[0] && d <= w[1]; });
+      return e.date <= w[1] && (e.endDate || e.date) >= w[0];
+    }
     function fill(sel, field) {
       if (!sel) return;
       var vals = all.map(function (x) { return x[field]; }).filter(Boolean);
@@ -102,10 +165,11 @@
     var params = new URLSearchParams(location.search);
     if (q && params.get("q")) q.value = params.get("q");
     if (cat && params.get("category")) cat.value = params.get("category");
+    if (when && params.get("when")) when.value = params.get("when");
     function draw() {
-      var term = q ? q.value.trim().toLowerCase() : "";
+      var term = q ? q.value.trim().toLowerCase() : "", w = when ? windowFor(when.value) : null;
       var items = all.filter(function (x) {
-        return (!term || text(x).indexOf(term) > -1) && (!city || !city.value || x.city === city.value) && (!cat || !cat.value || x.category === cat.value || (cat.value === "Happy hours" && x.happyHour));
+        return (!term || text(x).indexOf(term) > -1) && (!city || !city.value || x.city === city.value) && (!cat || !cat.value || x.category === cat.value || (cat.value === "Happy hours" && x.happyHour)) && inWindow(x, w);
       });
       if (!items.length) { browse.innerHTML = '<div class="empty">No matches. Try a different city or search word.</div>'; return; }
       if (key === "events") {
@@ -137,7 +201,7 @@
         browse.innerHTML = '<div class="' + (key === "news" ? "grid-2" : "grid") + '">' + items.map(R[TYPE[key]]).join("") + "</div>";
       }
     }
-    [q, city, cat].forEach(function (el) { if (el) el.addEventListener("input", draw); });
+    [q, city, cat, when].forEach(function (el) { if (el) el.addEventListener("input", draw); });
     draw();
   }
 
@@ -262,5 +326,15 @@
         .catch(function (err) { status.textContent = err.message || "That did not go through. Please call or text (760) 422-5475."; })
         .finally(function () { btn.disabled = false; });
     });
+  });
+  // "Apple / Outlook" calendar links: build the .ics file on click.
+  document.addEventListener("click", function (ev) {
+    var a = ev.target.closest && ev.target.closest("[data-ics]"); if (!a) return;
+    ev.preventDefault();
+    var slug = a.getAttribute("data-ics"), e = events.filter(function (x) { return eventSlug(x) === slug; })[0];
+    if (!e) return;
+    var url = URL.createObjectURL(new Blob([icsText(e)], { type: "text/calendar;charset=utf-8" })), dl = document.createElement("a");
+    dl.href = url; dl.download = slug.slice(0, 60) + ".ics"; document.body.appendChild(dl); dl.click();
+    setTimeout(function () { URL.revokeObjectURL(url); dl.remove(); }, 1000);
   });
 })();
