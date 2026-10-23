@@ -421,4 +421,4 @@ button.spot:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgb
 .gr-more { font-size: 14px; margin-top: auto; }
 .gr-foot { font-size: 13px; color: var(--ink-2); margin-top: 14px; }
 .gr-head .gr-stars { display: inline-block; color: #d9cfc2; vertical-align: -1px; }
-.gr-head .gr-stars > span { display: block; color: #f4a300; }
+.gr-head .gr-stars > span { display: block; color: #f4a300; font-size: inherit; }
