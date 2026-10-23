@@ -35,7 +35,7 @@ const andList = a => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " a
 const app = fs.readFileSync(path.join(root, "assets/app.js"), "utf8");
 const ctx = { window: { CVS: D }, document: { documentElement: { getAttribute: () => "" } }, URL };
 vm.runInNewContext(app.slice(app.indexOf("{") + 1, app.indexOf("/* PRERENDER-END")) +
-  "\n;__out = { R: R, events: events, deals: deals, directory: directory, eventSlug: eventSlug, parse: parse, MONTHS_LONG: MONTHS_LONG, googleCal: googleCal };", ctx);
+  "\n;__out = { R: R, events: events, deals: deals, directory: directory, eventSlug: eventSlug, parse: parse, MONTHS_LONG: MONTHS_LONG, googleCal: googleCal, calLinks: calLinks };", ctx);
 const C = ctx.__out;
 const TYPE = { events: "event", deals: "deal", directory: "directory" };
 const cards = (key, items) => items.map(C.R[TYPE[key]]).join("");
@@ -74,7 +74,7 @@ for (const e of C.events.filter(e => !e.feed)) {
 <h1>${esc(e.title)}</h1>
 ${e.description ? `<p>${esc(e.description)}</p>` : ""}
 <dl class="facts"><dt>When</dt><dd>${esc(when)}${e.time ? " &middot; " + esc(e.time) : ""}</dd><dt>Where</dt><dd>${esc(e.venue)}, ${esc(e.city)}</dd>${e.price ? `<dt>Price</dt><dd>${esc(e.price)}</dd>` : ""}</dl>
-<div class="cta-row">${e.url ? `<a class="btn" href="${esc(e.url)}" target="_blank" rel="noopener">Official event page &rarr;</a>` : ""}<a class="btn btn-ghost" href="${esc(C.googleCal(e))}" target="_blank" rel="noopener">Add to Google Calendar</a><a class="btn btn-ghost" href="#" data-ics="${esc(C.eventSlug(e))}">Add to Apple / Outlook</a></div>
+<div class="cta-row">${e.url ? `<a class="btn" href="${esc(e.url)}" target="_blank" rel="noopener">Official event page &rarr;</a>` : ""}${C.calLinks(e)}</div>
 <p class="risk">Details can change. Check with the organizer before you go.</p>
 </div></section>
 ${others.length ? `<section class="section" style="padding-top:0"><div class="wrap"><div class="section-head"><div><span class="eyebrow">On the calendar</span><h2>More things to do in the Coachella Valley</h2></div><a class="more" href="events">Open the calendar &rarr;</a></div><div class="grid-2">${cards("events", others)}</div></div></section>` : ""}

@@ -57,8 +57,16 @@
       "DTSTART" + tz + c.start, "DTEND" + tz + c.end, c.rule, "SUMMARY:" + x(e.title), "LOCATION:" + x(c.where), "DESCRIPTION:" + x("Details: " + c.more), "URL:" + c.more,
       "END:VEVENT", "END:VCALENDAR"].filter(Boolean).join("\r\n");
   }
+  // Icons for add-to-calendar (Google "G" mark from Simple Icons, CC0; the others are drawn here).
+  var ICON = {
+    cal: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    google: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>',
+    ics: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4M12 12.5v6M9.5 16l2.5 2.5 2.5-2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
   function calLinks(e) {
-    return '<span class="cal-links">Add to calendar: <a href="' + esc(googleCal(e)) + '" target="_blank" rel="noopener">Google</a> &middot; <a href="#" data-ics="' + esc(eventSlug(e)) + '">Apple / Outlook</a></span>';
+    return '<span class="cal-links"><span class="cal-label" title="Add to calendar">' + ICON.cal + '<span class="sr-only">Add to calendar:</span></span>' +
+      '<a class="cal-btn" href="' + esc(googleCal(e)) + '" target="_blank" rel="noopener" title="Add to Google Calendar" aria-label="Add to Google Calendar">' + ICON.google + '</a>' +
+      '<a class="cal-btn" href="#" data-ics="' + esc(eventSlug(e)) + '" title="Add to Apple Calendar or Outlook (.ics file)" aria-label="Add to Apple Calendar or Outlook">' + ICON.ics + '</a></span>';
   }
   function slugOf(b) { return b.slug || String(b.name).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
   function outbound(u) { try { var x = new URL(u); x.searchParams.set("utm_source", "coachellavalleyspotlight"); x.searchParams.set("utm_medium", "directory"); return x.toString(); } catch (e) { return u; } }
