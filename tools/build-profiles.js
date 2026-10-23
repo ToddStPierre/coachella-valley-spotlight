@@ -53,6 +53,7 @@ ${b.claimed ? '<p class="claim-line"><span class="claimed-badge">&#10003; Claime
 </div>
 ${prem && b.image ? `<figure class="profile-ad"><img src="${esc(b.image)}" alt="${esc(b.imageAlt || b.name + " ad")}"><figcaption>As seen on the Spotlight postcard</figcaption></figure>` : ""}
 </div>
+${prem && b.googlePlaceId ? `<section class="g-reviews" data-reviews="${slug}" hidden></section>` : ""}
 ${gallery.length ? `<h2 class="month-head" style="margin-top:48px"><span class="stripe-mini"></span>Photos</h2><div class="gallery">${gallery.map((g, i) => `<img src="${esc(g)}" alt="${esc(b.name)} photo ${i + 1}" loading="lazy">`).join("")}</div>` : ""}
 </div></section>
 <div class="wrap"><div class="biz-band"><p><strong>Own a local business?</strong><br>List it free, or go Premium for photos, hours, offers and monthly stats.</p><a class="btn" href="advertise#plans">See listing plans</a></div></div>

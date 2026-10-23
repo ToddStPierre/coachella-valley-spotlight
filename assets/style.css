@@ -400,3 +400,23 @@ button.spot:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgb
 .cal-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); color: var(--palm); text-decoration: none; }
 .cal-btn:hover, .cal-btn:focus-visible { background: var(--palm-soft); }
 .cta-row .cal-links { margin-left: 4px; }
+
+/* Google reviews on Premium profiles (filled in by app.js) */
+.gr-summary { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 0 16px; }
+.gr-summary b { font-family: var(--display); font-size: 32px; line-height: 1; }
+.gr-summary > span:last-child { color: var(--ink-2); }
+.gr-stars { position: relative; display: inline-block; font-size: 18px; line-height: 1; letter-spacing: 2px; color: #d9cfc2; }
+.gr-stars::before { content: "\2605\2605\2605\2605\2605"; }
+.gr-stars > span { position: absolute; inset: 0 auto 0 0; overflow: hidden; white-space: nowrap; color: #f4a300; }
+.gr-stars > span::before { content: "\2605\2605\2605\2605\2605"; }
+.gr-card .gr-stars { font-size: 14px; letter-spacing: 1px; margin-right: 4px; }
+.gr-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.gr-card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.gr-head { display: flex; gap: 10px; align-items: center; }
+.gr-head img { width: 36px; height: 36px; border-radius: 50%; }
+.gr-head b, .gr-head span { display: block; }
+.gr-head a { color: inherit; text-decoration: none; }
+.gr-head span { font-size: 13px; color: var(--ink-2); }
+.gr-card p { margin: 0; font-size: 15px; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical; overflow: hidden; }
+.gr-more { font-size: 14px; margin-top: auto; }
+.gr-foot { font-size: 13px; color: var(--ink-2); margin-top: 14px; }

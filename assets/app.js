@@ -256,6 +256,25 @@
     var host = a.closest("[data-biz]"), type = a.getAttribute("data-track");
     if (host && (type === "call" || type === "website")) track(host.getAttribute("data-biz"), type);
   });
+  // Google reviews on Premium profiles: fetched live from the tracker each visit (never stored, per Google's terms).
+  var grBox = document.querySelector("[data-reviews]");
+  if (grBox) {
+    var stars = function (n) { var w = Math.max(0, Math.min(5, n)) / 5 * 100; return '<span class="gr-stars" role="img" aria-label="' + n + ' out of 5 stars"><span style="width:' + w + '%"></span></span>'; };
+    fetch("https://cvs-tracker.toddstpierre.workers.dev/reviews?b=" + encodeURIComponent(grBox.getAttribute("data-reviews"))).then(function (r) { return r.json(); }).then(function (g) {
+      if (!g || !g.ok) return;
+      var ext = ' target="_blank" rel="noopener"';
+      var html = '<h2 class="month-head" style="margin-top:48px"><span class="stripe-mini"></span>Google reviews</h2>' +
+        '<p class="gr-summary"><b>' + g.rating.toFixed(1) + '</b>' + stars(g.rating) + '<span>' + g.count.toLocaleString() + ' review' + (g.count === 1 ? '' : 's') + ' on Google</span></p>';
+      if (g.reviews.length) html += '<div class="gr-list">' + g.reviews.map(function (r) {
+        var who = r.authorUrl ? '<a href="' + esc(r.authorUrl) + '"' + ext + '>' + esc(r.author) + '</a>' : esc(r.author);
+        return '<article class="gr-card"><div class="gr-head">' + (r.photo ? '<img src="' + esc(r.photo) + '" alt="" width="36" height="36" loading="lazy" referrerpolicy="no-referrer">' : '') +
+          '<div><b>' + who + '</b><span>' + stars(r.rating) + ' ' + esc(r.when) + '</span></div></div>' +
+          '<p>' + esc(r.text) + '</p>' + (r.url ? '<a class="gr-more" href="' + esc(r.url) + '"' + ext + '>Read on Google &rarr;</a>' : '') + '</article>';
+      }).join("") + '</div>';
+      html += '<p class="gr-foot">Reviews from <b>Google Maps</b>' + (g.mapsUrl ? ' &middot; <a href="' + esc(g.mapsUrl) + '"' + ext + '>See all reviews &rarr;</a>' : '') + '</p>';
+      grBox.innerHTML = html; grBox.hidden = false;
+    }).catch(function () {});
+  }
   // Site visitors: count each browser once per day, then show today's and this month's totals.
   var VAPI = "https://cvs-tracker.toddstpierre.workers.dev";
   var pDay = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Los_Angeles" }).format(new Date());
