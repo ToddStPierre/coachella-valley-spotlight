@@ -25,6 +25,15 @@ window.CVS.places = {
     "Restaurants": "Restaurants covers locally owned places to eat, from long-running family dining rooms to newer spots. Many offer deals listed here when you mention Coachella Valley Spotlight."
   },
   services: {
+    "Mexican restaurants": "Mexican food runs deep in the Coachella Valley, from family taquerias and birria spots in Coachella and Indio to long-running dining rooms in Palm Springs and Rancho Mirage. Many of these are family owned and have been open for decades.",
+    "American restaurants": "Locally owned American restaurants: diners, bistros, grills and dinner spots serving burgers, steaks, breakfast and comfort food across the valley.",
+    "Seafood restaurants": "Local seafood restaurants, from Mexican mariscos to fresh fish and sushi on El Paseo.",
+    "Asian restaurants": "Locally owned Thai, Vietnamese and Japanese restaurants, including Thai street food, shabu shabu hot pot and teppanyaki.",
+    "Mediterranean and European restaurants": "Locally owned Mediterranean, French, Belgian, Spanish and Central European restaurants, from casual bistros to dinner spots.",
+    "Cafes and delis": "Local cafes, delis and dessert shops for breakfast, lunch and coffee.",
+    "Pizza and burgers": "Local pizzerias and burger spots, the independent kind, not the national chains.",
+    "Vegan restaurants": "Plant-based and vegan restaurants in the valley.",
+    "Latin American restaurants": "Peruvian, Colombian and other Latin American cooking from local, family-run kitchens.",
     "Golf cars": "Golf car dealers sell new and used carts, handle service and repairs, and rent carts by the day, week or season. Demand picks up every fall when seasonal residents come back.",
     "Plumbing": "Plumbers here deal with a lot of hard water, slab leaks, water heaters that wear out early in the heat, and drains and sewer lines that need clearing. A local plumber who knows desert homes can usually get to you the same day.",
     "Roofing": "Desert sun is hard on roofs. Tile underlayment wears out, flat roofs need coating, and monsoon storms find every weak spot. Local roofers handle repairs, re-roofs and inspections for homes, businesses and mobile homes.",
