@@ -242,6 +242,8 @@ p { margin: 0 0 var(--s2); }
 .plan .amount { font-family: var(--display); font-size: 48px; font-weight: 700; line-height: 1; }
 .plan .amount small { font-family: var(--body); font-size: 16px; font-weight: 500; color: var(--ink-2); }
 .plan .alt { font-family: var(--mono); font-size: 13px; color: var(--palm); letter-spacing: .03em; }
+.plan .amount .was { font-size: 28px; font-weight: 500; color: var(--ink-2); text-decoration-thickness: 2px; margin-right: 4px; }
+.plan .founding { font-size: 14px; color: var(--ink-2); margin: 10px 0 0; }
 .plan ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
 .plan li { padding-left: 28px; position: relative; }
 .plan li::before { content: ""; position: absolute; left: 0; top: 7px; width: 16px; height: 10px; border-left: 3px solid var(--palm); border-bottom: 3px solid var(--palm); transform: rotate(-45deg); }
