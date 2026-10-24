@@ -486,3 +486,11 @@ main:focus { outline: none; }
 .city-photo figcaption { font-size: 13px; color: var(--ink-2); padding: 8px 4px 0; }
 .city-photo figcaption a { color: inherit; }
 @media (max-width: 900px) { .city-hero { grid-template-columns: 1fr; gap: var(--s3); } }
+
+/* Feature pills (dog parks etc.) */
+.feat-pills { list-style: none; margin: 4px 0 2px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.feat-pills li { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; line-height: 1; padding: 6px 10px; border-radius: 999px; background: var(--sand); border: 1px solid var(--line); color: var(--ink); }
+.feat-pills li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--palm); }
+.feat-lg { margin-bottom: 16px; }
+.feat-lg li { font-size: 15px; padding: 8px 14px; background: var(--paper); }
+.feat-head { font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); margin: 18px 0 8px; }

@@ -98,6 +98,10 @@
     "Automotive": '<path d="M5 17H3v-5l2-5h14l2 5v5h-2"/><path d="M9 17h6"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>'
   };
   var STORE = '<path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v12h16V9"/><path d="M3 9h18"/><path d="M9 21v-6h6v6"/>';
+  // Feature pills (dog parks and other public places): ["Fenced", "Shade", ...]
+  function featPills(list) {
+    return list && list.length ? '<ul class="feat-pills" aria-label="Features">' + list.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join("") + '</ul>' : '';
+  }
   function cardArt(b, prem) {
     var img = prem && (b.image || (b.gallery || [])[0]);
     if (img) return '<img class="card-img" src="' + ROOT + esc(img) + '" alt="" loading="lazy" width="640" height="360">';
@@ -146,7 +150,7 @@
       var name = slug ? '<a href="' + ROOT + 'business/' + slug + '/" data-track="profile-link" style="color:inherit;text-decoration:none">' + esc(b.name) + '</a>' : esc(b.name);
       var prem = b.premium || b.featured, off = prem && liveOffer(b.offer);
       return '<article class="card' + (prem ? ' featured' : '') + '"' + (slug ? ' data-biz="' + slug + '"' : '') + '>' + sample(b) + cardArt(b, prem) + '<span class="meta">' + esc(b.service || b.category) + ' &middot; ' + esc(b.city) + '</span>' +
-        '<h3>' + name + '</h3><p>' + esc(b.blurb) + '</p>' + (b.happyHour ? '<p class="hh"><b>Happy hour:</b> ' + esc(b.happyHour) + '</p>' : '') +
+        '<h3>' + name + '</h3><p>' + esc(b.blurb) + '</p>' + featPills(b.features) + (b.happyHour ? '<p class="hh"><b>Happy hour:</b> ' + esc(b.happyHour) + '</p>' : '') +
         (b.postcard ? '<span class="tag">On the Spotlight postcard</span>' : prem ? '<span class="tag">Premium listing</span>' : '') +
         (off ? '<div class="offer-box"><b>' + esc(off.title) + '</b>' + (off.details ? '<span>' + esc(off.details) + '</span>' : '') + '</div>' : '') +
         (slug ? '<a class="card-link" href="' + ROOT + 'business/' + slug + '/">View profile &rarr;</a>' : '') + '</article>';

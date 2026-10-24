@@ -23,7 +23,7 @@ for (const b of list) {
   const prem = !!(b.premium || b.featured);
   const today = new Date().toISOString().slice(0, 10);
   const offer = prem && b.offer && b.offer.title && (!b.offer.expires || b.offer.expires >= today) ? b.offer : null;
-  const rows = [["Area served", b.area], ["Address", b.address], ["Hours", prem && b.hours], ["Happy hour", b.happyHour]].filter(r => r[1]);
+  const rows = [["Area served", b.area], ["Address", b.address], ["Hours", (prem || b.public) && b.hours], ["Size", b.size], ["Happy hour", b.happyHour]].filter(r => r[1]);
   const gallery = prem ? (b.gallery || []) : [];
   const html = `${head}${metaTags({ title: `${b.name} | ${kind} in ${b.city}, CA`, description: desc, url, image: prem && b.image })}<base href="../../">
 ${headRest}${ldjson(schema)}${ldjson(breadcrumbs(trail))}
@@ -40,6 +40,7 @@ ${header}
 ${b.postcard || prem ? '<span class="tag" style="display:inline-block;font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:999px;background:#fde8bf;color:#7a4a00;margin-bottom:16px">' + (b.postcard ? "On the Spotlight postcard" : "Premium listing") + '</span>' : ""}
 <p>${esc(prem ? (b.about || b.blurb) : b.blurb)}</p>
 ${offer ? `<div class="offer-box" style="max-width:640px;margin-bottom:16px"><b>${esc(offer.title)}</b>${offer.details ? `<span>${esc(offer.details)}</span>` : ""}${offer.expires ? `<span>Good through ${esc(nice(offer.expires))}</span>` : ""}</div>` : ""}
+${b.features && b.features.length ? `<h2 class="feat-head">What it has</h2><ul class="feat-pills feat-lg" aria-label="Features">${b.features.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
 ${rows.length ? `<dl class="facts">${rows.map(r => `<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl>` : ""}
 <div class="cta-row">
 ${tel ? `<a class="btn" href="tel:${tel}" data-track="call">Call ${esc(b.phone)}</a>` : ""}
