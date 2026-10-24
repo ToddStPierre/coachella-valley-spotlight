@@ -45,8 +45,8 @@ ${rows.length ? `<dl class="facts">${rows.map(r => `<dt>${r[0]}</dt><dd>${esc(r[
 ${tel ? `<a class="btn" href="tel:${tel}" data-track="call">Call ${esc(b.phone)}</a>` : ""}
 ${b.url ? `<a class="btn btn-ghost" href="${esc(outbound(b.url))}" target="_blank" rel="noopener" data-track="website">Visit website &rarr;</a>` : ""}
 </div>
-<p class="risk">Tell them you found them on Coachella Valley Spotlight.</p>
-${b.claimed ? '<p class="claim-line"><span class="claimed-badge">&#10003; Claimed by the owner</span></p>' : `<p class="claim-line"><a href="claim.html?b=${slug}">Is this your business? Claim this listing &rarr;</a></p>`}
+${b.public ? "" : '<p class="risk">Tell them you found them on Coachella Valley Spotlight.</p>'}
+${b.public ? "" : b.claimed ? '<p class="claim-line"><span class="claimed-badge">&#10003; Claimed by the owner</span></p>' : `<p class="claim-line"><a href="claim.html?b=${slug}">Is this your business? Claim this listing &rarr;</a></p>`}
 </div>
 ${prem && b.image ? `<figure class="profile-ad"><img src="${esc(b.image)}" alt="${esc(b.imageAlt || b.name + " ad")}"><figcaption>As seen on the Spotlight postcard</figcaption></figure>` : ""}
 </div>
