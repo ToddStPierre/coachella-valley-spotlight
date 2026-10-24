@@ -96,7 +96,12 @@
     "Pets": '<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/>',
     "Outdoors": '<path d="m8 3 4 8 5-5 5 15H2L8 3Z"/>',
     "Recreation": '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6a9 9 0 0 1 0 12.8M18.4 5.6a9 9 0 0 0 0 12.8"/>',
+    "Attractions": '<path d="M3 21h18M5 21V10M9.5 21V10M14.5 21V10M19 21V10M2 10l10-6 10 6Z"/>',
     "Automotive": '<path d="M5 17H3v-5l2-5h14l2 5v5h-2"/><path d="M9 17h6"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>'
+  };
+  // Service-level icons win over the category icon.
+  var SERVICE_ICONS = {
+    "Swimming & water parks": '<path d="M2 20c2 0 2.5-1.5 5-1.5S10 20 12 20s2.5-1.5 5-1.5 3 1.5 5 1.5"/><path d="M3 15.5C3 9 7.5 4 13.5 4 17.6 4 20 6.4 20 9c0 2.3-1.8 4-4 4-1.9 0-3.2-1.3-3.2-2.9 0-1.2.8-2.1 1.9-2.1"/>'
   };
   var STORE = '<path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v12h16V9"/><path d="M3 9h18"/><path d="M9 21v-6h6v6"/>';
   // Feature pills (dog parks and other public places): ["Fenced", "Shade", ...]
@@ -106,7 +111,7 @@
   function cardArt(b, prem) {
     var img = prem && (b.image || (b.gallery || [])[0]);
     if (img) return '<img class="card-img" src="' + ROOT + esc(img) + '" alt="" loading="lazy" width="640" height="360">';
-    return '<span class="cat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[b.category] || STORE) + '</svg></span>';
+    return '<span class="cat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + (SERVICE_ICONS[b.service] || ICONS[b.category] || STORE) + '</svg></span>';
   }
 
   // "List your business" reminder after every 3rd category group on the full directory (not after the last; the page already ends with one).

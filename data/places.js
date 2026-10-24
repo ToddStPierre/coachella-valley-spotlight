@@ -22,6 +22,7 @@ window.CVS.places = {
   categories: {
     "Legal": "Legal covers locally based law firms and attorneys: estate planning, family law, criminal defense, bankruptcy, personal injury and business and real estate law. These are firms based in the valley, not national advertising networks. A listing here is not a recommendation or legal advice.",
     "Recreation": "Recreation covers places to play around the valley: free public pickleball and tennis courts at city parks, plus clubs you can join. Most public courts are first come, first served, and many are lit for evening play when it's cooler.",
+    "Attractions": "Attractions covers the valley's museums, gardens and landmark things to see, from the Aerial Tramway and the Air Museum to date farms and history museums.",
     "Outdoors": "Outdoors covers the valley's public hiking trails, from easy oasis walks to all-day mountain climbs in the Santa Rosa and San Jacinto Mountains. Start early, carry more water than you think you need, and check the managing agency's page for seasonal closures.",
     "Pets": "Pets covers the valley's independent veterinary clinics, animal hospitals and pet stores, plus the valley's public dog parks.",
     "Fitness": "Fitness covers the valley's independent gyms, CrossFit boxes, personal training studios and boxing and martial arts academies. These are locally owned, not the national chains.",
@@ -46,6 +47,7 @@ window.CVS.places = {
     "Pickleball": "Public pickleball courts across the valley, from Palm Springs' new 22-court Demuth Park complex to neighborhood parks in Palm Desert, La Quinta, Indio, Coachella and Rancho Mirage. Most are free and first come, first served, and some have lights and reservation times.",
     "Tennis": "Public tennis courts at city parks around the valley, free and mostly first come, first served, plus the Indian Wells Tennis Garden, home of the BNP Paribas Open.",
     "Swimming & water parks": "Public pools run by valley cities, the Palm Desert Aquatic Center with its slides and splash pad, and the valley's two wave pool surf parks. Hours change with the seasons, so check before you go, and summer is the busy time.",
+    "Museums & attractions": "Museums, gardens and landmark attractions around the valley: aircraft at the Palm Springs Air Museum, the Aerial Tramway up Mount San Jacinto, The Living Desert, Sunnylands, Cahuilla culture, local history and a classic date shake. Some are free and many have seasonal hours.",
     "Veterinarians": "Independent veterinarians and animal hospitals for checkups, vaccines, surgery and urgent care.",
     "Dentists": "Independent dental practices across the valley offering family, cosmetic and restorative dentistry. These are locally run offices, not the big dental chains.",
     "Orthodontists": "Local orthodontists offering braces and clear aligners for kids and adults.",

@@ -98,14 +98,14 @@ for (const p of landing) {
     ? `${items.length} ${p.category.toLowerCase()}${/[^is]s$/i.test(p.category) ? "" : " places"} are listed${p.city ? " in " + p.city : " across the valley"} right now, including ${andList(names)}. Each one has its own page with the location and details.`
     : allPublic
     ? `${items.length} ${p.category.toLowerCase()}${/[^is]s$/i.test(p.category) ? "" : " places"} are listed${p.city ? " in " + p.city : " across the valley"} right now, including ${andList(names)}. Each one has its own page with the location, details and a link to the official site.`
-    : `${items.length} ${p.category ? p.category.toLowerCase() + " businesses are" : "local businesses are"} listed${p.city ? " in " + p.city : " across the valley"} right now, including ${andList(names)}. Each one has its own page with the phone number, website and details, and premium listings show current offers.`;
+    : `${items.length} ${p.category ? p.category.toLowerCase() + (/[^is]s$/i.test(p.category) && !/services$/i.test(p.category) ? " are" : " businesses are") : "local businesses are"} listed${p.city ? " in " + p.city : " across the valley"} right now, including ${andList(names)}. Each one has its own page with the phone number, website and details, and premium listings show current offers.`;
   const related = landing.filter(o => o !== p && (
     (p.kind === "city" && o.kind === "combo" && o.city === p.city) ||
     (p.kind === "category" && ((o.kind === "combo" && o.category === p.category) || o.kind === "category")) ||
     (p.kind === "combo" && ((o.kind === "city" && o.city === p.city) || (o.kind === "category" && o.category === p.category)))));
   const label = o => o.kind === "city" ? `All businesses in ${o.city}` : o.kind === "category" ? `${o.category}, valley-wide` : `${o.category} in ${o.city}`;
   // Activity pages (dog parks, hiking trails) get a hero photo, valley-wide and per city.
-  const ACT_PHOTO = { "Dog parks": "dog-parks", "Hiking trails": "hiking-trails", "Pickleball": "pickleball", "Tennis": "tennis", "Swimming & water parks": "swimming" };
+  const ACT_PHOTO = { "Dog parks": "dog-parks", "Hiking trails": "hiking-trails", "Pickleball": "pickleball", "Tennis": "tennis", "Swimming & water parks": "swimming", "Museums & attractions": "attractions" };
   const fig = p.kind !== "city" && ACT_PHOTO[p.category] ? photoFigure(p.category, `assets/img/activities/${ACT_PHOTO[p.category]}.jpg`, p.category) : "";
   const trail = [["Home", ""], ["Directory", "directory"]];
   if (p.kind === "combo") trail.push([p.city, `local/${slugify(p.city)}/`]);
