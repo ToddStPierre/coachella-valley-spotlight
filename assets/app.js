@@ -375,6 +375,16 @@
   });
 
   // Forms: saved by the tracker (shows on the admin page) and emailed to Todd. If the tracker can't be reached, send straight to Formspree.
+  // Contact form: fill in from links like contact?topic=Fix%20or%20update%20a%20listing&about=Name&city=Indio&page=business/x/
+  document.querySelectorAll("form[data-prefill]").forEach(function (f) {
+    var sp = new URLSearchParams(location.search);
+    ["topic", "about", "city", "page"].forEach(function (k) {
+      var el = f.elements[k], v = sp.get(k);
+      if (!el || !v) return;
+      if (el.tagName === "SELECT" && ![].some.call(el.options, function (o) { return o.value === v || o.text === v; })) return;
+      el.value = v;
+    });
+  });
   document.querySelectorAll("form[data-ajax]").forEach(function (f) {
     f.addEventListener("submit", function (ev) {
       ev.preventDefault();

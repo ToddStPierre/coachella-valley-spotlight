@@ -47,6 +47,7 @@ ${tel ? `<a class="btn" href="tel:${tel}" data-track="call">Call ${esc(b.phone)}
 ${b.url ? `<a class="btn btn-ghost" href="${esc(outbound(b.url))}" target="_blank" rel="noopener" data-track="website">Visit website &rarr;</a>` : ""}
 </div>
 ${b.public ? "" : '<p class="risk">Tell them you found them on Coachella Valley Spotlight.</p>'}
+<p class="suggest-line"><a href="contact?topic=${encodeURIComponent("Fix or update a listing")}&about=${encodeURIComponent(b.name)}&city=${encodeURIComponent(b.city)}&page=${encodeURIComponent(url)}#form">See something wrong or out of date? Suggest an edit &rarr;</a></p>
 ${b.public ? "" : b.claimed ? '<p class="claim-line"><span class="claimed-badge">&#10003; Claimed by the owner</span></p>' : `<p class="claim-line"><a href="claim.html?b=${slug}">Is this your business? Claim this listing &rarr;</a></p>`}
 </div>
 ${prem && b.image ? `<figure class="profile-ad"><img src="${esc(b.image)}" alt="${esc(b.imageAlt || b.name + " ad")}"><figcaption>As seen on the Spotlight postcard</figcaption></figure>` : ""}

@@ -3,13 +3,13 @@
   var API = "https://cvs-tracker.toddstpierre.workers.dev";
   var admin = new URLSearchParams(location.search).get("admin"); if (!admin) return;
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
-  var LABEL = { submit: "Listing / event / deal", story: "Story idea", advertise: "Ad inquiry" };
+  var LABEL = { submit: "Listing / event / deal", story: "Story idea", advertise: "Ad inquiry", contact: "Contact / suggestion" };
   var SKIP = ["source"];
   var box = document.createElement("div"); box.id = "submissions-admin"; box.style.marginBottom = "40px";
   document.getElementById("st-out").before(box);
   function row(s) {
     var d = s.data, when = new Date(s.created_at).toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
-    var title = d.business || d.title || d.topic || d.name || "(no name)";
+    var title = d.business || d.title || (d.topic && d.about ? d.topic + ": " + d.about : d.topic) || d.name || "(no name)";
     var fields = Object.keys(d).filter(function (k) { return SKIP.indexOf(k) < 0 && d[k]; }).map(function (k) {
       return "<dt>" + esc(k.replace(/_/g, " ")) + "</dt><dd>" + (k === "email" ? '<a href="mailto:' + esc(d[k]) + '">' + esc(d[k]) + "</a>" : esc(d[k])) + "</dd>";
     }).join("");
