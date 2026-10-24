@@ -48,6 +48,8 @@ window.CVS.places = {
     "Tennis": "Public tennis courts at city parks around the valley, free and mostly first come, first served, plus the Indian Wells Tennis Garden, home of the BNP Paribas Open.",
     "Swimming & water parks": "Public pools run by valley cities, the Palm Desert Aquatic Center with its slides and splash pad, and the valley's two wave pool surf parks. Hours change with the seasons, so check before you go, and summer is the busy time.",
     "Museums & attractions": "Museums, gardens and landmark attractions around the valley: aircraft at the Palm Springs Air Museum, the Aerial Tramway up Mount San Jacinto, The Living Desert, Sunnylands, Cahuilla culture, local history and a classic date shake. Some are free and many have seasonal hours.",
+    "Skate parks": "City skate parks across the valley, from the Palm Springs Skate Park and its famous Nude Bowl to La Quinta's 31,000-square-foot X Park. Most are free, most require a helmet and pads, and several are lit for cooler evening sessions.",
+    "Disc golf": "Disc golf courses in the valley: the free 9-hole course at the Palm Desert Soccer Park and the 18-hole course at Palm Royale in La Quinta. Helix Disc Golf runs local leagues and tournaments.",
     "Veterinarians": "Independent veterinarians and animal hospitals for checkups, vaccines, surgery and urgent care.",
     "Dentists": "Independent dental practices across the valley offering family, cosmetic and restorative dentistry. These are locally run offices, not the big dental chains.",
     "Orthodontists": "Local orthodontists offering braces and clear aligners for kids and adults.",
