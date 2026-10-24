@@ -9,7 +9,7 @@
    git checkout -- index.html directory.html deals.html events.html */
 process.env.TZ = "America/Los_Angeles";
 const fs = require("fs"), path = require("path"), vm = require("vm");
-const { root, SITE, loadData, esc, slugify, ldjson, landingPages, shell, metaTags, breadcrumbs } = require("./lib");
+const { root, SITE, loadData, esc, slugify, ldjson, landingPages, shell, metaTags, breadcrumbs, photoFigure } = require("./lib");
 
 const D = loadData();
 const places = D.places || { cities: {}, categories: {} };
@@ -101,19 +101,22 @@ for (const p of landing) {
     (p.kind === "category" && ((o.kind === "combo" && o.category === p.category) || o.kind === "category")) ||
     (p.kind === "combo" && ((o.kind === "city" && o.city === p.city) || (o.kind === "category" && o.category === p.category)))));
   const label = o => o.kind === "city" ? `All businesses in ${o.city}` : o.kind === "category" ? `${o.category}, valley-wide` : `${o.category} in ${o.city}`;
+  // Activity pages (dog parks, hiking trails) get a hero photo, valley-wide and per city.
+  const ACT_PHOTO = { "Dog parks": "dog-parks", "Hiking trails": "hiking-trails" };
+  const fig = p.kind !== "city" && ACT_PHOTO[p.category] ? photoFigure(p.category, `assets/img/activities/${ACT_PHOTO[p.category]}.jpg`, p.category) : "";
   const trail = [["Home", ""], ["Directory", "directory"]];
   if (p.kind === "combo") trail.push([p.city, `local/${slugify(p.city)}/`]);
   trail.push([heading, p.path]);
   write(p.path, page({
     meta: { title: heading, description: `${heading}: ${andList(names)}${items.length > 3 ? " and more" : ""}. Phone numbers, websites and local deals on Coachella Valley Spotlight.`.slice(0, 300), url: p.path, noindex: !p.index },
     schema: [{ "@context": "https://schema.org", "@type": "ItemList", name: heading, itemListElement: items.map((b, i) => ({ "@type": "ListItem", position: i + 1, url: `${SITE}/business/${b.slug}/`, name: b.name })) }, breadcrumbs(trail)],
-    body: `<section class="page-hero"><div class="wrap">
+    body: `<section class="page-hero"><div class="wrap${fig ? " city-hero" : ""}">${fig ? "<div>" : ""}
 <nav class="crumbs" aria-label="Breadcrumb"><a href="directory">Directory</a>${p.kind === "combo" && landing.some(o => o.kind === "city" && o.city === p.city) ? ` &rsaquo; <a href="local/${slugify(p.city)}/">${esc(p.city)}</a>` : ""}</nav>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>Local directory</span>
 <h1>${esc(heading)}</h1>
 ${intro.map(t => `<p>${esc(t)}</p>`).join("\n")}
 <p>${esc(countLine)}</p>
-</div></section>
+${fig ? `</div>${fig}` : ""}</div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
 <div class="grid">${cards("directory", items)}</div>
 ${related.length ? `<h2 class="month-head" style="margin-top:48px"><span class="stripe-mini"></span>Keep browsing</h2><ul class="link-list">${related.map(o => `<li><a href="${o.path}">${esc(label(o))}</a></li>`).join("")}<li><a href="directory">The full directory</a></li></ul>` : ""}
@@ -128,10 +131,6 @@ const CITY_PAGES = ["Desert Hot Springs", "Palm Springs", "Cathedral City", "Tho
 const DATA_SCRIPTS = '<script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script>';
 fs.rmSync(path.join(root, "city"), { recursive: true, force: true });
 const cityPaths = [];
-// Photo credits for the city hero images, read from legal.html#photos so they're written in one place.
-const legalHtml = fs.readFileSync(path.join(root, "legal.html"), "utf8");
-const credits = {};
-for (const m of legalHtml.matchAll(/<li><strong>([^<]+):<\/strong> <a href="([^"]+)"[^>]*>[^<]*<\/a> by ([^,<]+(?:, [^,<]+)*?), <a [^>]*>([^<]+)<\/a>/g)) credits[m[1]] = { url: m[2], by: m[3], license: m[4] };
 for (const city of CITY_PAGES) {
   const slug = slugify(city), url = `city/${slug}/`, q = encodeURIComponent(city);
   const ev = C.events.filter(e => e.city === city), dl = C.deals.filter(d => d.city === city), biz = C.directory.filter(b => b.city === city && !b.sample);
@@ -141,15 +140,14 @@ for (const city of CITY_PAGES) {
 <div class="section-head"><div><span class="eyebrow">${eyebrow}</span><h2>${h2}</h2></div>${more}</div>
 ${inner}
 </div></section>`;
-  const photo = fs.existsSync(path.join(root, "assets/img/cities", slug + ".jpg")) ? `assets/img/cities/${slug}.jpg` : "";
-  const cr = credits[city];
-  let body = `<section class="page-hero"><div class="wrap city-hero${photo ? "" : " no-photo"}"><div>
+  const fig = photoFigure(city, `assets/img/cities/${slug}.jpg`, `${city}, California`);
+  let body = `<section class="page-hero"><div class="wrap city-hero${fig ? "" : " no-photo"}"><div>
 <nav class="crumbs" aria-label="Breadcrumb"><a href="./">Home</a> &rsaquo; ${esc(city)}</nav>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>City guide</span>
 <h1>${esc(city)}</h1>
 <p>${esc(intro)}</p>
 <div class="chips">${ev.length ? `<a class="chip" href="events?city=${q}">Things to do</a>` : ""}<a class="chip" href="directory?city=${q}">Local businesses</a>${dl.length ? '<a class="chip" href="#deals">Deals</a>' : ""}</div>
-</div>${photo ? `<figure class="city-photo"><img src="${photo}" alt="${esc(city)}, California" width="800" height="450"><figcaption>${cr ? `Photo: <a href="${esc(cr.url)}" target="_blank" rel="noopener">${esc(cr.by)}</a>, ${esc(cr.license)} via Wikimedia Commons` : '<a href="legal#photos">Photo credit</a>'}</figcaption></figure>` : ""}</div></section>`;
+</div>${fig}</div></section>`;
   if (ev.length) body += sec("On the calendar", `Coming up in ${esc(city)}`, `<a class="more" href="events?city=${q}">All ${esc(city)} events &rarr;</a>`,
     block(`class="grid-2" data-city="${esc(city)}" data-list="events" data-limit="6"`, cards("events", ev.slice(0, 6))), true);
   if (dl.length) body += sec('Local deals<span id="deals"></span>', `Deals in ${esc(city)}`, '<a class="more" href="deals">All deals &rarr;</a>',

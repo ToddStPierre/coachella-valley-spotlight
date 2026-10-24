@@ -85,4 +85,20 @@ function breadcrumbs(trail) {
   };
 }
 
-module.exports = { schemaType, root, SITE, loadData, esc, slugify, slugOf, ldjson, landingPages, shell, metaTags, breadcrumbs };
+/* Hero photo with its Wikimedia credit. Credits live in legal.html#photos as
+   <li><strong>Key:</strong> <a href="file page">name</a> by Author, <a ...>License</a>, so they're written once. */
+let creditCache;
+function credits() {
+  if (creditCache) return creditCache;
+  creditCache = {};
+  const html = fs.readFileSync(path.join(root, "legal.html"), "utf8");
+  for (const m of html.matchAll(/<li><strong>([^<]+):<\/strong> <a href="([^"]+)"[^>]*>[^<]*<\/a> by ([^,<]+(?:, [^,<]+)*?), <a [^>]*>([^<]+)<\/a>/g)) creditCache[m[1]] = { url: m[2], by: m[3], license: m[4] };
+  return creditCache;
+}
+function photoFigure(key, src, alt) {
+  if (!src || !fs.existsSync(path.join(root, src))) return "";
+  const cr = credits()[key];
+  return `<figure class="city-photo"><img src="${src}" alt="${esc(alt)}" width="800" height="450"><figcaption>${cr ? `Photo: <a href="${esc(cr.url)}" target="_blank" rel="noopener">${esc(cr.by)}</a>, ${esc(cr.license)} via Wikimedia Commons` : '<a href="legal#photos">Photo credit</a>'}</figcaption></figure>`;
+}
+
+module.exports = { photoFigure, schemaType, root, SITE, loadData, esc, slugify, slugOf, ldjson, landingPages, shell, metaTags, breadcrumbs };
