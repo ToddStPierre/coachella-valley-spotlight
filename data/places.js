@@ -38,6 +38,7 @@ window.CVS.places = {
     "Personal injury": "Local personal injury attorneys handle car and truck accidents, dog bites, falls and wrongful death claims, usually on a contingency fee.",
     "Business and real estate law": "Local business and real estate attorneys handle company formation, contracts, property deals, landlord and tenant matters, HOAs and business disputes.",
     "Pet stores": "Independent pet stores for food, treats, toys and supplies, with staff who can help you choose the right diet. These are local shops, not the big-box chains.",
+    "Med spas": "Local med spas offering injectables like Botox and fillers, skin treatments, weight loss programs and permanent makeup, in a spa setting with medical oversight.",
     "Veterinarians": "Independent veterinarians and animal hospitals for checkups, vaccines, surgery and urgent care.",
     "Dentists": "Independent dental practices across the valley offering family, cosmetic and restorative dentistry. These are locally run offices, not the big dental chains.",
     "Orthodontists": "Local orthodontists offering braces and clear aligners for kids and adults.",
