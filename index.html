@@ -40,7 +40,7 @@
 </nav></header>
 <main id="main" tabindex="-1">
 
-<section class="hero"><div class="wrap"><div class="hero-inner">
+<section class="hero"><div class="wrap hero-grid"><div class="hero-inner">
 <span class="eyebrow"><span class="stripe-mini"></span>Your local guide to the desert</span>
 <h1>Find What&rsquo;s Good in the <span class="grad">Coachella Valley.</span></h1>
 <p class="lede">Events this week, deals from local shops, and the businesses your neighbors actually call.</p>
@@ -53,7 +53,11 @@
 <a class="chip" href="directory?category=Home%20services">Home services</a><a class="chip" href="directory?category=Restaurants">Restaurants</a></div>
 <p class="cities">DESERT HOT SPRINGS &middot; PALM SPRINGS &middot; CATHEDRAL CITY &middot; THOUSAND PALMS &middot; RANCHO MIRAGE &middot; PALM DESERT &middot; INDIAN WELLS &middot; BERMUDA DUNES &middot; LA QUINTA &middot; INDIO &middot; COACHELLA &middot; THERMAL &middot; MECCA</p>
 <p class="hero-biz">Own a local business? <a href="advertise">See how Spotlight Postcards work &rarr;</a></p>
-</div></div><svg class="mountains" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
+</div>
+<aside class="hero-panel" aria-labelledby="hp-h"><span class="eyebrow"><span class="stripe-mini"></span>This weekend</span><h2 id="hp-h" class="sr-only">This weekend</h2>
+<ol class="hp-list" data-when="weekend" data-list="events" data-limit="3" data-view="row"></ol>
+<a class="more" href="events?when=weekend">See all weekend events &rarr;</a></aside>
+</div><svg class="mountains" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
 <path d="M0 120 L0 78 L120 40 L210 70 L330 18 L450 66 L560 36 L650 58 L780 10 L900 62 L1010 30 L1110 56 L1200 34 L1200 120 Z" fill="#c9667a" opacity=".35"/>
 <path d="M0 120 L0 96 L160 64 L260 88 L400 52 L520 90 L640 66 L760 92 L880 58 L1000 86 L1100 70 L1200 84 L1200 120 Z" fill="#5b4a7a" opacity=".55"/>
 <path d="M0 120 L0 108 L200 92 L380 108 L560 94 L760 110 L940 96 L1200 106 L1200 120 Z" fill="#221c18"/></svg></section>
@@ -61,8 +65,8 @@
 <div class="wrap"><section id="search-results" class="section" hidden></section></div>
 
 <section class="section"><div class="wrap">
-<div class="section-head"><div><span class="eyebrow">This weekend</span><h2>Things to do this weekend</h2><p>Markets, shows, games and more around the valley.</p></div><a class="more" href="events?when=weekend">All weekend events &rarr;</a></div>
-<div class="grid-2" data-when="weekend" data-list="events" data-limit="6"><noscript><div class="empty">Turn on JavaScript to see the listings.</div></noscript></div>
+<div class="section-head"><div><span class="eyebrow">On the calendar</span><h2>Coming up around the valley</h2><p>Markets, shows, games and more after this weekend.</p></div><a class="more" href="events">Open the calendar &rarr;</a></div>
+<div class="grid-2" data-when="after-weekend" data-list="events" data-limit="6"><noscript><div class="empty">Turn on JavaScript to see the listings.</div></noscript></div>
 </div></section>
 <section class="section" style="padding-top:0"><div class="wrap">
 <div class="section-head"><div><span class="eyebrow">Local deals</span><h2>Specials worth the drive</h2></div><a class="more" href="deals">All deals &rarr;</a></div>

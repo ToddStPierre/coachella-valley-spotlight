@@ -86,6 +86,23 @@
   var news = (D.news || []).concat(D.headlines || []).sort(function (a, b) { return parse(b.date) - parse(a.date); });
   var directory = (D.directory || []).slice().sort(function (a, b) { return ((b.premium || b.featured) ? 1 : 0) - ((a.premium || a.featured) ? 1 : 0) || (a.sample ? 1 : 0) - (b.sample ? 1 : 0) || a.name.localeCompare(b.name); });
 
+  // Card art: Premium listings show their own photo or ad; everyone else gets a category icon (Lucide-style strokes).
+  var ICONS = {
+    "Restaurants": '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+    "Home services": '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
+    "Health and beauty": '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+    "Fitness": '<path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11"/>',
+    "Legal": '<path d="M12 3v18M7 21h10M5 7h14M5 7l-3 7a3 3 0 0 0 6 0L5 7Zm14 0-3 7a3 3 0 0 0 6 0l-3-7Z"/>',
+    "Pets": '<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/>',
+    "Automotive": '<path d="M5 17H3v-5l2-5h14l2 5v5h-2"/><path d="M9 17h6"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>'
+  };
+  var STORE = '<path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v12h16V9"/><path d="M3 9h18"/><path d="M9 21v-6h6v6"/>';
+  function cardArt(b, prem) {
+    var img = prem && (b.image || (b.gallery || [])[0]);
+    if (img) return '<img class="card-img" src="' + ROOT + esc(img) + '" alt="" loading="lazy" width="640" height="360">';
+    return '<span class="cat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[b.category] || STORE) + '</svg></span>';
+  }
+
   var R = {
     event: function (e) {
       var d = parse(e.date);
@@ -94,9 +111,14 @@
         '<div style="display:grid;gap:6px"><span class="meta">' + esc(e.city) + (e.recurring ? ' &middot; ' + esc(e.recurring) : '') + (e.time ? ' &middot; ' + esc(e.time) : '') + '</span>' +
         // Pulled events (feed: true) have no page here; they link to the source's own page.
         '<h3><a href="' + (e.feed ? esc(e.url) + '" target="_blank" rel="noopener' : ROOT + 'event/' + eventSlug(e) + '/') + '" style="color:inherit;text-decoration:none">' + esc(e.title) + '</a></h3><p>' + esc(e.venue) + (e.price ? ' &middot; ' + esc(e.price) : '') + '</p>' +
-        (e.description ? '<p>' + esc(e.description) + '</p>' : '') +
+        (e.description ? '<p class="ev-desc">' + esc(e.description) + '</p>' : '') +
         (e.category ? '<span class="tag">' + esc(e.category) + '</span>' : '') +
         (e.feed ? '<a class="card-link" href="' + esc(e.url) + '" target="_blank" rel="noopener">Details at ' + esc(e.source) + ' &rarr;</a>' : '<a class="card-link" href="' + ROOT + 'event/' + eventSlug(e) + '/">Event details &rarr;</a>') + calLinks(e) + '</div></article>';
+    },
+    eventRow: function (e) {
+      var d = parse(e.date), href = e.feed ? esc(e.url) + '" target="_blank" rel="noopener' : ROOT + 'event/' + eventSlug(e) + '/';
+      return '<li><a href="' + href + '"><span class="hp-date"><small>' + ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()] + '</small><b>' + d.getDate() + '</b></span>' +
+        '<span class="hp-txt"><b>' + esc(e.title) + '</b><small>' + esc(e.city) + (e.time ? ' &middot; ' + esc(e.time) : '') + '</small></span></a></li>';
     },
     deal: function (x) {
       var d = parse(x.expires);
@@ -117,7 +139,7 @@
       var slug = !b.sample && slugOf(b);
       var name = slug ? '<a href="' + ROOT + 'business/' + slug + '/" data-track="profile-link" style="color:inherit;text-decoration:none">' + esc(b.name) + '</a>' : esc(b.name);
       var prem = b.premium || b.featured, off = prem && liveOffer(b.offer);
-      return '<article class="card' + (prem ? ' featured' : '') + '"' + (slug ? ' data-biz="' + slug + '"' : '') + '>' + sample(b) + '<span class="meta">' + esc(b.service || b.category) + ' &middot; ' + esc(b.city) + '</span>' +
+      return '<article class="card' + (prem ? ' featured' : '') + '"' + (slug ? ' data-biz="' + slug + '"' : '') + '>' + sample(b) + cardArt(b, prem) + '<span class="meta">' + esc(b.service || b.category) + ' &middot; ' + esc(b.city) + '</span>' +
         '<h3>' + name + '</h3><p>' + esc(b.blurb) + '</p>' + (b.happyHour ? '<p class="hh"><b>Happy hour:</b> ' + esc(b.happyHour) + '</p>' : '') +
         (b.postcard ? '<span class="tag">On the Spotlight postcard</span>' : prem ? '<span class="tag">Premium listing</span>' : '') +
         (off ? '<div class="offer-box"><b>' + esc(off.title) + '</b>' + (off.details ? '<span>' + esc(off.details) + '</span>' : '') + '</div>' : '') +
@@ -138,6 +160,7 @@
     if (v === "weekend") { if (dow >= 1 && dow <= 4) a.setDate(a.getDate() + (5 - dow)); b = new Date(a); b.setDate(a.getDate() + (7 - a.getDay()) % 7); }
     else if (v === "week") b.setDate(b.getDate() + 6);
     else if (v === "month") b = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    else if (v === "after-weekend") { var wk = windowFor("weekend"); a = parse(wk[1]); a.setDate(a.getDate() + 1); return [iso(a), "9999-12-31"]; }
     return [iso(a), iso(b)];
   }
   function inWindow(e, w) {
@@ -153,10 +176,12 @@
     // data-per="city": only the newest item from each city (the lists are already newest first)
     var items = SETS[key].filter(function (x) { if (!per) return true; var v = x[per] || ""; if (seen[v]) return false; seen[v] = 1; return true; });
     var w = windowFor(el.getAttribute("data-when"));
-    if (w) { var inW = items.filter(function (x) { return inWindow(x, w); }); if (inW.length) items = inW; }
+    // "after-weekend" goes by each event's next date, so a weekly market showing this Saturday isn't repeated under "Coming up".
+    var after = el.getAttribute("data-when") === "after-weekend";
+    if (w) { var inW = items.filter(function (x) { return after ? x.date >= w[0] : inWindow(x, w); }); if (inW.length) items = inW; }
     items = items.slice(0, limit);
-    var opt = { img: el.hasAttribute("data-img") };
-    el.innerHTML = items.length ? items.map(function (x) { return R[TYPE[key]](x, opt); }).join("") : '<div class="empty">Nothing here yet. Check back soon.</div>';
+    var opt = { img: el.hasAttribute("data-img") }, view = el.getAttribute("data-view") === "row" ? TYPE[key] + "Row" : TYPE[key];
+    el.innerHTML = items.length ? items.map(function (x) { return R[view](x, opt); }).join("") : '<div class="empty">Nothing here yet. Check back soon.</div>';
   });
 
   // Full list pages with filters: <div data-browse="events"></div>
