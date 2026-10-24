@@ -357,8 +357,13 @@
     btn.addEventListener("click", function (ev) { ev.stopPropagation(); set(!li.classList.contains("open")); });
     document.addEventListener("click", function (ev) { if (!li.contains(ev.target)) set(false); });
     li.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && li.classList.contains("open")) { set(false); btn.focus(); } });
-    var here = li.querySelector('a[href$="' + location.pathname.replace(/^.*\/(city\/[^\/]+\/)$/, "$1") + '"]');
-    if (/\/city\/[^\/]+\/$/.test(location.pathname) && here) { here.setAttribute("aria-current", "page"); btn.classList.add("current"); }
+    // Mark the current page inside the dropdown (city pages, events, golf and its course pages, dog parks) and light up its button.
+    var path = location.pathname.replace(/\.html$/, "").replace(/\/index$/, "/");
+    li.querySelectorAll(".sub-menu a").forEach(function (a) {
+      var p = new URL(a.href, location.href).pathname;
+      if (path === p || (p.slice(-1) === "/" && path.indexOf(p) === 0)) a.setAttribute("aria-current", "page");
+    });
+    if (li.querySelector('.sub-menu a[aria-current="page"]')) btn.classList.add("current");
   });
 
   // Forms: saved by the tracker (shows on the admin page) and emailed to Todd. If the tracker can't be reached, send straight to Formspree.
