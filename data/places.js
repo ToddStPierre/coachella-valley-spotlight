@@ -45,6 +45,7 @@ window.CVS.places = {
     "Hiking trails": "Public trails across the valley: palm oases in the Indian Canyons, National Monument trails above Palm Desert and Rancho Mirage, the La Quinta Cove, and high-country hikes from the Palm Springs Aerial Tramway. Some charge admission and some close seasonally or in summer heat.",
     "Pickleball": "Public pickleball courts across the valley, from Palm Springs' new 22-court Demuth Park complex to neighborhood parks in Palm Desert, La Quinta, Indio, Coachella and Rancho Mirage. Most are free and first come, first served, and some have lights and reservation times.",
     "Tennis": "Public tennis courts at city parks around the valley, free and mostly first come, first served, plus the Indian Wells Tennis Garden, home of the BNP Paribas Open.",
+    "Swimming & water parks": "Public pools run by valley cities, the Palm Desert Aquatic Center with its slides and splash pad, and the valley's two wave pool surf parks. Hours change with the seasons, so check before you go, and summer is the busy time.",
     "Veterinarians": "Independent veterinarians and animal hospitals for checkups, vaccines, surgery and urgent care.",
     "Dentists": "Independent dental practices across the valley offering family, cosmetic and restorative dentistry. These are locally run offices, not the big dental chains.",
     "Orthodontists": "Local orthodontists offering braces and clear aligners for kids and adults.",
