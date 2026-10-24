@@ -366,7 +366,9 @@
     // Mark the current page inside the dropdown (city pages, events, golf and its course pages, dog parks) and light up its button.
     var path = location.pathname.replace(/\.html$/, "").replace(/\/index$/, "/");
     li.querySelectorAll(".sub-menu a").forEach(function (a) {
-      var p = new URL(a.href, location.href).pathname;
+      var u = new URL(a.href, location.href), p = u.pathname;
+      // Links with a query (like directory?category=Happy hours) only match when the query matches too.
+      if (u.search && u.search !== location.search) return;
       if (path === p || (p.slice(-1) === "/" && path.indexOf(p) === 0)) a.setAttribute("aria-current", "page");
     });
     if (li.querySelector('.sub-menu a[aria-current="page"]')) btn.classList.add("current");
