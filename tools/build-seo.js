@@ -128,6 +128,10 @@ const CITY_PAGES = ["Desert Hot Springs", "Palm Springs", "Cathedral City", "Tho
 const DATA_SCRIPTS = '<script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script>';
 fs.rmSync(path.join(root, "city"), { recursive: true, force: true });
 const cityPaths = [];
+// Photo credits for the city hero images, read from legal.html#photos so they're written in one place.
+const legalHtml = fs.readFileSync(path.join(root, "legal.html"), "utf8");
+const credits = {};
+for (const m of legalHtml.matchAll(/<li><strong>([^<]+):<\/strong> <a href="([^"]+)"[^>]*>[^<]*<\/a> by ([^,<]+(?:, [^,<]+)*?), <a [^>]*>([^<]+)<\/a>/g)) credits[m[1]] = { url: m[2], by: m[3], license: m[4] };
 for (const city of CITY_PAGES) {
   const slug = slugify(city), url = `city/${slug}/`, q = encodeURIComponent(city);
   const ev = C.events.filter(e => e.city === city), dl = C.deals.filter(d => d.city === city), biz = C.directory.filter(b => b.city === city && !b.sample);
@@ -137,13 +141,15 @@ for (const city of CITY_PAGES) {
 <div class="section-head"><div><span class="eyebrow">${eyebrow}</span><h2>${h2}</h2></div>${more}</div>
 ${inner}
 </div></section>`;
-  let body = `<section class="page-hero"><div class="wrap">
+  const photo = fs.existsSync(path.join(root, "assets/img/cities", slug + ".jpg")) ? `assets/img/cities/${slug}.jpg` : "";
+  const cr = credits[city];
+  let body = `<section class="page-hero"><div class="wrap city-hero${photo ? "" : " no-photo"}"><div>
 <nav class="crumbs" aria-label="Breadcrumb"><a href="./">Home</a> &rsaquo; ${esc(city)}</nav>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>City guide</span>
 <h1>${esc(city)}</h1>
 <p>${esc(intro)}</p>
 <div class="chips">${ev.length ? `<a class="chip" href="events?city=${q}">Things to do</a>` : ""}<a class="chip" href="directory?city=${q}">Local businesses</a>${dl.length ? '<a class="chip" href="#deals">Deals</a>' : ""}</div>
-</div></section>`;
+</div>${photo ? `<figure class="city-photo"><img src="${photo}" alt="${esc(city)}, California" width="800" height="450"><figcaption>${cr ? `Photo: <a href="${esc(cr.url)}" target="_blank" rel="noopener">${esc(cr.by)}</a>, ${esc(cr.license)} via Wikimedia Commons` : '<a href="legal#photos">Photo credit</a>'}</figcaption></figure>` : ""}</div></section>`;
   if (ev.length) body += sec("On the calendar", `Coming up in ${esc(city)}`, `<a class="more" href="events?city=${q}">All ${esc(city)} events &rarr;</a>`,
     block(`class="grid-2" data-city="${esc(city)}" data-list="events" data-limit="6"`, cards("events", ev.slice(0, 6))), true);
   if (dl.length) body += sec('Local deals<span id="deals"></span>', `Deals in ${esc(city)}`, '<a class="more" href="deals">All deals &rarr;</a>',

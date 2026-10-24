@@ -72,7 +72,7 @@
   function outbound(u) { try { var x = new URL(u); x.searchParams.set("utm_source", "coachellavalleyspotlight"); x.searchParams.set("utm_medium", "directory"); return x.toString(); } catch (e) { return u; } }
   function liveOffer(o) { if (!o || !o.title) return null; var d = parse(o.expires); return !d || d >= today ? o : null; }
   // One photo per city for home page headline cards (assets/img/cities/, credits on legal.html#photos)
-  var CITY_PHOTOS = ["palm-springs", "desert-hot-springs", "cathedral-city", "rancho-mirage", "palm-desert", "indian-wells", "la-quinta", "indio", "coachella", "thousand-palms", "thermal", "mecca"];
+  var CITY_PHOTOS = ["bermuda-dunes", "palm-springs", "desert-hot-springs", "cathedral-city", "rancho-mirage", "palm-desert", "indian-wells", "la-quinta", "indio", "coachella", "thousand-palms", "thermal", "mecca"];
   function cityPhoto(city) { var s = String(city || "").toLowerCase().replace(/[^a-z]+/g, "-"); return CITY_PHOTOS.indexOf(s) > -1 ? s : "valley-wide"; }
   function link(url, label) {
     if (!url) return "";
