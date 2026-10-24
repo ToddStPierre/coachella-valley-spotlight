@@ -457,3 +457,20 @@ main:focus { outline: none; }
 @media (max-width: 700px) { .cal-btn { width: 44px; height: 44px; } }
 
 .list-band { margin: var(--s4) 0 var(--s2); }
+
+/* Cities dropdown (main menu) */
+.has-sub { position: relative; }
+.sub-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; border: 0; background: none; font: inherit; font-weight: 500; font-size: 15.5px; color: var(--ink); cursor: pointer; }
+.sub-toggle svg { transition: transform .15s ease; }
+.sub-toggle:hover, .has-sub.open .sub-toggle, .sub-toggle.current { background: var(--palm-soft); color: var(--palm); }
+.has-sub.open .sub-toggle svg { transform: rotate(180deg); }
+.sub-menu { display: none; list-style: none; margin: 0; padding: 10px; }
+.has-sub.open .sub-menu { display: grid; }
+@media (min-width: 921px) {
+  .sub-menu { position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); z-index: 30; width: 420px; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+}
+.sub-menu a { display: block; padding: 9px 12px; border-radius: 10px; font-size: 16px; }
+.sub-menu a:hover, .sub-menu a[aria-current="page"] { background: var(--palm-soft); color: var(--palm); }
+@media (max-width: 920px) {
+  .sub-menu { grid-template-columns: 1fr 1fr; padding: 4px 0 8px 12px; }
+}

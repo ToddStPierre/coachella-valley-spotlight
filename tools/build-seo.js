@@ -118,6 +118,48 @@ ${related.length ? `<h2 class="month-head" style="margin-top:48px"><span class="
   }));
 }
 
+/* 3b. City pages: city/<slug>/, linked from the Cities menu. The homepage mix (events, deals, businesses, headlines) for one city.
+   Cards are pre-rendered here; app.js re-renders the same blocks in the browser with data-city filtering. */
+const CITY_PAGES = ["Desert Hot Springs", "Palm Springs", "Cathedral City", "Thousand Palms", "Rancho Mirage", "Palm Desert", "Indian Wells", "Bermuda Dunes", "La Quinta", "Indio", "Coachella"];
+const DATA_SCRIPTS = '<script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script>';
+fs.rmSync(path.join(root, "city"), { recursive: true, force: true });
+const cityPaths = [];
+for (const city of CITY_PAGES) {
+  const slug = slugify(city), url = `city/${slug}/`, q = encodeURIComponent(city);
+  const ev = C.events.filter(e => e.city === city), dl = C.deals.filter(d => d.city === city), biz = C.directory.filter(b => b.city === city && !b.sample);
+  const intro = places.cities[city] || `${city} is part of the Coachella Valley.`;
+  const block = (attrs, html) => `<div ${attrs}>${html}</div>`;
+  const sec = (eyebrow, h2, more, inner, first) => `<section class="section"${first ? "" : ' style="padding-top:0"'}><div class="wrap">
+<div class="section-head"><div><span class="eyebrow">${eyebrow}</span><h2>${h2}</h2></div>${more}</div>
+${inner}
+</div></section>`;
+  let body = `<section class="page-hero"><div class="wrap">
+<nav class="crumbs" aria-label="Breadcrumb"><a href="./">Home</a> &rsaquo; ${esc(city)}</nav>
+<span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>City guide</span>
+<h1>${esc(city)}</h1>
+<p>${esc(intro)}</p>
+<div class="chips">${ev.length ? `<a class="chip" href="events?city=${q}">Things to do</a>` : ""}<a class="chip" href="directory?city=${q}">Local businesses</a>${dl.length ? '<a class="chip" href="#deals">Deals</a>' : ""}</div>
+</div></section>`;
+  if (ev.length) body += sec("On the calendar", `Coming up in ${esc(city)}`, `<a class="more" href="events?city=${q}">All ${esc(city)} events &rarr;</a>`,
+    block(`class="grid-2" data-city="${esc(city)}" data-list="events" data-limit="6"`, cards("events", ev.slice(0, 6))), true);
+  if (dl.length) body += sec('Local deals<span id="deals"></span>', `Deals in ${esc(city)}`, '<a class="more" href="deals">All deals &rarr;</a>',
+    block(`class="grid" data-city="${esc(city)}" data-list="deals" data-limit="6"`, cards("deals", dl.slice(0, 6))), !ev.length);
+  if (biz.length) body += sec("Local directory", `Businesses in ${esc(city)}`, `<a class="more" href="directory?city=${q}">All ${biz.length} in ${esc(city)} &rarr;</a>`,
+    block(`class="grid" data-city="${esc(city)}" data-list="directory" data-limit="8"`, cards("directory", biz.slice(0, 8))), !ev.length && !dl.length);
+  body += sec("Local headlines", `News from ${esc(city)}`, '<a class="more" href="news">All headlines &rarr;</a>',
+    block(`class="grid" data-city="${esc(city)}" data-list="news" data-limit="3" data-hide-empty`, '<noscript><div class="empty">Turn on JavaScript to see the headlines.</div></noscript>'), false);
+  body += `<div class="wrap" style="padding-bottom:var(--s5)"><div class="biz-band"><p><strong>Own a business in ${esc(city)}?</strong><br>Listing it here is free.</p><a class="btn" href="submit?plan=basic#form">Add my business</a></div></div>`;
+  const title = `${city}, CA: Things to Do, Deals and Local Businesses`;
+  write(url, page({
+    meta: { title, description: `What's on in ${city}: upcoming events, local deals and ${biz.length} local businesses. ${intro}`.slice(0, 300), url },
+    schema: [{ "@context": "https://schema.org", "@type": "CollectionPage", name: title, about: { "@type": "City", name: city, containedInPlace: { "@type": "State", name: "California" } },
+      mainEntity: { "@type": "ItemList", itemListElement: biz.slice(0, 8).map((b, i) => ({ "@type": "ListItem", position: i + 1, url: `${SITE}/business/${b.slug}/`, name: b.name })) } },
+      breadcrumbs([["Home", ""], [city, url]])],
+    body
+  }).replace('<script src="data/events.js"></script><script src="assets/app.js"></script>', DATA_SCRIPTS + '<script src="assets/app.js"></script>'));
+  cityPaths.push(url);
+}
+
 /* 1b. Pre-render the card lists into the hub pages, plus the browse links on the directory page. */
 const empty = '<div class="empty">Nothing here yet. Check back soon.</div>';
 function eventsByMonth(items) {
@@ -162,7 +204,7 @@ const golfCtx = { window: {} };
 if (fs.existsSync(path.join(root, "data", "golf.js"))) require("vm").runInNewContext(fs.readFileSync(path.join(root, "data", "golf.js"), "utf8"), golfCtx);
 const golfPaths = ((golfCtx.window.CVS || {}).golf || []).map(c => `golf/${c.slug}/`);
 const urls = ["", "directory", "deals", "events", "golf/", "advertise", "submit", "story", "mailing-area-el-paseo", "mailing-area-sun-city", "legal"]
-  .concat(list.map(b => `business/${b.slug}/`), eventPaths, landing.filter(p => p.index).map(p => p.path), golfPaths);
+  .concat(cityPaths, list.map(b => `business/${b.slug}/`), eventPaths, landing.filter(p => p.index).map(p => p.path), golfPaths);
 fs.writeFileSync(path.join(root, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(u => `  <url><loc>${esc(SITE + "/" + u)}</loc></url>`).join("\n")}

@@ -177,9 +177,9 @@
   // Small blocks: <div data-list="events" data-limit="4"></div>. Optional data-when="weekend" (events only; falls back to upcoming if empty).
   document.querySelectorAll("[data-list]").forEach(function (el) {
     var key = el.getAttribute("data-list"), limit = +el.getAttribute("data-limit") || 999;
-    var per = el.getAttribute("data-per"), seen = {};
+    var per = el.getAttribute("data-per"), seen = {}, inCity = el.getAttribute("data-city");
     // data-per="city": only the newest item from each city (the lists are already newest first)
-    var items = SETS[key].filter(function (x) { if (!per) return true; var v = x[per] || ""; if (seen[v]) return false; seen[v] = 1; return true; });
+    var items = SETS[key].filter(function (x) { if (inCity && x.city !== inCity) return false; if (!per) return true; var v = x[per] || ""; if (seen[v]) return false; seen[v] = 1; return true; });
     var w = windowFor(el.getAttribute("data-when"));
     // "after-weekend" goes by each event's next date, so a weekly market showing this Saturday isn't repeated under "Coming up".
     var after = el.getAttribute("data-when") === "after-weekend";
@@ -187,6 +187,8 @@
     items = items.slice(0, limit);
     var opt = { img: el.hasAttribute("data-img") }, view = el.getAttribute("data-view") === "row" ? TYPE[key] + "Row" : TYPE[key];
     el.innerHTML = items.length ? items.map(function (x) { return R[view](x, opt); }).join("") : '<div class="empty">Nothing here yet. Check back soon.</div>';
+    // data-hide-empty: drop the whole section when there's nothing to show (city pages).
+    if (!items.length && el.hasAttribute("data-hide-empty")) { var sec = el.closest("section"); if (sec) sec.hidden = true; }
   });
 
   // Full list pages with filters: <div data-browse="events"></div>
@@ -207,6 +209,7 @@
     var params = new URLSearchParams(location.search);
     if (q && params.get("q")) q.value = params.get("q");
     if (cat && params.get("category")) cat.value = params.get("category");
+    if (city && params.get("city")) city.value = params.get("city");
     if (when && params.get("when")) when.value = params.get("when");
     function draw() {
       var term = q ? q.value.trim().toLowerCase() : "", w = when ? windowFor(when.value) : null;
@@ -345,6 +348,17 @@
   var t = document.querySelector(".menu-toggle");
   if (t) t.addEventListener("click", function () {
     var nav = t.closest(".nav"); var open = nav.classList.toggle("open"); t.setAttribute("aria-expanded", open);
+  });
+
+  // Cities dropdown in the main menu: click/tap to open, Escape or a click outside closes it.
+  document.querySelectorAll(".sub-toggle").forEach(function (btn) {
+    var li = btn.parentNode;
+    function set(open) { li.classList.toggle("open", open); btn.setAttribute("aria-expanded", open); }
+    btn.addEventListener("click", function (ev) { ev.stopPropagation(); set(!li.classList.contains("open")); });
+    document.addEventListener("click", function (ev) { if (!li.contains(ev.target)) set(false); });
+    li.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && li.classList.contains("open")) { set(false); btn.focus(); } });
+    var here = li.querySelector('a[href$="' + location.pathname.replace(/^.*\/(city\/[^\/]+\/)$/, "$1") + '"]');
+    if (/\/city\/[^\/]+\/$/.test(location.pathname) && here) { here.setAttribute("aria-current", "page"); btn.classList.add("current"); }
   });
 
   // Forms: saved by the tracker (shows on the admin page) and emailed to Todd. If the tracker can't be reached, send straight to Formspree.
