@@ -103,6 +103,11 @@
     return '<span class="cat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[b.category] || STORE) + '</svg></span>';
   }
 
+  // "List your business" reminder after every 3rd category group on the full directory (not after the last; the page already ends with one).
+  function listBand(i, n) {
+    return (i + 1) % 3 === 0 && i < n - 1 ? '<div class="biz-band list-band"><p><strong>Got a business to list?</strong><br>Send it in. Listing it here is free.</p><a class="btn" href="' + ROOT + 'submit?plan=basic#form">Submit it</a></div>' : '';
+  }
+
   var R = {
     event: function (e) {
       var d = parse(e.date);
@@ -233,7 +238,7 @@
         var jumps = (feat.length ? ['<a href="#cat-featured">Featured (' + feat.length + ')</a>'] : []).concat(names.map(function (c) { return '<a href="#' + anchor(c) + '">' + esc(c) + ' (' + groups[c].length + ')</a>'; }));
         browse.innerHTML = (jumps.length > 1 ? '<p class="cat-jump">' + jumps.join("") + '</p>' : '') +
           (feat.length ? '<section class="featured-band">' + head("cat-featured", "Featured Listings", feat.length) + '<p class="featured-note">Local businesses on the current Spotlight postcard.</p><div class="grid">' + feat.map(R.directory).join("") + '</div></section>' : '') +
-          names.map(function (c) { return head(anchor(c), c, groups[c].length) + '<div class="grid">' + groups[c].map(R.directory).join("") + '</div>'; }).join("");
+          names.map(function (c, i) { return head(anchor(c), c, groups[c].length) + '<div class="grid">' + groups[c].map(R.directory).join("") + '</div>' + listBand(i, names.length); }).join("");
       } else {
         browse.innerHTML = '<div class="' + (key === "news" ? "grid-2" : "grid") + '">' + items.map(R[TYPE[key]]).join("") + "</div>";
       }

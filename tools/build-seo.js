@@ -35,8 +35,9 @@ const andList = a => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " a
 const app = fs.readFileSync(path.join(root, "assets/app.js"), "utf8");
 const ctx = { window: { CVS: D }, document: { documentElement: { getAttribute: () => "" } }, URL };
 vm.runInNewContext(app.slice(app.indexOf("{") + 1, app.indexOf("/* PRERENDER-END")) +
-  "\n;__out = { R: R, events: events, deals: deals, directory: directory, eventSlug: eventSlug, parse: parse, MONTHS_LONG: MONTHS_LONG, googleCal: googleCal, calLinks: calLinks };", ctx);
+  "\n;__out = { R: R, events: events, deals: deals, directory: directory, eventSlug: eventSlug, parse: parse, MONTHS_LONG: MONTHS_LONG, googleCal: googleCal, calLinks: calLinks, listBand: listBand };", ctx);
 const C = ctx.__out;
+const listBand = C.listBand;
 const TYPE = { events: "event", deals: "deal", directory: "directory" };
 const cards = (key, items) => items.map(C.R[TYPE[key]]).join("");
 
@@ -138,7 +139,7 @@ function byCategory(items) {
   const jumps = (feat.length ? [`<a href="#cat-featured">Featured (${feat.length})</a>`] : []).concat(names.map(c => `<a href="#${id(c)}">${esc(c)} (${groups[c].length})</a>`));
   return (jumps.length > 1 ? `<p class="cat-jump">${jumps.join("")}</p>` : "") +
     (feat.length ? `<section class="featured-band">${head("cat-featured", "Featured Listings", feat.length)}<p class="featured-note">Local businesses on the current Spotlight postcard.</p><div class="grid">${cards("directory", feat)}</div></section>` : "") +
-    names.map(c => `${head(id(c), c, groups[c].length)}<div class="grid">${cards("directory", groups[c])}</div>`).join("");
+    names.map((c, i) => `${head(id(c), c, groups[c].length)}<div class="grid">${cards("directory", groups[c])}</div>${listBand(i, names.length)}`).join("");
 }
 const browseLinks = landing.length ? `<div class="browse-links"><h2 class="month-head"><span class="stripe-mini"></span>Browse by city and category</h2><ul class="link-list">${landing.map(o => `<li><a href="${o.path}">${esc(o.kind === "city" ? "Businesses in " + o.city : o.kind === "category" ? o.category : o.category + " in " + o.city)}</a></li>`).join("")}</ul></div>` : "";
 for (const file of ["index.html", "directory.html", "deals.html", "events.html"]) {

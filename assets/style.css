@@ -455,3 +455,5 @@ main:focus { outline: none; }
 /* Event cards: descriptions cut to 3 lines so cards line up; full text is on the event page */
 .ev-desc { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 @media (max-width: 700px) { .cal-btn { width: 44px; height: 44px; } }
+
+.list-band { margin: var(--s4) 0 var(--s2); }
