@@ -21,6 +21,7 @@ window.CVS.places = {
   },
   categories: {
     "Legal": "Legal covers locally based law firms and attorneys: estate planning, family law, criminal defense, bankruptcy, personal injury and business and real estate law. These are firms based in the valley, not national advertising networks. A listing here is not a recommendation or legal advice.",
+    "Outdoors": "Outdoors covers the valley's public hiking trails, from easy oasis walks to all-day mountain climbs in the Santa Rosa and San Jacinto Mountains. Start early, carry more water than you think you need, and check the managing agency's page for seasonal closures.",
     "Pets": "Pets covers the valley's independent veterinary clinics, animal hospitals and pet stores, plus the valley's public dog parks.",
     "Fitness": "Fitness covers the valley's independent gyms, CrossFit boxes, personal training studios and boxing and martial arts academies. These are locally owned, not the national chains.",
     "Automotive": "Automotive covers local businesses that sell, service and rent vehicles, including the golf cars that are a common way to get around the valley's country clubs and gated communities.",
@@ -40,6 +41,7 @@ window.CVS.places = {
     "Pet stores": "Independent pet stores for food, treats, toys and supplies, with staff who can help you choose the right diet. These are local shops, not the big-box chains.",
     "Med spas": "Local med spas offering injectables like Botox and fillers, skin treatments, weight loss programs and permanent makeup, in a spa setting with medical oversight.",
     "Dog parks": "Public off-leash dog parks run by valley cities, most with separate areas for large and small dogs. Many close for a few weeks each fall for overseeding, so check the city page before you go.",
+    "Hiking trails": "Public trails across the valley: palm oases in the Indian Canyons, National Monument trails above Palm Desert and Rancho Mirage, the La Quinta Cove, and high-country hikes from the Palm Springs Aerial Tramway. Some charge admission and some close seasonally or in summer heat.",
     "Veterinarians": "Independent veterinarians and animal hospitals for checkups, vaccines, surgery and urgent care.",
     "Dentists": "Independent dental practices across the valley offering family, cosmetic and restorative dentistry. These are locally run offices, not the big dental chains.",
     "Orthodontists": "Local orthodontists offering braces and clear aligners for kids and adults.",

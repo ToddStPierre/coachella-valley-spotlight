@@ -91,7 +91,11 @@ for (const p of landing) {
   const heading = p.kind === "city" ? `Local Businesses in ${p.city}, CA` : p.kind === "category" ? `${p.category} in the Coachella Valley` : `${p.category} in ${p.city}, CA`;
   const intro = [p.city && places.cities[p.city], p.category && ((places.categories || {})[p.category] || (places.services || {})[p.category])].filter(Boolean);
   const names = items.slice(0, 3).map(b => b.name);
-  const countLine = `${items.length} ${p.category ? p.category.toLowerCase() + " businesses are" : "local businesses are"} listed${p.city ? " in " + p.city : " across the valley"} right now, including ${andList(names)}. Each one has its own page with the phone number, website and details, and premium listings show current offers.`;
+  // Public places (dog parks, trails) aren't businesses, so their pages get their own wording.
+  const allPublic = items.length && items.every(b => b.public);
+  const countLine = allPublic
+    ? `${items.length} ${p.category.toLowerCase()} are listed${p.city ? " in " + p.city : " across the valley"} right now, including ${andList(names)}. Each one has its own page with the location, details and a link to the official site.`
+    : `${items.length} ${p.category ? p.category.toLowerCase() + " businesses are" : "local businesses are"} listed${p.city ? " in " + p.city : " across the valley"} right now, including ${andList(names)}. Each one has its own page with the phone number, website and details, and premium listings show current offers.`;
   const related = landing.filter(o => o !== p && (
     (p.kind === "city" && o.kind === "combo" && o.city === p.city) ||
     (p.kind === "category" && ((o.kind === "combo" && o.category === p.category) || o.kind === "category")) ||
