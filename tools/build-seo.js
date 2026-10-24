@@ -21,7 +21,7 @@ ${headRest}${schema.map(ldjson).join("")}
 </head>
 <body>
 ${header}
-<main>
+<main id="main" tabindex="-1">
 ${body}
 </main>
 ${footer}

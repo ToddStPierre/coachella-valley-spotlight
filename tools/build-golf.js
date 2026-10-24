@@ -33,7 +33,7 @@ ${headRest}${ldjson({ "@context": "https://schema.org", "@type": "ItemList", nam
 </head>
 <body>
 ${header}
-<main>
+<main id="main" tabindex="-1">
 <section class="page-hero"><div class="wrap"><span class="eyebrow"><span class="stripe-mini"></span>Golf</span>
 <h1>Golf Courses in the <span class="grad">Coachella Valley.</span></h1>
 <p>Every golf club in the valley: ${list.length} clubs with ${nCourses} courses between them. ${pub} clubs are open to the public, and the rest are private clubs. Filter by city, or show only the courses you can book.</p></div></section>
@@ -87,7 +87,7 @@ ${headRest}${ldjson(schema)}${ldjson(breadcrumbs([["Home", ""], ["Golf", "golf/"
 </head>
 <body>
 ${header}
-<main>
+<main id="main" tabindex="-1">
 <section class="page-hero"><div class="wrap">
 <nav class="crumbs" aria-label="Breadcrumb"><a href="golf/">Golf</a> &rsaquo; <a href="golf/?city=${encodeURIComponent(c.city)}">${esc(c.city)}</a></nav>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>Golf &middot; ${esc(c.city)}</span>

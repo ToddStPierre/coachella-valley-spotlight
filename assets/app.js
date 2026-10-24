@@ -131,12 +131,30 @@
 
   function text(item) { return Object.keys(item).map(function (k) { return typeof item[k] === "string" ? item[k] : ""; }).join(" ").toLowerCase(); }
 
-  // Small blocks: <div data-list="events" data-limit="4"></div>
+  // Date window for the events "When" filter: [from, to] as YYYY-MM-DD, or null for any date.
+  function windowFor(v) {
+    if (!v) return null;
+    var a = new Date(today), b = new Date(today), dow = today.getDay();
+    if (v === "weekend") { if (dow >= 1 && dow <= 4) a.setDate(a.getDate() + (5 - dow)); b = new Date(a); b.setDate(a.getDate() + (7 - a.getDay()) % 7); }
+    else if (v === "week") b.setDate(b.getDate() + 6);
+    else if (v === "month") b = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    return [iso(a), iso(b)];
+  }
+  function inWindow(e, w) {
+    if (!w) return true;
+    if (e.dates) return e.dates.some(function (d) { return d >= w[0] && d <= w[1]; });
+    return e.date <= w[1] && (e.endDate || e.date) >= w[0];
+  }
+
+  // Small blocks: <div data-list="events" data-limit="4"></div>. Optional data-when="weekend" (events only; falls back to upcoming if empty).
   document.querySelectorAll("[data-list]").forEach(function (el) {
     var key = el.getAttribute("data-list"), limit = +el.getAttribute("data-limit") || 999;
     var per = el.getAttribute("data-per"), seen = {};
     // data-per="city": only the newest item from each city (the lists are already newest first)
-    var items = SETS[key].filter(function (x) { if (!per) return true; var v = x[per] || ""; if (seen[v]) return false; seen[v] = 1; return true; }).slice(0, limit);
+    var items = SETS[key].filter(function (x) { if (!per) return true; var v = x[per] || ""; if (seen[v]) return false; seen[v] = 1; return true; });
+    var w = windowFor(el.getAttribute("data-when"));
+    if (w) { var inW = items.filter(function (x) { return inWindow(x, w); }); if (inW.length) items = inW; }
+    items = items.slice(0, limit);
     var opt = { img: el.hasAttribute("data-img") };
     el.innerHTML = items.length ? items.map(function (x) { return R[TYPE[key]](x, opt); }).join("") : '<div class="empty">Nothing here yet. Check back soon.</div>';
   });
@@ -146,20 +164,6 @@
   if (browse) {
     var key = browse.getAttribute("data-browse"), all = SETS[key];
     var q = document.getElementById("f-q"), city = document.getElementById("f-city"), cat = document.getElementById("f-cat"), when = document.getElementById("f-when");
-    // Date window for the events "When" filter: [from, to] as YYYY-MM-DD, or null for any date.
-    function windowFor(v) {
-      if (!v) return null;
-      var a = new Date(today), b = new Date(today), dow = today.getDay();
-      if (v === "weekend") { if (dow >= 1 && dow <= 4) a.setDate(a.getDate() + (5 - dow)); b = new Date(a); b.setDate(a.getDate() + (7 - a.getDay()) % 7); }
-      else if (v === "week") b.setDate(b.getDate() + 6);
-      else if (v === "month") b = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-      return [iso(a), iso(b)];
-    }
-    function inWindow(e, w) {
-      if (!w) return true;
-      if (e.dates) return e.dates.some(function (d) { return d >= w[0] && d <= w[1]; });
-      return e.date <= w[1] && (e.endDate || e.date) >= w[0];
-    }
     function fill(sel, field) {
       if (!sel) return;
       var vals = all.map(function (x) { return x[field]; }).filter(Boolean);

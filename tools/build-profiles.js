@@ -30,14 +30,14 @@ ${headRest}${ldjson(schema)}${ldjson(breadcrumbs(trail))}
 </head>
 <body data-profile="${slug}">
 ${header}
-<main>
+<main id="main" tabindex="-1">
 <section class="page-hero"><div class="wrap">
 <nav class="crumbs" aria-label="Breadcrumb"><a href="directory">Directory</a>${cityPage ? ` &rsaquo; <a href="${cityPage.path}">${esc(b.city)}</a>` : ""}${catPage ? ` &rsaquo; <a href="${catPage.path}">${esc(catPage.category)}</a>` : ""}</nav>
 <div class="profile" data-biz="${slug}" data-noimp>
 <div>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>${esc(kind)} &middot; ${esc(b.city)}</span>
 <h1>${esc(b.name)}</h1>
-${b.postcard || prem ? '<span class="tag" style="display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:999px;background:#fde8bf;color:#7a4a00;margin-bottom:16px">' + (b.postcard ? "On the Spotlight postcard" : "Premium listing") + '</span>' : ""}
+${b.postcard || prem ? '<span class="tag" style="display:inline-block;font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:999px;background:#fde8bf;color:#7a4a00;margin-bottom:16px">' + (b.postcard ? "On the Spotlight postcard" : "Premium listing") + '</span>' : ""}
 <p>${esc(prem ? (b.about || b.blurb) : b.blurb)}</p>
 ${offer ? `<div class="offer-box" style="max-width:640px;margin-bottom:16px"><b>${esc(offer.title)}</b>${offer.details ? `<span>${esc(offer.details)}</span>` : ""}${offer.expires ? `<span>Good through ${esc(nice(offer.expires))}</span>` : ""}</div>` : ""}
 ${rows.length ? `<dl class="facts">${rows.map(r => `<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl>` : ""}
