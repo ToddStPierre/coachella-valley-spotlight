@@ -93,8 +93,11 @@ for (const p of landing) {
   const names = items.slice(0, 3).map(b => b.name);
   // Public places (dog parks, trails) aren't businesses, so their pages get their own wording.
   const allPublic = items.length && items.every(b => b.public);
-  const countLine = allPublic
-    ? `${items.length} ${p.category.toLowerCase()} are listed${p.city ? " in " + p.city : " across the valley"} right now, including ${andList(names)}. Each one has its own page with the location, details and a link to the official site.`
+  const somePublic = items.some(b => b.public);
+  const countLine = p.category && !allPublic && somePublic
+    ? `${items.length} ${p.category.toLowerCase()} places are listed${p.city ? " in " + p.city : " across the valley"} right now, including ${andList(names)}. Each one has its own page with the location and details.`
+    : allPublic
+    ? `${items.length} ${p.category.toLowerCase()}${/s$/i.test(p.category) ? "" : " places"} are listed${p.city ? " in " + p.city : " across the valley"} right now, including ${andList(names)}. Each one has its own page with the location, details and a link to the official site.`
     : `${items.length} ${p.category ? p.category.toLowerCase() + " businesses are" : "local businesses are"} listed${p.city ? " in " + p.city : " across the valley"} right now, including ${andList(names)}. Each one has its own page with the phone number, website and details, and premium listings show current offers.`;
   const related = landing.filter(o => o !== p && (
     (p.kind === "city" && o.kind === "combo" && o.city === p.city) ||
@@ -102,7 +105,7 @@ for (const p of landing) {
     (p.kind === "combo" && ((o.kind === "city" && o.city === p.city) || (o.kind === "category" && o.category === p.category)))));
   const label = o => o.kind === "city" ? `All businesses in ${o.city}` : o.kind === "category" ? `${o.category}, valley-wide` : `${o.category} in ${o.city}`;
   // Activity pages (dog parks, hiking trails) get a hero photo, valley-wide and per city.
-  const ACT_PHOTO = { "Dog parks": "dog-parks", "Hiking trails": "hiking-trails" };
+  const ACT_PHOTO = { "Dog parks": "dog-parks", "Hiking trails": "hiking-trails", "Pickleball": "pickleball", "Tennis": "tennis" };
   const fig = p.kind !== "city" && ACT_PHOTO[p.category] ? photoFigure(p.category, `assets/img/activities/${ACT_PHOTO[p.category]}.jpg`, p.category) : "";
   const trail = [["Home", ""], ["Directory", "directory"]];
   if (p.kind === "combo") trail.push([p.city, `local/${slugify(p.city)}/`]);
