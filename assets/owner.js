@@ -74,7 +74,7 @@
         '<p class="form-status" id="ow-photo-msg" role="status">' + esc(flash) + '</p></div>';
       flash = "";
     } else {
-      html += '<div class="biz-band" style="margin-top:32px"><p style="color:#fff"><strong>Want photos, hours, a special offer and monthly stats?</strong><br>Founding Premium is $19 a month (regularly $29), or free while you&rsquo;re on a Spotlight postcard.</p><a class="btn" href="advertise.html#plans">See Premium</a></div>';
+      html += '<div class="biz-band" style="margin-top:32px"><p style="color:#fff"><strong>Want photos, hours, a special offer and monthly stats?</strong><br>Premium is $49 a month or $438 a year, or free while you&rsquo;re on a Spotlight postcard.</p><a class="btn" href="advertise.html#plans">See Premium</a></div>';
     }
     out.innerHTML = html;
     wire(L);
