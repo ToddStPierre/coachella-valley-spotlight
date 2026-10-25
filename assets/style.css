@@ -550,3 +550,18 @@ main:focus { outline: none; }
 .pf-head .verified-lg, .pf-head .pf-badge { vertical-align: middle; margin-bottom: 14px; }
 .pf-head .verified-lg { line-height: 1.2; padding: 6px 12px; }
 .pf-head .pf-badge { line-height: 1.2; }
+
+/* Hero panel carousel: This weekend + postcard ads */
+.hp-slides { display: grid; }
+.hp-slide { grid-area: 1 / 1; }
+.hp-slide[hidden] { display: block; visibility: hidden; }
+.hp-slide.is-on { animation: hpFade .45s ease; }
+@keyframes hpFade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .hp-slide.is-on { animation: none; } }
+.hp-ad-img { display: block; margin: 0 0 12px; }
+.hp-ad-img img { display: block; width: 100%; max-height: 270px; object-fit: contain; border-radius: 10px; background: var(--sand); }
+.hp-controls { display: flex; align-items: center; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.hp-dot { width: 10px; height: 10px; padding: 0; border-radius: 50%; border: 1.5px solid var(--ink-2); background: transparent; cursor: pointer; position: relative; }
+.hp-dot::after { content: ""; position: absolute; inset: -8px; }
+.hp-dot[aria-current="true"] { background: var(--sun-deep); border-color: var(--sun-deep); }
+.hp-pause { margin-left: auto; font: 600 13px var(--body); color: var(--ink-2); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; cursor: pointer; }

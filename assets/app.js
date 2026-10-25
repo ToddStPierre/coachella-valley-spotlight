@@ -326,6 +326,47 @@
       grBox.innerHTML = html; grBox.hidden = false;
     }).catch(function () {});
   }
+  // Home hero panel: rotate "This weekend" with the ads on the current Spotlight postcard.
+  // Pauses on hover/focus and with the pause button; no auto-rotate for prefers-reduced-motion.
+  var panel = document.querySelector(".hero-panel .hp-slides");
+  var ads = directory.filter(function (b) { return b.postcard && b.image && !b.sample; });
+  if (panel && ads.length) {
+    ads.forEach(function (b) {
+      var slug = slugOf(b), d = document.createElement("div");
+      d.className = "hp-slide hp-ad"; d.setAttribute("role", "group"); d.setAttribute("aria-roledescription", "slide"); d.setAttribute("aria-label", b.name);
+      d.setAttribute("data-biz", slug); d.setAttribute("data-noimp", ""); d.hidden = true;
+      d.innerHTML = '<span class="eyebrow"><span class="stripe-mini"></span>On the Spotlight postcard</span>' +
+        '<a class="hp-ad-img" href="' + ROOT + 'business/' + slug + '/"><img src="' + ROOT + esc(b.image) + '" alt="' + esc(b.imageAlt || b.name + " ad") + '" loading="lazy"></a>' +
+        '<a class="more" href="' + ROOT + 'business/' + slug + '/">' + esc(b.name) + ' &rarr;</a>';
+      panel.appendChild(d);
+    });
+    var slides = panel.querySelectorAll(".hp-slide"), cur = 0, timer = null, paused = false;
+    var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var bar = document.createElement("div"); bar.className = "hp-controls";
+    var dots = [].map.call(slides, function (sl, i) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "hp-dot";
+      b.setAttribute("aria-label", "Show " + sl.getAttribute("aria-label")); b.addEventListener("click", function () { show(i); stop(); });
+      bar.appendChild(b); return b;
+    });
+    var pb = document.createElement("button"); pb.type = "button"; pb.className = "hp-pause"; bar.appendChild(pb);
+    panel.parentNode.appendChild(bar);
+    function show(i) {
+      slides[cur].hidden = true; slides[cur].classList.remove("is-on"); dots[cur].removeAttribute("aria-current");
+      cur = (i + slides.length) % slides.length;
+      slides[cur].hidden = false; slides[cur].classList.add("is-on"); dots[cur].setAttribute("aria-current", "true");
+      var slug = slides[cur].getAttribute("data-biz");
+      if (slug && !seen[slug]) { seen[slug] = 1; track(slug, "impression"); }
+    }
+    function start() { if (reduce || paused) return; clearInterval(timer); timer = setInterval(function () { show(cur + 1); }, 6000); }
+    function stop() { clearInterval(timer); timer = null; }
+    function label() { pb.textContent = paused || reduce ? "Play" : "Pause"; pb.setAttribute("aria-label", (paused || reduce ? "Play" : "Pause") + " slideshow"); }
+    pb.addEventListener("click", function () { if (paused || reduce) { paused = false; reduce = false; start(); } else { paused = true; stop(); } label(); });
+    var box = panel.parentNode;
+    box.addEventListener("mouseenter", stop); box.addEventListener("mouseleave", start);
+    box.addEventListener("focusin", stop); box.addEventListener("focusout", function (e) { if (!box.contains(e.relatedTarget)) start(); });
+    dots[0].setAttribute("aria-current", "true"); label(); start();
+  }
+
   // Site visitors: count each browser once per day, then show today's and this month's totals.
   var VAPI = "https://cvs-tracker.toddstpierre.workers.dev";
   var pDay = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Los_Angeles" }).format(new Date());
