@@ -497,3 +497,49 @@ main:focus { outline: none; }
 
 .suggest-line { margin-top: 10px; font-size: 15px; }
 .suggest-line a { color: var(--ink-2); }
+
+/* Business profile layout: hero, then main column + sidebar */
+.pf-hero { padding-bottom: var(--s3); }
+.pf-lede { color: var(--ink-2); font-size: 18px; max-width: 720px; }
+.pf-badge { display: inline-block; font-family: var(--mono); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; background: #fde8bf; color: #7a4a00; margin-bottom: 14px; }
+.pf-body { padding: 0 0 var(--s4); }
+.pf-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: var(--s3); align-items: start; }
+.pf-main, .pf-side { display: grid; gap: var(--s3); }
+.pf-card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s3); box-shadow: var(--shadow); }
+.pf-card h2 { font-size: 22px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+.pf-card p { color: var(--ink-2); margin: 0 0 10px; }
+.pf-card p:last-child { margin-bottom: 0; }
+.pf-contact ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.pf-contact li { display: flex; gap: 12px; align-items: flex-start; font-size: 17px; }
+.pf-contact li svg { flex: none; color: var(--sun-deep); margin-top: 2px; }
+.pf-contact li a { font-weight: 600; text-decoration: none; }
+.pf-map { display: block; width: 100%; height: 260px; border: 0; border-radius: 12px; margin-top: 18px; background: var(--sand); }
+.pf-dir { display: inline-block; margin-top: 8px; font-size: 15px; font-weight: 600; text-decoration: none; }
+.pf-deal { display: grid; grid-template-columns: 180px 1fr; gap: 16px; border: 1.5px dashed var(--sun); border-radius: 12px; padding: 12px; background: #fff4e8; }
+.pf-deal:not(:has(img)) { grid-template-columns: 1fr; }
+.pf-deal img { width: 100%; border-radius: 8px; object-fit: cover; aspect-ratio: 4 / 3; }
+.pf-deal b { font-family: var(--display); font-size: 20px; color: var(--sun-deep); display: block; margin-bottom: 4px; }
+.pf-deal-meta { font-size: 14px; }
+.pf-deal .btn { margin-top: 6px; }
+.pf-hours { white-space: pre-line; color: var(--ink) !important; }
+.pf-side .profile-ad { margin: 0; }
+.pf-side .facts dd { color: var(--ink); }
+.pf-social { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.pf-social a { display: inline-block; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); text-decoration: none; font-weight: 600; }
+.pf-upsell { background: var(--palm-soft); border-color: #c9dcd2; }
+.pf-owner p { font-size: 16px; }
+.pf-owner a { font-weight: 600; }
+.pf-owner span { font-size: 14px; color: var(--ink-2); }
+.pf-related { padding: 0 0 var(--s4); }
+.pf-rel { text-decoration: none; color: inherit; }
+.pf-rel b { font-family: var(--display); font-size: 19px; }
+.pf-rel span:last-child { color: var(--ink-2); font-size: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.pf-card.g-reviews .month-head { margin-top: 0 !important; }
+@media (max-width: 900px) { .pf-grid { grid-template-columns: 1fr; } .pf-deal { grid-template-columns: 1fr; } }
+
+.pf-hero { padding-bottom: 0; }
+.pf-hero .eyebrow { margin-bottom: 0; }
+.pf-body { padding-top: 14px; }
+.pf-left { display: grid; gap: var(--s3); min-width: 0; }
+.pf-head h1 { margin-top: 0; }
+.pf-side { padding-top: 6px; }
