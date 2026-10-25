@@ -543,3 +543,10 @@ main:focus { outline: none; }
 .pf-left { display: grid; gap: var(--s3); min-width: 0; }
 .pf-head h1 { margin-top: 0; }
 .pf-side { padding-top: 6px; }
+
+/* "Verified by owner" mark for claimed listings */
+.verified { display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; width: fit-content; font-size: 13px; font-weight: 600; color: var(--palm); background: var(--palm-soft); border: 1px solid #c9dcd2; border-radius: 999px; padding: 3px 10px; }
+.verified-lg { font-size: 14px; padding: 5px 12px; margin: 0 8px 14px 0; vertical-align: middle; }
+.pf-head .verified-lg, .pf-head .pf-badge { vertical-align: middle; margin-bottom: 14px; }
+.pf-head .verified-lg { line-height: 1.2; padding: 6px 12px; }
+.pf-head .pf-badge { line-height: 1.2; }

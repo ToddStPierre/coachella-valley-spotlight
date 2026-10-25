@@ -59,6 +59,7 @@ ${header}
 <div class="pf-left">
 <div class="pf-head">
 <h1>${esc(b.name)}</h1>
+${b.claimed && owner ? '<span class="verified verified-lg">&#10003; Verified by owner</span>' : ""}
 ${b.postcard || prem ? '<span class="pf-badge">' + (b.postcard ? "On the Spotlight postcard" : "Premium listing") + '</span>' : ""}
 <p class="pf-lede">${esc(b.blurb)}</p>
 <div class="cta-row">
@@ -92,7 +93,7 @@ ${facts.length ? `<div class="pf-card"><h2>Good to know</h2><dl class="facts">${
 ${social.length ? `<div class="pf-card"><h2>Follow</h2><ul class="pf-social">${social.map(k => `<li><a href="${esc(b.social[k])}" target="_blank" rel="noopener">${SOCIAL[k]}</a></li>`).join("")}</ul></div>` : ""}
 ${owner && !prem ? `<div class="pf-card pf-upsell"><h2>Is this your business?</h2><p>Add your hours, photos, a special offer and live Google reviews with a Premium listing, and see how many people view and call you each month.</p><a class="btn" href="advertise#plans">See Premium</a></div>` : ""}
 <div class="pf-card pf-owner">
-${owner ? (b.claimed ? '<p><span class="claimed-badge">&#10003; Claimed by the owner</span></p>' : `<p><a href="claim.html?b=${slug}">Claim this listing &rarr;</a><br><span>Free. Keep your details up to date yourself.</span></p>`) : ""}
+${owner ? (b.claimed ? '<p><span class="claimed-badge">&#10003; Verified by owner</span></p>' : `<p><a href="claim.html?b=${slug}">Claim this listing &rarr;</a><br><span>Free. Keep your details up to date yourself.</span></p>`) : ""}
 <p><a href="contact?topic=${encodeURIComponent("Fix or update a listing")}&about=${encodeURIComponent(b.name)}&city=${encodeURIComponent(b.city)}&page=${encodeURIComponent(url)}#form">Suggest an edit &rarr;</a><br><span>See something wrong or out of date?</span></p>
 </div>
 </aside>
