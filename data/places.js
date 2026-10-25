@@ -50,6 +50,7 @@ window.CVS.places = {
     "Museums & attractions": "Museums, gardens and landmark attractions around the valley: aircraft at the Palm Springs Air Museum, the Aerial Tramway up Mount San Jacinto, The Living Desert, Sunnylands, Cahuilla culture, local history and a classic date shake. Some are free and many have seasonal hours.",
     "Skate parks": "City skate parks across the valley, from the Palm Springs Skate Park and its famous Nude Bowl to La Quinta's 31,000-square-foot X Park. Most are free, most require a helmet and pads, and several are lit for cooler evening sessions.",
     "Disc golf": "Disc golf courses in the valley: the free 9-hole course at the Palm Desert Soccer Park and the 18-hole course at Palm Royale in La Quinta. Helix Disc Golf runs local leagues and tournaments.",
+    "Bowling": "Bowling in the valley: Fantasy Lanes at Fantasy Springs with weekend laser bowling, Palm Springs Lanes in Cathedral City for leagues and open play, and duckpin lanes with a pub at the Westin Rancho Mirage. A good way to beat the summer heat.",
     "Veterinarians": "Independent veterinarians and animal hospitals for checkups, vaccines, surgery and urgent care.",
     "Dentists": "Independent dental practices across the valley offering family, cosmetic and restorative dentistry. These are locally run offices, not the big dental chains.",
     "Orthodontists": "Local orthodontists offering braces and clear aligners for kids and adults.",

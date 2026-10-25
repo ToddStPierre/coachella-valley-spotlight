@@ -101,6 +101,7 @@
   };
   // Service-level icons win over the category icon.
   var SERVICE_ICONS = {
+    "Bowling": '<circle cx="9" cy="14" r="7"/><circle cx="7" cy="11.5" r=".8"/><circle cx="10" cy="11" r=".8"/><circle cx="8.8" cy="13.6" r=".8"/><path d="M18 3c1.3 0 2 1 2 2.2 0 .8-.6 1.4-.6 2.3 0 1.1 1.6 2.4 1.6 5.5 0 3.5-1.2 8-3 8s-3-4.5-3-8c0-3.1 1.6-4.4 1.6-5.5 0-.9-.6-1.5-.6-2.3C16 4 16.7 3 18 3Z"/>',
     "Skate parks": '<path d="M3 9.5h18M4.5 9.5c0 1.5 1 2.5 2.5 2.5h10c1.5 0 2.5-1 2.5-2.5"/><circle cx="7.5" cy="16" r="2"/><circle cx="16.5" cy="16" r="2"/>',
     "Disc golf": '<path d="M5 6h14M6 6l1.5 6h9L18 6M12 12v9M8 21h8M7.5 9h9"/>',
     "Swimming & water parks": '<path d="M2 20c2 0 2.5-1.5 5-1.5S10 20 12 20s2.5-1.5 5-1.5 3 1.5 5 1.5"/><path d="M3 15.5C3 9 7.5 4 13.5 4 17.6 4 20 6.4 20 9c0 2.3-1.8 4-4 4-1.9 0-3.2-1.3-3.2-2.9 0-1.2.8-2.1 1.9-2.1"/>'
