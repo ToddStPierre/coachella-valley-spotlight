@@ -43,7 +43,6 @@
 <nav class="crumbs" aria-label="Breadcrumb"><a href="advertise">Advertise</a> &rsaquo; <span>Pricing</span></nav>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>Postcard pricing</span>
 <h1>Your Ad in 5,000 Palm Desert Mailboxes, <span class="grad">From $300.</span></h1>
-<p class="pr-chip" id="pr-chip" hidden></p>
 <p>Pick your card, pick your size. Design, printing, postage and your category lock are always included, with no contract and no hidden fees.</p>
 </div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
@@ -82,7 +81,7 @@
 <script>
 (function () {
   var API = "https://local-spotlight-reservations.toddstpierre.workers.dev", M = (window.CVS_MAILINGS || []).slice();
-  var sel = document.getElementById("pr-card"), note = document.getElementById("pr-note"), chip = document.getElementById("pr-chip");
+  var sel = document.getElementById("pr-card"), note = document.getElementById("pr-note");
   function ymd(s) { var p = s.split("-"); return new Date(+p[0], p[1] - 1, +p[2]); }
   function left(s) { var t = new Date(); t.setHours(0, 0, 0, 0); return Math.round((ymd(s) - t) / 864e5); }
   function mon(s) { return ymd(s).toLocaleDateString("en-US", { month: "long", day: "numeric" }); }
@@ -102,7 +101,6 @@
   M.forEach(function (m, i) {
     fetch(API + "/api/spots?route=" + encodeURIComponent(m.route)).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
       counts[m.route] = d.positions.filter(function (p) { return (p.status || "").toLowerCase() === "open"; }).length;
-      if (i === 0) { chip.textContent = mon(m.mail) + " " + m.name + " card: " + counts[m.route] + " spots left"; chip.hidden = false; }
       links();
     }).catch(function () { if (i === +sel.value) note.textContent = "Call (760) 422-5475 for open spots."; });
   });
