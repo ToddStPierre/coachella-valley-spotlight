@@ -38,11 +38,11 @@ async function loadMine() {
 /* ---------- menu link ---------- */
 const navList = document.querySelector(".nav-links");
 const navItem = document.createElement("li");
-navItem.innerHTML = `<a class="nav-account" href="${ROOT}account">Sign in</a>`;
-if (navList) navList.appendChild(navItem);
+navItem.innerHTML = `<a class="nav-account" href="${ROOT}account">My Spotlight</a>`;
+if (navList) navList.insertBefore(navItem, navList.firstChild);
 function paintNav() {
   const a = navItem.querySelector("a");
-  a.textContent = user ? "My Spotlight" : "Sign in";
+  a.title = user ? "Your saved places, emails and account" : "Sign in or create a free account";
   if (/\/account(\.html)?$/.test(location.pathname)) a.setAttribute("aria-current", "page");
 }
 

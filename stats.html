@@ -65,6 +65,7 @@
     var slugs = dir.filter(function (x) { return !x.sample; }).map(slugOf).join(",");
     fetch(API + "/stats/all?key=" + encodeURIComponent(adminKey) + "&slugs=" + slugs).then(function (r) { return r.json(); }).then(function (d) {
       if (d.error) return fail("That admin link is not valid.");
+      dir = (window.CVS && window.CVS.directory) || dir; // the directory script loads after this one
       var base = location.href.split("?")[0], info = {};
       dir.forEach(function (x) { if (!x.sample) info[slugOf(x)] = x; });
       var all = d.businesses.map(function (b) { var x = info[b.slug] || {}; b.name = nameOf(b.slug); b.city = x.city || ""; b.premium = !!(x.premium || x.featured); b.postcard = !!x.postcard; b.claimed = !!x.claimed; b.pub = !!x.public; return b; });
