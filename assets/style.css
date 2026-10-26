@@ -646,3 +646,11 @@ main:focus { outline: none; }
 .has-sub.open .sub-menu.one-col { columns: 1; }
 .sub-menu li { break-inside: avoid; }
 @media (min-width: 921px) { #activities-menu { width: 480px; } .sub-menu a { white-space: nowrap; } }
+
+/* Hiking trails pages: dogs filter and desert box */
+.trail-filter { margin: 0 0 20px; }
+.trail-filter .chip { font-size: 14.5px; }
+.trail-filter .chip[aria-pressed="true"] { border-color: var(--palm); color: var(--palm); background: var(--palm-soft); }
+.tf-note { color: var(--ink-2); font-size: 15px; margin: -8px 0 20px; }
+.hike-box { margin-top: 40px; }
+.grid [data-biz][hidden] { display: none; }

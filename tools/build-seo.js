@@ -107,6 +107,21 @@ for (const p of landing) {
   // Activity pages (dog parks, hiking trails) get a hero photo, valley-wide and per city.
   const ACT_PHOTO = { "Dog parks": "dog-parks", "Hiking trails": "hiking-trails", "Pickleball": "pickleball", "Tennis": "tennis", "Swimming & water parks": "swimming", "Museums & attractions": "attractions", "Skate parks": "skate-parks", "Disc golf": "disc-golf", "Bowling": "bowling" };
   const fig = p.kind !== "city" && ACT_PHOTO[p.category] ? photoFigure(p.category, `assets/img/activities/${ACT_PHOTO[p.category]}.jpg`, p.category) : "";
+  // Hiking trails pages: a "dogs allowed" filter and a desert hiking box.
+  const hike = p.category === "Hiking trails";
+  const dogTrails = hike ? items.filter(b => (b.features || []).includes("Dogs on leash")) : [];
+  const dogFilter = dogTrails.length && dogTrails.length < items.length
+    ? `<div class="chips trail-filter" role="group" aria-label="Filter trails"><button type="button" class="chip" aria-pressed="true" data-tf="">All trails (${items.length})</button><button type="button" class="chip" aria-pressed="false" data-tf="${dogTrails.map(b => b.slug).join(" ")}">Dogs allowed (${dogTrails.length})</button></div>
+<p class="tf-note" hidden>These trails allow dogs on a leash. Some others allow dogs on part of the trail, like the Hopalong Cassidy between the Gabby Hayes junction and the cross, so check the dog rules on each trail's page.</p>
+<script>(function(){var bs=document.querySelectorAll(".trail-filter .chip"),n=document.querySelector(".tf-note");bs.forEach(function(b){b.addEventListener("click",function(){var s=b.getAttribute("data-tf"),k=s?s.split(" "):null;bs.forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false")});document.querySelectorAll(".grid [data-biz]").forEach(function(c){c.hidden=!!k&&k.indexOf(c.getAttribute("data-biz"))<0});if(n)n.hidden=!k})})})();</script>`
+    : "";
+  const hikeBox = hike ? `<div class="pf-card golf-season hike-box"><h2>Hiking in the desert: before you go</h2><ul>
+<li><b>Season:</b> October to April is the time for the desert-floor trails. In summer, hike only at first light, or go up the Tram, where Long Valley sits at 8,400 feet and is much cooler (expect snow in winter).</li>
+<li><b>Water:</b> carry more than you think you need. Tahquitz Canyon's rule of thumb is at least a quart for every hour of hiking. Most trails have no water once you leave the trailhead.</li>
+<li><b>Sun:</b> most low trails have little or no shade. Wear a hat, sunscreen and closed-toe shoes, and start early.</li>
+<li><b>Dogs:</b> they're banned on most National Monument trails to protect endangered bighorn sheep, leashed or not, and the tribal canyons allow no animals. In warm weather, hot ground can burn paws.</li>
+<li><b>Hours change with the seasons:</b> the Indian Canyons and Tahquitz Canyon go to Friday to Sunday from July 6 to October 1, Thousand Palms opens only on weekends from May to October, and Whitewater needs summer weekend reservations. Check each trail's page.</li>
+</ul></div>` : "";
   const trail = [["Home", ""], ["Directory", "directory"]];
   if (p.kind === "combo") trail.push([p.city, `local/${slugify(p.city)}/`]);
   trail.push([heading, p.path]);
@@ -121,7 +136,9 @@ ${intro.map(t => `<p>${esc(t)}</p>`).join("\n")}
 <p>${esc(countLine)}</p>
 ${fig ? `</div>${fig}` : ""}</div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
+${dogFilter}
 <div class="grid">${cards("directory", items)}</div>
+${hikeBox}
 ${related.length ? `<h2 class="month-head" style="margin-top:48px"><span class="stripe-mini"></span>Keep browsing</h2><ul class="link-list">${related.map(o => `<li><a href="${o.path}">${esc(label(o))}</a></li>`).join("")}<li><a href="directory">The full directory</a></li></ul>` : ""}
 <div class="biz-band" style="margin-top:48px"><p><strong>Own a business${p.city ? " in " + esc(p.city) : ""}?</strong><br>Listing it here is free.</p><a class="btn" href="submit">Add my business</a></div>
 </div></section>`
