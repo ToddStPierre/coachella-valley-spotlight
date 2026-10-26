@@ -739,3 +739,5 @@ main:focus { outline: none; }
 .roi-out .btn { align-self: flex-start; }
 .roi-fine { margin: 0; font-size: 13px; color: var(--ink-2); }
 @media (max-width: 800px) { .roi { padding: var(--s3); } .roi-grid { grid-template-columns: 1fr; } }
+.picker-paid { margin: 0 0 16px; padding: 14px 16px; border-radius: 12px; background: var(--palm-soft); color: var(--ink); border: 1px solid var(--palm); } .picker-paid b { color: var(--palm); }
+.btn[hidden] { display: none; }

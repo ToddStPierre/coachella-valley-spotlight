@@ -11,6 +11,10 @@
   var route = "el-paseo", pending = null, size = 1, openNow = {};
   // Ad sizes: blocks of spots on one side of the card (4 across, 2 down).
   var SIZES = { 1: { name: "1-spot", label: "1 spot", dims: "2.7\u2033 x 2.5\u2033", price: 300 }, 2: { name: "2-spot", label: "2 spots", dims: "5.4\u2033 x 2.5\u2033", price: 550 }, 4: { name: "4-spot", label: "4 spots", dims: "5.4\u2033 x 5\u2033", price: 1000 }, 8: { name: "full-side", label: "Full side", dims: "all 8 spots on one side", price: 2000 } };
+  // Stripe Payment Links, one per ad size. Leave a size "" to hide its Pay button (hold-only).
+  // Each link's "after payment" setting should redirect to https://coachellavalleyspotlight.com/advertise?paid=1#reserve
+  var PAY_LINKS = { 1: "", 2: "", 4: "", 8: "" };
+  var payBtn = root.querySelector("[data-pay]");
   function money(n) { return "$" + n.toLocaleString("en-US"); }
   function blockFor(pos, n) {
     var base = pos <= 8 ? 0 : 8, i = (pos - 1) % 8, c = i % 4, r = Math.floor(i / 4), tries = [];
@@ -70,6 +74,7 @@
     pending = { route: r, position: list[0], positions: list };
     mark(list);
     title.textContent = "Hold " + (list.length === 1 ? "Spot " + list[0] : "Spots " + list.join(", ")) + " on " + LABELS[r] + " (" + S.label + ", " + money(S.price) + ")";
+    if (payBtn) { payBtn.hidden = !PAY_LINKS[size]; payBtn.textContent = "Pay " + money(S.price) + " now and lock it in"; }
     msg.textContent = ""; shell.hidden = false;
     shell.scrollIntoView({ behavior: "smooth", block: "center" });
   }
@@ -93,16 +98,23 @@
 
   form.addEventListener("submit", function (e) {
     e.preventDefault(); if (!pending) return;
-    var btn = form.querySelector('button[type="submit"]'); btn.disabled = true; msg.textContent = "Holding your spot…";
+    var payNow = !!(e.submitter && e.submitter.hasAttribute("data-pay")) && !!PAY_LINKS[pending.positions.length];
+    var btn = e.submitter || form.querySelector('button[type="submit"]'); btn.disabled = true; msg.textContent = payNow ? "Holding your spot, then taking you to secure checkout…" : "Holding your spot…";
     var p = { route: pending.route, position: pending.position, positions: pending.positions, size: SIZES[pending.positions.length].label, price: money(SIZES[pending.positions.length].price), category: form.category.value, name: form.name.value, business: form.business.value, email: form.email.value, phone: form.phone.value, notes: form.notes.value };
     fetch(API + "/api/reserve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p) })
       .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, d: d }; }); })
       .then(function (r) {
         if (!r.ok) { msg.textContent = r.d.error || "That spot just got taken. Pick another one."; btn.disabled = false; load(route, true); return; }
         fetch(NOTIFY, { method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, body: JSON.stringify({
-          _subject: "Coachella Valley Spotlight: " + p.business + " wants " + (p.positions.length === 1 ? "Spot " + p.position : p.size + " (Spots " + p.positions.join(", ") + ")") + " (" + p.category + ") on " + LABELS[p.route],
+          _subject: "Coachella Valley Spotlight: " + p.business + (payNow ? " is paying online for " : " wants ") + (p.positions.length === 1 ? "Spot " + p.position : p.size + " (Spots " + p.positions.join(", ") + ")") + " (" + p.category + ") on " + LABELS[p.route],
           name: p.name, business: p.business, email: p.email, phone: p.phone, notes: p.notes, route: LABELS[p.route], spot: p.positions.join(", "), size: p.size, price: p.price + " per mailing", category: p.category,
           source: "coachellavalleyspotlight.com / advertise spot picker" }) }).catch(function () {});
+        if (payNow) {
+          var ref = pending.route + "__" + pending.positions.join("-"), go = PAY_LINKS[pending.positions.length] + (PAY_LINKS[pending.positions.length].indexOf("?") > -1 ? "&" : "?") + "client_reference_id=" + encodeURIComponent(ref);
+          msg.textContent = "Spot held. Taking you to secure checkout…";
+          setTimeout(function () { location.href = go; }, 600);
+          return;
+        }
         msg.textContent = "Spot held! We’ll email you shortly to confirm payment and lock it in.";
         btn.disabled = false; form.reset();
         setTimeout(function () { shell.hidden = true; }, 2500);
@@ -111,6 +123,11 @@
       .catch(function () { msg.textContent = "Something went wrong. Please try again in a moment, or call (760) 422-5475."; btn.disabled = false; });
   });
 
+  if (/[?&]paid=1\b/.test(location.search)) {
+    var note = document.createElement("p"); note.className = "picker-paid"; note.setAttribute("role", "status");
+    note.innerHTML = "<b>Payment received. Your spot is locked in.</b> We&rsquo;ll email you within a day to get your logo and offer and start your ad.";
+    root.insertBefore(note, root.firstChild);
+  }
   var wantSize = (location.search.match(/[?&]size=([1248])\b/) || [])[1];
   if (wantSize) root.querySelectorAll("[data-size]").forEach(function (b) { if (b.getAttribute("data-size") === wantSize) b.click(); });
   var want = (location.search.match(/[?&]route=([a-z-]+)/) || [])[1];
