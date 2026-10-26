@@ -677,3 +677,12 @@ main:focus { outline: none; }
 .mc-card .btn { align-self: flex-start; margin-top: auto; }
 .adm-mail input, .adm-mail select { font: inherit; font-size: 15px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; width: 100%; min-width: 130px; }
 .adm-mail td { vertical-align: top; }
+
+/* Ad sizes: picker size buttons, picked block, sizes table */
+.picker-sizes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 16px 0 4px; }
+.picker-sizes button { font: inherit; text-align: left; padding: 10px 12px; border-radius: 12px; border: 2px solid var(--line); background: #fff; color: var(--ink); cursor: pointer; display: grid; gap: 2px; }
+.picker-sizes button span { font-size: 13px; color: var(--ink-2); }
+.picker-sizes button[aria-pressed="true"] { border-color: var(--palm); background: var(--palm-soft); }
+.spot.picked { outline: 3px solid var(--palm); outline-offset: 1px; background: #dff0e6; border-style: solid; }
+.sizes-table .save { display: inline-block; margin-left: 6px; font-size: 13px; font-weight: 600; color: var(--palm); }
+@media (max-width: 640px) { .picker-sizes { grid-template-columns: repeat(2, 1fr); } }
