@@ -72,6 +72,7 @@ window.CVS.places = {
     "Latin American restaurants": "Peruvian, Colombian and other Latin American cooking from local, family-run kitchens.",
     "Bakeries": "Local bakeries and pastry shops around the valley: French patisseries, bagel bakers, Jewish deli bakeries and custom cake and cookie shops. Many sell out early, so go in the morning.",
     "Golf shops": "Golf shops sell clubs, balls, bags and apparel, and many offer custom club fitting on a launch monitor, regripping and repairs. Pre-owned and rental clubs are easy to find here, since so many visitors fly in without their own.",
+    "RV sales and service": "RV dealers, service centers and repair shops for motorhomes, travel trailers and fifth wheels, including mobile techs who come to your RV park or driveway. Busiest in fall, when snowbirds roll back into the valley.",
     "Golf cars": "Golf car dealers sell new and used carts, handle service and repairs, and rent carts by the day, week or season. Demand picks up every fall when seasonal residents come back.",
     "Plumbing": "Plumbers here deal with a lot of hard water, slab leaks, water heaters that wear out early in the heat, and drains and sewer lines that need clearing. A local plumber who knows desert homes can usually get to you the same day.",
     "Roofing": "Desert sun is hard on roofs. Tile underlayment wears out, flat roofs need coating, and monsoon storms find every weak spot. Local roofers handle repairs, re-roofs and inspections for homes, businesses and mobile homes.",
