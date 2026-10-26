@@ -42,6 +42,9 @@ for (const b of list) {
   const SOCIAL = { facebook: "Facebook", instagram: "Instagram", tiktok: "TikTok", yelp: "Yelp", youtube: "YouTube", x: "X" };
   const social = Object.keys(SOCIAL).filter(k => b.social && b.social[k]);
   const facts = [["Happy hour", b.happyHour], ["Size", b.size], ["Area served", b.area]].filter(r => r[1]);
+  // Court details (pickleball and tennis): what a player checks before driving over.
+  const C = b.courts || {};
+  const courtRows = [["Courts", b.size], ["Setup", C.setup], ["Surface", C.surface], ["Nets", C.nets], ["Lights", C.lights], ["How play works", C.play], ["Skill levels", C.levels], ["Reservations", C.reserve], ["Cost", C.cost], ["Lessons and leagues", C.lessons], ["Closures", C.closures], ["Court rules", C.rules], ["Good to know", C.note], ["Questions", C.contact]].filter(r => r[1]);
   const showHours = (prem || b.public) && b.hours;
   const owner = !b.public;
   const html = `${head}${metaTags({ title: `${b.name} | ${kind} in ${b.city}, CA`, description: desc, url, image: prem && b.image })}<base href="../../">
@@ -83,6 +86,7 @@ ${!b.address && !b.area ? `<li>${I.area}<span>${esc(b.city)}, CA</span></li>` : 
 ${`<iframe class="pf-map" title="Map of ${esc(b.name)}" src="https://maps.google.com/maps?q=${mapPlace}&amp;z=15&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><a class="pf-dir" href="https://www.google.com/maps/dir/?api=1&amp;destination=${mapPlace}" target="_blank" rel="noopener">Get directions &rarr;</a>`}
 </div>
 ${b.features && b.features.length ? `<div class="pf-card"><h2>What it has</h2><ul class="feat-pills feat-lg" aria-label="Features">${b.features.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
+${b.courts && courtRows.length ? `<div class="pf-card pf-courts"><h2>Court details</h2><dl class="facts">${courtRows.map(r => `<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl>${C.checked ? `<p class="pf-checked">Last checked ${esc(nice(C.checked))}. Hours and rules change, so call or check the official page before you go.</p>` : ""}</div>` : ""}
 ${prem && b.googlePlaceId ? `<section class="g-reviews pf-card" data-reviews="${slug}" hidden></section>` : ""}
 ${gallery.length ? `<div class="pf-card"><h2>Photos</h2><div class="gallery">${gallery.map((g, i) => `<img src="${esc(g)}" alt="${esc(b.name)} photo ${i + 1}" loading="lazy">`).join("")}</div></div>` : ""}
 </div>
