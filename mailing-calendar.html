@@ -42,7 +42,7 @@
 <nav class="crumbs" aria-label="Breadcrumb"><a href="advertise">Advertise</a> &rsaquo; <span>Mailing calendar</span></nav>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>Postcard mailing calendar</span>
 <h1>Every Upcoming Card, With the Date It <span class="grad">Hits Mailboxes.</span></h1>
-<p>Each card mails on its date, full or not. Book your spot and send your logo and offer by the artwork deadline, and we design the ad for you to approve before it prints. One business per category on every card.</p>
+<p>Each card mails on its date once at least 8 of its 16 spots are sold, and you can watch each card fill up below. Book your spot and send your logo and offer by the artwork deadline, and we design the ad for you to approve before it prints. One business per category on every card.</p>
 </div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
 <div class="mc-grid" id="mc-grid"><p>Loading the calendar&hellip;</p></div>
@@ -88,12 +88,15 @@
   cards.forEach(function (m, i) {
     var el = document.getElementById("mc-" + i), closed = left(m.deadline) < 0;
     fetch(API + "/api/spots?route=" + encodeURIComponent(m.route)).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
-      var total = d.positions.length, taken = d.positions.filter(function (p) { return (p.status || "").toLowerCase() !== "open"; }).length, open = total - taken;
-      el.querySelector("[data-fill]").innerHTML = "<b>" + taken + " of " + total + "</b> spots taken &middot; " + open + (open === 1 ? " spot" : " spots") + " left";
-      el.querySelector("[data-bar]").style.width = Math.round(taken / total * 100) + "%";
+      var total = d.positions.length, st8 = function (p) { return (p.status || "").toLowerCase(); };
+      var sold = d.positions.filter(function (p) { return st8(p) === "sold"; }).length, held = d.positions.filter(function (p) { return st8(p) === "pending"; }).length, open = total - sold - held, min = m.minSold || 0;
+      el.querySelector("[data-fill]").innerHTML = (min ? "<b>" + Math.min(sold, min) + " of " + min + "</b> spots sold to confirm this mailing<br>" : "") + "<span style='color:var(--ink-2);font-size:15px'>" + sold + " sold &middot; " + held + " on hold &middot; " + open + " open of " + total + "</span>";
+      el.querySelector("[data-bar]").style.width = Math.round((min ? Math.min(sold / min, 1) : (sold + held) / total) * 100) + "%";
       var st = el.querySelector("[data-status]");
-      if (!closed) { if (open === 0) { st.textContent = "Full"; st.className = "mc-status full"; } else if (open <= 4) { st.textContent = "Almost full"; st.className = "mc-status almost"; } }
-      else st.className = "mc-status closed";
+      if (closed) st.className = "mc-status closed";
+      else if (open === 0) { st.textContent = "Full"; st.className = "mc-status full"; }
+      else if (min && sold >= min) { st.textContent = "Confirmed to mail"; }
+      else if (open <= 4) { st.textContent = "Almost full"; st.className = "mc-status almost"; }
     }).catch(function () { el.querySelector("[data-fill]").textContent = "Call (760) 422-5475 for open spots."; });
   });
 })();

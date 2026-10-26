@@ -672,3 +672,5 @@ main:focus { outline: none; }
 .mc-bar { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
 .mc-bar span { display: block; height: 100%; background: var(--sun-deep); width: 0; transition: width .4s; }
 .mc-card .btn { align-self: flex-start; margin-top: auto; }
+.adm-mail input, .adm-mail select { font: inherit; font-size: 15px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; width: 100%; min-width: 130px; }
+.adm-mail td { vertical-align: top; }
