@@ -70,6 +70,7 @@ window.CVS.places = {
     "Pizza and burgers": "Local pizzerias and burger spots, the independent kind, not the national chains.",
     "Vegan restaurants": "Plant-based and vegan restaurants in the valley.",
     "Latin American restaurants": "Peruvian, Colombian and other Latin American cooking from local, family-run kitchens.",
+    "Bakeries": "Local bakeries and pastry shops around the valley: French patisseries, bagel bakers, Jewish deli bakeries and custom cake and cookie shops. Many sell out early, so go in the morning.",
     "Golf shops": "Golf shops sell clubs, balls, bags and apparel, and many offer custom club fitting on a launch monitor, regripping and repairs. Pre-owned and rental clubs are easy to find here, since so many visitors fly in without their own.",
     "Golf cars": "Golf car dealers sell new and used carts, handle service and repairs, and rent carts by the day, week or season. Demand picks up every fall when seasonal residents come back.",
     "Plumbing": "Plumbers here deal with a lot of hard water, slab leaks, water heaters that wear out early in the heat, and drains and sewer lines that need clearing. A local plumber who knows desert homes can usually get to you the same day.",
