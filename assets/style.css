@@ -686,3 +686,34 @@ main:focus { outline: none; }
 .spot.picked { outline: 3px solid var(--palm); outline-offset: 1px; background: #dff0e6; border-style: solid; }
 .sizes-table .save { display: inline-block; margin-left: 6px; font-size: 13px; font-weight: 600; color: var(--palm); }
 @media (max-width: 640px) { .picker-sizes { grid-template-columns: repeat(2, 1fr); } }
+
+/* Pricing page */
+.pr-chip[hidden] { display: none; }
+.pr-chip { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 8px; padding: 6px 14px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); font-size: 15px; font-weight: 600; }
+.pr-chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--sun-deep); }
+.pr-step { display: flex; gap: 16px; align-items: flex-start; background: var(--paper); border: 1px solid var(--line); border-radius: 20px; padding: 24px; max-width: 640px; }
+.pr-step h2 { margin: 2px 0 12px; font-size: 22px; }
+.pr-step select { font: inherit; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: #fff; min-width: min(420px, 100%); }
+.pr-step-b { background: none; border: 0; padding: 0; margin-top: 40px; }
+.pr-num { flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--sun-deep); color: #fff; font-weight: 700; }
+.pr-step-b .pr-num { background: none; border: 2px solid var(--ink); color: var(--ink); }
+.pr-note { margin: 8px 0 0; color: var(--ink-2); font-size: 15px; }
+.tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 20px; }
+.tier { position: relative; background: var(--paper); border: 1px solid var(--line); border-radius: 20px; padding: 28px 22px 22px; display: flex; flex-direction: column; }
+.tier-hot { border: 2px solid var(--ink); box-shadow: 6px 6px 0 var(--gold); }
+.tier-badge { position: absolute; top: -13px; left: 22px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; }
+.tier-name { font-family: var(--mono); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.tier h3 { margin: 6px 0 2px; font-size: 22px; }
+.tier-tag { margin: 0; color: var(--ink-2); font-size: 15px; }
+.tier-price { margin: 18px 0 0; font-family: var(--display); font-size: 40px; white-space: nowrap; font-weight: 700; line-height: 1; }
+.tier-price small { font-family: var(--body); font-size: 14px; font-weight: 500; color: var(--ink-2); margin-left: 4px; }
+.tier-per { margin: 6px 0 14px; font-size: 14px; color: var(--ink-2); }
+.tier ul, .pr-included ul { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 8px; }
+.tier li, .pr-included li { position: relative; padding-left: 26px; font-size: 15px; }
+.tier li::before, .pr-included li::before { content: ""; position: absolute; left: 2px; top: 6px; width: 13px; height: 8px; border-left: 3px solid var(--palm); border-bottom: 3px solid var(--palm); transform: rotate(-45deg); }
+.tier .btn { margin-top: auto; text-align: center; }
+.pr-included { margin-top: 40px; background: var(--paper); border: 1px solid var(--line); border-radius: 20px; padding: 28px; }
+.pr-included h2 { margin: 0 0 16px; font-size: 22px; }
+.pr-included ul { grid-template-columns: repeat(2, 1fr); margin: 0; }
+@media (max-width: 1000px) { .tiers { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .tiers, .pr-included ul { grid-template-columns: 1fr; } .pr-step { padding: 18px; } }

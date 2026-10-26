@@ -111,6 +111,8 @@
       .catch(function () { msg.textContent = "Something went wrong. Please try again in a moment, or call (760) 422-5475."; btn.disabled = false; });
   });
 
+  var wantSize = (location.search.match(/[?&]size=([1248])\b/) || [])[1];
+  if (wantSize) root.querySelectorAll("[data-size]").forEach(function (b) { if (b.getAttribute("data-size") === wantSize) b.click(); });
   var want = (location.search.match(/[?&]route=([a-z-]+)/) || [])[1];
   tabs.forEach(function (t) { if (want && t.getAttribute("data-route") === want) t.click(); });
   if (!want || !mailing(want)) load(route);
