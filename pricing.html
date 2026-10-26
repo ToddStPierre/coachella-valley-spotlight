@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=20261026c">
+<link rel="stylesheet" href="assets/style.css?v=20261026d">
 </head>
 <body>
 <header class="site-header"><a class="skip-link" href="#main">Skip to main content</a><div class="stripe"></div><nav class="nav wrap" aria-label="Main">
@@ -54,6 +54,28 @@
 <div class="pr-included"><h2>Every ad includes</h2><ul>
 <li>Ad design, done for you and approved by you</li><li>Printing and postage</li><li>Delivery to every home on the route</li><li>One business per category on the card</li>
 <li>A digital copy of your finished ad</li><li>A free Premium listing while your ad runs, with monthly views, calls and website clicks</li><li>No contract: book one mailing at a time</li><li>No hidden design, printing or postage fees</li></ul></div>
+<section class="roi" id="roi" aria-labelledby="roi-h">
+<span class="eyebrow">Run your numbers</span><h2 id="roi-h">What Could One Mailing Bring You?</h2>
+<p class="roi-lede">Plug in your own numbers. The math is yours, not ours.</p>
+<div class="roi-grid"><form class="roi-form" id="roi-form" onsubmit="return false">
+<label>Card<select id="roi-card"></select></label>
+<label>Ad size<select id="roi-size"><option value="1">1 spot, $300</option><option value="2">2 spots, $550</option><option value="4">4 spots, $1,000</option><option value="8">Full side, $2,000</option></select></label>
+<label>Response rate<select id="roi-rate"><option value="0.1">0.1%</option><option value="0.25" selected>0.25%</option><option value="0.5">0.5%</option><option value="0.75">0.75%</option><option value="1">1%</option><option value="2">2%</option></select><small>Start low. We default to a conservative 0.25%. Your offer, category and season move it.</small></label>
+<label>Your average sale<span class="roi-money"><span aria-hidden="true">$</span><input id="roi-sale" type="number" inputmode="decimal" min="1" max="100000" step="1" value="500"></span><small>What a typical new customer spends with you on the first visit or job.</small></label>
+</form>
+<div class="roi-out" aria-live="polite">
+<p class="roi-break" id="roi-break"></p>
+<dl class="roi-dl">
+<dt>Your investment</dt><dd id="roi-cost"></dd>
+<dt>Homes reached</dt><dd id="roi-homes"></dd>
+<dt>Cost per home</dt><dd id="roi-per"></dd>
+<dt id="roi-cust-l">New customers</dt><dd id="roi-cust"></dd>
+<dt>Estimated sales</dt><dd id="roi-sales"></dd>
+<dt>Sales for every $1 spent</dt><dd id="roi-x"></dd>
+</dl>
+<a class="btn" id="roi-cta" href="advertise?size=1#reserve">Hold my 1-spot ad</a>
+<p class="roi-fine">Estimates only. Sales are before your own costs, and new customers are rounded down. Response rates vary by offer, category and season. Homes are approximate for each route.</p>
+</div></div></section>
 <div class="faq" style="max-width:860px;margin-top:56px"><span class="eyebrow">Questions</span><h2>Pricing questions</h2><details><summary>What is the cheapest way to get started?</summary><p>A Basic listing in our directory is free. On the postcard, a single spot is $300 per mailing to about 5,000 homes, with design, printing and postage included.</p></details><details><summary>Is there a contract?</summary><p>No. You book one mailing at a time. Come back for the next card if it works for you.</p></details><details><summary>What does one business per category mean?</summary><p>When you book, your category is locked on that card. If you are the dentist on the El Paseo card, no other dentist can buy a spot on it.</p></details><details><summary>What do I need to send?</summary><p>Your logo, your offer and your phone number. We design the ad, and you approve it before anything prints.</p></details><details><summary>When do I pay?</summary><p>After your ad is approved, we send an invoice. Your spot is locked in once it is paid.</p></details><details><summary>What if a card doesn&rsquo;t reach 8 spots sold?</summary><p>A card mails once at least 8 of its 16 spots are sold. If it has fewer by the artwork deadline, it moves to the next mailing date. Your spot, your category and your payment carry over, or we refund you if you would rather not wait.</p></details></div>
 <div class="biz-band" style="margin-top:48px"><p><strong>Not sure which size fits?</strong><br>Tell Todd your goal and budget, and he&rsquo;ll recommend a size and a card.</p><a class="btn" href="tel:+17604225475">Call or text (760) 422-5475</a></div>
 </div></section>
@@ -77,7 +99,7 @@
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
 <script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js"></script>
-<script src="data/mailings.js?v=20261026c"></script>
+<script src="data/mailings.js?v=20261026d"></script>
 <script>
 (function () {
   var API = "https://local-spotlight-reservations.toddstpierre.workers.dev", M = (window.CVS_MAILINGS || []).slice();
@@ -104,6 +126,32 @@
       links();
     }).catch(function () { if (i === +sel.value) note.textContent = "Call (760) 422-5475 for open spots."; });
   });
+})();
+</script>
+<script>
+(function () {
+  var M = (window.CVS_MAILINGS || []).slice(), PRICE = { 1: 300, 2: 550, 4: 1000, 8: 2000 }, NAME = { 1: "1-spot", 2: "2-spot", 4: "4-spot", 8: "full-side" };
+  var $ = function (id) { return document.getElementById(id); }, card = $("roi-card");
+  if (!card) return;
+  if (!M.length) M = [{ route: "el-paseo", name: "El Paseo", homes: "About 5,000 homes" }];
+  card.innerHTML = M.map(function (m, i) { return '<option value="' + i + '">' + m.name + " (" + (m.homes || "about 5,000 homes").replace(/^About /, "about ") + ")</option>"; }).join("");
+  var usd = function (n, d) { return "$" + n.toLocaleString("en-US", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); };
+  function calc() {
+    var m = M[+card.value] || M[0], size = +$("roi-size").value, cost = PRICE[size];
+    var homes = parseInt(String(m.homes || "5,000").replace(/[^0-9]/g, ""), 10) || 5000;
+    var rate = +$("roi-rate").value, sale = Math.min(Math.max(parseFloat($("roi-sale").value) || 0, 0), 100000);
+    var cust = Math.floor(homes * rate / 100), sales = cust * sale, need = sale > 0 ? Math.ceil(cost / sale) : 0;
+    $("roi-cost").textContent = usd(cost); $("roi-homes").textContent = homes.toLocaleString("en-US");
+    $("roi-per").textContent = usd(cost / homes, 2); $("roi-cust-l").textContent = "New customers (" + rate + "%)";
+    $("roi-cust").textContent = cust; $("roi-sales").textContent = usd(sales);
+    $("roi-x").textContent = cost ? usd(sales / cost, 2) : "–";
+    $("roi-break").innerHTML = sale > 0 ? "<b>" + need + (need === 1 ? " new customer" : " new customers") + "</b>" + (need === 1 ? " pays" : " pay") + " for this ad." : "Enter your average sale to see your break-even.";
+    var cta = $("roi-cta"); cta.textContent = "Hold my " + NAME[size] + " ad";
+    cta.href = "advertise?route=" + encodeURIComponent(m.route) + "&size=" + size + "#reserve";
+  }
+  ["roi-card", "roi-size", "roi-rate", "roi-sale"].forEach(function (id) { $(id).addEventListener("input", calc); $(id).addEventListener("change", calc); });
+  $("roi-cta").addEventListener("click", function () { try { gtag("event", "roi_cta_click", { size: $("roi-size").value }); } catch (e) {} });
+  calc();
 })();
 </script>
 </body>
