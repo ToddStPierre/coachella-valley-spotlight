@@ -51,6 +51,7 @@
   var API = "https://cvs-tracker.toddstpierre.workers.dev";
   var LABELS = [["impression", "Listing seen", "Times your listing showed up on someone's screen"], ["profile", "Profile views", "Visits to your profile page"], ["call", "Calls tapped", "Taps on your phone number"], ["website", "Website visits", "Clicks through to your website"]];
   var out = document.getElementById("st-out"), q = new URLSearchParams(location.search);
+  var adminKey = q.get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })();
   var dir = (window.CVS && window.CVS.directory) || [];
   function slugOf(b) { return b.slug || String(b.name).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
   function nameOf(s) { var b = dir.filter(function (x) { return !x.sample && slugOf(x) === s; })[0]; return b ? b.name : s; }
@@ -58,11 +59,11 @@
   function tiles(set) { return '<div class="stats" style="margin-bottom:16px">' + LABELS.map(function (l) { return '<div class="stat"><b>' + (set[l[0]] || 0).toLocaleString() + '</b><span>' + l[1] + '</span></div>'; }).join("") + '</div>'; }
   function fail(msg) { out.innerHTML = '<div class="empty">' + msg + '</div>'; }
 
-  if (q.get("admin")) {
+  if (adminKey) {
     document.getElementById("st-title").textContent = "All listings";
     document.getElementById("st-sub").textContent = "Every real business in the directory. Copy a business's private link to send them their numbers.";
     var slugs = dir.filter(function (x) { return !x.sample; }).map(slugOf).join(",");
-    fetch(API + "/stats/all?key=" + encodeURIComponent(q.get("admin")) + "&slugs=" + slugs).then(function (r) { return r.json(); }).then(function (d) {
+    fetch(API + "/stats/all?key=" + encodeURIComponent(adminKey) + "&slugs=" + slugs).then(function (r) { return r.json(); }).then(function (d) {
       if (d.error) return fail("That admin link is not valid.");
       var base = location.href.split("?")[0];
       var rows = d.businesses.sort(function (a, b) { return nameOf(a.slug).localeCompare(nameOf(b.slug)); }).map(function (b) {
@@ -77,7 +78,24 @@
   }
 
   var slug = q.get("b"), key = q.get("key");
-  if (!slug || !key) return fail("This page needs the private link we sent you.");
+  if (!slug || !key) {
+    // Admin by sign-in: a signed-in admin account gets the admin key for this tab, then the page reloads into admin mode.
+    fail("Checking your sign-in&hellip;");
+    (function waitAuth(n) {
+      if (!window.CVS_AUTH) return n > 100 ? fail("This page needs the private link we sent you.") : setTimeout(function () { waitAuth(n + 1); }, 100);
+      window.CVS_AUTH.ready.then(function (u) {
+        if (!u) return fail('This page needs the private link we sent you. Site admin? <a href="' + window.CVS_AUTH.signInUrl() + '">Sign in</a>.');
+        window.CVS_AUTH.token().then(function (t) {
+          return fetch(API + "/admin/session", { headers: { Authorization: "Bearer " + t } }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); });
+        }).then(function (r) {
+          if (!r.ok || !r.d.key) return fail("This page needs the private link we sent you.");
+          try { sessionStorage.setItem("cvs_admin", r.d.key); } catch (e) {}
+          location.reload();
+        }).catch(function () { fail("Could not check your sign-in. Try again in a minute."); });
+      });
+    })(0);
+    return;
+  }
   fetch(API + "/stats?b=" + encodeURIComponent(slug) + "&key=" + encodeURIComponent(key)).then(function (r) { return r.json(); }).then(function (d) {
     if (d.error) return fail("That link is not valid. Ask us for a fresh one.");
     document.getElementById("st-title").textContent = nameOf(slug);

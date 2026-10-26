@@ -1,7 +1,7 @@
 /* Admin: site visitors, resident email signups and the La Quinta / Indio route waitlist. Shown on stats.html?admin=KEY */
 (function () {
   var API = "https://cvs-tracker.toddstpierre.workers.dev";
-  var admin = new URLSearchParams(location.search).get("admin"); if (!admin) return;
+  var admin = (new URLSearchParams(location.search).get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })()); if (!admin) return;
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function csv(rows, cols) {
     return [cols.join(",")].concat(rows.map(function (r) { return cols.map(function (c) { return '"' + String(r[c] == null ? "" : r[c]).replace(/"/g, '""') + '"'; }).join(","); })).join("\n");

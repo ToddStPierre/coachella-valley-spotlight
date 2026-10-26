@@ -1,7 +1,7 @@
 /* Admin: every form submission (business listings, stories, ad holds), saved by the tracker. Shown on stats.html?admin=KEY */
 (function () {
   var API = "https://cvs-tracker.toddstpierre.workers.dev";
-  var admin = new URLSearchParams(location.search).get("admin"); if (!admin) return;
+  var admin = (new URLSearchParams(location.search).get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })()); if (!admin) return;
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   var LABEL = { submit: "Listing / event / deal", story: "Story idea", advertise: "Ad inquiry", contact: "Contact / suggestion" };
   var SKIP = ["source"];

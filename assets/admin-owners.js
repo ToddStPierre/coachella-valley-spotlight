@@ -1,7 +1,7 @@
 /* Admin: pending claims and owner dashboard links. Shown on stats.html?admin=KEY */
 (function () {
   var API = "https://cvs-tracker.toddstpierre.workers.dev";
-  var admin = new URLSearchParams(location.search).get("admin"); if (!admin) return;
+  var admin = (new URLSearchParams(location.search).get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })()); if (!admin) return;
   var dir = (window.CVS && window.CVS.directory) || [];
   function nameOf(s) { var b = dir.filter(function (x) { return x.slug === s; })[0]; return b ? b.name : s; }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
