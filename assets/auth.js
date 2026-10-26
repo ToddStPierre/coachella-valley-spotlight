@@ -76,7 +76,7 @@ document.addEventListener("click", async ev => {
   const b = ev.target.closest("[data-fav]");
   if (!b) return;
   ev.preventDefault(); ev.stopPropagation();
-  if (!user) { location.href = ROOT + "account?next=" + encodeURIComponent(location.pathname + location.search); return; }
+  if (!user) { location.href = ROOT + "account?mode=up&save=" + encodeURIComponent(b.getAttribute("data-fav")) + "&next=" + encodeURIComponent(location.pathname + location.search); return; }
   const key = b.getAttribute("data-fav"), list = new Set(data.favorites || []);
   list.has(key) ? list.delete(key) : list.add(key);
   data.favorites = [...list].slice(-500); paintHearts();
@@ -105,7 +105,7 @@ function formView(mode, note) {
   const title = { in: "Sign in", up: "Create your free account", reset: "Reset your password" }[mode];
   const lead = {
     in: "Save your favorite local businesses and events, and pick the emails you want.",
-    up: "It's free. Save places and events, choose your emails, and manage your business listing if you own one.",
+    up: new URLSearchParams(location.search).get("save") ? "Create a free account to save this and come back to it anytime. It takes 30 seconds." : "It's free. Save places and events, choose your emails, and manage your business listing if you own one.",
     reset: "Enter your email and we'll send you a link to set a new password."
   }[mode];
   box.innerHTML = `<div class="card acct-card">
@@ -160,7 +160,7 @@ function savedHTML() {
 function renderAccount() {
   if (!box) return;
   if (!loaded) { box.innerHTML = '<div class="empty">Loading your account…</div>'; return; }
-  if (!user) { formView("in"); return; }
+  if (!user) { formView(new URLSearchParams(location.search).get("mode") === "up" ? "up" : "in"); return; }
   const p = data.prefs || {};
   box.innerHTML = `<div class="acct-grid">
 <div class="acct-main">
@@ -188,7 +188,49 @@ ${mine && mine.listings && mine.listings.length ? `<div class="card acct-card ac
   paintHearts();
 }
 
+/* ---------- sign-up prompts (only for signed-out visitors) ---------- */
+const PROMPT_KEY = "cvs_hide_acct_prompt";
+function promptsOff() { try { return sessionStorage.getItem(PROMPT_KEY) === "1"; } catch (e) { return false; } }
+function addPrompts() {
+  if (document.querySelector("[data-acct-prompt]")) return;
+  const up = ROOT + "account?mode=up&next=" + encodeURIComponent(location.pathname + location.search);
+  const heart = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.4-9.3C1.4 8.3 3.2 4.8 6.6 4.5c2-.2 3.7.9 5.4 2.9 1.7-2 3.4-3.1 5.4-2.9 3.4.3 5.2 3.8 4 6.7-1.9 4.7-9.4 9.3-9.4 9.3Z"/></svg>';
+  const make = (cls, html) => { const d = document.createElement("div"); d.className = cls; d.setAttribute("data-acct-prompt", ""); d.innerHTML = html; return d; };
+  // Footer, every page
+  const foot = document.querySelector(".foot-signup > div");
+  if (foot) foot.appendChild(make("acct-foot", `<p>Or <a href="${up}">create a free My Spotlight account</a> to save places and events and pick your emails.</p>`));
+  if (promptsOff()) return;
+  // Home: after "Coming up around the valley"
+  const coming = document.querySelector('[data-when="after-weekend"]');
+  const sec = coming && coming.closest("section");
+  if (sec) sec.after(make("wrap acct-band-wrap", `<div class="acct-band"><div class="acct-band-ico">${heart}</div><div><h2>Make the valley yours</h2><p>Create a free <b>My Spotlight</b> account to save the places and events you love, get weekend picks by email, and find them again in one tap.</p></div><a class="btn" href="${up}">Create my free account</a></div>`));
+  // Directory / events: slim bar above the results
+  const browse = document.querySelector("[data-browse]");
+  if (browse) browse.before(make("acct-bar", `${heart}<span>Tap the heart to save businesses and events to <b>My Spotlight</b>.</span><a href="${up}">Create a free account</a><button type="button" class="acct-x" aria-label="Hide this">&times;</button>`));
+  // Business profile: sidebar card
+  const side = document.querySelector(".pf-side"), name = document.querySelector(".pf-head h1");
+  if (side && name) {
+    const c = make("pf-card acct-side-card", `<h2>${heart} Save ${esc(name.textContent)}</h2><p>Keep the businesses you use in one place with a free My Spotlight account.</p><a class="btn btn-ghost" href="${ROOT}account?mode=up&save=${encodeURIComponent((document.querySelector(".pf-head [data-fav]") || {}).getAttribute ? document.querySelector(".pf-head [data-fav]").getAttribute("data-fav") : "")}&next=${encodeURIComponent(location.pathname)}">Create a free account</a>`);
+    const firstCard = side.querySelector(".pf-card");
+    firstCard ? firstCard.after(c) : side.prepend(c);
+  }
+}
+function removePrompts() { document.querySelectorAll("[data-acct-prompt]").forEach(el => el.remove()); }
+document.addEventListener("click", e => {
+  if (!e.target.closest(".acct-x")) return;
+  try { sessionStorage.setItem(PROMPT_KEY, "1"); } catch (err) {}
+  const bar = e.target.closest(".acct-bar"); if (bar) bar.remove();
+});
+
 onAuthStateChanged(auth, async u => {
   user = u; paintNav(); renderAccount(); readyResolve(u);
-  await Promise.all([loadUser(), box ? loadMine() : null]); paintHearts(); renderAccount();
+  if (u) removePrompts(); else addPrompts();
+  await Promise.all([loadUser(), box ? loadMine() : null]);
+  // Finish a save that started before sign-up (?save=biz:slug), then go back.
+  const sp = new URLSearchParams(location.search), pend = sp.get("save");
+  if (u && pend && /^(biz|event):[a-z0-9-]{2,120}$/.test(pend)) {
+    if (!(data.favorites || []).includes(pend)) { data.favorites = (data.favorites || []).concat(pend).slice(-500); try { await saveUser({}); } catch (e) {} }
+    const n = next(); if (n) { location.href = n; return; }
+  }
+  paintHearts(); renderAccount();
 });
