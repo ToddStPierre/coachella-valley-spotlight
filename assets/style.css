@@ -379,6 +379,17 @@ button.spot:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgb
 .golf-card h3 a { color: inherit; text-decoration: none; }
 .golf-card h3 a:hover { text-decoration: underline; }
 .golf-holes { margin: 0; color: var(--ink-2); }
+.golf-card .feat-pills { margin-top: 10px; }
+.golf-style { font-size: 14px; color: var(--ink-2); }
+.golf-tees { max-width: 860px; margin-top: 16px; }
+.golf-tees summary { cursor: pointer; font-weight: 600; color: var(--palm); }
+.golf-tees h3 { font-size: 18px; margin: 16px 0 8px; }
+.golf-play { max-width: 860px; margin-top: 24px; }
+.golf-season { max-width: 860px; margin-top: 24px; }
+.golf-season ul { margin: 0; padding-left: 20px; color: var(--ink-2); }
+.golf-season li { margin-bottom: 8px; }
+.golf-play .facts dd { color: var(--ink); }
+@media (max-width: 560px) { .golf-play .facts { grid-template-columns: 1fr; gap: 2px; } .golf-play .facts dd { margin-bottom: 10px; } }
 .golf-count { font-family: var(--mono); font-size: 13px; color: var(--ink-2); margin: 0 0 16px; }
 .golf-card[hidden] { display: none; }
 /* Directory: category jump links and group counts */
