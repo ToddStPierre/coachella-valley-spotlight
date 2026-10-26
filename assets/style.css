@@ -654,3 +654,21 @@ main:focus { outline: none; }
 .tf-note { color: var(--ink-2); font-size: 15px; margin: -8px 0 20px; }
 .hike-box { margin-top: 40px; }
 .grid [data-biz][hidden] { display: none; }
+
+/* Mailing dates: picker line and the mailing calendar page */
+.picker-left { display: block; margin-top: 4px; color: var(--ink-2); text-transform: none; letter-spacing: 0; font-family: var(--body); font-size: 14px; }
+.spot.open:disabled { cursor: not-allowed; opacity: .55; }
+.mc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--s3); }
+.mc-card { background: var(--paper); border: 1px solid var(--line); border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 14px; }
+.mc-card h2 { margin: 0; font-size: 26px; }
+.mc-area { margin: 0; color: var(--ink-2); }
+.mc-dates { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 0; }
+.mc-dates dt { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); padding-top: 3px; }
+.mc-dates dd { margin: 0; font-weight: 600; }
+.mc-status { display: inline-block; align-self: flex-start; padding: 5px 12px; border-radius: 999px; font-size: 14px; font-weight: 600; background: var(--palm-soft); color: var(--palm); }
+.mc-status.almost { background: #fbe6c8; color: #9a5a12; }
+.mc-status.full, .mc-status.closed { background: #efe3dc; color: var(--ink-2); }
+.mc-fill { margin: 0; font-size: 17px; }
+.mc-bar { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.mc-bar span { display: block; height: 100%; background: var(--sun-deep); width: 0; transition: width .4s; }
+.mc-card .btn { align-self: flex-start; margin-top: auto; }

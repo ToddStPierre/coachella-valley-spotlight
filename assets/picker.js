@@ -9,11 +9,25 @@
   var shell = document.getElementById("picker-form-shell"), title = document.getElementById("picker-form-title");
   var form = document.getElementById("picker-form"), cat = document.getElementById("pf-category"), msg = document.getElementById("picker-msg");
   var route = "el-paseo", pending = null;
+  var dateEl = root.querySelector(".picker-date"), MAIL = window.CVS_MAILINGS || [];
+  function mailing(r) { for (var i = 0; i < MAIL.length; i++) if (MAIL[i].route === r) return MAIL[i]; return null; }
+  function ymd(s) { var p = s.split("-"); return new Date(+p[0], p[1] - 1, +p[2]); }
+  function nice(s) { return ymd(s).toLocaleDateString("en-US", { weekday: "short", month: "long", day: "numeric" }); }
+  function daysLeft(s) { var t = new Date(); t.setHours(0, 0, 0, 0); return Math.round((ymd(s) - t) / 864e5); }
+  function closed(r) { var m = mailing(r); return !!(m && daysLeft(m.deadline) < 0); }
+  function showDate(r) {
+    var m = mailing(r); if (!dateEl) return;
+    if (!m) { dateEl.textContent = "Mailing date coming soon"; return; }
+    var d = daysLeft(m.deadline);
+    dateEl.innerHTML = "Mails " + nice(m.mail) + " &middot; Artwork due " + nice(m.deadline) +
+      (d < 0 ? '<span class="picker-left">Booking for this card is closed. The next date is coming soon.</span>' : '<span class="picker-left">' + (d === 0 ? "Last day to book" : d + (d === 1 ? " day" : " days") + " left to book") + '</span>');
+  }
 
   function state(s) { s = (s || "").toLowerCase(); return s === "open" ? "open" : s === "pending" ? "pending" : "sold"; }
   function word(k) { return k === "open" ? "Open" : k === "pending" ? "Pending" : "Sold"; }
 
   function load(r, keepForm) {
+    showDate(r);
     statusEl.textContent = "Loading spots…"; countEl.textContent = "Loading availability…";
     front.innerHTML = ""; back.innerHTML = ""; if (!keepForm) shell.hidden = true;
     fetch(API + "/api/spots?route=" + encodeURIComponent(r)).then(function (res) { if (!res.ok) throw 0; return res.json(); }).then(function (d) {
@@ -22,7 +36,8 @@
         el.className = "spot " + k;
         el.innerHTML = '<span class="spot-n">Spot ' + p.position + '</span><span class="spot-cat">' + (p.category ? p.category.replace(/</g, "&lt;") : (k === "open" ? "Tap to hold" : "")) + '</span><span class="spot-state">' + word(k) + '</span>';
         el.setAttribute("aria-label", "Spot " + p.position + (p.category ? ", " + p.category : "") + ", " + word(k));
-        if (k === "open") { el.type = "button"; el.addEventListener("click", function () { open(r, p.position); }); }
+        if (k === "open" && closed(r)) { el.disabled = true; el.title = "Booking for this card is closed"; }
+        else if (k === "open") { el.type = "button"; el.addEventListener("click", function () { open(r, p.position); }); }
         (p.position <= 8 ? front : back).appendChild(el);
       });
       var taken = d.categories.filter(function (c) { return d.takenCategories.indexOf(c) === -1; });
@@ -72,5 +87,7 @@
       .catch(function () { msg.textContent = "Something went wrong. Please try again in a moment, or call (760) 422-5475."; btn.disabled = false; });
   });
 
-  load(route);
+  var want = (location.search.match(/[?&]route=([a-z-]+)/) || [])[1];
+  tabs.forEach(function (t) { if (want && t.getAttribute("data-route") === want) t.click(); });
+  if (!want || !mailing(want)) load(route);
 })();
