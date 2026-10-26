@@ -617,3 +617,11 @@ main:focus { outline: none; }
 .acct-foot p { margin: 8px 0 0; font-size: 15px; color: #d8cbb9; }
 .acct-foot a { color: #fff; font-weight: 600; }
 @media (max-width: 760px) { .acct-band { grid-template-columns: 1fr; text-align: left; } }
+
+/* My Spotlight page layout */
+.acct-page { padding-bottom: var(--s5); }
+.acct-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 480px); gap: var(--s4); align-items: start; }
+.acct-layout .acct-intro { padding-top: 8px; }
+.acct-layout #acct > .acct-card { max-width: none; }
+.acct-layout.is-in { grid-template-columns: 1fr; gap: var(--s3); }
+@media (max-width: 900px) { .acct-layout { grid-template-columns: 1fr; gap: var(--s3); } }

@@ -159,6 +159,8 @@ function savedHTML() {
 
 function renderAccount() {
   if (!box) return;
+  // Signed out: intro on the left, sign-in box on the right. Signed in: full-width account view under the intro.
+  const lay = document.getElementById("acct-layout"); if (lay) lay.classList.toggle("is-in", !!user);
   if (!loaded) { box.innerHTML = '<div class="empty">Loading your account…</div>'; return; }
   if (!user) { formView(new URLSearchParams(location.search).get("mode") === "up" ? "up" : "in"); return; }
   const p = data.prefs || {};
