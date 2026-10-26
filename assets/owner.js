@@ -8,13 +8,16 @@
   function monthName(ym) { var p = ym.split("-"); return new Date(+p[0], +p[1] - 1, 1).toLocaleString("en-US", { month: "long", year: "numeric" }); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function fail(m) { out.innerHTML = '<div class="empty">' + m + '</div>'; }
-  if (!slug || !key) return fail("This page needs the private dashboard link we sent you.");
+  // Signed-in owners don't need the private link: their Firebase login is sent instead (assets/auth.js).
+  var bearer = null;
+  function authHeaders() { return bearer ? { Authorization: "Bearer " + bearer } : {}; }
+  if (!slug) return fail("Open your listing from <a href=\"account\">My Spotlight</a>, or use the private dashboard link we sent you.");
 
   // Formspree drops emails sent from the tracker's servers, so the browser sends the tracker's email notice.
   function mailTodd(n) { if (!n) return; var fd = new FormData(); Object.keys(n).forEach(function (k) { if (n[k] != null) fd.append(k, String(n[k])); }); fetch("https://formspree.io/f/myezyype", { method: "POST", headers: { Accept: "application/json" }, body: fd }).catch(function () {}); }
   function post(path, body) {
-    body.b = slug; body.key = key;
-    return fetch(API + path, { method: "POST", body: JSON.stringify(body) })
+    body.b = slug; if (key) body.key = key;
+    return fetch(API + path, { method: "POST", headers: authHeaders(), body: JSON.stringify(body) })
       .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || "Something went wrong."); mailTodd(d.notice); return d; }); });
   }
 
@@ -127,9 +130,18 @@
   }
 
   function reload() {
-    fetch(API + "/owner?b=" + encodeURIComponent(slug) + "&key=" + encodeURIComponent(key))
+    fetch(API + "/owner?b=" + encodeURIComponent(slug) + (key ? "&key=" + encodeURIComponent(key) : ""), { headers: authHeaders() })
       .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error); return d; }); })
       .then(render).catch(function (err) { fail(err.message || "Could not load your listing. Try again in a minute."); });
   }
-  reload();
+  if (key) return reload();
+  // No private link: wait for the site's sign-in, then use it.
+  out.innerHTML = '<div class="empty">Checking your sign-in&hellip;</div>';
+  (function waitAuth(n) {
+    if (!window.CVS_AUTH) return n > 100 ? fail("Sign-in didn&rsquo;t load. Refresh the page.") : setTimeout(function () { waitAuth(n + 1); }, 100);
+    window.CVS_AUTH.ready.then(function (u) {
+      if (!u) return fail('Please <a href="' + window.CVS_AUTH.signInUrl() + '">sign in</a> with the email you used to claim this listing.');
+      window.CVS_AUTH.token().then(function (t) { bearer = t; reload(); });
+    });
+  })(0);
 })();

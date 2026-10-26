@@ -52,7 +52,7 @@
   box.addEventListener("submit", function (e) {
     if (e.target.id !== "own-manual") return; e.preventDefault();
     var f = e.target; msg("Working…");
-    post("/admin/approve", { b: f.b.value, name: f.name.value, email: f.email.value }).then(function () { msg("Dashboard link created. Copy it from the Owners table."); load(); }).catch(function (err) { msg(err.message); });
+    post("/admin/approve", { b: f.b.value, name: f.name.value, email: f.email.value }).then(function () { msg("Approved. The owner can sign in at coachellavalleyspotlight.com/account with the email on the claim (after confirming it), or use the dashboard link in the Owners table."); load(); }).catch(function (err) { msg(err.message); });
   });
   load();
 })();

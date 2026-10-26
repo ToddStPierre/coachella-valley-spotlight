@@ -10,6 +10,11 @@
   document.getElementById("cl-biz").value = biz.name;
   document.getElementById("cl-title").textContent = "Claim " + biz.name;
   if (biz.claimed) { form.innerHTML = '<p class="full">This listing has already been claimed. If that wasn&rsquo;t you, call or text (760) 422-5475 and we&rsquo;ll sort it out.</p>'; return; }
+  // If they're signed in, fill in their account email (it's what links the listing to their login).
+  (function waitAuth(n) {
+    if (!window.CVS_AUTH) { if (n < 100) setTimeout(function () { waitAuth(n + 1); }, 100); return; }
+    window.CVS_AUTH.ready.then(function (u) { if (u && u.email && !form.email.value) form.email.value = u.email; });
+  })(0);
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     var btn = form.querySelector("button[type=submit]"); btn.disabled = true; msg.textContent = "Sending…";
@@ -18,7 +23,7 @@
       .then(function (r) {
         if (!r.ok) { msg.textContent = r.d.error || "That didn’t go through. Please try again."; btn.disabled = false; return; }
         mailTodd(r.d.notice);
-        form.innerHTML = '<p class="full" style="font-size:18px"><strong>Got it, thank you!</strong> We&rsquo;ll give the business a quick call to confirm, then email you your private dashboard link.</p>';
+        form.innerHTML = '<p class="full" style="font-size:18px"><strong>Got it, thank you!</strong> We&rsquo;ll give the business a quick call to confirm. Once it&rsquo;s approved, <a href="account">sign in or create a free account</a> with this same email to manage your listing.</p>';
       })
       .catch(function () { msg.textContent = "That didn’t go through. Please call or text (760) 422-5475."; btn.disabled = false; });
   });

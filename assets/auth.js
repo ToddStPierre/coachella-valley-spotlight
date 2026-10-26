@@ -21,6 +21,18 @@ const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&a
 const PREFS = [["news", "Valley news and good stories"], ["deals", "Local deals and coupons"], ["events", "Things to do this weekend"]];
 
 let user = null, data = { favorites: [], prefs: {} }, loaded = false;
+const OWNER_API = "https://cvs-tracker.toddstpierre.workers.dev";
+let readyResolve; const ready = new Promise(r => { readyResolve = r; });
+window.CVS_AUTH = { ready, user: () => user, token: () => (user ? user.getIdToken() : Promise.resolve(null)), signInUrl: n => ROOT + "account?next=" + encodeURIComponent(n || location.pathname + location.search) };
+let mine = null;
+async function loadMine() {
+  mine = null;
+  if (!user) return;
+  try {
+    const r = await fetch(OWNER_API + "/owner/mine", { headers: { Authorization: "Bearer " + await user.getIdToken() } });
+    mine = r.ok ? await r.json() : { listings: [] };
+  } catch (e) { mine = { listings: [] }; }
+}
 
 /* ---------- menu link ---------- */
 const navList = document.querySelector(".nav-links");
@@ -159,7 +171,8 @@ ${savedHTML()}
 <div class="card acct-card"><h2>Your account</h2><p>${esc(user.email)}</p><button type="button" class="btn btn-ghost" data-act="out">Sign out</button></div>
 <div class="card acct-card"><h2>Email preferences</h2><form class="acct-prefs">${PREFS.map(([k, t]) => `<label class="acct-check"><input type="checkbox" name="${k}"${p[k] ? " checked" : ""}> ${t}</label>`).join("")}
 <button class="btn" type="submit">Save preferences</button><p class="form-status" role="status" aria-live="polite"></p></form></div>
-<div class="card acct-card"><h2>Own a local business?</h2><p>Find your listing and tap &ldquo;Claim this listing&rdquo; to keep it up to date and see its stats.</p><a class="btn btn-ghost" href="${ROOT}directory">Find my business</a></div>
+${mine && mine.listings && mine.listings.length ? `<div class="card acct-card acct-owner"><h2>Your business</h2>${mine.listings.map(l => `<p><b>${esc(l.name)}</b><br><a href="${ROOT}owner.html?b=${encodeURIComponent(l.slug)}">Manage listing and stats &rarr;</a></p>`).join("")}</div>`
+  : `<div class="card acct-card"><h2>Own a local business?</h2>${mine && mine.notice ? `<p><b>${esc(mine.notice)}</b></p>` : ""}<p>Find your listing and tap &ldquo;Claim this listing.&rdquo; Once we approve it, sign in here with the same email to manage it and see its stats.</p><a class="btn btn-ghost" href="${ROOT}directory">Find my business</a></div>`}
 </aside></div>`;
   box.querySelector('[data-act="out"]').addEventListener("click", () => signOut(auth));
   const v = box.querySelector('[data-act="verify"]');
@@ -174,6 +187,6 @@ ${savedHTML()}
 }
 
 onAuthStateChanged(auth, async u => {
-  user = u; paintNav(); renderAccount();
-  await loadUser(); paintHearts(); renderAccount();
+  user = u; paintNav(); renderAccount(); readyResolve(u);
+  await Promise.all([loadUser(), box ? loadMine() : null]); paintHearts(); renderAccount();
 });
