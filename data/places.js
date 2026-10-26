@@ -43,6 +43,7 @@ window.CVS.places = {
     "Business and real estate law": "Local business and real estate attorneys handle company formation, contracts, property deals, landlord and tenant matters, HOAs and business disputes.",
     "Pet stores": "Independent pet stores for food, treats, toys and supplies, with staff who can help you choose the right diet. These are local shops, not the big-box chains.",
     "Nail salons": "Local nail salons for manicures, pedicures, gel, acrylics, dip powder and nail art, many with waxing and lash services too. Walk-ins are often welcome.",
+    "Meditation": "Meditation teachers and centers in the valley, from personalized courses to free introductory talks, for stress relief, better sleep and a calmer mind.",
     "Med spas": "Local med spas offering injectables like Botox and fillers, skin treatments, weight loss programs and permanent makeup, in a spa setting with medical oversight.",
     "Dog parks": "Public off-leash dog parks run by valley cities, most with separate areas for large and small dogs. Many close for a few weeks each fall for overseeding, so check the city page before you go.",
     "Hiking trails": "Public trails across the valley: palm oases in the Indian Canyons, National Monument trails above Palm Desert and Rancho Mirage, the La Quinta Cove, and high-country hikes from the Palm Springs Aerial Tramway. Some charge admission and some close seasonally or in summer heat.",
