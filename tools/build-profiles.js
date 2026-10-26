@@ -65,6 +65,7 @@ ${b.postcard || prem ? '<span class="pf-badge">' + (b.postcard ? "On the Spotlig
 <div class="cta-row">
 ${tel ? `<a class="btn" href="tel:${tel}" data-track="call">Call ${esc(b.phone)}</a>` : ""}
 ${b.url ? `<a class="btn btn-ghost" href="${esc(outbound(b.url))}" target="_blank" rel="noopener" data-track="website">Visit website &rarr;</a>` : ""}
+<button type="button" class="btn btn-ghost fav-btn" data-fav="biz:${slug}" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.4-9.3C1.4 8.3 3.2 4.8 6.6 4.5c2-.2 3.7.9 5.4 2.9 1.7-2 3.4-3.1 5.4-2.9 3.4.3 5.2 3.8 4 6.7-1.9 4.7-9.4 9.3-9.4 9.3Z"/></svg><span>Save</span></button>
 </div>
 ${owner ? '<p class="risk">Tell them you found them on Coachella Valley Spotlight.</p>' : ""}
 </div>

@@ -111,6 +111,10 @@
   function featPills(list) {
     return list && list.length ? '<ul class="feat-pills" aria-label="Features">' + list.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join("") + '</ul>' : '';
   }
+  // Save (heart) button; assets/auth.js wires it to the visitor's account.
+  function favBtn(key, label) {
+    return '<button type="button" class="fav" data-fav="' + esc(key) + '" aria-pressed="false" aria-label="Save ' + esc(label) + '"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.4-9.3C1.4 8.3 3.2 4.8 6.6 4.5c2-.2 3.7.9 5.4 2.9 1.7-2 3.4-3.1 5.4-2.9 3.4.3 5.2 3.8 4 6.7-1.9 4.7-9.4 9.3-9.4 9.3Z"/></svg></button>';
+  }
   function cardArt(b, prem) {
     var img = prem && (b.image || (b.gallery || [])[0]);
     if (img) return '<img class="card-img" src="' + ROOT + esc(img) + '" alt="" loading="lazy" width="640" height="360">';
@@ -125,7 +129,7 @@
   var R = {
     event: function (e) {
       var d = parse(e.date);
-      return '<article class="card event">' + sample(e) +
+      return '<article class="card event">' + sample(e) + favBtn("event:" + eventSlug(e), e.title) +
         '<div class="date-tile"><span>' + MONTHS[d.getMonth()] + '</span><b>' + d.getDate() + '</b><span>' + (e.endDate ? 'to ' + parse(e.endDate).getDate() : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()]) + '</span></div>' +
         '<div style="display:grid;gap:6px"><span class="meta">' + esc(e.city) + (e.recurring ? ' &middot; ' + esc(e.recurring) : '') + (e.time ? ' &middot; ' + esc(e.time) : '') + '</span>' +
         // Pulled events (feed: true) have no page here; they link to the source's own page.
@@ -158,7 +162,7 @@
       var slug = !b.sample && slugOf(b);
       var name = slug ? '<a href="' + ROOT + 'business/' + slug + '/" data-track="profile-link" style="color:inherit;text-decoration:none">' + esc(b.name) + '</a>' : esc(b.name);
       var prem = b.premium || b.featured, off = prem && liveOffer(b.offer);
-      return '<article class="card' + (prem ? ' featured' : '') + '"' + (slug ? ' data-biz="' + slug + '"' : '') + '>' + sample(b) + cardArt(b, prem) + '<span class="meta">' + esc(b.service || b.category) + ' &middot; ' + esc(b.city) + '</span>' +
+      return '<article class="card' + (prem ? ' featured' : '') + '"' + (slug ? ' data-biz="' + slug + '"' : '') + '>' + sample(b) + (slug ? favBtn("biz:" + slug, b.name) : '') + cardArt(b, prem) + '<span class="meta">' + esc(b.service || b.category) + ' &middot; ' + esc(b.city) + '</span>' +
         '<h3>' + name + '</h3>' + (b.claimed && !b.public ? '<span class="verified" title="The owner has claimed this listing and keeps it up to date">&#10003; Verified by owner</span>' : '') + '<p>' + esc(b.blurb) + '</p>' + featPills(b.features) + (b.happyHour ? '<p class="hh"><b>Happy hour:</b> ' + esc(b.happyHour) + '</p>' : '') +
         (b.postcard ? '<span class="tag">On the Spotlight postcard</span>' : prem ? '<span class="tag">Premium listing</span>' : '') +
         (off ? '<div class="offer-box"><b>' + esc(off.title) + '</b>' + (off.details ? '<span>' + esc(off.details) + '</span>' : '') + '</div>' : '') +
@@ -167,6 +171,9 @@
   };
 
   /* PRERENDER-END: tools/build-seo.js runs everything above this line at build time to put the same cards in the HTML. */
+  // Shared with assets/auth.js (favorites page) and used to load it on every page.
+  window.CVS_RENDER = { R: R, events: events, directory: directory, slugOf: slugOf, eventSlug: eventSlug, root: ROOT };
+  (function () { var m = document.createElement("script"); m.type = "module"; m.src = ROOT + "assets/auth.js"; document.head.appendChild(m); })();
   var SETS = { events: events, deals: deals, news: news, directory: directory };
   var TYPE = { events: "event", deals: "deal", news: "news", directory: "directory" };
 
