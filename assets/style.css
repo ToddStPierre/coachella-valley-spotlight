@@ -625,3 +625,8 @@ main:focus { outline: none; }
 .acct-layout #acct > .acct-card { max-width: none; }
 .acct-layout.is-in { grid-template-columns: 1fr; gap: var(--s3); }
 @media (max-width: 900px) { .acct-layout { grid-template-columns: 1fr; gap: var(--s3); } }
+
+/* Dropdowns (Activities, Cities): fill top to bottom, then the next column */
+.has-sub.open .sub-menu { display: block; columns: 2; column-gap: 4px; }
+.has-sub.open .sub-menu.one-col { columns: 1; }
+.sub-menu li { break-inside: avoid; }
