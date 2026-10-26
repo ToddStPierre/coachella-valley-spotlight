@@ -630,3 +630,4 @@ main:focus { outline: none; }
 .has-sub.open .sub-menu { display: block; columns: 2; column-gap: 4px; }
 .has-sub.open .sub-menu.one-col { columns: 1; }
 .sub-menu li { break-inside: avoid; }
+@media (min-width: 921px) { #activities-menu { width: 480px; } .sub-menu a { white-space: nowrap; } }
