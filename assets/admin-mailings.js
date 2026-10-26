@@ -16,7 +16,7 @@
       '<td><input type="date" data-f="mail" value="' + esc(m.mail) + '" required></td>' +
       '<td><input type="date" data-f="deadline" value="' + esc(m.deadline) + '" required></td>' +
       '<td><input type="number" data-f="minSold" min="1" max="16" value="' + esc(m.minSold || 8) + '" style="width:5em"></td>' +
-      '<td><input data-f="area" value="' + esc(m.area) + '" placeholder="Area"><input data-f="homes" value="' + esc(m.homes) + '" placeholder="About 5,000 homes" style="margin-top:6px"></td>' +
+      '<td><input data-f="area" value="' + esc(m.area) + '" placeholder="Area"><input data-f="homes" value="' + esc(m.homes) + '" placeholder="4,972 homes" style="margin-top:6px"></td>' +
       '<td><button type="button" class="btn btn-ghost" data-remove="' + i + '">Remove</button></td></tr>';
   }
   function render(note) {
@@ -37,7 +37,7 @@
   box.addEventListener("click", function (e) {
     var msg = function (t) { var p = document.getElementById("mail-msg"); if (p) p.textContent = t; };
     if (e.target.id === "mail-add") {
-      read(); var last = list[list.length - 1] || { route: "el-paseo", name: "El Paseo", area: "Palm Desert 92260, around El Paseo", homes: "About 5,000 homes", minSold: 8 };
+      read(); var last = list[list.length - 1] || { route: "el-paseo", name: "El Paseo", area: "Palm Desert 92260, around El Paseo", homes: "4,972 homes", minSold: 8 };
       list.push({ route: last.route, name: last.name, area: last.area, homes: last.homes, mail: "", deadline: "", minSold: last.minSold || 8 });
       render("New card added. Fill in its dates, then save.");
     } else if (e.target.hasAttribute("data-remove")) {
