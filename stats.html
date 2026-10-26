@@ -65,14 +65,66 @@
     var slugs = dir.filter(function (x) { return !x.sample; }).map(slugOf).join(",");
     fetch(API + "/stats/all?key=" + encodeURIComponent(adminKey) + "&slugs=" + slugs).then(function (r) { return r.json(); }).then(function (d) {
       if (d.error) return fail("That admin link is not valid.");
-      var base = location.href.split("?")[0];
-      var rows = d.businesses.sort(function (a, b) { return nameOf(a.slug).localeCompare(nameOf(b.slug)); }).map(function (b) {
-        var link = base + "?b=" + b.slug + "&key=" + b.key;
-        return "<tr><td><strong>" + nameOf(b.slug) + "</strong></td>" + LABELS.map(function (l) { return "<td>" + b.thisMonth[l[0]] + " <span style='color:var(--ink-2)'>/ " + b.lastMonth[l[0]] + "</span></td>"; }).join("") +
-          '<td><a href="' + link + '" target="_blank" rel="noopener">Open</a> &middot; <a href="#" data-copy="' + link + '">Copy link</a></td></tr>';
-      }).join("");
-      out.innerHTML = '<p class="meta" style="font-family:var(--mono);font-size:13px">THIS MONTH / LAST MONTH</p><div class="table-scroll"><table class="stats-table"><thead><tr><th>Business</th>' + LABELS.map(function (l) { return "<th>" + l[1] + "</th>"; }).join("") + "<th>Private link</th></tr></thead><tbody>" + (rows || '<tr><td colspan="6">No businesses yet.</td></tr>') + "</tbody></table></div>";
-      out.addEventListener("click", function (e) { var a = e.target.closest("[data-copy]"); if (!a) return; e.preventDefault(); navigator.clipboard.writeText(a.getAttribute("data-copy")); a.textContent = "Copied"; });
+      var base = location.href.split("?")[0], info = {};
+      dir.forEach(function (x) { if (!x.sample) info[slugOf(x)] = x; });
+      var all = d.businesses.map(function (b) { var x = info[b.slug] || {}; b.name = nameOf(b.slug); b.city = x.city || ""; b.premium = !!(x.premium || x.featured); b.postcard = !!x.postcard; b.claimed = !!x.claimed; b.pub = !!x.public; return b; });
+      var cities = all.map(function (b) { return b.city; }).filter(function (c, i, a) { return c && a.indexOf(c) === i; }).sort();
+      var PERIODS = [["thisMonth", "This month"], ["lastMonth", "Last month"], ["last30", "Last 30 days"], ["allTime", "All time"]];
+      var st = { period: "thisMonth", sort: "profile", q: "", city: "", filter: "active", shown: 25 };
+      out.innerHTML = '<div class="adm-tiles" id="adm-tiles"></div>' +
+        '<div class="filters adm-controls">' +
+        '<label class="sr-only" for="adm-q">Search</label><input id="adm-q" type="search" placeholder="Search businesses">' +
+        '<label class="sr-only" for="adm-city">City</label><select id="adm-city"><option value="">All cities</option>' + cities.map(function (c) { return "<option>" + c + "</option>"; }).join("") + '</select>' +
+        '<label class="sr-only" for="adm-period">Period</label><select id="adm-period">' + PERIODS.map(function (p) { return '<option value="' + p[0] + '">' + p[1] + "</option>"; }).join("") + '</select>' +
+        '<label class="sr-only" for="adm-sort">Sort</label><select id="adm-sort"><option value="profile">Most profile views</option><option value="impression">Most times seen</option><option value="call">Most calls</option><option value="website">Most website visits</option><option value="name">Name A to Z</option></select>' +
+        '</div><div class="chips adm-chips" id="adm-chips"></div><p class="golf-count" id="adm-count"></p><div class="table-scroll"><table class="stats-table"><thead id="adm-head"></thead><tbody id="adm-body"></tbody></table></div><p id="adm-more-wrap" style="margin-top:16px"></p>';
+      var FILTERS = [["all", "All"], ["active", "Has activity"], ["postcard", "On the postcard"], ["premium", "Premium"], ["claimed", "Claimed"], ["prospects", "Free listings with traffic"]];
+      function $(id) { return document.getElementById(id); }
+      function sum(b) { return LABELS.reduce(function (n, l) { return n + (b[st.period][l[0]] || 0); }, 0); }
+      function pass(b) {
+        if (st.q && b.name.toLowerCase().indexOf(st.q) < 0) return false;
+        if (st.city && b.city !== st.city) return false;
+        var f = st.filter;
+        if (f === "active") return sum(b) > 0;
+        if (f === "postcard") return b.postcard;
+        if (f === "premium") return b.premium;
+        if (f === "claimed") return b.claimed;
+        if (f === "prospects") return !b.premium && !b.postcard && !b.pub && sum(b) > 0;
+        return true;
+      }
+      function trend(b, k) {
+        if (st.period !== "thisMonth") return "";
+        var a = b.thisMonth[k] || 0, p = b.lastMonth[k] || 0;
+        if (!p) return a ? ' <span class="adm-up">new</span>' : "";
+        var pct = Math.round((a - p) / p * 100);
+        return pct ? ' <span class="' + (pct > 0 ? "adm-up" : "adm-down") + '">' + (pct > 0 ? "+" : "") + pct + "%</span>" : "";
+      }
+      function draw() {
+        var list = all.filter(pass).sort(function (a, b) { return st.sort === "name" ? a.name.localeCompare(b.name) : (b[st.period][st.sort] || 0) - (a[st.period][st.sort] || 0) || a.name.localeCompare(b.name); });
+        var tot = {}; LABELS.forEach(function (l) { tot[l[0]] = list.reduce(function (n, b) { return n + (b[st.period][l[0]] || 0); }, 0); });
+        $("adm-tiles").innerHTML = tiles(tot);
+        $("adm-chips").innerHTML = FILTERS.map(function (f) { return '<button type="button" class="chip' + (st.filter === f[0] ? " active" : "") + '" data-f="' + f[0] + '">' + f[1] + " (" + all.filter(function (b) { var o = st.filter; st.filter = f[0]; var ok = pass(b); st.filter = o; return ok; }).length + ")</button>"; }).join("");
+        var label = PERIODS.filter(function (p) { return p[0] === st.period; })[0][1];
+        $("adm-count").textContent = list.length + " of " + all.length + " listings · " + label + (st.period === "thisMonth" ? " (change vs. last month)" : "");
+        $("adm-head").innerHTML = "<tr><th>Business</th>" + LABELS.map(function (l) { return "<th>" + l[1] + "</th>"; }).join("") + "<th>Private link</th></tr>";
+        $("adm-body").innerHTML = list.slice(0, st.shown).map(function (b) {
+          var link = base + "?b=" + b.slug + "&key=" + b.key;
+          var tags = (b.postcard ? '<span class="adm-tag">Postcard</span>' : b.premium ? '<span class="adm-tag">Premium</span>' : "") + (b.claimed ? '<span class="adm-tag adm-tag-c">Claimed</span>' : "");
+          return "<tr><td><strong>" + b.name + "</strong>" + tags + '<br><span class="adm-city">' + b.city + "</span></td>" + LABELS.map(function (l) { return "<td>" + (b[st.period][l[0]] || 0) + trend(b, l[0]) + "</td>"; }).join("") +
+            '<td><a href="' + link + '" target="_blank" rel="noopener">Open</a> &middot; <a href="#" data-copy="' + link + '">Copy link</a></td></tr>';
+        }).join("") || '<tr><td colspan="6">Nothing matches.</td></tr>';
+        $("adm-more-wrap").innerHTML = list.length > st.shown ? '<button type="button" class="btn btn-ghost" id="adm-more">Show ' + Math.min(25, list.length - st.shown) + " more (" + (list.length - st.shown) + " left)</button>" : "";
+      }
+      $("adm-q").addEventListener("input", function (e) { st.q = e.target.value.trim().toLowerCase(); st.shown = 25; draw(); });
+      $("adm-city").addEventListener("change", function (e) { st.city = e.target.value; st.shown = 25; draw(); });
+      $("adm-period").addEventListener("change", function (e) { st.period = e.target.value; st.shown = 25; draw(); });
+      $("adm-sort").addEventListener("change", function (e) { st.sort = e.target.value; draw(); });
+      out.addEventListener("click", function (e) {
+        var c = e.target.closest("[data-copy]"); if (c) { e.preventDefault(); navigator.clipboard.writeText(c.getAttribute("data-copy")); c.textContent = "Copied"; return; }
+        var f = e.target.closest("[data-f]"); if (f) { st.filter = f.getAttribute("data-f"); st.shown = 25; draw(); return; }
+        if (e.target.id === "adm-more") { st.shown += 25; draw(); }
+      });
+      draw();
     }).catch(function () { fail("Could not load the numbers. Try again in a minute."); });
     return;
   }

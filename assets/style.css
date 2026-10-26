@@ -590,3 +590,13 @@ main:focus { outline: none; }
 .acct-check input { width: 20px; height: 20px; }
 .acct-prefs .btn { justify-self: start; margin-top: 6px; }
 @media (max-width: 900px) { .acct-grid { grid-template-columns: 1fr; } }
+
+/* Admin listings table */
+.adm-controls { margin-top: 8px; }
+.adm-chips { margin: 4px 0 8px; }
+.adm-chips .chip { font-size: 14px; }
+.adm-tag { display: inline-block; margin-left: 8px; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: #fde8bf; color: #7a4a00; vertical-align: middle; }
+.adm-tag-c { background: var(--palm-soft); color: var(--palm); }
+.adm-city { font-size: 13px; color: var(--ink-2); }
+.adm-up { font-size: 12px; font-weight: 700; color: var(--palm); }
+.adm-down { font-size: 12px; font-weight: 700; color: var(--sun-deep); }
