@@ -465,7 +465,7 @@
   function mailTodd(n) { if (!n) return; var fd = new FormData(); Object.keys(n).forEach(function (k) { if (n[k] != null) fd.append(k, String(n[k])); }); fetch("https://formspree.io/f/myezyype", { method: "POST", headers: { Accept: "application/json" }, body: fd }).catch(function () {}); }
 
   // Email signups (footer) and the La Quinta / Indio route waitlist: saved by the tracker
-  var SIGNUP_THANKS = { news: "You're on the list. Thanks, neighbor!", waitlist: "You're on the waitlist. We'll reach out before the first La Quinta or Indio card goes out." };
+  var SIGNUP_THANKS = { news: "You're on the list. Thanks, neighbor!", waitlist: "You're on the waitlist. We'll reach out before the first card for your city goes out." };
   document.querySelectorAll("form[data-signup]").forEach(function (f) {
     f.addEventListener("submit", function (ev) {
       ev.preventDefault();

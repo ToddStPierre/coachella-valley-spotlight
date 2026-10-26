@@ -356,6 +356,9 @@ button.spot:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgb
 .foot-signup + .footer-grid { padding-top: var(--s4); }
 @media (max-width: 820px) { .foot-signup { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { .foot-signup .signup-form { grid-template-columns: 1fr; } }
+.waitlist-grid { margin-top: var(--s3); }
+.waitlist-grid .waitlist { margin-top: 0; }
+.wl-zip { margin: 0 0 8px; color: var(--ink-2); font-size: 15px; }
 .waitlist { margin-top: var(--s3); border: 2px dashed var(--palm); background: var(--palm-soft); }
 .waitlist .meta { color: var(--palm); font-family: var(--mono); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
 .waitlist h3 { margin: 6px 0 8px; }
