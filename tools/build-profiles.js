@@ -45,6 +45,9 @@ for (const b of list) {
   // Court details (pickleball and tennis): what a player checks before driving over.
   const C = b.courts || {};
   const courtRows = [["Courts", b.size], ["Setup", C.setup], ["Surface", C.surface], ["Nets", C.nets], ["Lights", C.lights], ["How play works", C.play], ["Skill levels", C.levels], ["Reservations", C.reserve], ["Cost", C.cost], ["Lessons and leagues", C.lessons], ["Closures", C.closures], ["Court rules", C.rules], ["Good to know", C.note], ["Questions", C.contact]].filter(r => r[1]);
+  // Trail details (hiking trails): what a hiker checks before heading out.
+  const TR = b.trail || {};
+  const trailRows = [["Distance", TR.length], ["Climb", TR.climb], ["Difficulty", TR.difficulty], ["Time", TR.time], ["The route", TR.route], ["Dogs", TR.dogs], ["Fee", TR.fee], ["Hours", TR.hours], ["Permit", TR.permit], ["Parking", TR.parking], ["At the trailhead", TR.facilities], ["Shade", TR.shade], ["Best time to go", TR.season], ["Guided hikes", TR.guided], ["Closures", TR.closures], ["Before you go", TR.rules], ["Good to know", TR.note], ["Questions", TR.contact]].filter(r => r[1]);
   const showHours = (prem || b.public) && b.hours;
   const owner = !b.public;
   const html = `${head}${metaTags({ title: `${b.name} | ${kind} in ${b.city}, CA`, description: desc, url, image: prem && b.image })}<base href="../../">
@@ -87,6 +90,7 @@ ${`<iframe class="pf-map" title="Map of ${esc(b.name)}" src="https://maps.google
 </div>
 ${b.features && b.features.length ? `<div class="pf-card"><h2>What it has</h2><ul class="feat-pills feat-lg" aria-label="Features">${b.features.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
 ${b.courts && courtRows.length ? `<div class="pf-card pf-courts"><h2>Court details</h2><dl class="facts">${courtRows.map(r => `<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl>${C.checked ? `<p class="pf-checked">Last checked ${esc(nice(C.checked))}. Hours and rules change, so call or check the official page before you go.</p>` : ""}</div>` : ""}
+${b.trail && trailRows.length ? `<div class="pf-card pf-courts pf-trail"><h2>Trail details</h2><dl class="facts">${trailRows.map(r => `<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl>${TR.checked ? `<p class="pf-checked">Last checked ${esc(nice(TR.checked))}. Hours, fees and trail rules change, so check the official page before you go. In the desert, start early and carry plenty of water.</p>` : ""}</div>` : ""}
 ${prem && b.googlePlaceId ? `<section class="g-reviews pf-card" data-reviews="${slug}" hidden></section>` : ""}
 ${gallery.length ? `<div class="pf-card"><h2>Photos</h2><div class="gallery">${gallery.map((g, i) => `<img src="${esc(g)}" alt="${esc(b.name)} photo ${i + 1}" loading="lazy">`).join("")}</div></div>` : ""}
 </div>
