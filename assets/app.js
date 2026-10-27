@@ -430,6 +430,10 @@
     else if (tt) tt.placeholder = "Course name";
   }
 
+  // City pages: close the "Browse <City> businesses by type" panel on an outside click or Escape.
+  document.addEventListener("click", function (ev) { document.querySelectorAll("details.type-menu[open]").forEach(function (d) { if (!d.contains(ev.target)) d.open = false; }); });
+  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") document.querySelectorAll("details.type-menu[open]").forEach(function (d) { d.open = false; d.querySelector("summary").focus(); }); });
+
   // Mobile menu
   var t = document.querySelector(".menu-toggle");
   if (t) t.addEventListener("click", function () {

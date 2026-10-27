@@ -177,12 +177,17 @@ for (const city of CITY_PAGES) {
 ${inner}
 </div></section>`;
   const fig = photoFigure(city, `assets/img/cities/${slug}.jpg`, `${city}, California`);
+  const cityLinks = landing.filter(o => o.city === city && o.kind === "combo").sort((a, b) => a.category.localeCompare(b.category));
+  const cityHub = landing.find(o => o.kind === "city" && o.city === city);
+  // "Browse <City> businesses by type": a button that opens a panel of real links (crawlable, unlike a <select>).
+  const typeMenu = cityLinks.length || cityHub ? `<details class="type-menu"><summary class="chip">Browse ${esc(city)} businesses by type</summary><ul class="link-list">${cityHub ? `<li><a href="${cityHub.path}">All businesses in ${esc(city)}</a></li>` : ""}${cityLinks.map(o => `<li><a href="${o.path}">${esc(o.category)}</a></li>`).join("")}</ul></details>` : "";
   let body = `<section class="page-hero"><div class="wrap city-hero${fig ? "" : " no-photo"}"><div>
 <nav class="crumbs" aria-label="Breadcrumb"><a href="./">Home</a> &rsaquo; ${esc(city)}</nav>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>City guide</span>
 <h1>${esc(city)}</h1>
 <p>${esc(intro)}</p>
 <div class="chips">${ev.length ? `<a class="chip" href="events?city=${q}">Things to do</a>` : ""}<a class="chip" href="directory?city=${q}">Local businesses</a>${dl.length ? '<a class="chip" href="#deals">Deals</a>' : ""}</div>
+${typeMenu}
 </div>${fig}</div></section>`;
   if (ev.length) body += sec("On the calendar", `Coming up in ${esc(city)}`, `<a class="more" href="events?city=${q}">All ${esc(city)} events &rarr;</a>`,
     block(`class="grid-2" data-city="${esc(city)}" data-list="events" data-limit="6"`, cards("events", ev.slice(0, 6))), true);
@@ -192,9 +197,6 @@ ${inner}
     block(`class="grid" data-city="${esc(city)}" data-list="directory" data-limit="8"`, cards("directory", biz.slice(0, 8))), !ev.length && !dl.length);
   body += sec("Local headlines", `News from ${esc(city)}`, '<a class="more" href="news">All headlines &rarr;</a>',
     block(`class="grid" data-city="${esc(city)}" data-list="news" data-limit="3" data-hide-empty`, '<noscript><div class="empty">Turn on JavaScript to see the headlines.</div></noscript>'), false);
-  const cityLinks = landing.filter(o => o.city === city && o.kind === "combo").sort((a, b) => a.category.localeCompare(b.category));
-  const cityHub = landing.find(o => o.kind === "city" && o.city === city);
-  if (cityLinks.length || cityHub) body += `<div class="wrap" style="padding-bottom:var(--s4)"><h2 class="month-head"><span class="stripe-mini"></span>Browse ${esc(city)} businesses by type</h2><ul class="link-list">${cityHub ? `<li><a href="${cityHub.path}">All businesses in ${esc(city)}</a></li>` : ""}${cityLinks.map(o => `<li><a href="${o.path}">${esc(o.category)} in ${esc(city)}</a></li>`).join("")}</ul></div>`;
   body += `<div class="wrap" style="padding-bottom:var(--s5)"><div class="biz-band"><p><strong>Own a business in ${esc(city)}?</strong><br>Listing it here is free.</p><a class="btn" href="submit?plan=basic#form">Add my business</a></div></div>`;
   const title = `${city}, CA: Things to Do, Deals and Local Businesses`;
   write(url, page({

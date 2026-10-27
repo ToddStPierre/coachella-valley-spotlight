@@ -773,3 +773,12 @@ main:focus { outline: none; }
 /* "Narrow it down" chips on broad landing pages */
 .sub-chips { align-items: center; }
 .sub-label { font-weight: 600; margin-right: 4px; }
+/* City guide pages: "Browse <City> businesses by type" button that opens a panel of links */
+.type-menu { margin-top: 12px; }
+.type-menu summary { list-style: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+.type-menu summary::-webkit-details-marker { display: none; }
+.type-menu summary::after { content: ""; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform .15s; }
+.type-menu[open] summary::after { transform: translateY(2px) rotate(-135deg); }
+.type-menu[open] summary { border-color: var(--palm); color: var(--palm); background: var(--palm-soft); }
+.type-menu .link-list { margin-top: 12px; padding: 16px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.type-menu .link-list a { font-size: 14px; padding: 6px 12px; }
