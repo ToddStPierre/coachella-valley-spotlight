@@ -300,7 +300,7 @@
   // Listing tracking: counts views, profile views, calls and website clicks per business.
   var TRACK = "https://cvs-tracker.toddstpierre.workers.dev/t";
   function track(slug, type) {
-    if (!slug || /localhost|127\.0\.0\.1|^file/.test(location.href)) return;
+    if (!slug || window.CVS_NOTRACK || /localhost|127\.0\.0\.1|^file/.test(location.href)) return;
     var body = JSON.stringify({ b: slug, e: type });
     try { if (navigator.sendBeacon && navigator.sendBeacon(TRACK, body)) return; } catch (e) {}
     try { fetch(TRACK, { method: "POST", body: body, keepalive: true, mode: "no-cors" }); } catch (e) {}
@@ -320,6 +320,23 @@
     var host = a.closest("[data-biz]"), type = a.getAttribute("data-track");
     if (host && (type === "call" || type === "website")) track(host.getAttribute("data-biz"), type);
   });
+
+  // Google Analytics goal events (the tag in each page's <head> sets window.gtag and CVS_NOTRACK).
+  function ga(name, params) {
+    if (window.CVS_NOTRACK || typeof window.gtag !== "function") return;
+    try { window.gtag("event", name, params || {}); } catch (e) {}
+  }
+  window.CVS_GA = ga;
+  document.addEventListener("click", function (ev) {
+    var a = ev.target.closest && ev.target.closest("a[href]"); if (!a) return;
+    var h = a.getAttribute("href"), host = a.closest("[data-biz]");
+    var p = { business: host ? host.getAttribute("data-biz") : (document.body.getAttribute("data-profile") || "") };
+    if (/^tel:/.test(h)) ga("call_click", p);
+    else if (/^mailto:/.test(h)) ga("email_click", p);
+    else if (/\/maps\/dir\//.test(h)) ga("directions_click", p);
+    else if (/pay\.coachellavalleyspotlight\.com|buy\.stripe\.com/.test(h)) { p.link_url = h; ga("begin_checkout", p); }
+    else if (a.getAttribute("data-track") === "website" || /utm_source=coachellavalleyspotlight/.test(h)) ga("website_click", p);
+  }, true);
   // Google reviews on Premium profiles: fetched live from the tracker each visit (never stored, per Google's terms).
   var grBox = document.querySelector("[data-reviews]");
   if (grBox) {
@@ -461,7 +478,7 @@
           if (r.status === 400 || r.status === 429) return r.json().then(function (d) { throw new Error(d.error || ""); });
           return direct();
         }, direct)
-        .then(function () { f.reset(); status.textContent = f.getAttribute("data-thanks") || "Got it. Thank you!"; })
+        .then(function () { ga("generate_lead", { form: "submit", kind: body.type || body.plan || "" }); f.reset(); status.textContent = f.getAttribute("data-thanks") || "Got it. Thank you!"; })
         .catch(function (err) { status.textContent = err.message || "That did not go through. Please call or text (760) 422-5475."; })
         .finally(function () { btn.disabled = false; });
     });
@@ -483,7 +500,7 @@
       btn.disabled = true; status.textContent = "Sending...";
       fetch(VAPI + "/signup", { method: "POST", body: JSON.stringify(body) })
         .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || ""); mailTodd(d.notice); }); })
-        .then(function () { f.reset(); status.textContent = SIGNUP_THANKS[kind]; })
+        .then(function () { ga(kind === "waitlist" ? "join_waitlist" : "email_signup", { page: location.pathname }); f.reset(); status.textContent = SIGNUP_THANKS[kind]; })
         .catch(function (err) { status.textContent = err.message || "That did not go through. Please call or text (760) 422-5475."; })
         .finally(function () { btn.disabled = false; });
     });

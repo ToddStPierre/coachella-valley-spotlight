@@ -133,6 +133,7 @@ ${mode === "up" ? '<p class="full acct-hint">At least 8 characters.</p>' : ""}
       else if (mode === "up") {
         const cred = await createUserWithEmailAndPassword(auth, email, pw);
         try { await sendEmailVerification(cred.user); } catch (e2) {}
+        if (window.CVS_GA) window.CVS_GA("sign_up", { method: "email" });
       } else {
         await sendPasswordResetEmail(auth, email);
         formView("in", "If there's an account for " + email + ", a reset link is on its way. Check your inbox (and spam).");

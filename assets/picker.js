@@ -109,6 +109,7 @@
           _subject: "Coachella Valley Spotlight: " + p.business + (payNow ? " is paying online for " : " wants ") + (p.positions.length === 1 ? "Spot " + p.position : p.size + " (Spots " + p.positions.join(", ") + ")") + " (" + p.category + ") on " + LABELS[p.route],
           name: p.name, business: p.business, email: p.email, phone: p.phone, notes: p.notes, route: LABELS[p.route], spot: p.positions.join(", "), size: p.size, price: p.price + " per mailing", category: p.category,
           source: "coachellavalleyspotlight.com / advertise spot picker" }) }).catch(function () {});
+        if (window.CVS_GA) window.CVS_GA(payNow ? "spot_pay_now" : "spot_hold", { route: p.route, spots: p.positions.length, category: p.category });
         if (payNow) {
           var ref = pending.route + "__" + pending.positions.join("-"), go = PAY_LINKS[pending.positions.length] + (PAY_LINKS[pending.positions.length].indexOf("?") > -1 ? "&" : "?") + "client_reference_id=" + encodeURIComponent(ref);
           msg.textContent = "Spot held. Taking you to secure checkout…";

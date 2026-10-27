@@ -1,14 +1,25 @@
 <!doctype html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-6640JVDZJ1"></script>
+<!-- Google tag (gtag.js). Not loaded for Todd's own browsers (open any page with ?notrack=1 once; ?notrack=0 undoes it) or automated test browsers. -->
 <script>
+(function () {
+  var off = false;
+  try {
+    if (/[?&]notrack=1\b/.test(location.search)) localStorage.setItem("cvs_notrack", "1");
+    if (/[?&]notrack=0\b/.test(location.search)) localStorage.removeItem("cvs_notrack");
+    off = localStorage.getItem("cvs_notrack") === "1";
+  } catch (e) {}
+  if (navigator.webdriver || /HeadlessChrome/.test(navigator.userAgent)) off = true;
+  window.CVS_NOTRACK = off;
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
+  window.gtag = function () { dataLayer.push(arguments); };
+  if (off) return;
   gtag('js', new Date());
-
   gtag('config', 'G-6640JVDZJ1');
+  var s = document.createElement("script"); s.async = true; s.src = "https://www.googletagmanager.com/gtag/js?id=G-6640JVDZJ1";
+  document.head.appendChild(s);
+})();
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

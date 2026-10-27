@@ -23,6 +23,7 @@
       .then(function (r) {
         if (!r.ok) { msg.textContent = r.d.error || "That didn’t go through. Please try again."; btn.disabled = false; return; }
         mailTodd(r.d.notice);
+        if (window.CVS_GA) window.CVS_GA("claim_request", { business: slug });
         form.innerHTML = '<p class="full" style="font-size:18px"><strong>Got it, thank you!</strong> We&rsquo;ll give the business a quick call to confirm. Once it&rsquo;s approved, <a href="account">sign in or create a free account</a> with this same email to manage your listing.</p>';
       })
       .catch(function () { msg.textContent = "That didn’t go through. Please call or text (760) 422-5475."; btn.disabled = false; });
