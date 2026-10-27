@@ -51,6 +51,7 @@
         '<p class="risk">Counts come from this site only. Bots and people who block tracking are not counted, so real numbers run a little higher. Times are Pacific.</p></details>';
     }
 
+    html += '<div class="ow-split"><div class="ow-main">';
     html += '<h2 class="month-head"><span class="stripe-mini"></span>Your details</h2><div class="card" style="padding:28px"><form class="form" id="ow-form">';
     html += field("blurb", "Short description (shows on the directory card)", L.blurb, { full: true, area: true, max: 220, rows: 2, help: "Up to 220 characters." });
     html += field("phone", "Phone", L.phone, { type: "tel", max: 25 });
@@ -66,6 +67,7 @@
         '<small class="ow-help full">Clear the headline to remove the offer.</small></fieldset>';
     }
     html += '<div class="full"><button class="btn" type="submit">Save changes</button></div><p class="form-status" id="ow-msg" role="status"></p></form></div>';
+    html += '</div><aside class="ow-side">' + badgeCard() + '</aside></div>';
 
     if (L.premium) {
       html += '<h2 class="month-head"><span class="stripe-mini"></span>Photos</h2><div class="card" style="padding:28px">' +
@@ -79,14 +81,6 @@
     } else {
       html += '<div class="biz-band" style="margin-top:32px"><p style="color:#fff"><strong>Want photos, hours, a special offer and monthly stats?</strong><br>Premium is $49 a month or $438 a year, or free while you&rsquo;re on a Spotlight postcard.</p><a class="btn" href="advertise.html#plans">See Premium</a></div>';
     }
-    html += '<h2 class="month-head"><span class="stripe-mini"></span>Add our badge to your website</h2><div class="card" style="padding:28px">' +
-      '<p style="margin-top:0">Put this badge on your website so customers can find your listing here. Pick a style, copy the code, and paste it into your site where you want the badge to show (a footer works well). If someone else runs your website, just send them the code.</p>' +
-      '<div class="ow-badges" role="radiogroup" aria-label="Badge style">' + ["light", "dark"].map(function (t, i) {
-        return '<label class="ow-badge"><input type="radio" name="ow-badge" value="' + t + '"' + (i ? '' : ' checked') + '><img src="assets/badge/find-us-' + t + '.png" alt="' + (i ? 'Dark' : 'Light') + ' badge" width="240" height="72"><span>' + (i ? 'Dark' : 'Light') + '</span></label>';
-      }).join("") + '</div>' +
-      '<label class="ow-help" for="ow-badge-code" style="display:block;margin:16px 0 6px">Badge code</label>' +
-      '<textarea id="ow-badge-code" readonly rows="4" style="width:100%;font-family:var(--mono);font-size:12.5px"></textarea>' +
-      '<p style="margin:12px 0 0"><button class="btn" type="button" id="ow-badge-copy">Copy code</button> <span class="form-status" id="ow-badge-msg" role="status"></span></p></div>';
     out.innerHTML = html;
     wire(L);
     badge(L);
@@ -108,6 +102,17 @@
       else { document.execCommand("copy"); done(); }
     });
     fill();
+  }
+
+  function badgeCard() {
+    return '<h2 class="month-head"><span class="stripe-mini"></span>Add our badge to your website</h2><div class="card" style="padding:28px">' +
+      '<p style="margin-top:0">Put this badge on your website so customers can find your listing here. Pick a style, copy the code, and paste it into your site where you want the badge to show (a footer works well). If someone else runs your website, just send them the code.</p>' +
+      '<div class="ow-badges" role="radiogroup" aria-label="Badge style">' + ["light", "dark"].map(function (t, i) {
+        return '<label class="ow-badge"><input type="radio" name="ow-badge" value="' + t + '"' + (i ? '' : ' checked') + '><img src="assets/badge/find-us-' + t + '.png" alt="' + (i ? 'Dark' : 'Light') + ' badge" width="240" height="72"><span>' + (i ? 'Dark' : 'Light') + '</span></label>';
+      }).join("") + '</div>' +
+      '<label class="ow-help" for="ow-badge-code" style="display:block;margin:16px 0 6px">Badge code</label>' +
+      '<textarea id="ow-badge-code" readonly rows="4" style="width:100%;font-family:var(--mono);font-size:12.5px"></textarea>' +
+      '<p style="margin:12px 0 0"><button class="btn" type="button" id="ow-badge-copy">Copy code</button> <span class="form-status" id="ow-badge-msg" role="status"></span></p></div>';
   }
 
   function wire(L) {

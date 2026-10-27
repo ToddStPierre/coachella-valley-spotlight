@@ -750,3 +750,10 @@ main:focus { outline: none; }
 .ow-badge span { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
 .ow-badge:has(input:checked) { border-color: var(--sun); }
 .ow-badge:has(input:focus-visible) { outline: 2px solid var(--dusk); outline-offset: 2px; }
+/* Owner dashboard: badge card sits to the right of "Your details" on wide screens, below it on phones */
+.ow-split { display: grid; gap: 0 32px; align-items: start; }
+.ow-side .ow-badges { flex-direction: column; }
+@media (min-width: 960px) {
+  .ow-split { grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr); }
+  .ow-side { position: sticky; top: 96px; }
+}
