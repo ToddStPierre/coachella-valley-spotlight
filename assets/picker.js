@@ -10,7 +10,7 @@
   var form = document.getElementById("picker-form"), cat = document.getElementById("pf-category"), msg = document.getElementById("picker-msg");
   var route = "el-paseo", pending = null, size = 1, openNow = {};
   // Ad sizes: blocks of spots on one side of the card (4 across, 2 down).
-  var SIZES = { 1: { name: "1-spot", label: "1 spot", dims: "2.7\u2033 x 2.5\u2033", price: 300 }, 2: { name: "2-spot", label: "2 spots", dims: "5.4\u2033 x 2.5\u2033", price: 550 }, 4: { name: "4-spot", label: "4 spots", dims: "5.4\u2033 x 5\u2033", price: 1000 }, 8: { name: "full-side", label: "Full side", dims: "all 8 spots on one side", price: 2000 } };
+  var SIZES = { 1: { name: "1-spot", label: "1 spot", dims: "2.7\u2033 x 2.6\u2033", price: 300 }, 2: { name: "2-spot", label: "2 spots", dims: "5.4\u2033 x 2.6\u2033", price: 550 }, 4: { name: "4-spot", label: "4 spots", dims: "5.4\u2033 x 5.2\u2033", price: 1000 }, 8: { name: "full-side", label: "Full side", dims: "all 8 spots on one side", price: 2000 } };
   // Stripe Payment Links, one per ad size. Leave a size "" to hide its Pay button (hold-only).
   // Each link's "after payment" setting should redirect to https://coachellavalleyspotlight.com/advertise?paid=1#reserve
   var PAY_LINKS = { 1: "https://pay.coachellavalleyspotlight.com/b/aFaaEX6E01cW1Mkg6S9MY0B", 2: "https://pay.coachellavalleyspotlight.com/b/4gM00jaUg3l462AdYK9MY0C", 4: "https://pay.coachellavalleyspotlight.com/b/bJebJ15zW3l4bmU8Eq9MY0D", 8: "https://pay.coachellavalleyspotlight.com/b/eVq4gz0fCdZIbmUcUG9MY0E" };
