@@ -759,3 +759,17 @@ main:focus { outline: none; }
 }
 /* City + service pages: "More gyms nearby: Indio, La Quinta and Palm Desert." */
 .near-line { margin: 24px 0 0; font-size: 18px; }
+/* Directory "Browse by city and category": two columns of collapsible rows */
+.browse-cols { display: grid; gap: 8px 40px; margin-top: 16px; }
+@media (min-width: 860px) { .browse-cols { grid-template-columns: 1fr 1fr; } }
+.browse-cols h3 { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); margin: 16px 0 8px; }
+.browse-row { border-bottom: 1px solid var(--line); }
+.browse-row summary { cursor: pointer; padding: 12px 4px; font-weight: 600; font-size: 16px; list-style: none; display: flex; align-items: center; gap: 8px; }
+.browse-row summary::-webkit-details-marker { display: none; }
+.browse-row summary::after { content: "+"; margin-left: auto; font-family: var(--mono); font-size: 18px; color: var(--ink-2); }
+.browse-row[open] summary::after { content: "–"; }
+.browse-row .link-list { margin: 0 0 16px; }
+.browse-row .link-list a { font-size: 14px; padding: 6px 12px; }
+/* "Narrow it down" chips on broad landing pages */
+.sub-chips { align-items: center; }
+.sub-label { font-weight: 600; margin-right: 4px; }

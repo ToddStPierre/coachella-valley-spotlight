@@ -89,6 +89,10 @@ ${others.length ? `<section class="section" style="padding-top:0"><div class="wr
 /* 3. City and category pages */
 const landing = landingPages(list);
 fs.rmSync(path.join(root, "local"), { recursive: true, force: true });
+/* The broad category a page belongs to ("Gyms" belongs to "Fitness"). */
+const topCat = o => o.field === "service" ? o.items[0].category : o.category;
+/* Narrower pages under a broad one: "Fitness in Coachella" → "Gyms in Coachella", "Boxing and martial arts in Coachella". */
+const subPages = p => p.field === "category" ? landing.filter(o => o.field === "service" && o.kind === p.kind && o.city === p.city && topCat(o) === p.category && o.category !== p.category) : [];
 for (const p of landing) {
   const items = C.directory.filter(b => p.items.includes(b));
   const heading = p.kind === "city" ? `Local Businesses in ${p.city}, CA` : p.kind === "category" ? `${p.category} in the Coachella Valley` : `${p.category} in ${p.city}, CA`;
@@ -105,7 +109,10 @@ for (const p of landing) {
   const related = landing.filter(o => o !== p && (
     (p.kind === "city" && o.kind === "combo" && o.city === p.city) ||
     (p.kind === "category" && ((o.kind === "combo" && o.category === p.category) || o.kind === "category")) ||
-    (p.kind === "combo" && ((o.kind === "city" && o.city === p.city) || (o.kind === "category" && o.category === p.category)))));
+    (p.kind === "combo" && ((o.kind === "city" && o.city === p.city) || (o.kind === "category" && o.category === p.category))) ||
+    (p.kind === "combo" && p.field === "service" && o.kind === "combo" && o.field === "category" && o.city === p.city && o.category === topCat(p))));
+  const subs = subPages(p);
+  const subChips = subs.length ? `<div class="chips sub-chips"><span class="sub-label">Narrow it down:</span>${subs.map(o => `<a class="chip" href="${o.path}">${esc(o.category)}</a>`).join("")}</div>` : "";
   // City + service pages: point to the same service in the nearest other cities that have their own page.
   const near = p.kind === "combo" ? landing.filter(o => o.kind === "combo" && o.category === p.category && o.city !== p.city)
     .sort((x, y) => cityDist(p.city, x.city) - cityDist(p.city, y.city)).slice(0, 3) : [];
@@ -141,6 +148,7 @@ for (const p of landing) {
 <h1>${esc(heading)}</h1>
 ${intro.map(t => `<p>${esc(t)}</p>`).join("\n")}
 <p>${esc(countLine)}</p>
+${subChips}
 ${fig ? `</div>${fig}` : ""}</div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
 ${dogFilter}
@@ -184,6 +192,9 @@ ${inner}
     block(`class="grid" data-city="${esc(city)}" data-list="directory" data-limit="8"`, cards("directory", biz.slice(0, 8))), !ev.length && !dl.length);
   body += sec("Local headlines", `News from ${esc(city)}`, '<a class="more" href="news">All headlines &rarr;</a>',
     block(`class="grid" data-city="${esc(city)}" data-list="news" data-limit="3" data-hide-empty`, '<noscript><div class="empty">Turn on JavaScript to see the headlines.</div></noscript>'), false);
+  const cityLinks = landing.filter(o => o.city === city && o.kind === "combo").sort((a, b) => a.category.localeCompare(b.category));
+  const cityHub = landing.find(o => o.kind === "city" && o.city === city);
+  if (cityLinks.length || cityHub) body += `<div class="wrap" style="padding-bottom:var(--s4)"><h2 class="month-head"><span class="stripe-mini"></span>Browse ${esc(city)} businesses by type</h2><ul class="link-list">${cityHub ? `<li><a href="${cityHub.path}">All businesses in ${esc(city)}</a></li>` : ""}${cityLinks.map(o => `<li><a href="${o.path}">${esc(o.category)} in ${esc(city)}</a></li>`).join("")}</ul></div>`;
   body += `<div class="wrap" style="padding-bottom:var(--s5)"><div class="biz-band"><p><strong>Own a business in ${esc(city)}?</strong><br>Listing it here is free.</p><a class="btn" href="submit?plan=basic#form">Add my business</a></div></div>`;
   const title = `${city}, CA: Things to Do, Deals and Local Businesses`;
   write(url, page({
@@ -219,7 +230,21 @@ function byCategory(items) {
     (feat.length ? `<section class="featured-band">${head("cat-featured", "Featured Listings", feat.length)}<p class="featured-note">Local businesses on the current Spotlight postcard.</p><div class="grid">${cards("directory", feat)}</div></section>` : "") +
     names.map((c, i) => `${head(id(c), c, groups[c].length)}<div class="grid">${cards("directory", groups[c])}</div>${listBand(i, names.length)}`).join("");
 }
-const browseLinks = landing.length ? `<div class="browse-links"><h2 class="month-head"><span class="stripe-mini"></span>Browse by city and category</h2><ul class="link-list">${landing.map(o => `<li><a href="${o.path}">${esc(o.kind === "city" ? "Businesses in " + o.city : o.kind === "category" ? o.category : o.category + " in " + o.city)}</a></li>`).join("")}</ul></div>` : "";
+/* Directory page "Browse by city and category": one collapsible row per city and per broad category, so the page
+   stays short but every landing page is still linked (Google reads links inside closed <details>). */
+const pill = (o, text) => `<li><a href="${o.path}">${esc(text)}</a></li>`;
+const browseRow = (title, n, links) => `<details class="browse-row"><summary>${esc(title)} <span class="cat-count">${n}</span></summary><ul class="link-list">${links}</ul></details>`;
+const byCityRows = landing.filter(o => o.kind === "city").sort((a, b) => a.city.localeCompare(b.city)).map(c => {
+  const combos = landing.filter(o => o.kind === "combo" && o.city === c.city).sort((a, b) => a.category.localeCompare(b.category));
+  return browseRow(c.city, c.items.length, pill(c, "All businesses in " + c.city) + combos.map(o => pill(o, o.category)).join(""));
+}).join("");
+const tops = landing.filter(o => o.kind === "category" && o.field === "category").sort((a, b) => a.category.localeCompare(b.category));
+const byCatRows = tops.map(t => {
+  const svc = landing.filter(o => o.kind === "category" && o.field === "service" && topCat(o) === t.category && o.category !== t.category).sort((a, b) => a.category.localeCompare(b.category));
+  return browseRow(t.category, t.items.length, pill(t, "All " + t.category.toLowerCase()) + svc.map(o => pill(o, o.category)).join(""));
+}).join("");
+const orphanSvc = landing.filter(o => o.kind === "category" && o.field === "service" && !tops.some(t => t.category === topCat(o)));
+const browseLinks = landing.length ? `<div class="browse-links"><h2 class="month-head"><span class="stripe-mini"></span>Browse by city and category</h2><div class="browse-cols"><div><h3>By city</h3>${byCityRows}</div><div><h3>By category</h3>${byCatRows}${orphanSvc.length ? browseRow("More", orphanSvc.length, orphanSvc.map(o => pill(o, o.category)).join("")) : ""}</div></div></div>` : "";
 for (const file of ["index.html", "directory.html", "deals.html", "events.html"]) {
   const p = path.join(root, file);
   let html = fs.readFileSync(p, "utf8");
