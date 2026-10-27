@@ -40,7 +40,7 @@ ${header}
 <main id="main" tabindex="-1">
 <section class="page-hero"><div class="wrap city-hero"><div><span class="eyebrow"><span class="stripe-mini"></span>Golf</span>
 <h1>Golf Courses in the <span class="grad">Coachella Valley.</span></h1>
-<p>Every golf club in the valley: ${list.length} clubs with ${nCourses} courses between them. ${pub} clubs are open to the public, and the rest are private clubs. Filter by city, or show only the courses you can book.</p></div>${photoFigure("Golf", "assets/img/activities/golf.jpg", "Desert Willow Golf Resort, Palm Desert")}</div></section>
+<p>The Coachella Valley has ${nCourses} golf courses at ${list.length} golf clubs, and this guide lists every one. ${pub} clubs are open to the public, and the rest are private clubs. Filter by city, or show only the courses you can book.</p></div>${photoFigure("Golf", "assets/img/activities/golf.jpg", "Desert Willow Golf Resort, Palm Desert")}</div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
 <div class="filters"><label class="sr-only" for="g-q">Search</label><input id="g-q" type="search" placeholder="Search courses">
 <label class="sr-only" for="g-city">City</label><select id="g-city"><option value="">All cities</option>${cities.map(c => `<option>${esc(c)}</option>`).join("")}</select>
