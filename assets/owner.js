@@ -79,8 +79,35 @@
     } else {
       html += '<div class="biz-band" style="margin-top:32px"><p style="color:#fff"><strong>Want photos, hours, a special offer and monthly stats?</strong><br>Premium is $49 a month or $438 a year, or free while you&rsquo;re on a Spotlight postcard.</p><a class="btn" href="advertise.html#plans">See Premium</a></div>';
     }
+    html += '<h2 class="month-head"><span class="stripe-mini"></span>Add our badge to your website</h2><div class="card" style="padding:28px">' +
+      '<p style="margin-top:0">Put this badge on your website so customers can find your listing here. Pick a style, copy the code, and paste it into your site where you want the badge to show (a footer works well). If someone else runs your website, just send them the code.</p>' +
+      '<div class="ow-badges" role="radiogroup" aria-label="Badge style">' + ["light", "dark"].map(function (t, i) {
+        return '<label class="ow-badge"><input type="radio" name="ow-badge" value="' + t + '"' + (i ? '' : ' checked') + '><img src="assets/badge/find-us-' + t + '.png" alt="' + (i ? 'Dark' : 'Light') + ' badge" width="240" height="72"><span>' + (i ? 'Dark' : 'Light') + '</span></label>';
+      }).join("") + '</div>' +
+      '<label class="ow-help" for="ow-badge-code" style="display:block;margin:16px 0 6px">Badge code</label>' +
+      '<textarea id="ow-badge-code" readonly rows="4" style="width:100%;font-family:var(--mono);font-size:12.5px"></textarea>' +
+      '<p style="margin:12px 0 0"><button class="btn" type="button" id="ow-badge-copy">Copy code</button> <span class="form-status" id="ow-badge-msg" role="status"></span></p></div>';
     out.innerHTML = html;
     wire(L);
+    badge(L);
+  }
+
+  // "Find us on Coachella Valley Spotlight" badge: copy-and-paste code for the owner's own website.
+  function badge(L) {
+    var code = document.getElementById("ow-badge-code"), msg = document.getElementById("ow-badge-msg");
+    function fill() {
+      var t = (document.querySelector('input[name="ow-badge"]:checked') || {}).value || "light";
+      code.value = '<a href="https://coachellavalleyspotlight.com/business/' + esc(L.slug) + '/" title="' + esc(L.name) + ' on Coachella Valley Spotlight">' +
+        '<img src="https://coachellavalleyspotlight.com/assets/badge/find-us-' + t + '.png" alt="Find ' + esc(L.name) + ' on Coachella Valley Spotlight" width="240" height="72" style="border:0"></a>';
+    }
+    document.querySelectorAll('input[name="ow-badge"]').forEach(function (r) { r.addEventListener("change", function () { fill(); msg.textContent = ""; }); });
+    document.getElementById("ow-badge-copy").addEventListener("click", function () {
+      code.select();
+      var done = function () { msg.textContent = "Copied! Paste it into your website."; };
+      if (navigator.clipboard) navigator.clipboard.writeText(code.value).then(done, function () { document.execCommand("copy"); done(); });
+      else { document.execCommand("copy"); done(); }
+    });
+    fill();
   }
 
   function wire(L) {

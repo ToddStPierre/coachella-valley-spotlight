@@ -741,3 +741,12 @@ main:focus { outline: none; }
 @media (max-width: 800px) { .roi { padding: var(--s3); } .roi-grid { grid-template-columns: 1fr; } }
 .picker-paid { margin: 0 0 16px; padding: 14px 16px; border-radius: 12px; background: var(--palm-soft); color: var(--ink); border: 1px solid var(--palm); } .picker-paid b { color: var(--palm); }
 .btn[hidden] { display: none; }
+
+/* Owner dashboard: "Find us on" badge picker */
+.ow-badges { display: flex; flex-wrap: wrap; gap: 16px; }
+.ow-badge { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; border: 2px solid var(--line); border-radius: var(--radius); cursor: pointer; background: var(--sand); }
+.ow-badge input { position: absolute; opacity: 0; pointer-events: none; }
+.ow-badge img { display: block; max-width: 100%; height: auto; }
+.ow-badge span { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
+.ow-badge:has(input:checked) { border-color: var(--sun); }
+.ow-badge:has(input:focus-visible) { outline: 2px solid var(--dusk); outline-offset: 2px; }
