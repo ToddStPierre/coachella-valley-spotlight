@@ -757,3 +757,5 @@ main:focus { outline: none; }
   .ow-split { grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr); }
   .ow-side { position: sticky; top: 96px; }
 }
+/* City + service pages: "More gyms nearby: Indio, La Quinta and Palm Desert." */
+.near-line { margin: 24px 0 0; font-size: 18px; }

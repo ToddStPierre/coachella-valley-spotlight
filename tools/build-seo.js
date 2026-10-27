@@ -29,6 +29,9 @@ ${footer}
 </body>
 </html>
 `;
+/* Rough city centers (lat, lng), only used to sort "nearby" links by distance. */
+const CITY_LL = { "Desert Hot Springs": [33.961, -116.502], "Palm Springs": [33.830, -116.545], "Cathedral City": [33.780, -116.466], "Rancho Mirage": [33.740, -116.413], "Thousand Palms": [33.820, -116.390], "Palm Desert": [33.722, -116.374], "Indian Wells": [33.718, -116.341], "Bermuda Dunes": [33.743, -116.290], "La Quinta": [33.663, -116.310], "Indio": [33.720, -116.216], "Coachella": [33.680, -116.174] };
+const cityDist = (a, b) => { const p = CITY_LL[a], q = CITY_LL[b]; return p && q ? Math.hypot(p[0] - q[0], p[1] - q[1]) : 99; };
 const andList = a => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
 
 /* 1. Run the card code from app.js (everything above its PRERENDER-END line). */
@@ -103,6 +106,10 @@ for (const p of landing) {
     (p.kind === "city" && o.kind === "combo" && o.city === p.city) ||
     (p.kind === "category" && ((o.kind === "combo" && o.category === p.category) || o.kind === "category")) ||
     (p.kind === "combo" && ((o.kind === "city" && o.city === p.city) || (o.kind === "category" && o.category === p.category)))));
+  // City + service pages: point to the same service in the nearest other cities that have their own page.
+  const near = p.kind === "combo" ? landing.filter(o => o.kind === "combo" && o.category === p.category && o.city !== p.city)
+    .sort((x, y) => cityDist(p.city, x.city) - cityDist(p.city, y.city)).slice(0, 3) : [];
+  const nearLine = near.length ? `<p class="near-line">More ${esc(p.category.toLowerCase())} nearby: ${andList(near.map(o => `<a href="${o.path}">${esc(o.city)}</a>`))}.</p>` : "";
   const label = o => o.kind === "city" ? `All businesses in ${o.city}` : o.kind === "category" ? `${o.category}, valley-wide` : `${o.category} in ${o.city}`;
   // Activity pages (dog parks, hiking trails) get a hero photo, valley-wide and per city.
   const ACT_PHOTO = { "Dog parks": "dog-parks", "Hiking trails": "hiking-trails", "Pickleball": "pickleball", "Tennis": "tennis", "Swimming & water parks": "swimming", "Museums & attractions": "attractions", "Skate parks": "skate-parks", "Disc golf": "disc-golf", "Bowling": "bowling" };
@@ -138,6 +145,7 @@ ${fig ? `</div>${fig}` : ""}</div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
 ${dogFilter}
 <div class="grid">${cards("directory", items)}</div>
+${nearLine}
 ${hikeBox}
 ${related.length ? `<h2 class="month-head" style="margin-top:48px"><span class="stripe-mini"></span>Keep browsing</h2><ul class="link-list">${related.map(o => `<li><a href="${o.path}">${esc(label(o))}</a></li>`).join("")}<li><a href="directory">The full directory</a></li></ul>` : ""}
 <div class="biz-band" style="margin-top:48px"><p><strong>Own a business${p.city ? " in " + esc(p.city) : ""}?</strong><br>Listing it here is free.</p><a class="btn" href="submit">Add my business</a></div>
