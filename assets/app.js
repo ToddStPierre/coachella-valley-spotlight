@@ -10,6 +10,17 @@
   function fmt(d) { return MONTHS[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear(); }
   function sample(x) { return x.sample ? '<span class="sample">SAMPLE</span>' : ""; }
   var ROOT = document.documentElement.getAttribute("data-root") || "";
+  // Referral partners: a visit with ?ref=<name> (e.g. ?ref=gracilyn) is remembered for 90 days in this browser.
+  // The first partner wins; holds, payments and form submissions carry it so the partner gets credit.
+  (function () {
+    try {
+      var r = (new URLSearchParams(location.search).get("ref") || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 30);
+      var saved = JSON.parse(localStorage.getItem("cvs_ref") || "null");
+      if (saved && Date.now() - saved.at > 90 * 864e5) { localStorage.removeItem("cvs_ref"); saved = null; }
+      if (r && !saved) { localStorage.setItem("cvs_ref", JSON.stringify({ ref: r, at: Date.now() })); if (!window.CVS_NOTRACK && window.gtag) window.gtag("event", "referral_visit", { ref: r }); }
+    } catch (e) {}
+  })();
+  window.CVS_REF = function () { try { var s = JSON.parse(localStorage.getItem("cvs_ref") || "null"); return s && Date.now() - s.at <= 90 * 864e5 ? s.ref : ""; } catch (e) { return ""; } };
   function eventSlug(e) { return (String(e.title).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").replace(/^(.{80}[^-]*).*$/, "$1")) + "-" + (e.weekly ? "weekly" : e.date); }
   function iso(d) { return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
   var WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -474,6 +485,7 @@
       ev.preventDefault();
       var status = f.querySelector(".form-status"), btn = f.querySelector("button[type=submit]");
       var body = {}; new FormData(f).forEach(function (v, k) { if (typeof v === "string") body[k] = v; });
+      if (window.CVS_REF()) body.referred_by = window.CVS_REF();
       function direct() { return fetch(f.action, { method: "POST", body: new FormData(f), headers: { Accept: "application/json" } }).then(function (r) { if (!r.ok) throw new Error(""); }); }
       btn.disabled = true; status.textContent = "Sending...";
       fetch(VAPI + "/submission", { method: "POST", body: JSON.stringify(body) })

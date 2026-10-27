@@ -100,16 +100,16 @@
     e.preventDefault(); if (!pending) return;
     var payNow = !!(e.submitter && e.submitter.hasAttribute("data-pay")) && !!PAY_LINKS[pending.positions.length];
     var btn = e.submitter || form.querySelector('button[type="submit"]'); btn.disabled = true; msg.textContent = payNow ? "Holding your spot, then taking you to secure checkout…" : "Holding your spot…";
-    var p = { route: pending.route, position: pending.position, positions: pending.positions, size: SIZES[pending.positions.length].label, price: money(SIZES[pending.positions.length].price), category: form.category.value, name: form.name.value, business: form.business.value, email: form.email.value, phone: form.phone.value, notes: form.notes.value };
+    var p = { route: pending.route, position: pending.position, positions: pending.positions, size: SIZES[pending.positions.length].label, price: money(SIZES[pending.positions.length].price), category: form.category.value, name: form.name.value, business: form.business.value, email: form.email.value, phone: form.phone.value, notes: form.notes.value + (window.CVS_REF && window.CVS_REF() ? " [Referred by: " + window.CVS_REF() + "]" : "") };
     fetch(API + "/api/reserve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p) })
       .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, d: d }; }); })
       .then(function (r) {
         if (!r.ok) { msg.textContent = r.d.error || "That spot just got taken. Pick another one."; btn.disabled = false; load(route, true); return; }
         fetch(NOTIFY, { method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, body: JSON.stringify({
           _subject: "Coachella Valley Spotlight: " + p.business + (payNow ? " is paying online for " : " wants ") + (p.positions.length === 1 ? "Spot " + p.position : p.size + " (Spots " + p.positions.join(", ") + ")") + " (" + p.category + ") on " + LABELS[p.route],
-          name: p.name, business: p.business, email: p.email, phone: p.phone, notes: p.notes, route: LABELS[p.route], spot: p.positions.join(", "), size: p.size, price: p.price + " per mailing", category: p.category,
+          name: p.name, business: p.business, email: p.email, phone: p.phone, notes: p.notes, referred_by: (window.CVS_REF && window.CVS_REF()) || "", route: LABELS[p.route], spot: p.positions.join(", "), size: p.size, price: p.price + " per mailing", category: p.category,
           source: "coachellavalleyspotlight.com / advertise spot picker" }) }).catch(function () {});
-        if (window.CVS_GA) window.CVS_GA(payNow ? "spot_pay_now" : "spot_hold", { route: p.route, spots: p.positions.length, category: p.category });
+        if (window.CVS_GA) window.CVS_GA(payNow ? "spot_pay_now" : "spot_hold", { route: p.route, spots: p.positions.length, category: p.category, ref: (window.CVS_REF && window.CVS_REF()) || "" });
         if (payNow) {
           var ref = pending.route + "__" + pending.positions.join("-"), go = PAY_LINKS[pending.positions.length] + (PAY_LINKS[pending.positions.length].indexOf("?") > -1 ? "&" : "?") + "client_reference_id=" + encodeURIComponent(ref);
           msg.textContent = "Spot held. Taking you to secure checkout…";
