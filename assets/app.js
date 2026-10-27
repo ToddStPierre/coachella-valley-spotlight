@@ -123,6 +123,9 @@
   }
 
   // "List your business" reminder after every 3rd category group on the full directory (not after the last; the page already ends with one).
+  function eventBand() {
+    return '<div class="biz-band list-band"><p><strong>Got an event coming up?</strong><br>Send it in. Listing it here is free.</p><a class="btn" href="' + ROOT + 'submit?type=event#form">Submit it</a></div>';
+  }
   function listBand(i, n) {
     return (i + 1) % 3 === 0 && i < n - 1 ? '<div class="biz-band list-band"><p><strong>Got a business to list?</strong><br>Send it in. Listing it here is free.</p><a class="btn" href="' + ROOT + 'submit?plan=basic#form">Submit it</a></div>' : '';
   }
@@ -241,10 +244,12 @@
       if (!items.length) { browse.innerHTML = '<div class="empty">No matches. Try a different city or search word.</div>'; return; }
       if (key === "events") {
         var html = "", last = "";
-        items.forEach(function (e) {
+        items.forEach(function (e, i) {
           var d = parse(e.date), m = MONTHS_LONG[d.getMonth()] + " " + d.getFullYear();
           if (m !== last) { html += (last ? "</div>" : "") + '<h2 class="month-head"><span class="stripe-mini"></span>' + m + '</h2><div class="grid-2">'; last = m; }
           html += R.event(e);
+          // "Send it in" band after every 12 events, so it shows up without scrolling to the bottom
+          if ((i + 1) % 12 === 0 && i < items.length - 1) html += '</div>' + eventBand() + '<div class="grid-2">';
         });
         browse.innerHTML = html + "</div>";
       } else if (key === "directory") {
@@ -400,6 +405,7 @@
   if (plan && planSel) { planSel.value = plan === "premium" ? "Premium listing" : "Basic listing (free)"; var ty = document.getElementById("type"); if (ty) ty.value = "A business listing"; }
   // Golf: submit?type=golf&name=<course> pre-picks "A golf course" (and the course name when sending an update)
   var sp = new URLSearchParams(location.search), tySel = document.getElementById("type");
+  if (sp.get("type") === "event" && tySel) tySel.value = "An event";
   if (sp.get("type") === "golf" && tySel) {
     tySel.value = "A golf course";
     var bz = document.querySelector('#form input[name="business"]'), tt = document.querySelector('#form input[name="title"]');
