@@ -823,3 +823,16 @@ main:focus { outline: none; }
 .sponsor-side p { font-size: 15px; color: var(--ink-2); margin: 0 0 12px; }
 .sponsor-side .btn { width: 100%; justify-content: center; text-align: center; }
 .sponsor-side .sponsor-note { font-size: 12.5px; margin: 10px 0 0; }
+/* Category sponsor pitch (advertise.html#sponsor) */
+.sponsor-pitch { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: var(--s4); align-items: start; background: var(--paper); border: 1.5px solid var(--line); border-radius: 20px; padding: var(--s4); box-shadow: var(--shadow); }
+.sponsor-pitch h2 { max-width: 640px; }
+.sp-list { padding-left: 1.2em; margin: var(--s2) 0; }
+.sp-list li { margin-bottom: 10px; max-width: 640px; }
+.sp-honest { background: var(--sand); border-left: 4px solid var(--gold); border-radius: 10px; padding: 14px 16px; max-width: 640px; }
+.sp-price .amount { font-family: var(--display); font-size: 44px; font-weight: 700; line-height: 1; margin: var(--s3) 0 6px; }
+.sp-price .amount small { font-family: var(--body); font-size: 16px; font-weight: 500; color: var(--ink-2); }
+.sp-example { position: sticky; top: 90px; }
+.sp-example-label { display: block; font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 10px; }
+.sp-placeholder { margin: 10px 0 12px; aspect-ratio: 4 / 3; border: 2px dashed var(--line); border-radius: 10px; display: grid; place-items: center; color: var(--ink-2); font-size: 14px; background: var(--sand); }
+.sp-live { display: inline-block; margin-top: 12px; font-size: 15px; }
+@media (max-width: 860px) { .sponsor-pitch { grid-template-columns: 1fr; padding: var(--s3); } .sp-example { position: static; } }

@@ -8,6 +8,7 @@
    w/h: the image's pixel size. Every ad is labeled "Sponsored". Keep copy free of health claims. */
 window.CVS = window.CVS || {};
 window.CVS.sponsors = [
+  // House ad (Todd's own affiliate link). Todd: take it down as soon as a paying Health and beauty sponsor signs up.
   { id: "dosed-collective", name: "The Dosed Collective", placements: ["category:Health and beauty"], affiliate: true,
     image: "assets/img/ads/dosed-collective.jpg", alt: "The Dosed Collective products: an oral strip box, a nasal spray and a serum bottle",
     headline: "Modern peptides, simply dosed.",
