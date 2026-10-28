@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="hv-t">
+<title id="hv-t">Halloween night in the Coachella Valley: a full moon over the mountains, palm trees, bats and glowing jack-o'-lanterns</title>
+<defs>
+  <linearGradient id="hv-sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#2a2140"/>
+    <stop offset=".45" stop-color="#5b4a7a"/>
+    <stop offset=".72" stop-color="#c9667a"/>
+    <stop offset="1" stop-color="#f0a33a"/>
+  </linearGradient>
+  <radialGradient id="hv-moon" cx=".42" cy=".4" r=".7">
+    <stop offset="0" stop-color="#fff6e2"/>
+    <stop offset=".7" stop-color="#fbe3b4"/>
+    <stop offset="1" stop-color="#f3c983"/>
+  </radialGradient>
+  <radialGradient id="hv-glow" cx=".5" cy=".5" r=".5">
+    <stop offset="0" stop-color="#fff2cf" stop-opacity=".55"/>
+    <stop offset="1" stop-color="#fff2cf" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="hv-pump" cx=".4" cy=".35" r=".75">
+    <stop offset="0" stop-color="#f6a23b"/>
+    <stop offset="1" stop-color="#d9552b"/>
+  </radialGradient>
+  <radialGradient id="hv-lit" cx=".5" cy=".5" r=".5">
+    <stop offset="0" stop-color="#ffd36b" stop-opacity=".7"/>
+    <stop offset="1" stop-color="#ffd36b" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+
+<!-- sky, stars, moon -->
+<rect width="640" height="360" fill="url(#hv-sky)"/>
+<g fill="#fff6e2">
+  <circle cx="60" cy="38" r="1.6"/><circle cx="132" cy="70" r="1.1"/><circle cx="210" cy="30" r="1.4"/><circle cx="298" cy="58" r="1"/>
+  <circle cx="352" cy="22" r="1.5"/><circle cx="560" cy="34" r="1.2"/><circle cx="610" cy="80" r="1.5"/><circle cx="24" cy="96" r="1"/>
+  <circle cx="250" cy="96" r="1"/><circle cx="590" cy="120" r="1"/><circle cx="96" cy="128" r=".9"/>
+</g>
+<circle cx="452" cy="118" r="96" fill="url(#hv-glow)"/>
+<circle cx="452" cy="118" r="54" fill="url(#hv-moon)"/>
+<g fill="#e8c48a" opacity=".55"><circle cx="436" cy="104" r="8"/><circle cx="470" cy="132" r="6"/><circle cx="458" cy="96" r="3.5"/><circle cx="430" cy="138" r="4"/></g>
+
+<!-- bats -->
+<g fill="#221c18">
+  <path d="M300 92c6-7 12-8 16-4 2-4 5-5 7-2 2-3 5-2 7 2 4-4 10-3 16 4-7-2-11 0-13 4-3-3-6-2-8 1-2-3-5-4-8-1-2-4-7-6-17-4z"/>
+  <path d="M372 64c4-5 8-5 11-3 1-3 3-3 5-1 1-2 3-2 5 1 3-2 7-2 11 3-5-1-8 0-9 3-2-2-4-2-6 1-1-2-3-3-5 0-2-3-5-4-12-4z"/>
+  <path d="M536 70c5-6 10-7 13-3 2-3 4-4 6-1 2-3 4-2 6 1 3-4 8-3 13 3-6-2-9 0-11 3-2-2-5-2-7 1-1-3-4-3-6 0-2-3-6-5-14-4z"/>
+  <path d="M232 140c3-4 6-4 8-2 1-2 2-2 3-1 1-1 2-1 3 1 2-2 5-2 8 2-4-1-6 0-7 2-1-1-3-1-4 1-1-2-2-2-3 0-2-2-4-3-8-3z"/>
+</g>
+
+<!-- mountains, in the site's layered style -->
+<path d="M0 360 L0 222 L70 186 L132 214 L214 150 L300 206 L372 172 L452 214 L540 160 L640 204 L640 360 Z" fill="#c9667a" opacity=".55"/>
+<path d="M0 360 L0 252 L96 222 L170 246 L260 210 L352 248 L440 226 L530 254 L640 230 L640 360 Z" fill="#5b4a7a" opacity=".85"/>
+<path d="M0 360 L0 288 L150 270 L320 290 L480 274 L640 286 L640 360 Z" fill="#221c18"/>
+
+<!-- palms -->
+<g fill="#221c18">
+  <path d="M78 290 C80 240 84 200 92 160 L96 160 C90 200 88 240 88 290 Z"/>
+  <path d="M94 160 c-20-6-40 0-54 14 18-6 36-8 52-6z M94 160 c-14-14-34-18-52-12 18 2 34 6 50 14z M94 160 c4-18 0-34-12-46 6 16 8 30 8 44z M94 160 c16-12 36-14 54-6-18 0-34 4-50 10z M94 160 c22 0 40 10 50 26-16-10-32-16-48-20z"/>
+  <path d="M146 290 C147 252 150 222 156 194 L159 194 C155 222 153 252 154 290 Z"/>
+  <path d="M157 194 c-15-5-30 0-40 10 13-4 26-6 39-4z M157 194 c-10-10-25-13-38-9 13 2 25 4 37 10z M157 194 c3-13 0-25-9-34 5 12 6 22 6 32z M157 194 c12-9 26-10 40-4-13 0-25 3-37 7z M157 194 c16 0 30 7 37 19-12-7-24-12-36-15z"/>
+  <path d="M566 292 C567 250 570 216 576 186 L579 186 C575 216 573 250 574 292 Z"/>
+  <path d="M577 186 c-16-5-32 0-43 11 14-5 28-6 42-4z M577 186 c-11-11-27-14-41-9 14 2 27 5 40 11z M577 186 c3-14 0-27-10-36 5 13 7 24 7 34z M577 186 c13-10 28-11 43-4-14 0-27 3-40 8z M577 186 c17 0 32 8 40 21-13-8-26-13-39-16z"/>
+</g>
+
+<!-- jack-o'-lanterns -->
+<g>
+  <ellipse cx="300" cy="318" rx="70" ry="22" fill="url(#hv-lit)"/>
+  <ellipse cx="420" cy="322" rx="56" ry="18" fill="url(#hv-lit)"/>
+
+  <g transform="translate(300 300)">
+    <path d="M-3-34 c2-8 6-12 12-14 -4 4-6 9-6 14z" fill="#2e5c4f"/>
+    <ellipse cx="-20" cy="0" rx="24" ry="30" fill="url(#hv-pump)"/>
+    <ellipse cx="20" cy="0" rx="24" ry="30" fill="url(#hv-pump)"/>
+    <ellipse cx="0" cy="0" rx="26" ry="32" fill="#e8742e"/>
+    <path d="M-30 -2 l10-12 10 12z M10 -2 l10-12 10 12z" fill="#ffd36b"/>
+    <path d="M-28 10 q28 22 56 0 l-6 2 -5-5 -5 6 -6-6 -6 6 -5-6 -5 6 -6-6 -5 5z" fill="#ffd36b"/>
+  </g>
+
+  <g transform="translate(420 310) scale(.72)">
+    <path d="M-3-34 c2-8 6-12 12-14 -4 4-6 9-6 14z" fill="#2e5c4f"/>
+    <ellipse cx="-20" cy="0" rx="24" ry="30" fill="url(#hv-pump)"/>
+    <ellipse cx="20" cy="0" rx="24" ry="30" fill="url(#hv-pump)"/>
+    <ellipse cx="0" cy="0" rx="26" ry="32" fill="#e8742e"/>
+    <circle cx="-14" cy="-8" r="6" fill="#ffd36b"/><circle cx="14" cy="-8" r="6" fill="#ffd36b"/>
+    <path d="M-20 12 q20 14 40 0 q-20 6 -40 0z" fill="#ffd36b"/>
+  </g>
+
+  <g transform="translate(232 326) scale(.5)">
+    <path d="M-3-34 c2-8 6-12 12-14 -4 4-6 9-6 14z" fill="#2e5c4f"/>
+    <ellipse cx="-20" cy="0" rx="24" ry="30" fill="url(#hv-pump)"/>
+    <ellipse cx="20" cy="0" rx="24" ry="30" fill="url(#hv-pump)"/>
+    <ellipse cx="0" cy="0" rx="26" ry="32" fill="#e8742e"/>
+  </g>
+</g>
+</svg>
