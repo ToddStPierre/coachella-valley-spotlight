@@ -185,14 +185,27 @@
     }
   };
 
-  /* PRERENDER-END: tools/build-seo.js runs everything above this line at build time to put the same cards in the HTML. */
-  // Shared with assets/auth.js (favorites page) and used to load it on every page.
-  window.CVS_RENDER = { R: R, events: events, directory: directory, slugOf: slugOf, eventSlug: eventSlug, root: ROOT };
-  (function () { var m = document.createElement("script"); m.type = "module"; m.src = ROOT + "assets/auth.js"; document.head.appendChild(m); })();
   var SETS = { events: events, deals: deals, news: news, directory: directory };
   var TYPE = { events: "event", deals: "deal", news: "news", directory: "directory" };
 
-  function text(item) { return Object.keys(item).map(function (k) { return typeof item[k] === "string" ? item[k] : ""; }).join(" ").toLowerCase(); }
+  // data-mix="valley" (home page): postcard advertisers first, then one business from each of the other towns,
+  // biggest first, each one a different everyday trade where the town has it, so the home page reads valley-wide.
+  var MIX_SERVICES = ["Mexican restaurants", "Pool service", "Plumbing", "Dentists", "Gyms", "Electrical", "Heating and air conditioning", "American restaurants", "Landscaping"];
+  function valleyMix(items, limit) {
+    var out = items.filter(function (b) { return b.postcard; }), used = {}, usedSvc = {}, counts = {};
+    out.forEach(function (b) { used[b.city] = 1; });
+    items.forEach(function (b) { if (!b.public && !b.postcard) counts[b.city] = (counts[b.city] || 0) + 1; });
+    Object.keys(counts).filter(function (c) { return !used[c]; }).sort(function (a, b) { return counts[b] - counts[a] || a.localeCompare(b); }).forEach(function (c) {
+      if (out.length >= limit) return;
+      var here = items.filter(function (b) { return b.city === c && !b.public && !b.postcard; }), pick = null;
+      for (var i = 0; i < MIX_SERVICES.length && !pick; i++) {
+        if (usedSvc[MIX_SERVICES[i]]) continue;
+        for (var j = 0; j < here.length; j++) if (here[j].service === MIX_SERVICES[i]) { pick = here[j]; usedSvc[MIX_SERVICES[i]] = 1; break; }
+      }
+      out.push(pick || here[0]);
+    });
+    return out.slice(0, limit);
+  }
 
   // Date window for the events "When" filter: [from, to] as YYYY-MM-DD, or null for any date.
   function windowFor(v) {
@@ -211,16 +224,32 @@
   }
 
   // Small blocks: <div data-list="events" data-limit="4"></div>. Optional data-when="weekend" (events only; falls back to upcoming if empty).
-  document.querySelectorAll("[data-list]").forEach(function (el) {
-    var key = el.getAttribute("data-list"), limit = +el.getAttribute("data-limit") || 999;
-    var per = el.getAttribute("data-per"), seen = {}, inCity = el.getAttribute("data-city");
-    // data-per="city": only the newest item from each city (the lists are already newest first)
-    var items = SETS[key].filter(function (x) { if (inCity && x.city !== inCity) return false; if (!per) return true; var v = x[per] || ""; if (seen[v]) return false; seen[v] = 1; return true; });
-    var w = windowFor(el.getAttribute("data-when"));
+  // attr(name) reads the block's attributes; tools/build-seo.js calls this too, so the HTML and the browser show the same cards.
+  function pickList(key, attr) {
+    var limit = +attr("data-limit") || 999;
+    var per = attr("data-per"), seen = {}, inCity = attr("data-city"), has = attr("data-has");
+    if (attr("data-mix") === "valley") return valleyMix(SETS[key], limit);
+    // data-per="city": only the newest item from each city (the lists are already newest first). data-has="happyHour": only items with that field.
+    var items = SETS[key].filter(function (x) { if (inCity && x.city !== inCity) return false; if (has && !x[has]) return false; if (!per) return true; var v = x[per] || ""; if (seen[v]) return false; seen[v] = 1; return true; });
+    var w = windowFor(attr("data-when"));
     // "after-weekend" goes by each event's next date, so a weekly market showing this Saturday isn't repeated under "Coming up".
-    var after = el.getAttribute("data-when") === "after-weekend";
+    var after = attr("data-when") === "after-weekend";
     if (w) { var inW = items.filter(function (x) { return after ? x.date >= w[0] : inWindow(x, w); }); if (inW.length) items = inW; }
-    items = items.slice(0, limit);
+    return items.slice(0, limit);
+  }
+
+  /* PRERENDER-END: tools/build-seo.js runs everything above this line at build time to put the same cards in the HTML. */
+  // Shared with assets/auth.js (favorites page) and used to load it on every page.
+  window.CVS_RENDER = { R: R, events: events, directory: directory, slugOf: slugOf, eventSlug: eventSlug, root: ROOT };
+  (function () { var m = document.createElement("script"); m.type = "module"; m.src = ROOT + "assets/auth.js"; document.head.appendChild(m); })();
+
+  function text(item) { return Object.keys(item).map(function (k) { return typeof item[k] === "string" ? item[k] : ""; }).join(" ").toLowerCase(); }
+
+  // Live counts: <span data-count="directory"></span> (pre-filled by tools/build-seo.js too).
+  document.querySelectorAll("[data-count]").forEach(function (el) { var s = SETS[el.getAttribute("data-count")]; if (s) el.textContent = s.filter(function (x) { return !x.sample; }).length; });
+
+  document.querySelectorAll("[data-list]").forEach(function (el) {
+    var key = el.getAttribute("data-list"), items = pickList(key, function (n) { return el.getAttribute(n); });
     var opt = { img: el.hasAttribute("data-img") }, view = el.getAttribute("data-view") === "row" ? TYPE[key] + "Row" : TYPE[key];
     el.innerHTML = items.length ? items.map(function (x) { return R[view](x, opt); }).join("") : '<div class="empty">Nothing here yet. Check back soon.</div>';
     // data-hide-empty: drop the whole section when there's nothing to show (city pages).

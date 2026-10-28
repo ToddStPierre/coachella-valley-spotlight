@@ -82,7 +82,6 @@ window.CVS.places = {
     "Flooring": "Local flooring companies install tile, vinyl, carpet and wood-look floors, and many offer free in-home estimates. Tile and luxury vinyl are popular here because they hold up to heat, sand and pets.",
     "Solar panel cleaning": "Dust and wind leave a film on solar panels that cuts how much power they make. Local crews clean panels and pressure wash driveways, patios and buildings for homes and businesses.",
     "Wallpaper installation": "Wallpaper installers hang everything from a single accent wall to murals and premium wallcoverings, and prep the walls so it lasts.",
-    "Peptides": "Peptide suppliers provide research-grade peptides. Look for batch testing, clear sourcing and documentation with every order.",
     "Acupuncture": "Local acupuncturists offer acupuncture and herbal medicine for pain, stress, autoimmune conditions and overall wellness. These are licensed, independent practices.",
     "Weight loss": "Local medical weight loss clinics offer physician-supervised programs, including GLP-1 medications, B12 injections and nutrition guidance.",
     "Italian restaurants": "Locally owned Italian restaurants serving pasta, pizza and dinner with a bar, from long-running family dining rooms to newer spots."

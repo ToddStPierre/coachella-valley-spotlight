@@ -6,7 +6,7 @@
    4. Writes sitemap.xml.
    It changes the HTML files in place, so it is meant for the GitHub build. If you run it locally
    (node tools/build-profiles.js && node tools/build-seo.js), undo the HTML changes after with:
-   git checkout -- index.html directory.html deals.html events.html */
+   git checkout -- index.html directory.html deals.html events.html news.html */
 process.env.TZ = "America/Los_Angeles";
 const fs = require("fs"), path = require("path"), vm = require("vm");
 const { root, SITE, loadData, esc, slugify, ldjson, landingPages, shell, metaTags, breadcrumbs, photoFigure } = require("./lib");
@@ -38,10 +38,10 @@ const andList = a => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " a
 const app = fs.readFileSync(path.join(root, "assets/app.js"), "utf8");
 const ctx = { window: { CVS: D }, document: { documentElement: { getAttribute: () => "" } }, URL };
 vm.runInNewContext(app.slice(app.indexOf("{") + 1, app.indexOf("/* PRERENDER-END")) +
-  "\n;__out = { R: R, events: events, deals: deals, directory: directory, eventSlug: eventSlug, parse: parse, MONTHS_LONG: MONTHS_LONG, googleCal: googleCal, calLinks: calLinks, listBand: listBand };", ctx);
+  "\n;__out = { R: R, events: events, deals: deals, news: news, directory: directory, pickList: pickList, eventSlug: eventSlug, parse: parse, MONTHS_LONG: MONTHS_LONG, googleCal: googleCal, calLinks: calLinks, listBand: listBand };", ctx);
 const C = ctx.__out;
 const listBand = C.listBand;
-const TYPE = { events: "event", deals: "deal", directory: "directory" };
+const TYPE = { events: "event", deals: "deal", news: "news", directory: "directory" };
 const cards = (key, items) => items.map(C.R[TYPE[key]]).join("");
 
 /* 2. Event pages */
@@ -195,8 +195,10 @@ ${typeMenu}
     block(`class="grid" data-city="${esc(city)}" data-list="deals" data-limit="6"`, cards("deals", dl.slice(0, 6))), !ev.length);
   if (biz.length) body += sec("Local directory", `Businesses in ${esc(city)}`, `<a class="more" href="directory?city=${q}">All ${biz.length} in ${esc(city)} &rarr;</a>`,
     block(`class="grid" data-city="${esc(city)}" data-list="directory" data-limit="8"`, cards("directory", biz.slice(0, 8))), !ev.length && !dl.length);
-  body += sec("Local headlines", `News from ${esc(city)}`, '<a class="more" href="news">All headlines &rarr;</a>',
-    block(`class="grid" data-city="${esc(city)}" data-list="news" data-limit="3" data-hide-empty`, '<noscript><div class="empty">Turn on JavaScript to see the headlines.</div></noscript>'), false);
+  // Headlines are pre-rendered too; a city with none skips the section (app.js hides it the same way).
+  const hl = C.pickList("news", n => ({ "data-city": city, "data-limit": "3" })[n] || null);
+  if (hl.length) body += sec("Local headlines", `News from ${esc(city)}`, '<a class="more" href="news">All headlines &rarr;</a>',
+    block(`class="grid" data-city="${esc(city)}" data-list="news" data-limit="3" data-hide-empty`, cards("news", hl)), false);
   body += `<div class="wrap" style="padding-bottom:var(--s5)"><div class="biz-band"><p><strong>Own a business in ${esc(city)}?</strong><br>Listing it here is free.</p><a class="btn" href="submit?plan=basic#form">Add my business</a></div></div>`;
   const title = `${city}, CA: Things to Do, Deals and Local Businesses`;
   write(url, page({
@@ -247,16 +249,25 @@ const byCatRows = tops.map(t => {
 }).join("");
 const orphanSvc = landing.filter(o => o.kind === "category" && o.field === "service" && !tops.some(t => t.category === topCat(o)));
 const browseLinks = landing.length ? `<div class="browse-links"><h2 class="month-head"><span class="stripe-mini"></span>Browse by city and category</h2><div class="browse-cols"><div><h3>By city</h3>${byCityRows}</div><div><h3>By category</h3>${byCatRows}${orphanSvc.length ? browseRow("More", orphanSvc.length, orphanSvc.map(o => pill(o, o.category)).join("")) : ""}</div></div></div>` : "";
-for (const file of ["index.html", "directory.html", "deals.html", "events.html"]) {
+/* Reads an opening tag's attributes into { name: value } (bare attributes get ""). */
+const attrsOf = str => { const a = {}; str.replace(/([\w-]+)(?:="([^"]*)")?/g, (m, k, v) => { a[k] = v === undefined ? "" : v; }); return a; };
+for (const file of ["index.html", "directory.html", "deals.html", "events.html", "news.html"]) {
   const p = path.join(root, file);
   let html = fs.readFileSync(p, "utf8");
-  html = html.replace(/(data-(browse|list)="(\w+)"(?: data-limit="(\d+)")?>)<noscript><div class="empty">Turn on JavaScript to see the listings\.<\/div><\/noscript>/g, (m, open, mode, key, limit) => {
+  // Any empty data-list / data-browse block (or one holding only the "Turn on JavaScript" placeholder) gets its cards.
+  html = html.replace(/<(div|ol) ([^>]*\bdata-(browse|list)="(\w+)"[^>]*)>(?:<noscript><div class="empty">Turn on JavaScript to see the (?:listings|headlines)\.<\/div><\/noscript>)?(?=<\/(?:div|ol)>)/g, (m, tag, attrs, mode, key) => {
     if (!TYPE[key]) return m;
-    const items = C[key].slice(0, +limit || 999);
+    const open = `<${tag} ${attrs}>`, a = attrsOf(attrs);
+    if (mode === "list") {
+      const items = C.pickList(key, n => n in a ? a[n] : null);
+      const view = a["data-view"] === "row" ? TYPE[key] + "Row" : TYPE[key], opt = { img: "data-img" in a };
+      return open + (items.length ? items.map(x => C.R[view](x, opt)).join("") : empty);
+    }
+    const items = C[key];
     if (!items.length) return open + empty;
-    if (mode === "list") return open + cards(key, items);
-    return open + (key === "events" ? eventsByMonth(items) : key === "directory" ? byCategory(items) : `<div class="grid">${cards(key, items)}</div>`);
+    return open + (key === "events" ? eventsByMonth(items) : key === "directory" ? byCategory(items) : `<div class="${key === "news" ? "grid-2" : "grid"}">${cards(key, items)}</div>`);
   });
+  html = html.replace(/<span data-count="(\w+)"><\/span>/g, (m, k) => `<span data-count="${k}">${(C[k] || []).filter(x => !x.sample).length}</span>`);
   html = html.replace("<!--browse-links-->", browseLinks);
   fs.writeFileSync(p, html);
   console.log("prerendered " + file);
