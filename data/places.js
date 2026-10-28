@@ -90,6 +90,14 @@ window.CVS.places = {
     "Garage doors": "Garage door companies install and repair doors, springs and openers, plus driveway gate operators. Heat, wind and sun wear out springs and seals faster here.",
     "Plant nurseries": "Nurseries selling desert trees, palms, cactus, succulents and shrubs that can handle a valley summer, often grown right here.",
     "Gift shops": "Local gift and card shops for greeting cards, gifts, ornaments and seasonal decor.",
-    "Custom printing": "Local print shops for custom t-shirts, screen printing, embroidery and branded merch for businesses, teams and events."
+    "Custom printing": "Local print shops for custom t-shirts, screen printing, embroidery and branded merch for businesses, teams and events.",
+    "Chiropractors": "Local chiropractors for back and neck pain, sports injuries and family care, including prenatal and pediatric chiropractic at some practices.",
+    "Massage and day spas": "Day spas and massage studios around the valley, from deep tissue and relaxation massage to float therapy.",
+    "Yoga and pilates": "Yoga, Pilates and barre studios with group classes and private sessions, from beginner-friendly flows to reformer Pilates.",
+    "Handyman": "Handyman and property maintenance pros for repairs, odd jobs, pressure washing and window cleaning, for homes, HOAs and rentals.",
+    "Dermatology": "Dermatology practices for skin checks, skin cancer treatment, acne care and cosmetic skin procedures. Sun protection matters in the desert.",
+    "Optometrists": "Local optometrists for eye exams, contact lens fittings and eyewear. Desert sun and dust make regular eye care worth it.",
+    "Hair salons and barbers": "Hair salons and barbershops for cuts, color, styling and grooming.",
+    "Laundry service": "Local wash, dry and fold laundry services, with drop-off or pickup and delivery."
   }
 };
