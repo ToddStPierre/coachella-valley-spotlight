@@ -98,8 +98,10 @@ const TODAY_ISO = new Date().toISOString().slice(0, 10);
 const sponsorBand = p => {
   const cat = topCat(p);
   const ads = (D.sponsors || []).filter(s => (s.placements || []).includes("category:" + cat) && (!s.start || s.start <= TODAY_ISO) && (!s.until || s.until >= TODAY_ISO));
-  return ads.map(s => `<aside class="sponsor-band" aria-label="Sponsored: ${esc(s.name)}"><a class="sponsor-img" href="${esc(s.url)}" target="_blank" rel="sponsored nofollow noopener" data-sponsor="${esc(s.id)}"><img src="${esc(s.image)}" alt="${esc(s.alt)}" loading="lazy" width="900" height="630"></a>
-<div class="sponsor-copy"><span class="sponsor-tag">Sponsored</span><h2>${esc(s.headline)}</h2><p>${esc(s.text)}</p><a class="btn" href="${esc(s.url)}" target="_blank" rel="sponsored nofollow noopener" data-sponsor="${esc(s.id)}">${esc(s.cta)} &rarr;</a>
+  // Off-site links open in a new tab with rel="sponsored nofollow"; links to our own pages (e.g. business/<slug>/) stay plain.
+  const linkAttrs = s => /^https?:/.test(s.url) ? `href="${esc(s.url)}" target="_blank" rel="sponsored nofollow noopener"` : `href="${esc(s.url)}"`;
+  return ads.map(s => `<aside class="sponsor-band" aria-label="Sponsored: ${esc(s.name)}"><a class="sponsor-img" ${linkAttrs(s)} data-sponsor="${esc(s.id)}"><img src="${esc(s.image)}" alt="${esc(s.alt)}" loading="lazy" width="${s.w || 900}" height="${s.h || 630}"></a>
+<div class="sponsor-copy"><span class="sponsor-tag">Sponsored</span><h2>${esc(s.headline)}</h2><p>${esc(s.text)}</p><a class="btn" ${linkAttrs(s)} data-sponsor="${esc(s.id)}">${esc(s.cta)} &rarr;</a>
 ${s.affiliate ? `<p class="sponsor-note">Paid placement. Coachella Valley Spotlight earns a commission if you buy through this link.</p>` : `<p class="sponsor-note">Paid placement.</p>`}</div></aside>`).join("\n");
 };
 for (const p of landing) {
