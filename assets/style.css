@@ -782,3 +782,14 @@ main:focus { outline: none; }
 .type-menu[open] summary { border-color: var(--palm); color: var(--palm); background: var(--palm-soft); }
 .type-menu .link-list { margin-top: 12px; padding: 16px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
 .type-menu .link-list a { font-size: 14px; padding: 6px 12px; }
+
+/* Seasonal feature (Halloween guide): hero chip and hero slide, plus the guide page's day jump links */
+.chip.chip-feature { background: var(--sun); border-color: var(--sun); color: #fff; font-weight: 600; }
+.chip.chip-feature:hover { background: var(--sun-deep); border-color: var(--sun-deep); color: #fff; }
+.hp-feature-title { display: block; font-family: var(--display); font-size: 22px; font-weight: 600; line-height: 1.2; color: var(--ink); text-decoration: none; margin: 2px 0 10px; text-wrap: balance; }
+.hp-feature-title:hover { color: var(--sun-deep); }
+.day-jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 var(--s3); }
+.guide-day { scroll-margin-top: 90px; margin-bottom: var(--s4); }
+.guide-day .grid-2 { margin-top: var(--s2); }
+.guide-faq h3 { font-size: 20px; margin: var(--s3) 0 6px; }
+.guide-faq p { max-width: 760px; }

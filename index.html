@@ -63,11 +63,15 @@
 <input id="hq" name="q" type="search" placeholder="Try &ldquo;tacos&rdquo;, &ldquo;pool service&rdquo; or &ldquo;Indio&rdquo;">
 <button class="btn" type="submit">Search</button></form>
 <div class="chips">
-<a class="chip" href="events">Things to do</a><a class="chip" href="events?when=weekend">This weekend</a><a class="chip" href="directory?category=Happy%20hours">Happy hours</a><a class="chip" href="golf/">Golf courses</a><a class="chip" href="deals">Deals</a><a class="chip news-link" href="news">Local news</a>
+<a class="chip chip-feature" href="halloween" data-until="2026-11-02">&#127875; Halloween guide</a><a class="chip" href="events">Things to do</a><a class="chip" href="events?when=weekend">This weekend</a><a class="chip" href="directory?category=Happy%20hours">Happy hours</a><a class="chip" href="golf/">Golf courses</a><a class="chip" href="deals">Deals</a><a class="chip news-link" href="news">Local news</a>
 <a class="chip" href="directory?category=Home%20services">Home services</a><a class="chip" href="directory?category=Restaurants">Restaurants</a></div>
 </div>
 <aside class="hero-panel" aria-labelledby="hp-h" aria-roledescription="carousel"><div class="hp-slides" aria-live="off">
-<div class="hp-slide is-on" role="group" aria-roledescription="slide" aria-label="This weekend"><span class="eyebrow"><span class="stripe-mini"></span>This weekend</span><h2 id="hp-h" class="sr-only">This weekend</h2>
+<div class="hp-slide hp-feature is-on" role="group" aria-roledescription="slide" aria-label="Halloween guide" data-until="2026-11-02"><span class="eyebrow"><span class="stripe-mini"></span>Halloween in the valley</span>
+<a class="hp-feature-title" href="halloween">Trick-or-treats, haunted houses and parties, town by town &rarr;</a>
+<ol class="hp-list" data-list="events" data-tag="halloween" data-limit="3" data-view="row"></ol>
+<a class="more" href="halloween">See the full Halloween guide &rarr;</a></div>
+<div class="hp-slide" role="group" aria-roledescription="slide" aria-label="This weekend" hidden><span class="eyebrow"><span class="stripe-mini"></span>This weekend</span><h2 id="hp-h" class="sr-only">This weekend</h2>
 <ol class="hp-list" data-when="weekend" data-list="events" data-limit="3" data-view="row"></ol>
 <a class="more" href="events?when=weekend">See all weekend events &rarr;</a></div>
 </div></aside>

@@ -244,6 +244,7 @@
     return e.date <= w[1] && (e.endDate || e.date) >= w[0];
   }
 
+  var TAG_RX = { halloween: /hallowe|trunk.or.treat|haunt|spooktacular|howl-o-ween|d[ií]a de (los )?muertos/i };
   // Small blocks: <div data-list="events" data-limit="4"></div>. Optional data-when="weekend" (events only; falls back to upcoming if empty).
   // attr(name) reads the block's attributes; tools/build-seo.js calls this too, so the HTML and the browser show the same cards.
   function pickList(key, attr) {
@@ -253,6 +254,10 @@
     if (attr("data-fill") === "happyHour") return withHappyHours(SETS[key].slice(0, limit), +attr("data-min") || 0);
     // data-per="city": only the newest item from each city (the lists are already newest first). data-has="happyHour": only items with that field.
     var items = SETS[key].filter(function (x) { if (inCity && x.city !== inCity) return false; if (has && !x[has]) return false; if (!per) return true; var v = x[per] || ""; if (seen[v]) return false; seen[v] = 1; return true; });
+    // data-tag="halloween": only events tagged that way (or, for feed events, a matching title). data-on="YYYY-MM-DD": only that day, no fallback.
+    var tag = attr("data-tag"), on = attr("data-on");
+    if (tag) items = items.filter(function (x) { return (x.tags || []).indexOf(tag) > -1 || (TAG_RX[tag] && x.feed && TAG_RX[tag].test(x.title || "")); });
+    if (on) return items.filter(function (x) { return inWindow(x, [on, on]); }).slice(0, limit);
     var w = windowFor(attr("data-when"));
     // "after-weekend" goes by each event's next date, so a weekly market showing this Saturday isn't repeated under "Coming up".
     var after = attr("data-when") === "after-weekend";
@@ -418,6 +423,10 @@
       grBox.innerHTML = html; grBox.hidden = false;
     }).catch(function () {});
   }
+  // Seasonal pieces: anything with data-until="YYYY-MM-DD" is removed after that day (the Halloween hero slide and chip).
+  document.querySelectorAll("[data-until]").forEach(function (el) { if (iso(today) > el.getAttribute("data-until")) el.parentNode.removeChild(el); });
+  var hpFirst = document.querySelector(".hero-panel .hp-slide");
+  if (hpFirst && !document.querySelector(".hero-panel .hp-slide.is-on")) { hpFirst.hidden = false; hpFirst.classList.add("is-on"); }
   // Home hero panel: rotate "This weekend" with the ads on the current Spotlight postcard.
   // Pauses on hover/focus and with the pause button; no auto-rotate for prefers-reduced-motion.
   var panel = document.querySelector(".hero-panel .hp-slides");
