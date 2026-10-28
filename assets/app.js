@@ -162,7 +162,7 @@
       var d = parse(x.expires);
       return '<article class="card deal">' + sample(x) + '<span class="meta">' + esc(x.business) + ' &middot; ' + esc(x.city) + '</span>' +
         '<div class="offer">' + esc(x.offer) + '</div><p>' + esc(x.details) + '</p>' +
-        '<span class="meta">' + (d ? 'Good through ' + fmt(d) : 'Ongoing') + '</span>' + link(x.url, "Get this deal") + '</article>';
+        '<span class="meta">' + (x.when ? esc(x.when) : d ? 'Good through ' + fmt(d) : 'Ongoing') + '</span>' + link(x.url, x.cta || "Get this deal") + '</article>';
     },
     news: function (n, opt) {
       var d = parse(n.date);
@@ -207,6 +207,27 @@
     return out.slice(0, limit);
   }
 
+  // data-fill="happyHour" data-min="4" (home deals): when there are fewer deals than the minimum, top up with happy hours
+  // shown as deal cards. One per town, skipping towns and businesses that already have a deal; the starting point moves
+  // each day so every happy hour gets its turn.
+  function withHappyHours(items, min) {
+    if (items.length >= min) return items;
+    var busy = {}, towns = {}, out = items.slice();
+    items.forEach(function (x) { busy[x.business] = 1; towns[x.city] = 1; });
+    var pool = directory.filter(function (b) { return b.happyHour && !busy[b.name]; });
+    if (!pool.length) return out;
+    var start = Math.floor(today / 864e5) % pool.length;
+    pool = pool.slice(start).concat(pool.slice(0, start));
+    [true, false].forEach(function (oneTown) {
+      pool.forEach(function (b) {
+        if (out.length >= min || busy[b.name] || (oneTown && towns[b.city])) return;
+        busy[b.name] = towns[b.city] = 1;
+        out.push({ offer: "Happy hour", business: b.name, city: b.city, details: b.happyHour, url: "business/" + slugOf(b) + "/", cta: "View profile" });
+      });
+    });
+    return out;
+  }
+
   // Date window for the events "When" filter: [from, to] as YYYY-MM-DD, or null for any date.
   function windowFor(v) {
     if (!v) return null;
@@ -229,6 +250,7 @@
     var limit = +attr("data-limit") || 999;
     var per = attr("data-per"), seen = {}, inCity = attr("data-city"), has = attr("data-has");
     if (attr("data-mix") === "valley") return valleyMix(SETS[key], limit);
+    if (attr("data-fill") === "happyHour") return withHappyHours(SETS[key].slice(0, limit), +attr("data-min") || 0);
     // data-per="city": only the newest item from each city (the lists are already newest first). data-has="happyHour": only items with that field.
     var items = SETS[key].filter(function (x) { if (inCity && x.city !== inCity) return false; if (has && !x[has]) return false; if (!per) return true; var v = x[per] || ""; if (seen[v]) return false; seen[v] = 1; return true; });
     var w = windowFor(attr("data-when"));
