@@ -400,6 +400,7 @@
     var p = { business: host ? host.getAttribute("data-biz") : (document.body.getAttribute("data-profile") || "") };
     if (/^tel:/.test(h)) ga("call_click", p);
     else if (/^mailto:/.test(h)) ga("email_click", p);
+    else if (a.hasAttribute("data-sponsor")) ga("sponsor_click", { sponsor: a.getAttribute("data-sponsor"), link_url: h });
     else if (/\/maps\/dir\//.test(h)) ga("directions_click", p);
     else if (/pay\.coachellavalleyspotlight\.com|buy\.stripe\.com/.test(h)) { p.link_url = h; ga("begin_checkout", p); }
     else if (a.getAttribute("data-track") === "website" || /utm_source=coachellavalleyspotlight/.test(h)) ga("website_click", p);

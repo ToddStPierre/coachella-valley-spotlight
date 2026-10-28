@@ -93,6 +93,15 @@ fs.rmSync(path.join(root, "local"), { recursive: true, force: true });
 const topCat = o => o.field === "service" ? o.items[0].category : o.category;
 /* Narrower pages under a broad one: "Fitness in Coachella" → "Gyms in Coachella", "Boxing and martial arts in Coachella". */
 const subPages = p => p.field === "category" ? landing.filter(o => o.field === "service" && o.kind === p.kind && o.city === p.city && topCat(o) === p.category && o.category !== p.category) : [];
+/* Sponsored band at the top of matching /local/ pages (data/sponsors.js). */
+const TODAY_ISO = new Date().toISOString().slice(0, 10);
+const sponsorBand = p => {
+  const cat = topCat(p);
+  const ads = (D.sponsors || []).filter(s => (s.placements || []).includes("category:" + cat) && (!s.start || s.start <= TODAY_ISO) && (!s.until || s.until >= TODAY_ISO));
+  return ads.map(s => `<aside class="sponsor-band" aria-label="Sponsored: ${esc(s.name)}"><a class="sponsor-img" href="${esc(s.url)}" target="_blank" rel="sponsored nofollow noopener" data-sponsor="${esc(s.id)}"><img src="${esc(s.image)}" alt="${esc(s.alt)}" loading="lazy" width="900" height="630"></a>
+<div class="sponsor-copy"><span class="sponsor-tag">Sponsored</span><h2>${esc(s.headline)}</h2><p>${esc(s.text)}</p><a class="btn" href="${esc(s.url)}" target="_blank" rel="sponsored nofollow noopener" data-sponsor="${esc(s.id)}">${esc(s.cta)} &rarr;</a>
+${s.affiliate ? `<p class="sponsor-note">Paid placement. Coachella Valley Spotlight earns a commission if you buy through this link.</p>` : `<p class="sponsor-note">Paid placement.</p>`}</div></aside>`).join("\n");
+};
 for (const p of landing) {
   const items = C.directory.filter(b => p.items.includes(b));
   const heading = p.kind === "city" ? `Local Businesses in ${p.city}, CA` : p.kind === "category" ? `${p.category} in the Coachella Valley` : `${p.category} in ${p.city}, CA`;
@@ -151,6 +160,7 @@ ${intro.map(t => `<p>${esc(t)}</p>`).join("\n")}
 ${subChips}
 ${fig ? `</div>${fig}` : ""}</div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
+${sponsorBand(p)}
 ${dogFilter}
 <div class="grid">${cards("directory", items)}</div>
 ${nearLine}

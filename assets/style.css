@@ -806,3 +806,12 @@ main:focus { outline: none; }
 .welcome-table td, .welcome-table th { vertical-align: top; }
 .welcome-note { font-size: 15px; color: var(--ink-2); margin-top: var(--s2); }
 .welcome-table tbody th { font-family: var(--body); text-transform: none; letter-spacing: 0; font-size: 15px; color: var(--ink); font-weight: 600; }
+
+/* Sponsored band at the top of /local/ category pages (data/sponsors.js) */
+.sponsor-band { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: var(--s3); align-items: center; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: var(--s2); margin: 0 0 var(--s4); }
+.sponsor-img img { display: block; width: 100%; height: auto; border-radius: 10px; }
+.sponsor-copy h2 { font-size: clamp(24px, 3vw, 32px); margin: 6px 0 8px; }
+.sponsor-copy p { color: var(--ink-2); margin: 0 0 14px; max-width: 560px; }
+.sponsor-tag { display: inline-block; font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; }
+.sponsor-copy .sponsor-note { font-size: 13px; margin: 10px 0 0; }
+@media (max-width: 700px) { .sponsor-band { grid-template-columns: 1fr; } }
