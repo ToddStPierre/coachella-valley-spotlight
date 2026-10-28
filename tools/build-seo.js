@@ -93,17 +93,20 @@ fs.rmSync(path.join(root, "local"), { recursive: true, force: true });
 const topCat = o => o.field === "service" ? o.items[0].category : o.category;
 /* Narrower pages under a broad one: "Fitness in Coachella" → "Gyms in Coachella", "Boxing and martial arts in Coachella". */
 const subPages = p => p.field === "category" ? landing.filter(o => o.field === "service" && o.kind === p.kind && o.city === p.city && topCat(o) === p.category && o.category !== p.category) : [];
-/* Sponsored band at the top of matching /local/ pages (data/sponsors.js). */
+/* Sponsored ads on matching /local/ pages (data/sponsors.js). On pages without a hero photo, the first ad
+   sits in the hero's right column as a card (sponsorSide). Pages with a hero photo get a band above the listings. */
 const TODAY_ISO = new Date().toISOString().slice(0, 10);
-const sponsorBand = p => {
-  const cat = topCat(p);
-  const ads = (D.sponsors || []).filter(s => (s.placements || []).includes("category:" + cat) && (!s.start || s.start <= TODAY_ISO) && (!s.until || s.until >= TODAY_ISO));
-  // Off-site links open in a new tab with rel="sponsored nofollow"; links to our own pages (e.g. business/<slug>/) stay plain.
-  const linkAttrs = s => /^https?:/.test(s.url) ? `href="${esc(s.url)}" target="_blank" rel="sponsored nofollow noopener"` : `href="${esc(s.url)}"`;
-  return ads.map(s => `<aside class="sponsor-band" aria-label="Sponsored: ${esc(s.name)}"><a class="sponsor-img" ${linkAttrs(s)} data-sponsor="${esc(s.id)}"><img src="${esc(s.image)}" alt="${esc(s.alt)}" loading="lazy" width="${s.w || 900}" height="${s.h || 630}"></a>
-<div class="sponsor-copy"><span class="sponsor-tag">Sponsored</span><h2>${esc(s.headline)}</h2><p>${esc(s.text)}</p><a class="btn" ${linkAttrs(s)} data-sponsor="${esc(s.id)}">${esc(s.cta)} &rarr;</a>
-${s.affiliate ? `<p class="sponsor-note">Paid placement. Coachella Valley Spotlight earns a commission if you buy through this link.</p>` : `<p class="sponsor-note">Paid placement.</p>`}</div></aside>`).join("\n");
-};
+const adsFor = p => (D.sponsors || []).filter(s => (s.placements || []).includes("category:" + topCat(p)) && (!s.start || s.start <= TODAY_ISO) && (!s.until || s.until >= TODAY_ISO));
+// Off-site links open in a new tab with rel="sponsored nofollow"; links to our own pages (e.g. business/<slug>/) stay plain.
+const linkAttrs = s => /^https?:/.test(s.url) ? `href="${esc(s.url)}" target="_blank" rel="sponsored nofollow noopener"` : `href="${esc(s.url)}"`;
+const adNote = s => `<p class="sponsor-note">${s.affiliate ? "Paid placement. Coachella Valley Spotlight earns a commission if you buy through this link." : "Paid placement."}</p>`;
+const adImg = s => `<a class="sponsor-img" ${linkAttrs(s)} data-sponsor="${esc(s.id)}"><img src="${esc(s.image)}" alt="${esc(s.alt)}" loading="lazy" width="${s.w || 900}" height="${s.h || 630}"></a>`;
+const adBtn = s => `<a class="btn" ${linkAttrs(s)} data-sponsor="${esc(s.id)}">${esc(s.cta)} &rarr;</a>`;
+const sponsorBand = p => adsFor(p).map(s => `<aside class="sponsor-band" aria-label="Sponsored: ${esc(s.name)}">${adImg(s)}
+<div class="sponsor-copy"><span class="sponsor-tag">Sponsored</span><h2>${esc(s.headline)}</h2><p>${esc(s.text)}</p>${adBtn(s)}
+${adNote(s)}</div></aside>`).join("\n");
+const sponsorSide = p => { const s = adsFor(p)[0]; return s ? `<aside class="sponsor-side" aria-label="Sponsored: ${esc(s.name)}"><span class="sponsor-tag">Sponsored</span>${adImg(s)}
+<h2>${esc(s.headline)}</h2><p>${esc(s.short || s.text)}</p>${adBtn(s)}${adNote(s)}</aside>` : ""; };
 for (const p of landing) {
   const items = C.directory.filter(b => p.items.includes(b));
   const heading = p.kind === "city" ? `Local Businesses in ${p.city}, CA` : p.kind === "category" ? `${p.category} in the Coachella Valley` : `${p.category} in ${p.city}, CA`;
@@ -132,6 +135,7 @@ for (const p of landing) {
   // Activity pages (dog parks, hiking trails) get a hero photo, valley-wide and per city.
   const ACT_PHOTO = { "Dog parks": "dog-parks", "Hiking trails": "hiking-trails", "Pickleball": "pickleball", "Tennis": "tennis", "Swimming & water parks": "swimming", "Museums & attractions": "attractions", "Skate parks": "skate-parks", "Disc golf": "disc-golf", "Bowling": "bowling" };
   const fig = p.kind !== "city" && ACT_PHOTO[p.category] ? photoFigure(p.category, `assets/img/activities/${ACT_PHOTO[p.category]}.jpg`, p.category) : "";
+  const side = fig || sponsorSide(p);
   // Hiking trails pages: a "dogs allowed" filter and a desert hiking box.
   const hike = p.category === "Hiking trails";
   const dogTrails = hike ? items.filter(b => (b.features || []).includes("Dogs on leash")) : [];
@@ -153,16 +157,16 @@ for (const p of landing) {
   write(p.path, page({
     meta: { title: heading, description: `${heading}: ${andList(names)}${items.length > 3 ? " and more" : ""}. Phone numbers, websites and local deals on Coachella Valley Spotlight.`.slice(0, 300), url: p.path, noindex: !p.index },
     schema: [{ "@context": "https://schema.org", "@type": "ItemList", name: heading, itemListElement: items.map((b, i) => ({ "@type": "ListItem", position: i + 1, url: `${SITE}/business/${b.slug}/`, name: b.name })) }, breadcrumbs(trail)],
-    body: `<section class="page-hero"><div class="wrap${fig ? " city-hero" : ""}">${fig ? "<div>" : ""}
+    body: `<section class="page-hero"><div class="wrap${side ? " city-hero" : ""}">${side ? "<div>" : ""}
 <nav class="crumbs" aria-label="Breadcrumb"><a href="directory">Directory</a>${p.kind === "combo" && landing.some(o => o.kind === "city" && o.city === p.city) ? ` &rsaquo; <a href="local/${slugify(p.city)}/">${esc(p.city)}</a>` : ""}</nav>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>Local directory</span>
 <h1>${esc(heading)}</h1>
 ${intro.map(t => `<p>${esc(t)}</p>`).join("\n")}
 <p>${esc(countLine)}</p>
 ${subChips}
-${fig ? `</div>${fig}` : ""}</div></section>
+${side ? `</div>${side}` : ""}</div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
-${sponsorBand(p)}
+${fig ? sponsorBand(p) : ""}
 ${dogFilter}
 <div class="grid">${cards("directory", items)}</div>
 ${nearLine}

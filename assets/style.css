@@ -815,3 +815,11 @@ main:focus { outline: none; }
 .sponsor-tag { display: inline-block; font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; }
 .sponsor-copy .sponsor-note { font-size: 13px; margin: 10px 0 0; }
 @media (max-width: 700px) { .sponsor-band { grid-template-columns: 1fr; } }
+/* Sponsored card in the hero's right column (pages without a hero photo) */
+.sponsor-side { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: var(--s2); }
+.sponsor-side .sponsor-img { display: block; margin: 10px 0 12px; }
+.sponsor-side .sponsor-img img { display: block; width: 100%; height: auto; max-height: 260px; object-fit: contain; border-radius: 10px; }
+.sponsor-side h2 { font-size: 22px; margin: 0 0 6px; }
+.sponsor-side p { font-size: 15px; color: var(--ink-2); margin: 0 0 12px; }
+.sponsor-side .btn { width: 100%; justify-content: center; text-align: center; }
+.sponsor-side .sponsor-note { font-size: 12.5px; margin: 10px 0 0; }
