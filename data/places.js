@@ -84,6 +84,12 @@ window.CVS.places = {
     "Wallpaper installation": "Wallpaper installers hang everything from a single accent wall to murals and premium wallcoverings, and prep the walls so it lasts.",
     "Acupuncture": "Local acupuncturists offer acupuncture and herbal medicine for pain, stress, autoimmune conditions and overall wellness. These are licensed, independent practices.",
     "Weight loss": "Local medical weight loss clinics offer physician-supervised programs, including GLP-1 medications, B12 injections and nutrition guidance.",
-    "Italian restaurants": "Locally owned Italian restaurants serving pasta, pizza and dinner with a bar, from long-running family dining rooms to newer spots."
+    "Italian restaurants": "Locally owned Italian restaurants serving pasta, pizza and dinner with a bar, from long-running family dining rooms to newer spots.",
+    "Breweries": "Local craft breweries and taprooms brewing their own beer in the valley, with weekly events like trivia nights and live music.",
+    "Auto repair": "Independent auto repair shops for brakes, alignment, A/C, diagnostics, tires and smog checks. Desert heat is hard on batteries, cooling systems and A/C, so a trusted local mechanic is worth having.",
+    "Garage doors": "Garage door companies install and repair doors, springs and openers, plus driveway gate operators. Heat, wind and sun wear out springs and seals faster here.",
+    "Plant nurseries": "Nurseries selling desert trees, palms, cactus, succulents and shrubs that can handle a valley summer, often grown right here.",
+    "Gift shops": "Local gift and card shops for greeting cards, gifts, ornaments and seasonal decor.",
+    "Custom printing": "Local print shops for custom t-shirts, screen printing, embroidery and branded merch for businesses, teams and events."
   }
 };
