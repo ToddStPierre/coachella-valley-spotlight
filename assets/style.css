@@ -793,3 +793,16 @@ main:focus { outline: none; }
 .guide-day .grid-2 { margin-top: var(--s2); }
 .guide-faq h3 { font-size: 20px; margin: var(--s3) 0 6px; }
 .guide-faq p { max-width: 760px; }
+
+/* Welcome guide (/welcome) */
+.welcome-paths { margin-top: var(--s2); }
+.welcome-sec h3 { font-size: 21px; margin: var(--s3) 0 8px; }
+.welcome-sec p, .welcome-sec li { max-width: 820px; }
+.welcome-sec ul, .welcome-check { padding-left: 1.2em; }
+.welcome-sec li { margin-bottom: 8px; }
+.welcome-check li::marker { color: var(--sun-deep); font-weight: 700; }
+.welcome-table { min-width: 760px; }
+.welcome-table th[scope="row"] { text-align: left; white-space: nowrap; }
+.welcome-table td, .welcome-table th { vertical-align: top; }
+.welcome-note { font-size: 15px; color: var(--ink-2); margin-top: var(--s2); }
+.welcome-table tbody th { font-family: var(--body); text-transform: none; letter-spacing: 0; font-size: 15px; color: var(--ink); font-weight: 600; }
