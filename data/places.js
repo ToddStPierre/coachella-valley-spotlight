@@ -98,6 +98,13 @@ window.CVS.places = {
     "Dermatology": "Dermatology practices for skin checks, skin cancer treatment, acne care and cosmetic skin procedures. Sun protection matters in the desert.",
     "Optometrists": "Local optometrists for eye exams, contact lens fittings and eyewear. Desert sun and dust make regular eye care worth it.",
     "Hair salons and barbers": "Hair salons and barbershops for cuts, color, styling and grooming.",
-    "Laundry service": "Local wash, dry and fold laundry services, with drop-off or pickup and delivery."
+    "Laundry service": "Local wash, dry and fold laundry services, with drop-off or pickup and delivery.",
+    "Pool builders": "Pool builders design and build new pools and spas, and remodel older ones with new plaster, tile, decking and equipment. Ask about permits and how long the yard will be torn up.",
+    "Tree care": "Arborists and tree services for desert trees and palms: health checks, treatment, trimming and removal. Monsoon winds make pruning before summer worth it.",
+    "Painting": "House painters for interiors and exteriors. Desert sun fades and cracks exterior paint faster than most places, so stucco and trim need repainting more often.",
+    "Window cleaning": "Window cleaners for homes and businesses, often with solar panel cleaning too. Dust storms and hard water spots make regular cleaning worth it here.",
+    "Carpet cleaning": "Carpet, upholstery and rug cleaners, many also doing tile and grout. A good time to book is before the snowbirds arrive or after they leave.",
+    "Blinds and shutters": "Window covering companies for shutters, blinds, solar shades and motorized shades. Blocking the afternoon sun can cut cooling bills noticeably.",
+    "Glass and mirrors": "Glass contractors for shower enclosures, custom mirrors, table tops and glass repair."
   }
 };
