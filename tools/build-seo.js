@@ -38,7 +38,7 @@ const andList = a => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " a
 const app = fs.readFileSync(path.join(root, "assets/app.js"), "utf8");
 const ctx = { window: { CVS: D }, document: { documentElement: { getAttribute: () => "" } }, URL };
 vm.runInNewContext(app.slice(app.indexOf("{") + 1, app.indexOf("/* PRERENDER-END")) +
-  "\n;__out = { R: R, events: events, deals: deals, news: news, directory: directory, pickList: pickList, eventSlug: eventSlug, parse: parse, MONTHS_LONG: MONTHS_LONG, googleCal: googleCal, calLinks: calLinks, listBand: listBand };", ctx);
+  "\n;__out = { R: R, events: events, deals: deals, news: news, directory: directory, pickList: pickList, eventSlug: eventSlug, parse: parse, MONTHS_LONG: MONTHS_LONG, googleCal: googleCal, calLinks: calLinks, listBand: listBand, windowFor: windowFor, inWindow: inWindow, iso: iso };", ctx);
 const C = ctx.__out;
 const listBand = C.listBand;
 const TYPE = { events: "event", deals: "deal", news: "news", directory: "directory" };
@@ -227,6 +227,73 @@ ${typeMenu}
   cityPaths.push(url);
 }
 
+/* 3c. This weekend: this-weekend/ for the valley and this-weekend/<city>/ for each city page.
+   Fixed URLs that refill every build (every 3 hours), so they can rank for "things to do this weekend".
+   Mon to Thu shows the coming Fri to Sun; Fri to Sun shows today through Sunday (same window as events?when=weekend).
+   City pages are always built so their URLs never 404, but are noindex (and left out of the sitemap) under 3 events. */
+fs.rmSync(path.join(root, "this-weekend"), { recursive: true, force: true });
+const weekendPaths = [];
+{
+  const w = C.windowFor("weekend"), days = [];
+  for (let d = C.parse(w[0]); C.iso(d) <= w[1]; d.setDate(d.getDate() + 1)) days.push(C.iso(d));
+  const dayName = s => C.parse(s).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  const short = s => C.parse(s).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const range = days.length > 1 ? `${short(days[0])}–${short(days[days.length - 1])}` : short(days[0]);
+  const longRange = days.length > 1 ? `${dayName(days[0])} to ${dayName(days[days.length - 1])}` : dayName(days[0]);
+  const all = C.events.filter(e => C.inWindow(e, w));
+  // Multi-day events that run every day of the window go in "All weekend" instead of repeating under each day.
+  const allWeekend = e => !e.dates && e.endDate && e.date <= w[0] && e.endDate >= w[1] && days.length > 1;
+  const isFree = e => /\bfree\b/i.test((e.description || "") + " " + (e.time || "")) && !/\$\d/.test(e.description || "");
+  const weekendPage = (city, items, url) => {
+    const where = city || "the Coachella Valley", whereShort = city || "the valley";
+    const cities = [...new Set(items.map(e => e.city))];
+    const free = items.filter(isFree);
+    const picks = items.filter(e => !e.feed).concat(items.filter(e => e.feed)).slice(0, 3).map(e => e.title);
+    let body = `<section class="page-hero"><div class="wrap city-hero no-photo"><div>
+<nav class="crumbs" aria-label="Breadcrumb"><a href="./">Home</a> &rsaquo; <a href="events">Events</a> &rsaquo; ${city ? `<a href="this-weekend/">This weekend</a> &rsaquo; ${esc(city)}` : "This weekend"}</nav>
+<span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>${esc(longRange)}</span>
+<h1>Things to Do This Weekend in <span class="grad">${esc(where)}.</span></h1>
+<p>${items.length ? `${items.length} event${items.length === 1 ? "" : "s"} ${city ? `in ${esc(city)}` : `across ${cities.length} ${cities.length === 1 ? "city" : "cities"}`} this weekend${picks.length ? `, including ${esc(andList(picks))}` : ""}.${free.length ? ` ${free.length} of them ${free.length === 1 ? "is" : "are"} free.` : ""} This page updates on its own every few hours.` : `Nothing is on the calendar in ${esc(where)} this weekend yet. Here&rsquo;s what&rsquo;s happening nearby.`}</p>
+<div class="chips">${days.map(d => `<a class="chip" href="${url}#${d}">${esc(C.parse(d).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }))}</a>`).join("")}<a class="chip" href="events">Full calendar</a></div>
+</div></div></section>
+<section style="padding-bottom:var(--s5)"><div class="wrap">`;
+    const group = (id, h, list) => list.length ? `<section class="guide-day" id="${id}"><h2 class="month-head"><span class="stripe-mini"></span>${h}</h2><div class="grid-2">${cards("events", list)}</div></section>` : "";
+    const long = items.filter(allWeekend);
+    body += group("all-weekend", "All weekend long", long);
+    // A feed show that opened earlier ("& Juliet", Oct 29 to Nov 1) shows that day's date on its card, not its opening night.
+    // Hand-entered events keep their own date, because their event/<slug>/ link is built from it.
+    const onDay = (e, d) => e.feed && e.date < d ? Object.assign({}, e, { date: d }) : e;
+    for (const d of days) body += group(d, esc(dayName(d)), items.filter(e => !allWeekend(e) && C.inWindow(e, [d, d])).map(e => onDay(e, d)));
+    if (!items.length) {
+      const near = all.slice().sort((a, b) => cityDist(city, a.city) - cityDist(city, b.city)).slice(0, 8);
+      body += near.length ? group("nearby", "Nearby this weekend", near) : `<div class="empty">Nothing on the calendar yet. Check back soon.</div>`;
+    }
+    // City links (valley page) or a link back up (city pages).
+    const counts = CITY_PAGES.map(c => [c, all.filter(e => e.city === c).length]).filter(x => x[1]);
+    body += city ? `<p style="margin-top:var(--s4)"><a href="this-weekend/">Everything happening in the Coachella Valley this weekend &rarr;</a></p>`
+      : counts.length ? `<div class="browse-links"><h2 class="month-head"><span class="stripe-mini"></span>This weekend by city</h2><ul class="link-list">${counts.map(([c, n]) => `<li><a href="this-weekend/${slugify(c)}/">${esc(c)} (${n})</a></li>`).join("")}</ul></div>` : "";
+    body += `<div class="seo-copy guide-faq"><h2>This weekend in ${esc(whereShort)}: quick answers</h2>
+<h3>What is there to do in ${esc(where)} this weekend?</h3><p>${items.length ? `${items.length} things are on the calendar for ${esc(longRange)}. ${esc(andList(items.slice(0, 5).map(e => `${e.title} (${e.city})`)))}${items.length > 5 ? ", and more listed above" : ""}.` : `Nothing is listed in ${esc(where)} this weekend yet. Nearby events are listed above.`}</p>
+<h3>What is free to do this weekend?</h3><p>${free.length ? `${esc(andList(free.slice(0, 6).map(e => e.title)))}${free.length > 6 ? `, plus ${free.length - 6} more` : ""}.` : "Nothing on this weekend&rsquo;s list is marked free. Farmers markets, parks and hiking trails always are."} See <a href="local/hiking-trails/">hiking trails</a> and <a href="local/dog-parks/">dog parks</a> for free things to do any day.</p>
+<p>Times and details come from each organizer and can change, so check the event&rsquo;s own page before you go. Hosting something that isn&rsquo;t here? <a href="submit">Add it free</a>.</p></div>
+</div></section>`;
+    const title = `Things to Do This Weekend in ${city ? city + ", CA" : "the Coachella Valley"} (${range})`;
+    const description = (items.length ? `${items.length} things to do in ${where} this weekend, ${range}: ${andList(picks)}${free.length ? `, plus ${free.length} free events` : ""}. Updated every few hours.` : `What's happening in and near ${where} this weekend, ${range}.`).slice(0, 300);
+    const shown = items.length ? items : [];
+    write(url, page({
+      meta: { title, description, url, noindex: city && items.length < INDEX_MIN_WEEKEND },
+      schema: [{ "@context": "https://schema.org", "@type": "CollectionPage", name: title, description,
+        mainEntity: { "@type": "ItemList", itemListElement: shown.slice(0, 30).map((e, i) => ({ "@type": "ListItem", position: i + 1, name: e.title, url: e.feed ? e.url || undefined : `${SITE}/event/${C.eventSlug(e)}/` })) } },
+        breadcrumbs([["Home", ""], ["Events", "events"], ["This weekend", "this-weekend/"]].concat(city ? [[city, url]] : []))],
+      body
+    }).replace('<script src="data/events.js"></script><script src="assets/app.js"></script>', DATA_SCRIPTS + '<script src="assets/app.js"></script>'));
+    if (!city || items.length >= INDEX_MIN_WEEKEND) weekendPaths.push(url);
+  };
+  const INDEX_MIN_WEEKEND = 3;
+  weekendPage(null, all, "this-weekend/");
+  for (const city of CITY_PAGES) weekendPage(city, all.filter(e => e.city === city), `this-weekend/${slugify(city)}/`);
+}
+
 /* 1b. Pre-render the card lists into the hub pages, plus the browse links on the directory page. */
 const empty = '<div class="empty">Nothing here yet. Check back soon.</div>';
 function eventsByMonth(items) {
@@ -294,7 +361,7 @@ const golfCtx = { window: {} };
 if (fs.existsSync(path.join(root, "data", "golf.js"))) require("vm").runInNewContext(fs.readFileSync(path.join(root, "data", "golf.js"), "utf8"), golfCtx);
 const golfPaths = ((golfCtx.window.CVS || {}).golf || []).map(c => `golf/${c.slug}/`);
 const urls = ["", "directory", "deals", "events", "halloween", "welcome", "golf/", "advertise", "submit", "story", "contact", "mailing-area-el-paseo", "mailing-area-sun-city", "mailing-calendar", "pricing", "legal"]
-  .concat(cityPaths, list.map(b => `business/${b.slug}/`), eventPaths, landing.filter(p => p.index).map(p => p.path), golfPaths);
+  .concat(cityPaths, weekendPaths, list.map(b => `business/${b.slug}/`), eventPaths, landing.filter(p => p.index).map(p => p.path), golfPaths);
 fs.writeFileSync(path.join(root, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(u => `  <url><loc>${esc(SITE + "/" + u)}</loc></url>`).join("\n")}
