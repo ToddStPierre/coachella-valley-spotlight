@@ -21,7 +21,8 @@
       }).join("");
       var owners = d.owners.map(function (o) {
         return '<tr><td><strong>' + esc(nameOf(o.slug)) + '</strong></td><td>' + esc(o.name) + '<br>' + esc(o.email) + '</td><td>' + (o.revoked ? 'Link cancelled' : '<a href="' + esc(link(o)) + '" target="_blank" rel="noopener">Open dashboard</a> &middot; <a href="#" data-copylink="' + esc(link(o)) + '">Copy link</a>') +
-          '</td><td>' + (o.revoked ? '<button class="btn btn-ghost" data-approve="' + esc(o.slug) + '" data-name="' + esc(o.name) + '" data-email="' + esc(o.email) + '">Re-approve</button>' : '<button class="btn btn-ghost" data-revoke="' + esc(o.slug) + '">Cancel link</button>') + '</td></tr>';
+          '</td><td class="own-actions">' + (o.revoked ? '<button class="btn btn-ghost" data-approve="' + esc(o.slug) + '" data-name="' + esc(o.name) + '" data-email="' + esc(o.email) + '">Re-approve</button>' : '<button class="btn btn-ghost" data-newlink="' + esc(o.slug) + '" title="The old dashboard link stops working. The owner keeps access by signing in.">New link</button>') +
+          ' <button class="btn btn-ghost own-remove" data-remove="' + esc(o.slug) + '" data-label="' + esc(nameOf(o.slug)) + '" data-who="' + esc(o.name || o.email) + '">Remove owner</button></td></tr>';
       }).join("");
       box.innerHTML = '<h2 class="month-head"><span class="stripe-mini"></span>Claim requests</h2>' +
         '<p class="risk">Call the business to confirm the person really works there before approving.</p>' +
@@ -37,15 +38,18 @@
   }
   var msg = function (t) { status.textContent = t; };
   box.addEventListener("click", function (e) {
-    var a = e.target.closest("[data-approve],[data-reject],[data-revoke],[data-copylink]"); if (!a) return;
+    var a = e.target.closest("[data-approve],[data-reject],[data-revoke],[data-newlink],[data-remove],[data-copylink]"); if (!a) return;
     e.preventDefault();
     if (a.dataset.copylink) { navigator.clipboard.writeText(a.dataset.copylink); a.textContent = "Copied"; return; }
+    if (a.dataset.remove && !confirm("Remove " + a.dataset.who + " as the owner of " + a.dataset.label + "?\n\nThey lose access to the dashboard and their account, and the listing goes back to unclaimed. Anyone can claim it again later.")) return;
     a.disabled = true; msg("Working…");
     var job = a.dataset.approve ? post("/admin/approve", { b: a.dataset.approve, claim: a.dataset.claim ? +a.dataset.claim : undefined, name: a.dataset.name, email: a.dataset.email })
       : a.dataset.reject ? post("/admin/reject", { claim: +a.dataset.reject })
+      : a.dataset.newlink ? post("/admin/newlink", { b: a.dataset.newlink })
+      : a.dataset.remove ? post("/admin/remove", { b: a.dataset.remove })
       : post("/admin/revoke", { b: a.dataset.revoke });
     job.then(function (d) {
-      msg(d.key ? "Approved. The dashboard link is in the Owners table below. Copy it and send it to the owner." : "Done.");
+      msg(d.key ? "Approved. The owner can now create an account at coachellavalleyspotlight.com/account with the claim email." : d.removed ? "Owner removed. " + nameOf(d.removed) + " is unclaimed again (the site updates in a minute or two)." : a.dataset.newlink ? "New link made. The old dashboard link no longer works." : "Done.");
       load();
     }).catch(function (err) { msg(err.message); a.disabled = false; });
   });
