@@ -36,3 +36,11 @@ jobs:
           path: .
       - id: deployment
         uses: actions/deploy-pages@v4
+      # Tell Bing/IndexNow what changed: every page on a push or manual run; on the schedule, only the self-refreshing
+      # pages, once a day (the 08:xx UTC run, just after midnight Pacific when the weekend window can move).
+      - name: IndexNow
+        continue-on-error: true
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then node tools/indexnow.js all
+          elif [ "$(date -u +%H)" = "08" ]; then node tools/indexnow.js fresh
+          fi
