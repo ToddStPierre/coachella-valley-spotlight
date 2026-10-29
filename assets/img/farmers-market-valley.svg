@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="fm-t">
+<title id="fm-t">A morning farmers market in the Coachella Valley: striped stalls with crates of oranges, dates and greens under the mountains and palm trees</title>
+<defs>
+  <linearGradient id="fm-sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f7e3c0"/>
+    <stop offset=".6" stop-color="#f5c890"/>
+    <stop offset="1" stop-color="#f0a33a"/>
+  </linearGradient>
+  <radialGradient id="fm-sun" cx=".5" cy=".5" r=".5">
+    <stop offset="0" stop-color="#fff3d6"/>
+    <stop offset=".6" stop-color="#ffd27a"/>
+    <stop offset="1" stop-color="#f0a33a"/>
+  </radialGradient>
+  <radialGradient id="fm-glow" cx=".5" cy=".5" r=".5">
+    <stop offset="0" stop-color="#fff3d6" stop-opacity=".7"/>
+    <stop offset="1" stop-color="#fff3d6" stop-opacity="0"/>
+  </radialGradient>
+  <pattern id="fm-stripe-a" width="40" height="10" patternUnits="userSpaceOnUse">
+    <rect width="20" height="10" fill="#d9552b"/><rect x="20" width="20" height="10" fill="#fffaf3"/>
+  </pattern>
+  <pattern id="fm-stripe-b" width="40" height="10" patternUnits="userSpaceOnUse">
+    <rect width="20" height="10" fill="#2e5c4f"/><rect x="20" width="20" height="10" fill="#fffaf3"/>
+  </pattern>
+</defs>
+<rect width="640" height="360" fill="url(#fm-sky)"/>
+<circle cx="120" cy="96" r="92" fill="url(#fm-glow)"/>
+<circle cx="120" cy="96" r="44" fill="url(#fm-sun)"/>
+
+<!-- mountains -->
+<path d="M0 360 L0 196 L90 150 L170 190 L250 128 L340 184 L420 146 L500 192 L580 140 L640 172 L640 360 Z" fill="#c9667a" opacity=".55"/>
+<path d="M0 360 L0 226 L110 196 L200 222 L290 190 L380 224 L470 200 L560 228 L640 206 L640 360 Z" fill="#5b4a7a" opacity=".7"/>
+<path d="M0 360 L0 262 L170 252 L340 266 L500 254 L640 262 L640 360 Z" fill="#e9d6b8"/>
+
+<!-- palms -->
+<g fill="#2e5c4f">
+  <path d="M584 268 C586 222 590 186 598 150 L602 150 C596 186 594 222 594 268 Z" fill="#7a5a3a"/>
+  <path d="M600 152 C580 138 560 140 546 150 C566 140 584 146 600 156 Z"/>
+  <path d="M600 152 C616 134 636 134 648 144 C630 138 614 146 602 158 Z"/>
+  <path d="M600 152 C592 130 576 122 560 124 C578 128 590 138 598 156 Z"/>
+  <path d="M600 152 C612 128 630 120 642 122 C626 128 612 140 604 156 Z"/>
+  <path d="M600 152 C590 160 580 176 578 190 C586 174 594 164 604 156 Z"/>
+  <path d="M30 266 C32 230 35 202 41 176 L44 176 C40 202 38 230 38 266 Z" fill="#7a5a3a"/>
+  <path d="M42 178 C28 168 14 170 4 176 C18 170 30 174 42 182 Z"/>
+  <path d="M42 178 C54 165 68 165 78 172 C64 168 52 174 44 184 Z"/>
+  <path d="M42 178 C36 162 25 156 13 158 C26 161 35 168 40 182 Z"/>
+  <path d="M42 178 C51 160 64 154 74 156 C62 160 52 168 46 182 Z"/>
+</g>
+
+<!-- ground -->
+<rect x="0" y="300" width="640" height="60" fill="#d9c3a0"/>
+<path d="M0 300 L640 300" stroke="#c4ab84" stroke-width="2"/>
+
+<!-- stall 1 (sun orange) -->
+<g>
+  <rect x="94" y="196" width="6" height="108" fill="#5d5048"/>
+  <rect x="268" y="196" width="6" height="108" fill="#5d5048"/>
+  <path d="M84 182 L284 182 L272 162 L96 162 Z" fill="url(#fm-stripe-a)"/>
+  <path d="M84 182 Q96 196 108 182 Q120 196 132 182 Q144 196 156 182 Q168 196 180 182 Q192 196 204 182 Q216 196 228 182 Q240 196 252 182 Q264 196 276 182 Q280 188 284 182 Z" fill="#d9552b"/>
+  <rect x="104" y="250" width="160" height="12" rx="2" fill="#7a5a3a"/>
+  <rect x="104" y="262" width="160" height="40" fill="#b88a5a"/>
+  <path d="M104 276 L264 276 M104 290 L264 290" stroke="#9c7248" stroke-width="2"/>
+  <!-- oranges -->
+  <rect x="112" y="232" width="44" height="20" rx="2" fill="#9c7248"/>
+  <g fill="#f0a33a"><circle cx="120" cy="230" r="7"/><circle cx="134" cy="229" r="7"/><circle cx="148" cy="230" r="7"/><circle cx="127" cy="221" r="7"/><circle cx="141" cy="221" r="7"/></g>
+  <!-- dates -->
+  <rect x="162" y="232" width="44" height="20" rx="2" fill="#9c7248"/>
+  <g fill="#6b3a26"><ellipse cx="170" cy="229" rx="5" ry="7"/><ellipse cx="181" cy="228" rx="5" ry="7"/><ellipse cx="192" cy="229" rx="5" ry="7"/><ellipse cx="176" cy="220" rx="5" ry="7"/><ellipse cx="187" cy="220" rx="5" ry="7"/><ellipse cx="200" cy="228" rx="4" ry="6"/></g>
+  <!-- tomatoes -->
+  <rect x="212" y="232" width="44" height="20" rx="2" fill="#9c7248"/>
+  <g fill="#c94a3a"><circle cx="220" cy="230" r="7"/><circle cx="234" cy="229" r="7"/><circle cx="248" cy="230" r="7"/><circle cx="227" cy="221" r="7"/><circle cx="241" cy="221" r="7"/></g>
+</g>
+
+<!-- stall 2 (palm green) -->
+<g>
+  <rect x="330" y="206" width="6" height="98" fill="#5d5048"/>
+  <rect x="510" y="206" width="6" height="98" fill="#5d5048"/>
+  <path d="M320 192 L526 192 L514 172 L332 172 Z" fill="url(#fm-stripe-b)"/>
+  <path d="M320 192 Q332 206 344 192 Q356 206 368 192 Q380 206 392 192 Q404 206 416 192 Q428 206 440 192 Q452 206 464 192 Q476 206 488 192 Q500 206 512 192 Q519 200 526 192 Z" fill="#2e5c4f"/>
+  <rect x="340" y="256" width="166" height="12" rx="2" fill="#7a5a3a"/>
+  <rect x="340" y="268" width="166" height="34" fill="#b88a5a"/>
+  <path d="M340 282 L506 282 M340 294 L506 294" stroke="#9c7248" stroke-width="2"/>
+  <!-- greens -->
+  <rect x="348" y="238" width="46" height="20" rx="2" fill="#9c7248"/>
+  <g fill="#4f8a5b"><path d="M352 238 C354 222 362 218 366 234 Z"/><path d="M360 238 C364 218 374 216 376 236 Z"/><path d="M370 238 C374 220 384 220 386 236 Z"/><path d="M380 238 C384 224 392 224 392 238 Z"/></g>
+  <!-- lemons -->
+  <rect x="400" y="238" width="46" height="20" rx="2" fill="#9c7248"/>
+  <g fill="#f2d34f"><ellipse cx="409" cy="235" rx="7" ry="6"/><ellipse cx="423" cy="234" rx="7" ry="6"/><ellipse cx="437" cy="235" rx="7" ry="6"/><ellipse cx="416" cy="226" rx="7" ry="6"/><ellipse cx="430" cy="226" rx="7" ry="6"/></g>
+  <!-- flowers -->
+  <rect x="456" y="226" width="20" height="32" rx="3" fill="#5b4a7a"/>
+  <g><path d="M466 226 L462 206 M466 226 L470 204 M466 226 L466 202" stroke="#2e5c4f" stroke-width="2"/>
+    <circle cx="462" cy="204" r="6" fill="#c9667a"/><circle cx="471" cy="202" r="6" fill="#f0a33a"/><circle cx="466" cy="198" r="6" fill="#fffaf3"/></g>
+  <rect x="482" y="232" width="18" height="26" rx="3" fill="#5b4a7a" opacity=".8"/>
+  <g><path d="M491 232 L488 216 M491 232 L494 214" stroke="#2e5c4f" stroke-width="2"/>
+    <circle cx="488" cy="214" r="5" fill="#d9552b"/><circle cx="495" cy="212" r="5" fill="#c9667a"/></g>
+</g>
+
+<!-- basket in front -->
+<g>
+  <path d="M286 318 L326 318 L320 344 L292 344 Z" fill="#b88a5a"/>
+  <path d="M290 318 Q306 292 322 318" fill="none" stroke="#7a5a3a" stroke-width="3"/>
+  <circle cx="298" cy="314" r="6" fill="#f0a33a"/><circle cx="310" cy="312" r="6" fill="#c94a3a"/><path d="M314 316 C316 302 324 300 324 316 Z" fill="#4f8a5b"/>
+</g>
+</svg>
