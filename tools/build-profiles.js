@@ -37,7 +37,8 @@ for (const b of list) {
     phone: ico('<path d="M5 4h3.5l1.5 4-2 1.5a11 11 0 0 0 6.5 6.5L16 14l4 1.5V19a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/>'),
     web: ico('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3Z"/>'),
     area: ico('<path d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3Z"/><path d="M9 4v13M15 7v13"/>'),
-    clock: ico('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')
+    clock: ico('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+    star: ico('<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z"/>')
   };
   const SOCIAL = { facebook: "Facebook", instagram: "Instagram", tiktok: "TikTok", yelp: "Yelp", youtube: "YouTube", x: "X" };
   const social = Object.keys(SOCIAL).filter(k => b.social && b.social[k]);
@@ -83,6 +84,7 @@ ${offer ? `<div class="pf-card"><h2>Deals</h2><div class="pf-deal">${b.image ? `
 ${b.address ? `<li>${I.pin}<span>${esc(b.address)}</span></li>` : ""}
 ${tel ? `<li>${I.phone}<a href="tel:${tel}" data-track="call">${esc(b.phone)}</a></li>` : ""}
 ${b.url ? `<li>${I.web}<a href="${esc(outbound(b.url))}" target="_blank" rel="noopener" data-track="website">${b.public ? "Official page" : "Visit website"} &rarr;</a></li>` : ""}
+${b.googlePlaceId ? `<li class="pf-review">${I.star}<a href="https://search.google.com/local/writereview?placeid=${esc(b.googlePlaceId)}" target="_blank" rel="noopener" data-track="review">Leave a Google review &rarr;</a></li>` : ""}
 ${!b.address && b.area ? `<li>${I.area}<span>${esc(b.area)}</span></li>` : ""}
 ${!b.address && !b.area ? `<li>${I.area}<span>${esc(b.city)}, CA</span></li>` : ""}
 </ul>
