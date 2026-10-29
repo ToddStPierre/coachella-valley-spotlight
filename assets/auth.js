@@ -174,10 +174,10 @@ ${savedHTML()}
 <aside class="acct-side">
 ${isAdmin ? `<div class="card acct-card acct-owner"><h2>Site admin</h2><p>Stats for every listing, claims, sign-ups and form submissions.</p><a class="btn" href="${ROOT}stats.html">Open the admin page</a></div>` : ""}
 <div class="card acct-card"><h2>Your account</h2><p>${esc(user.email)}</p><button type="button" class="btn btn-ghost" data-act="out">Sign out</button></div>
+${mine && mine.listings && mine.listings.length ? `<div class="card acct-card acct-owner"><h2>Your business</h2>${mine.listings.map(l => `<p><b>${esc(l.name)}</b><br><a href="${ROOT}owner.html?b=${encodeURIComponent(l.slug)}">Manage listing and stats &rarr;</a></p>`).join("")}</div>` : ""}
 <div class="card acct-card"><h2>Email preferences</h2><form class="acct-prefs">${PREFS.map(([k, t]) => `<label class="acct-check"><input type="checkbox" name="${k}"${p[k] ? " checked" : ""}> ${t}</label>`).join("")}
 <button class="btn" type="submit">Save preferences</button><p class="form-status" role="status" aria-live="polite"></p></form></div>
-${mine && mine.listings && mine.listings.length ? `<div class="card acct-card acct-owner"><h2>Your business</h2>${mine.listings.map(l => `<p><b>${esc(l.name)}</b><br><a href="${ROOT}owner.html?b=${encodeURIComponent(l.slug)}">Manage listing and stats &rarr;</a></p>`).join("")}</div>`
-  : `<div class="card acct-card"><h2>Own a local business?</h2>${mine && mine.notice ? `<p><b>${esc(mine.notice)}</b></p>` : ""}<p>Find your listing and tap &ldquo;Claim this listing.&rdquo; Once we approve it, sign in here with the same email to manage it and see its stats.</p><a class="btn btn-ghost" href="${ROOT}directory">Find my business</a></div>`}
+${mine && mine.listings && mine.listings.length ? "" : `<div class="card acct-card"><h2>Own a local business?</h2>${mine && mine.notice ? `<p><b>${esc(mine.notice)}</b></p>` : ""}<p>Find your listing and tap &ldquo;Claim this listing.&rdquo; Once we approve it, sign in here with the same email to manage it and see its stats.</p><a class="btn btn-ghost" href="${ROOT}directory">Find my business</a></div>`}
 </aside></div>`;
   box.querySelector('[data-act="out"]').addEventListener("click", () => { try { sessionStorage.removeItem("cvs_admin"); } catch (e) {} signOut(auth); });
   const v = box.querySelector('[data-act="verify"]');
