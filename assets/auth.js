@@ -53,18 +53,35 @@ async function loadUser() {
   try {
     const snap = await getDoc(doc(db, "users", user.uid));
     data = snap.exists() ? Object.assign({ favorites: [], prefs: {} }, snap.data()) : { favorites: [], prefs: { news: true, deals: true, events: true } };
+    try { if (!sessionStorage.getItem("cvs_saves_synced")) { sessionStorage.setItem("cvs_saves_synced", "1"); syncSaves(); } } catch (e) {}
   } catch (e) { console.warn("[cvs-auth] load failed", e); }
   loaded = true;
 }
 async function saveUser(patch) {
   Object.assign(data, patch);
   await setDoc(doc(db, "users", user.uid), { email: user.email, favorites: data.favorites || [], prefs: data.prefs || {}, updatedAt: serverTimestamp() });
+  syncSaves();
+}
+// Tell the tracker this person's full saved list so it can count saves per business/event (never blocks the UI).
+async function syncSaves() {
+  if (!user) return;
+  try {
+    await fetch(OWNER_API + "/saves/sync", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + await user.getIdToken() }, body: JSON.stringify({ items: data.favorites || [] }) });
+  } catch (e) {}
 }
 
 /* ---------- hearts ---------- */
+// Public save counts: the tracker only returns items with 10+ saves, so small numbers never show.
+let saveCounts = {};
+fetch(OWNER_API + "/saves").then(r => r.ok ? r.json() : null).then(d => { if (d && d.counts) { saveCounts = d.counts; paintHearts(); } }).catch(() => {});
 function paintHearts() {
   const fav = new Set(data.favorites || []);
   document.querySelectorAll("[data-fav]").forEach(b => {
+    const n = saveCounts[b.getAttribute("data-fav")] || 0;
+    let c = b.querySelector(".fav-count");
+    if (n && !c) { c = document.createElement("b"); c.className = "fav-count"; b.appendChild(c); }
+    if (c) { c.textContent = n ? String(n) : ""; c.hidden = !n; }
+    if (n) b.setAttribute("aria-label", (b.getAttribute("aria-label") || "Save").replace(/\s*\(\d+ saved\)$/, "") + " (" + n + " saved)");
     const on = !!user && fav.has(b.getAttribute("data-fav"));
     b.setAttribute("aria-pressed", on ? "true" : "false");
     b.classList.toggle("on", on);

@@ -39,6 +39,8 @@
     document.getElementById("ow-sub").innerHTML = "Hi " + esc(d.owner.name || "there") + ". Update your listing below. Changes go live on the site in about a minute. <a href=\"business/" + esc(L.slug) + "/\" target=\"_blank\" rel=\"noopener\">View your public page &rarr;</a>";
     var html = '';
     html += '<p class="meta" style="font-family:var(--mono);font-size:13px;margin:0 0 8px">' + esc(L.category) + ' &middot; ' + esc(L.city) + ' &middot; ' + (L.premium ? '<span style="color:#7a4a00">PREMIUM LISTING</span>' : 'BASIC LISTING') + '</p>';
+    var sv = +d.saves || 0;
+    html += '<p class="ow-saves"><span class="ow-heart" aria-hidden="true">&#9829;</span> ' + (sv ? '<strong>' + sv + (sv === 1 ? ' person has' : ' people have') + ' saved ' + esc(L.name) + '</strong> to their My Spotlight.' : 'When people tap the heart on your listing to save it, you&rsquo;ll see how many here.') + (sv && !L.premium ? ' Premium puts your special offer in front of everyone who saved you.' : '') + '</p>';
 
     if (L.premium && d.stats) {
       var S = d.stats, months = Object.keys(S.months || {}).sort().reverse();
