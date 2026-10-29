@@ -334,7 +334,7 @@ const orphanSvc = landing.filter(o => o.kind === "category" && o.field === "serv
 const browseLinks = landing.length ? `<div class="browse-links"><h2 class="month-head"><span class="stripe-mini"></span>Browse by city and category</h2><div class="browse-cols"><div><h3>By city</h3>${byCityRows}</div><div><h3>By category</h3>${byCatRows}${orphanSvc.length ? browseRow("More", orphanSvc.length, orphanSvc.map(o => pill(o, o.category)).join("")) : ""}</div></div></div>` : "";
 /* Reads an opening tag's attributes into { name: value } (bare attributes get ""). */
 const attrsOf = str => { const a = {}; str.replace(/([\w-]+)(?:="([^"]*)")?/g, (m, k, v) => { a[k] = v === undefined ? "" : v; }); return a; };
-for (const file of ["index.html", "directory.html", "deals.html", "events.html", "news.html", "halloween.html", "welcome.html"]) {
+for (const file of ["index.html", "directory.html", "deals.html", "events.html", "news.html", "halloween.html", "welcome.html", "farmers-markets.html"]) {
   const p = path.join(root, file);
   let html = fs.readFileSync(p, "utf8");
   // Any empty data-list / data-browse block (or one holding only the "Turn on JavaScript" placeholder) gets its cards.
@@ -360,7 +360,7 @@ for (const file of ["index.html", "directory.html", "deals.html", "events.html",
 const golfCtx = { window: {} };
 if (fs.existsSync(path.join(root, "data", "golf.js"))) require("vm").runInNewContext(fs.readFileSync(path.join(root, "data", "golf.js"), "utf8"), golfCtx);
 const golfPaths = ((golfCtx.window.CVS || {}).golf || []).map(c => `golf/${c.slug}/`);
-const urls = ["", "directory", "deals", "events", "halloween", "welcome", "golf/", "advertise", "submit", "story", "contact", "mailing-area-el-paseo", "mailing-area-sun-city", "mailing-calendar", "pricing", "legal"]
+const urls = ["", "directory", "deals", "events", "halloween", "welcome", "farmers-markets", "golf/", "advertise", "submit", "story", "contact", "mailing-area-el-paseo", "mailing-area-sun-city", "mailing-calendar", "pricing", "legal"]
   .concat(cityPaths, weekendPaths, list.map(b => `business/${b.slug}/`), eventPaths, landing.filter(p => p.index).map(p => p.path), golfPaths);
 fs.writeFileSync(path.join(root, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
