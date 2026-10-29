@@ -37,8 +37,7 @@ for (const b of list) {
     phone: ico('<path d="M5 4h3.5l1.5 4-2 1.5a11 11 0 0 0 6.5 6.5L16 14l4 1.5V19a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/>'),
     web: ico('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3Z"/>'),
     area: ico('<path d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3Z"/><path d="M9 4v13M15 7v13"/>'),
-    clock: ico('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
-    star: ico('<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z"/>')
+    clock: ico('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')
   };
   const SOCIAL = { facebook: "Facebook", instagram: "Instagram", tiktok: "TikTok", yelp: "Yelp", youtube: "YouTube", x: "X" };
   const social = Object.keys(SOCIAL).filter(k => b.social && b.social[k]);
@@ -72,9 +71,10 @@ ${b.postcard || prem ? '<span class="pf-badge">' + (b.postcard ? "On the Spotlig
 <div class="cta-row">
 ${tel ? `<a class="btn" href="tel:${tel}" data-track="call">Call ${esc(b.phone)}</a>` : ""}
 ${b.url ? `<a class="btn btn-ghost" href="${esc(outbound(b.url))}" target="_blank" rel="noopener" data-track="website">Visit website &rarr;</a>` : ""}
+${b.googlePlaceId ? `<a class="btn btn-ghost" href="https://search.google.com/local/writereview?placeid=${esc(b.googlePlaceId)}" target="_blank" rel="noopener" data-track="review">Leave a Google review</a>` : ""}
 <button type="button" class="btn btn-ghost fav-btn" data-fav="biz:${slug}" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.4-9.3C1.4 8.3 3.2 4.8 6.6 4.5c2-.2 3.7.9 5.4 2.9 1.7-2 3.4-3.1 5.4-2.9 3.4.3 5.2 3.8 4 6.7-1.9 4.7-9.4 9.3-9.4 9.3Z"/></svg><span>Save</span></button>
 </div>
-${owner ? '<p class="risk">Tell them you found them on Coachella Valley Spotlight.</p>' : ""}
+${owner ? '<p class="pf-mention"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4Z"/><path d="M8 9.5h8M8 12.5h5"/></svg><span>Tell them you found them on <b>Coachella Valley Spotlight</b>.</span></p>' : ""}
 </div>
 <div class="pf-main">
 ${(prem && b.about) ? `<div class="pf-card"><h2>About</h2><p>${esc(b.about)}</p></div>` : ""}
@@ -82,9 +82,6 @@ ${offer ? `<div class="pf-card"><h2>Deals</h2><div class="pf-deal">${b.image ? `
 <div class="pf-card pf-contact">
 <ul>
 ${b.address ? `<li>${I.pin}<span>${esc(b.address)}</span></li>` : ""}
-${tel ? `<li>${I.phone}<a href="tel:${tel}" data-track="call">${esc(b.phone)}</a></li>` : ""}
-${b.url ? `<li>${I.web}<a href="${esc(outbound(b.url))}" target="_blank" rel="noopener" data-track="website">${b.public ? "Official page" : "Visit website"} &rarr;</a></li>` : ""}
-${b.googlePlaceId ? `<li class="pf-review">${I.star}<a href="https://search.google.com/local/writereview?placeid=${esc(b.googlePlaceId)}" target="_blank" rel="noopener" data-track="review">Leave a Google review &rarr;</a></li>` : ""}
 ${!b.address && b.area ? `<li>${I.area}<span>${esc(b.area)}</span></li>` : ""}
 ${!b.address && !b.area ? `<li>${I.area}<span>${esc(b.city)}, CA</span></li>` : ""}
 </ul>

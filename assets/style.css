@@ -866,3 +866,8 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .own-actions { white-space: nowrap; }
 .own-actions .own-remove { color: #a3321f; border-color: #e4b7ad; }
 .own-actions .own-remove:hover { background: #fbeae6; }
+
+/* Profile: "Tell them you found them on Coachella Valley Spotlight" callout */
+.pf-mention { display: inline-flex; align-items: center; gap: 12px; margin-top: 18px; padding: 12px 18px; background: #fff4e8; border: 1.5px solid var(--sun); border-left-width: 6px; border-radius: 12px; font-size: 17px; font-weight: 600; color: var(--ink); line-height: 1.35; }
+.pf-mention svg { flex: none; color: var(--sun-deep); }
+.pf-mention b { color: var(--sun-deep); }
