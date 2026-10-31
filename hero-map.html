@@ -44,10 +44,14 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://coachellavalleyspotlight.com/#org","name":"Coachella Valley Spotlight","url":"https://coachellavalleyspotlight.com/","telephone":"+1-760-422-5475","areaServed":{"@type":"Place","name":"Coachella Valley, California"},"description":"A local guide to the Coachella Valley: a free business directory, events calendar and local deals, plus the Spotlight shared postcard mailed to Palm Desert homes."},{"@type":"WebSite","@id":"https://coachellavalleyspotlight.com/#website","name":"Coachella Valley Spotlight","url":"https://coachellavalleyspotlight.com/","publisher":{"@id":"https://coachellavalleyspotlight.com/#org"}}]}</script>
 <style>
 /* PREVIEW ONLY: map-in-hero layout */
-.hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); gap: var(--s4); align-items: center; }
+.hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); gap: var(--s4); align-items: start; }
+.hero-grid .hero-inner > .eyebrow:first-child { margin-top: 0; }
 .hero-grid h1 { font-size: clamp(36px, 4.6vw, 56px); }
 .hero p.lede { font-size: 18.5px; }
-.hero-map { position: relative; z-index: 1; background: var(--paper); border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 2px 4px rgba(34,28,24,.05), 0 24px 48px -24px rgba(34,28,24,.35); padding: 12px; scroll-margin-top: 80px; }
+.hero-map { position: relative; z-index: 1; background: var(--paper); border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 2px 4px rgba(34,28,24,.05), 0 24px 48px -24px rgba(34,28,24,.35); padding: 12px; margin-top: 0; scroll-margin-top: 80px; }
+.hero-map .hp-slides { margin-top: 2px; }
+.hero-map .hp-slide:not(:first-child) { padding: 16px 6px 0; }
+.hero-map .hp-controls { margin: 10px 6px 2px; }
 .hero-map-head { display: flex; justify-content: space-between; align-items: center; padding: 4px 6px 10px; }
 .hero-map-head .eyebrow { margin: 0; }
 .hero-map .vmap { border-radius: 14px; box-shadow: none; }
@@ -63,12 +67,8 @@
 .hero-map .vm-pin[data-small]:hover .vm-label, .hero-map .vm-pin[data-small][aria-current="true"] .vm-label { display: block; }
 .hm-link { background: none; border: 0; padding: 4px; color: var(--ink-2); font-family: var(--body); font-size: 14px; text-decoration: underline; cursor: pointer; }
 .hm-link:hover { color: var(--sun-deep); } .hm-link[hidden] { display: none; }
-.now-band { margin-top: var(--s4); }
-.now-panel { margin: 0; }
-.now-panel .hp-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 @media (max-width: 900px) {
   .hero-grid { grid-template-columns: minmax(0, 1fr); }
-  .now-panel .hp-list { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 640px) { .hero-map { padding: 8px; border-radius: 18px; } }
 </style>
@@ -98,7 +98,7 @@
 <a class="chip" href="directory?category=Home%20services">Home services</a><a class="chip" href="directory?category=Restaurants">Restaurants</a></div>
 
 </div>
-<div class="hero-map" id="valley-map">
+<div class="hero-panel hero-map" id="valley-map" aria-roledescription="carousel">
 <div class="hero-map-head"><span class="eyebrow"><span class="stripe-mini"></span>Pick your town</span><button type="button" class="hm-link" id="localize-geo">&#128205; Use my location</button></div>
 <div class="vmap" id="vmap">
 <svg viewBox="0 0 1000 520" preserveAspectRatio="none" aria-hidden="true" focusable="false">
@@ -137,11 +137,21 @@
 <a class="vm-pin" href="city/coachella/" data-town="Coachella" data-lab="b" style="--x:88.8%;--y:84%"><span class="vm-dot"></span><span class="vm-label">Coachella</span></a>
 </div>
 <div class="vm-towns" id="vm-towns" role="group" aria-label="Choose a town"></div>
-<div class="vm-card" id="vm-card" aria-live="polite">
+<div class="hp-slides" aria-live="off">
+<div class="hp-slide is-on" role="group" aria-roledescription="slide" aria-label="Town spotlight"><div class="vm-card" id="vm-card" aria-live="polite">
 <span class="eyebrow"><span class="stripe-mini"></span>Spotlight on</span>
 <h3>Palm Desert</h3>
 <p class="vm-tag">El Paseo shopping, Highway 111 dining, and the middle of the valley.</p>
 <div class="vm-actions"><a class="btn" href="city/palm-desert/">Explore Palm Desert &rarr;</a></div>
+</div>
+</div>
+<div class="hp-slide hp-feature" hidden role="group" aria-roledescription="slide" aria-label="Halloween guide" data-until="2026-11-02"><span class="eyebrow"><span class="stripe-mini"></span>Halloween in the valley</span>
+<a class="hp-feature-title" href="halloween">Trick-or-treats, haunted houses and parties, town by town &rarr;</a>
+<ol class="hp-list" data-list="events" data-tag="halloween" data-limit="3" data-view="row"></ol>
+<a class="more" href="halloween">See the full Halloween guide &rarr;</a></div>
+<div class="hp-slide" role="group" aria-roledescription="slide" aria-label="This weekend" hidden><span class="eyebrow"><span class="stripe-mini"></span>This weekend</span><h2 id="hp-h" class="sr-only">This weekend</h2>
+<ol class="hp-list" data-when="weekend" data-list="events" data-limit="3" data-view="row"></ol>
+<a class="more" href="this-weekend/">See all weekend events &rarr;</a></div>
 </div>
 </div>
 </div><svg class="mountains" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
@@ -149,15 +159,6 @@
 <path d="M0 120 L0 96 L160 64 L260 88 L400 52 L520 90 L640 66 L760 92 L880 58 L1000 86 L1100 70 L1200 84 L1200 120 Z" fill="#5b4a7a" opacity=".55"/>
 <path d="M0 120 L0 108 L200 92 L380 108 L560 94 L760 110 L940 96 L1200 106 L1200 120 Z" fill="#221c18"/></svg></section>
 
-<div class="wrap now-band"><aside class="hero-panel now-panel" aria-labelledby="hp-h" aria-roledescription="carousel"><div class="hp-slides" aria-live="off">
-<div class="hp-slide hp-feature is-on" role="group" aria-roledescription="slide" aria-label="Halloween guide" data-until="2026-11-02"><span class="eyebrow"><span class="stripe-mini"></span>Halloween in the valley</span>
-<a class="hp-feature-title" href="halloween">Trick-or-treats, haunted houses and parties, town by town &rarr;</a>
-<ol class="hp-list" data-list="events" data-tag="halloween" data-limit="3" data-view="row"></ol>
-<a class="more" href="halloween">See the full Halloween guide &rarr;</a></div>
-<div class="hp-slide" role="group" aria-roledescription="slide" aria-label="This weekend" hidden><span class="eyebrow"><span class="stripe-mini"></span>This weekend</span><h2 id="hp-h" class="sr-only">This weekend</h2>
-<ol class="hp-list" data-when="weekend" data-list="events" data-limit="3" data-view="row"></ol>
-<a class="more" href="this-weekend/">See all weekend events &rarr;</a></div>
-</div></aside></div>
 <div class="wrap"><section id="search-results" class="section" hidden></section></div>
 
 <section class="section near-you" id="near-you" hidden><div class="wrap">
@@ -346,6 +347,7 @@
     pins.forEach(function (p) { if (p.getAttribute("data-town") === town) p.setAttribute("aria-current", "true"); else p.removeAttribute("aria-current"); });
     if (chips) [].forEach.call(chips.children, function (b) { var on = b.getAttribute("data-town") === town; b.setAttribute("aria-pressed", on ? "true" : "false"); if (on && track) b.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" }); });
     render(town);
+    if (track) { var d0 = document.querySelector(".hero-map .hp-dot"); if (d0 && d0.getAttribute("aria-current") !== "true") d0.click(); var pb = document.querySelector(".hero-map .hp-pause"); if (pb && pb.textContent === "Pause") pb.click(); }
     if (track && !window.CVS_NOTRACK && window.gtag) window.gtag("event", "map_town", { city: town });
   }
 
