@@ -457,6 +457,32 @@
     window.addEventListener("scroll", reveal, { passive: true });
   })();
 
+  // Mobile app-style tab bar: a persistent bottom nav (Home / Events / Deals / Directory / Search) on
+  // every page on a phone, so the four things people actually come back for are always one thumb-tap
+  // away instead of buried behind the hamburger menu. Site-wide, not per-page — this is how the whole
+  // site should feel on a phone. Skipped on business profiles, which already dock Call/Directions there.
+  (function () {
+    if (document.body.classList.contains("has-sticky-cta")) return;
+    var p = location.pathname;
+    function on(re) { return re.test(p); }
+    var tabs = [
+      { href: "", label: "Home", icon: "🏠", active: p === "/" || p === "/index.html" },
+      { href: "events", label: "Events", icon: "🎉", active: on(/\/(events|event|this-weekend)(\/|\.html|$)/) },
+      { href: "deals", label: "Deals", icon: "🏷️", active: on(/\/deals(\/|\.html|$)/) },
+      { href: "directory", label: "Directory", icon: "📒", active: on(/\/(directory|business)(\/|\.html|$)/) },
+      { href: "directory#f-q", label: "Search", icon: "🔍", active: false }
+    ];
+    var bar = document.createElement("nav");
+    bar.className = "tab-bar";
+    bar.setAttribute("aria-label", "Quick navigation");
+    bar.innerHTML = tabs.map(function (t) {
+      return '<a href="' + ROOT + t.href + '" class="tab' + (t.active ? " is-active" : "") + '"' + (t.active ? ' aria-current="page"' : "") +
+        '><span class="tab-icon" aria-hidden="true">' + t.icon + '</span><span class="tab-label">' + t.label + "</span></a>";
+    }).join("");
+    document.body.appendChild(bar);
+    document.body.classList.add("has-tabbar");
+  })();
+
   // Google Analytics goal events (the tag in each page's <head> sets window.gtag and CVS_NOTRACK).
   function ga(name, params) {
     if (window.CVS_NOTRACK || typeof window.gtag !== "function") return;
