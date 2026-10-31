@@ -106,6 +106,56 @@
 </div>
 </div></section>
 
+<section class="section vmap-section" id="valley-map"><div class="wrap">
+<div class="section-head"><div><span class="eyebrow">Town by town</span><h2>Eleven towns. One valley. <span class="grad">Pick yours.</span></h2><p>Tap a town on the map to see what&rsquo;s there: local businesses, what&rsquo;s coming up, and where the deals are.</p></div><a class="more" href="directory">Whole valley &rarr;</a></div>
+<div class="vmap-grid">
+<div>
+<div class="vmap" id="vmap">
+<svg viewBox="0 0 1000 520" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+<defs>
+<linearGradient id="vm-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e9d3"/><stop offset="1" stop-color="#ecd3b0"/></linearGradient>
+<linearGradient id="vm-mtn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6f9a"/><stop offset="1" stop-color="#5b4a7a"/></linearGradient>
+<radialGradient id="vm-sun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#f0a33a" stop-opacity=".55"/><stop offset="1" stop-color="#f0a33a" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1000" height="520" fill="url(#vm-floor)"/>
+<circle cx="930" cy="40" r="170" fill="url(#vm-sun)"/>
+<path d="M0,0 L0,78 L50,64 L110,36 L160,22 L210,0 Z" fill="#5b4a7a" opacity=".22"/>
+<path d="M290,0 L330,26 L380,42 L430,70 L475,62 L520,100 L580,112 L640,150 L700,140 L760,180 L830,190 L900,226 L1000,232 L1000,0 Z" fill="#c9667a" opacity=".16"/>
+<path d="M330,0 L370,22 L420,30 L470,48 L520,70 L580,80 L650,118 L720,112 L790,150 L860,160 L930,196 L1000,200 L1000,0 Z" fill="#5b4a7a" opacity=".2"/>
+<path d="M0,128 L36,140 L68,176 L88,232 L96,282 L130,316 L200,340 L262,356 L322,388 L384,396 L444,418 L500,414 L548,432 L574,462 L592,498 L612,520 L0,520 Z" fill="#c9667a" opacity=".22" transform="translate(0,-22)"/>
+<path d="M0,128 L36,140 L68,176 L88,232 L96,282 L130,316 L200,340 L262,356 L322,388 L384,396 L444,418 L500,414 L548,432 L574,462 L592,498 L612,520 L0,520 Z" fill="url(#vm-mtn)" opacity=".5"/>
+<polyline points="0,103 208,178 375,239 479,274 625,308 792,363 917,404 1000,424" fill="none" stroke="#221c18" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
+<polyline points="0,103 208,178 375,239 479,274 625,308 792,363 917,404 1000,424" fill="none" stroke="#f5ede1" stroke-width="1.5" stroke-dasharray="10 9" opacity=".9"/>
+<polyline points="104,192 135,246 250,287 354,335 458,369 563,383 667,397 771,397 896,424" fill="none" stroke="#b8401c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 7" opacity=".55"/>
+<g font-family="JetBrains Mono, monospace" font-size="15" font-weight="700" fill="#221c18" opacity=".55">
+<text x="22" y="92" transform="rotate(20 22 92)">&#8592; I-10 to L.A.</text>
+<text x="700" y="320" transform="rotate(18 700 320)">I-10</text>
+<text x="930" y="505" font-size="13" text-anchor="end">Salton Sea &#8600;</text>
+<text x="30" y="500" font-size="13" fill="#fffaf3" opacity=".9">Santa Rosa Mtns</text>
+</g>
+</svg>
+<a class="vm-pin" href="city/desert-hot-springs/" data-town="Desert Hot Springs" data-lab="r" style="--x:20.5%;--y:10.2%"><span class="vm-dot"></span><span class="vm-label">Desert Hot Springs</span></a>
+<a class="vm-pin" href="city/palm-springs/" data-town="Palm Springs" data-lab="t" style="--x:11.4%;--y:44.6%"><span class="vm-dot"></span><span class="vm-label">Palm Springs</span></a>
+<a class="vm-pin" href="city/cathedral-city/" data-town="Cathedral City" data-lab="l" style="--x:28.1%;--y:57.9%"><span class="vm-dot"></span><span class="vm-label">Cathedral City</span></a>
+<a class="vm-pin" href="city/thousand-palms/" data-town="Thousand Palms" data-lab="r" style="--x:45.8%;--y:46.7%"><span class="vm-dot"></span><span class="vm-label">Thousand Palms</span></a>
+<a class="vm-pin" href="city/rancho-mirage/" data-town="Rancho Mirage" data-lab="l" style="--x:39%;--y:68.5%"><span class="vm-dot"></span><span class="vm-label">Rancho Mirage</span></a>
+<a class="vm-pin" href="city/palm-desert/" data-town="Palm Desert" data-lab="t" style="--x:47%;--y:73.1%"><span class="vm-dot"></span><span class="vm-label">Palm Desert</span></a>
+<a class="vm-pin" href="city/indian-wells/" data-town="Indian Wells" data-lab="b" style="--x:54.2%;--y:74.4%"><span class="vm-dot"></span><span class="vm-label">Indian Wells</span></a>
+<a class="vm-pin" href="city/bermuda-dunes/" data-town="Bermuda Dunes" data-lab="t" style="--x:63.2%;--y:68.7%"><span class="vm-dot"></span><span class="vm-label">Bermuda Dunes</span></a>
+<a class="vm-pin" href="city/la-quinta/" data-town="La Quinta" data-lab="r" style="--x:60.4%;--y:88.7%"><span class="vm-dot"></span><span class="vm-label">La Quinta</span></a>
+<a class="vm-pin" href="city/indio/" data-town="Indio" data-lab="t" style="--x:80.1%;--y:73.5%"><span class="vm-dot"></span><span class="vm-label">Indio</span></a>
+<a class="vm-pin" href="city/coachella/" data-town="Coachella" data-lab="b" style="--x:88.8%;--y:84%"><span class="vm-dot"></span><span class="vm-label">Coachella</span></a>
+</div>
+<div class="vm-towns" id="vm-towns" role="group" aria-label="Choose a town"></div>
+</div>
+<div class="vm-card" id="vm-card" aria-live="polite">
+<span class="eyebrow"><span class="stripe-mini"></span>Spotlight on</span>
+<h3>Palm Desert</h3>
+<p class="vm-tag">El Paseo shopping, Highway 111 dining, and the middle of the valley.</p>
+<div class="vm-actions"><a class="btn" href="city/palm-desert/">Explore Palm Desert &rarr;</a></div>
+</div>
+</div>
+</div></section>
 <section class="section"><div class="wrap">
 <div class="section-head"><div><span class="eyebrow">On the calendar</span><h2>Coming up around the valley</h2><p>Markets, shows, games and more after this weekend.</p></div><a class="more" href="events">Open the calendar &rarr;</a></div>
 <div class="grid-2" data-when="after-weekend" data-list="events" data-limit="6"><noscript><div class="empty">Turn on JavaScript to see the listings.</div></noscript></div>
@@ -200,5 +250,106 @@
 })();
 </script>
 <script src="assets/app.js"></script>
+<script>
+// Valley map: tap a town pin to see its businesses, upcoming events, deals and top categories.
+// Runs after app.js so it can reuse CVS_RENDER (upcoming events with weekly dates filled in, the sorted directory).
+(function () {
+  var map = document.getElementById("vmap"), card = document.getElementById("vm-card");
+  if (!map || !card) return;
+  var R = window.CVS_RENDER || {}, D = window.CVS || {}, ROOT = R.root || "";
+  var TAG = {
+    "Palm Springs": "Mid-century homes, Palm Canyon Drive and the tram up Mount San Jacinto.",
+    "Desert Hot Springs": "Hot mineral spring spas on the high side of the valley, north of I-10.",
+    "Cathedral City": "Family-run shops, trades and taquerias between Palm Springs and Rancho Mirage.",
+    "Rancho Mirage": "Resorts, golf and some of the valley's best dining along Highway 111.",
+    "Thousand Palms": "North of I-10, home of the Coachella Valley Preserve's palm oasis trails.",
+    "Palm Desert": "El Paseo shopping, Highway 111 dining, and the middle of the valley.",
+    "Indian Wells": "Home of the Indian Wells Tennis Garden and resort golf.",
+    "Bermuda Dunes": "A small golf-course community tucked between Palm Desert and Indio.",
+    "La Quinta": "Old Town, the Cove and trails right up into the Santa Rosa Mountains.",
+    "Indio": "The City of Festivals: polo grounds, the fairgrounds and a busy downtown.",
+    "Coachella": "Date groves, farm fields and a growing downtown at the east end."
+  };
+  var today = new Date(); today.setHours(0, 0, 0, 0);
+  function iso(d) { return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  var T0 = iso(today), T30 = iso(new Date(today.getTime() + 30 * 864e5));
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function slug(s) { return String(s).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+  function fmtDay(d) { var p = d.split("-"), x = new Date(+p[0], +p[1] - 1, +p[2]); return x.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }); }
+  var biz = (R.directory || D.directory || []).filter(function (b) { return !b.sample; });
+  var events = (R.events || []).filter(function (e) { return e.date && e.date <= T30; });
+  var deals = (D.deals || []).filter(function (x) { return !x.expires || x.expires >= T0; });
+  // A town + category page (local/<town>/<category>/) exists once there are 2+ listings and the category is in more than one town.
+  var catTowns = {}; biz.forEach(function (b) { (catTowns[b.category] = catTowns[b.category] || {})[b.city] = 1; });
+
+  function stats(town) {
+    var here = biz.filter(function (b) { return b.city === town; });
+    var cats = {}; here.forEach(function (b) { if (b.category) cats[b.category] = (cats[b.category] || 0) + 1; });
+    var ev = events.filter(function (e) { return e.city === town; });
+    var dl = deals.filter(function (x) { return x.city === town; }).length +
+      here.filter(function (b) { return b.happyHour || (b.offer && b.offer.title && (!b.offer.expires || b.offer.expires >= T0)); }).length;
+    return { biz: here.length, cats: Object.keys(cats).sort(function (a, b) { return cats[b] - cats[a] || a.localeCompare(b); }).slice(0, 5).map(function (c) { return [c, cats[c]]; }), ev: ev, deals: dl };
+  }
+
+  var pins = [].slice.call(map.querySelectorAll(".vm-pin"));
+  var counts = {}; pins.forEach(function (p) { var t = p.getAttribute("data-town"); counts[t] = stats(t).biz; });
+  pins.forEach(function (p) { var n = counts[p.getAttribute("data-town")] || 0; p.style.setProperty("--d", Math.round(14 + Math.sqrt(n) * 2.6) + "px"); p.setAttribute("aria-label", p.getAttribute("data-town") + ", " + n + " businesses"); });
+
+  var mine = ""; try { mine = localStorage.getItem("cvs_city") || ""; } catch (e) {}
+  var chips = document.getElementById("vm-towns");
+  if (chips) chips.innerHTML = pins.slice().sort(function (a, b) { return (counts[b.getAttribute("data-town")] || 0) - (counts[a.getAttribute("data-town")] || 0); })
+    .map(function (p) { var t = p.getAttribute("data-town"); return '<button type="button" class="chip" aria-pressed="false" data-town="' + esc(t) + '">' + esc(t) + '</button>'; }).join("");
+
+  function render(town) {
+    var s = stats(town), c = slug(town), next = s.ev[0], nextHtml = "";
+    if (next) {
+      var href = !next.feed ? ROOT + "event/" + R.eventSlug(next) + "/" : (next.url || ROOT + "events");
+      var ext = next.feed && next.url ? ' target="_blank" rel="noopener"' : "";
+      nextHtml = '<p class="vm-next"><span class="vm-k">Next up &middot; ' + esc(fmtDay(next.date)) + '</span><a href="' + esc(href) + '"' + ext + '>' + esc(next.title) + '</a></p>';
+    }
+    var catHtml = s.cats.map(function (x) {
+      var page = x[1] >= 2 && Object.keys(catTowns[x[0]] || {}).length > 1;
+      var href = page ? ROOT + "local/" + c + "/" + slug(x[0]) + "/" : ROOT + "directory?city=" + encodeURIComponent(town) + "&category=" + encodeURIComponent(x[0]);
+      return '<a class="chip" href="' + esc(href) + '">' + esc(x[0]) + '<small>' + x[1] + '</small></a>';
+    }).join("");
+    card.innerHTML = '<span class="eyebrow"><span class="stripe-mini"></span>Spotlight on</span><h3>' + esc(town) + '</h3>' +
+      '<p class="vm-tag">' + esc(TAG[town] || "") + '</p>' +
+      '<ul class="vm-stats">' +
+      '<li><a href="' + ROOT + 'directory?city=' + encodeURIComponent(town) + '"><b>' + s.biz + '</b><span>local businesses</span></a></li>' +
+      '<li><a href="' + ROOT + 'events?city=' + encodeURIComponent(town) + '"><b>' + s.ev.length + '</b><span>events in the next 30 days</span></a></li>' +
+      '<li><a href="' + ROOT + 'deals"><b>' + s.deals + '</b><span>deals &amp; happy hours</span></a></li></ul>' +
+      nextHtml + (catHtml ? '<div class="vm-cats">' + catHtml + '</div>' : "") +
+      '<div class="vm-actions"><a class="btn" href="' + ROOT + 'city/' + c + '/">Explore ' + esc(town) + ' &rarr;</a>' +
+      (mine === town ? '<span class="vm-mine">&#10003; Your town</span>' : '<button type="button" class="btn btn-ghost" data-vm-mine="' + esc(town) + '">Make it my town</button>') + '</div>';
+  }
+
+  var current = "";
+  function select(town, track) {
+    if (!town || town === current) return;
+    current = town;
+    pins.forEach(function (p) { if (p.getAttribute("data-town") === town) p.setAttribute("aria-current", "true"); else p.removeAttribute("aria-current"); });
+    if (chips) [].forEach.call(chips.children, function (b) { var on = b.getAttribute("data-town") === town; b.setAttribute("aria-pressed", on ? "true" : "false"); if (on && track) b.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" }); });
+    render(town);
+    if (track && !window.CVS_NOTRACK && window.gtag) window.gtag("event", "map_town", { city: town });
+  }
+
+  pins.forEach(function (p) {
+    var t = p.getAttribute("data-town");
+    // First tap selects the town; tapping the already-selected pin opens its city page.
+    p.addEventListener("click", function (e) { if (current !== t) { e.preventDefault(); select(t, true); } });
+    p.addEventListener("mouseenter", function () { if (window.matchMedia("(hover: hover)").matches) select(t, true); });
+    p.addEventListener("focus", function () { select(t, false); });
+  });
+  if (chips) chips.addEventListener("click", function (e) { var b = e.target.closest("[data-town]"); if (b) select(b.getAttribute("data-town"), true); });
+  card.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-vm-mine]"); if (!b) return;
+    var t = b.getAttribute("data-vm-mine");
+    try { localStorage.setItem("cvs_city", t); } catch (err) {}
+    if (!window.CVS_NOTRACK && window.gtag) window.gtag("event", "localize_set", { city: t, from: "map" });
+    location.reload();
+  });
+  select(TAG[mine] ? mine : "Palm Desert", false);
+})();
+</script>
 </body>
 </html>
