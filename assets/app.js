@@ -80,6 +80,10 @@
       '<a class="cal-btn" href="#" data-ics="' + esc(eventSlug(e)) + '" title="Add to Apple Calendar or Outlook (.ics file)" aria-label="Add to Apple Calendar or Outlook">' + ICON.ics + '</a></span>';
   }
   function slugOf(b) { return b.slug || String(b.name).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+  // Stable id for a deal (used for the claim button, the redemption code and the "already claimed" check).
+  function dealKey(x) { return (x.business + "-" + x.offer).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+  // Short redemption code, deterministic from the deal so it is the same every time it's opened.
+  function claimCode(key) { var h = 0; for (var i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0; return "CVS-" + h.toString(36).toUpperCase().slice(-5); }
   function outbound(u) { try { var x = new URL(u); x.searchParams.set("utm_source", "coachellavalleyspotlight"); x.searchParams.set("utm_medium", "directory"); return x.toString(); } catch (e) { return u; } }
   function liveOffer(o) { if (!o || !o.title) return null; var d = parse(o.expires); return !d || d >= today ? o : null; }
   // One photo per city for home page headline cards (assets/img/cities/, credits on legal.html#photos)
@@ -159,10 +163,11 @@
         '<span class="hp-txt"><b>' + esc(e.title) + '</b><small>' + esc(e.city) + (e.time ? ' &middot; ' + esc(e.time) : '') + '</small></span></a></li>';
     },
     deal: function (x) {
-      var d = parse(x.expires);
-      return '<article class="card deal">' + sample(x) + '<span class="meta">' + esc(x.business) + ' &middot; ' + esc(x.city) + '</span>' +
+      var d = parse(x.expires), key = dealKey(x);
+      return '<article class="card deal" data-deal="' + esc(key) + '">' + sample(x) + '<span class="meta">' + esc(x.business) + ' &middot; ' + esc(x.city) + '</span>' +
         '<div class="offer">' + esc(x.offer) + '</div><p>' + esc(x.details) + '</p>' +
-        '<span class="meta">' + (x.when ? esc(x.when) : d ? 'Good through ' + fmt(d) : 'Ongoing') + '</span>' + link(x.url, x.cta || "Get this deal") + '</article>';
+        '<span class="meta">' + (x.when ? esc(x.when) : d ? 'Good through ' + fmt(d) : 'Ongoing') + '</span>' +
+        (x.cta ? link(x.url, x.cta) : '<button type="button" class="card-link claim-btn" data-claim="' + esc(key) + '">Claim this deal &rarr;<span class="claimed-check" aria-hidden="true">&#10003; Claimed</span></button>') + '</article>';
     },
     news: function (n, opt) {
       var d = parse(n.date);
@@ -270,6 +275,50 @@
   window.CVS_RENDER = { R: R, events: events, directory: directory, slugOf: slugOf, eventSlug: eventSlug, root: ROOT };
   (function () { var m = document.createElement("script"); m.type = "module"; m.src = ROOT + "assets/auth.js"; document.head.appendChild(m); })();
 
+  // Claim This Deal: turns a deal card from plain text into a one-tap digital coupon (redemption code,
+  // text/email-to-self, call button) instead of sending the visitor straight off the site. Claims are
+  // remembered locally (so the card shows "Claimed") and logged as a gtag conversion so advertisers can
+  // see real redemption counts, not just impressions.
+  var dealsByKey = {}; deals.forEach(function (x) { dealsByKey[dealKey(x)] = x; });
+  function claimedSet() { try { return JSON.parse(localStorage.getItem("cvs_claims") || "[]"); } catch (e) { return []; } }
+  function markClaimed(key) { try { var s = claimedSet(); if (s.indexOf(key) < 0) { s.push(key); localStorage.setItem("cvs_claims", JSON.stringify(s)); } } catch (e) {} }
+  function paintClaimed() { var s = claimedSet(); document.querySelectorAll("[data-deal]").forEach(function (el) { if (s.indexOf(el.getAttribute("data-deal")) > -1) el.classList.add("claimed"); }); }
+  function phoneIn(s) { var m = String(s || "").match(/\(\d{3}\)\s?\d{3}-\d{4}/); return m ? m[0] : ""; }
+
+  function closeDealModal() { var o = document.querySelector(".deal-modal-backdrop"); if (!o) return; o.remove(); if (o._return) o._return.focus(); document.removeEventListener("keydown", escClose); }
+  function escClose(e) { if (e.key === "Escape") closeDealModal(); }
+
+  function openDealModal(x, trigger) {
+    var key = dealKey(x), code = claimCode(key), d = parse(x.expires);
+    var phone = phoneIn(x.details), tel = phone.replace(/[^\d]/g, "");
+    var body = x.offer + " at " + x.business + " (" + x.details + "). Code " + code + ". " + location.origin + ROOT + "deals";
+    var o = document.createElement("div"); o.className = "deal-modal-backdrop"; o._return = trigger;
+    o.innerHTML = '<div class="deal-modal" role="dialog" aria-modal="true" aria-labelledby="dm-title">' +
+      '<button type="button" class="deal-modal-close" aria-label="Close">&times;</button>' +
+      '<div class="deal-modal-ticket"><span class="meta">' + esc(x.business) + ' &middot; ' + esc(x.city) + '</span>' +
+      '<h3 id="dm-title">' + esc(x.offer) + '</h3><p>' + esc(x.details) + '</p>' +
+      '<div class="deal-code"><span>Show this to redeem</span><b>' + code + '</b></div>' +
+      '<span class="meta">' + (d ? 'Good through ' + fmt(d) : 'Ongoing') + '</span></div>' +
+      '<div class="deal-modal-actions">' +
+      '<a class="btn" href="sms:?&body=' + encodeURIComponent(body) + '">Text me this deal</a>' +
+      '<a class="btn btn-ghost" href="mailto:?subject=' + encodeURIComponent("Your Coachella Valley Spotlight deal") + '&body=' + encodeURIComponent(body) + '">Email it to me</a>' +
+      (tel ? '<a class="btn btn-ghost" href="tel:' + tel + '">Call ' + esc(phone) + '</a>' : '') +
+      (x.url ? '<a class="btn btn-ghost" href="' + esc(/^https?:/i.test(x.url) ? x.url : ROOT + x.url) + '">View business &rarr;</a>' : '') +
+      '</div></div>';
+    document.body.appendChild(o);
+    markClaimed(key); paintClaimed();
+    if (!window.CVS_NOTRACK && window.gtag) window.gtag("event", "deal_claim", { business: x.business, offer: x.offer });
+    o.querySelector(".deal-modal-close").focus();
+    document.addEventListener("keydown", escClose);
+    o.addEventListener("click", function (e) { if (e.target === o || e.target.closest(".deal-modal-close")) closeDealModal(); });
+  }
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-claim]");
+    if (!btn) return;
+    var x = dealsByKey[btn.getAttribute("data-claim")];
+    if (x) openDealModal(x, btn);
+  });
+
   function text(item) { return Object.keys(item).map(function (k) { return typeof item[k] === "string" ? item[k] : ""; }).join(" ").toLowerCase(); }
 
   // Live counts: <span data-count="directory"></span> (pre-filled by tools/build-seo.js too).
@@ -282,6 +331,7 @@
     // data-hide-empty: drop the whole section when there's nothing to show (city pages).
     if (!items.length && el.hasAttribute("data-hide-empty")) { var sec = el.closest("section"); if (sec) sec.hidden = true; }
   });
+  paintClaimed();
 
   // Full list pages with filters: <div data-browse="events"></div>
   var browse = document.querySelector("[data-browse]");
@@ -340,8 +390,8 @@
         browse.innerHTML = '<div class="' + (key === "news" ? "grid-2" : "grid") + '">' + items.map(R[TYPE[key]]).join("") + "</div>";
       }
     }
-    [q, city, cat, when].forEach(function (el) { if (el) el.addEventListener("input", draw); });
-    draw();
+    [q, city, cat, when].forEach(function (el) { if (el) el.addEventListener("input", function () { draw(); paintClaimed(); }); });
+    draw(); paintClaimed();
   }
 
   // Home page search: searches everything at once

@@ -126,6 +126,26 @@ p { margin: 0 0 var(--s2); }
 .card.deal { border-top: 5px solid var(--sun); }
 .card.deal .offer { font-family: var(--display); font-size: 22px; font-weight: 600; color: var(--ink); line-height: 1.2; }
 .card.featured { border: 2px solid var(--gold); }
+
+/* Claim This Deal: the deal card's button, and its claimed state */
+.claim-btn { background: none; border: 0; margin-top: auto; padding-top: 10px; font: inherit; font-weight: 600; color: var(--sun-deep); text-align: left; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+.claim-btn:hover { text-decoration: underline; }
+.claim-btn .claimed-check { display: none; font-family: var(--mono); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--palm); text-decoration: none; }
+.card.deal.claimed .claim-btn .claimed-check { display: inline; }
+
+/* Claim This Deal: the modal (digital coupon) */
+.deal-modal-backdrop { position: fixed; inset: 0; background: rgba(34, 28, 24, .55); z-index: 100; display: grid; place-items: center; padding: var(--s2); }
+.deal-modal { position: relative; width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto; background: var(--paper); border-radius: var(--radius); box-shadow: var(--shadow); padding: var(--s3); display: grid; gap: var(--s2); }
+.deal-modal-close { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--paper); font-size: 22px; line-height: 1; color: var(--ink-2); cursor: pointer; }
+.deal-modal-close:hover { background: var(--line); }
+.deal-modal-ticket { display: grid; gap: 6px; padding-right: 28px; }
+.deal-modal-ticket h3 { font-size: 24px; margin: 0 0 4px; }
+.deal-modal-ticket p { color: var(--ink-2); }
+.deal-code { background: #fff4e8; border: 1.5px dashed var(--sun); border-radius: 12px; padding: 14px; text-align: center; margin: 4px 0; }
+.deal-code span { display: block; font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 4px; }
+.deal-code b { font-family: var(--mono); font-size: 26px; letter-spacing: .1em; color: var(--sun-deep); }
+.deal-modal-actions { display: grid; gap: 10px; }
+.deal-modal-actions .btn, .deal-modal-actions .btn-ghost { text-align: center; }
 .sample { position: absolute; top: 12px; right: 12px; font-family: var(--mono); font-size: 13px; letter-spacing: .1em; font-weight: 700; color: #7a4a00; background: #fde8bf; border: 1px dashed #c98a1c; padding: 2px 8px; border-radius: 6px; }
 
 .event { display: grid; grid-template-columns: 76px 1fr; gap: var(--s2); align-items: start; }
