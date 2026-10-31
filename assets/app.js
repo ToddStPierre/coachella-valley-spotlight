@@ -615,24 +615,83 @@
   // Formspree drops emails sent from the tracker's servers, so the browser sends the tracker's email notice.
   function mailTodd(n) { if (!n) return; var fd = new FormData(); Object.keys(n).forEach(function (k) { if (n[k] != null) fd.append(k, String(n[k])); }); fetch("https://formspree.io/f/myezyype", { method: "POST", headers: { Accept: "application/json" }, body: fd }).catch(function () {}); }
 
-  // Email signups (footer) and the La Quinta / Indio route waitlist: saved by the tracker
+  // Email signups (footer, the exit popup) and the La Quinta / Indio route waitlist: saved by the tracker.
+  // Delegated on document (not queried once at load) so forms injected later, like the popup, are covered too.
   var SIGNUP_THANKS = { news: "You're on the list. Thanks, neighbor!", waitlist: "You're on the waitlist. We'll reach out before the first card for your city goes out." };
-  document.querySelectorAll("form[data-signup]").forEach(function (f) {
-    f.addEventListener("submit", function (ev) {
-      ev.preventDefault();
-      var kind = f.getAttribute("data-signup"), status = f.querySelector(".form-status"), btn = f.querySelector("button[type=submit]");
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email.value.trim())) { status.textContent = "Please add a valid email."; f.email.focus(); return; }
-      if (f.business && !f.business.value.trim()) { status.textContent = "Please add your business name."; f.business.focus(); return; }
-      var body = { kind: kind, page: location.pathname };
-      Array.prototype.forEach.call(f.elements, function (el) { if (el.name) body[el.name] = el.value; });
-      btn.disabled = true; status.textContent = "Sending...";
-      fetch(VAPI + "/signup", { method: "POST", body: JSON.stringify(body) })
-        .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || ""); mailTodd(d.notice); }); })
-        .then(function () { ga(kind === "waitlist" ? "join_waitlist" : "email_signup", { page: location.pathname }); f.reset(); status.textContent = SIGNUP_THANKS[kind]; })
-        .catch(function (err) { status.textContent = err.message || "That did not go through. Please call or text (760) 422-5475."; })
-        .finally(function () { btn.disabled = false; });
-    });
+  document.addEventListener("submit", function (ev) {
+    var f = ev.target.closest && ev.target.closest("form[data-signup]");
+    if (!f) return;
+    ev.preventDefault();
+    var kind = f.getAttribute("data-signup"), status = f.querySelector(".form-status"), btn = f.querySelector("button[type=submit]");
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email.value.trim())) { status.textContent = "Please add a valid email."; f.email.focus(); return; }
+    if (f.business && !f.business.value.trim()) { status.textContent = "Please add your business name."; f.business.focus(); return; }
+    var body = { kind: kind, page: location.pathname };
+    Array.prototype.forEach.call(f.elements, function (el) { if (el.name) body[el.name] = el.value; });
+    btn.disabled = true; status.textContent = "Sending...";
+    fetch(VAPI + "/signup", { method: "POST", body: JSON.stringify(body) })
+      .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || ""); mailTodd(d.notice); }); })
+      .then(function () {
+        ga(kind === "waitlist" ? "join_waitlist" : "email_signup", { page: location.pathname });
+        if (kind === "news") { try { localStorage.setItem("cvs_subscribed", "1"); } catch (e) {} closePopup(); }
+        f.reset(); status.textContent = SIGNUP_THANKS[kind];
+      })
+      .catch(function (err) { status.textContent = err.message || "That did not go through. Please call or text (760) 422-5475."; })
+      .finally(function () { btn.disabled = false; });
   });
+
+  // Exit-intent / scroll-depth email popup: offers the same free weekly signup as the footer, but at the
+  // moment a visitor is about to leave (or has read enough to be interested), instead of only at the very
+  // bottom of the page where almost nobody scrolls. Shown at most once; skipped entirely once subscribed.
+  (function () {
+    if (document.body.hasAttribute("data-no-popup")) return;
+    var SEEN_KEY = "cvs_popup_seen", DAYS = 14;
+    try {
+      if (localStorage.getItem("cvs_subscribed") === "1") return;
+      var seen = +localStorage.getItem(SEEN_KEY);
+      if (seen && Date.now() - seen < DAYS * 86400000) return;
+    } catch (e) {}
+    var shown = false;
+    function closePopup() {
+      var o = document.querySelector(".popup-backdrop"); if (!o) return;
+      o.remove(); document.removeEventListener("keydown", escPopup);
+    }
+    window.closePopup = closePopup; // referenced by the signup handler above, defined before this IIFE runs its course
+    function escPopup(e) { if (e.key === "Escape") closePopup(); }
+    var CITIES = ["Palm Desert", "La Quinta", "Indio", "Indian Wells", "Rancho Mirage", "Cathedral City", "Palm Springs", "Coachella", "Desert Hot Springs", "Other"];
+    function showPopup() {
+      if (shown || document.querySelector(".popup-backdrop")) return;
+      shown = true;
+      var o = document.createElement("div"); o.className = "popup-backdrop";
+      o.innerHTML = '<div class="popup-modal" role="dialog" aria-modal="true" aria-labelledby="pm-title">' +
+        '<button type="button" class="popup-close" aria-label="Close">&times;</button>' +
+        '<span class="eyebrow"><span class="stripe-mini"></span>Before you go</span>' +
+        '<h3 id="pm-title">Get the valley&rsquo;s best deals, first.</h3>' +
+        '<p>Join the neighbors getting the week&rsquo;s best local deals, events and news. Free, no spam.</p>' +
+        '<form class="form signup-form" data-signup="news" novalidate>' +
+        '<label class="sr-only" for="pm-email">Email</label><input id="pm-email" name="email" type="email" placeholder="you@email.com" autocomplete="email" required>' +
+        '<label class="sr-only" for="pm-city">Your city</label><select id="pm-city" name="city"><option value="">Your city</option>' + CITIES.map(function (c) { return "<option>" + c + "</option>"; }).join("") + "</select>" +
+        '<input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">' +
+        '<button class="btn" type="submit">Get the good stuff</button><p class="form-status" role="status"></p>' +
+        "</form>" +
+        '<button type="button" class="popup-dismiss">No thanks, maybe later</button>' +
+        "</div>";
+      document.body.appendChild(o);
+      try { localStorage.setItem(SEEN_KEY, String(Date.now())); } catch (e) {}
+      ga("popup_shown", { page: location.pathname });
+      o.querySelector("#pm-email").focus();
+      document.addEventListener("keydown", escPopup);
+      o.addEventListener("click", function (e) { if (e.target === o || e.target.closest(".popup-close") || e.target.closest(".popup-dismiss")) closePopup(); });
+    }
+    // Desktop: exit intent, cursor leaving toward the top of the viewport.
+    document.addEventListener("mouseout", function (e) { if (!e.relatedTarget && e.clientY < 10) showPopup(); });
+    // Mobile / anyone who never trips exit intent: once they've read a good chunk of the page.
+    window.addEventListener("scroll", function () {
+      if (shown) return;
+      var scrolled = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight;
+      if (scrolled > 0.6) showPopup();
+    }, { passive: true });
+  })();
+
   // "Apple / Outlook" calendar links: build the .ics file on click.
   document.addEventListener("click", function (ev) {
     var a = ev.target.closest && ev.target.closest("[data-ics]"); if (!a) return;
