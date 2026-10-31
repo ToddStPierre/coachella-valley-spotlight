@@ -53,8 +53,10 @@
 <main id="main" tabindex="-1">
 
 <section class="page-hero"><div class="wrap"><span class="eyebrow"><span class="stripe-mini"></span>Local directory</span><h1>The Valley&rsquo;s Local Pros, <span class="grad">Sorted.</span></h1><p>Find a plumber, a pool guy or a great taco in a couple of taps. Businesses on the Spotlight postcard are featured at the top, and premium listings come first in each category.</p></div></section>
-<section style="padding-bottom:0"><div class="wrap">
-<div class="quote-card" id="quote">
+<section style="padding-bottom:var(--s5)"><div class="wrap">
+<div class="filters"><label class="sr-only" for="f-q">Search</label><input id="f-q" type="search" placeholder="Search">
+<label class="sr-only" for="f-city">City</label><select id="f-city"><option value="">All cities</option></select><label class="sr-only" for="f-cat">Categories</label><select id="f-cat"><option value="">All categories</option></select></div>
+<div class="quote-card" id="quote" hidden>
 <div class="quote-pitch"><span class="eyebrow"><span class="stripe-mini"></span>Skip the scrolling</span>
 <h2>Need a pro, not a search? We&rsquo;ll find you 3.</h2>
 <p>Tell us what you need done and where. We match you with up to 3 top-rated local businesses who want the work &mdash; they call you, not the other way around.</p>
@@ -71,10 +73,6 @@
 <p class="fine-print full">We only share your request with businesses in this directory. No spam, ever.</p>
 </form>
 </div>
-</div></section>
-<section style="padding-bottom:var(--s5)"><div class="wrap">
-<div class="filters"><label class="sr-only" for="f-q">Search</label><input id="f-q" type="search" placeholder="Search">
-<label class="sr-only" for="f-city">City</label><select id="f-city"><option value="">All cities</option></select><label class="sr-only" for="f-cat">Categories</label><select id="f-cat"><option value="">All categories</option></select></div>
 <div data-browse="directory"><noscript><div class="empty">Turn on JavaScript to see the listings.</div></noscript></div><!--browse-links--><div class="seo-copy"><h2>About the directory</h2><p>Coachella Valley Spotlight is a free directory of local businesses across the desert, from Palm Springs and Cathedral City to Rancho Mirage, Palm Desert, Indian Wells, La Quinta, Indio, Coachella and Desert Hot Springs. It is built for people who would rather call a local business than a national call center: plumbers, roofers, air conditioning and pest control companies, flooring and wallpaper pros, clinics and acupuncturists, and the restaurants your neighbors keep going back to.</p>
 <p>Every business has its own page with its phone number, website and service area. Premium listings also show hours, photos and current offers. Many of the businesses here also advertise on the Spotlight postcard, which goes to nearly 5,000 homes per route in Palm Desert. Owners can claim their listing for free and keep it up to date. If you know a local business that should be here, send it in and we will add it at no cost.</p></div><div class="biz-band" style="margin-top:48px"><p><strong>Got a business to list?</strong><br>Send it in. Listing it here is free.</p><a class="btn" href="submit">Submit it</a></div>
 </div></section>
@@ -97,13 +95,21 @@
 </div></footer>
 <script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js"></script>
 <script>
-// Get 3 Quotes: prefill the category from ?category= so a visitor who taps "Home services" on the
-// homepage lands with the quote form already matching what they searched for.
+// Get 3 Quotes: only makes sense for "hire a pro" categories, so it stays hidden until the visitor's
+// filter says they're in one (or they haven't filtered at all) — a restaurant or activity search never
+// sees a quote pitch. Also prefills its own category from the directory filter so a visitor who taps
+// "Home services" on the homepage, or picks a category in the filter bar, lands with it already matching.
 (function () {
-  var sel = document.getElementById("qf-cat");
-  if (!sel) return;
-  var want = new URLSearchParams(location.search).get("category");
-  if (want && [].some.call(sel.options, function (o) { return o.value === want; })) sel.value = want;
+  var card = document.getElementById("quote"), qfCat = document.getElementById("qf-cat"), fCat = document.getElementById("f-cat");
+  if (!card || !fCat) return;
+  var NOT_A_PRO_SEARCH = ["Restaurants", "Fitness", "Recreation", "Outdoors", "Attractions", "Shopping", "Happy hours"];
+  function sync() {
+    var v = fCat.value;
+    card.hidden = NOT_A_PRO_SEARCH.indexOf(v) > -1;
+    if (qfCat && v && [].some.call(qfCat.options, function (o) { return o.value === v; })) qfCat.value = v;
+  }
+  sync();
+  fCat.addEventListener("change", sync);
 })();
 </script>
 </body>

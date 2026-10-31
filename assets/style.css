@@ -206,6 +206,7 @@ p { margin: 0 0 var(--s2); }
 
 /* Get 3 Quotes: the lead-matching widget on the directory (and its homepage teaser) */
 .quote-card { background: var(--ink); color: #f7efe4; border-radius: var(--radius); padding: var(--s4); margin-bottom: var(--s4); display: grid; grid-template-columns: 1fr 1.2fr; gap: var(--s4); align-items: center; box-shadow: var(--shadow); border-top: 5px solid; border-image: linear-gradient(100deg, var(--sun) 10%, var(--rose) 55%, var(--dusk) 100%) 1; position: relative; overflow: hidden; }
+.quote-card[hidden] { display: none; }
 .quote-card::after { content: ""; position: absolute; inset: 0; background: radial-gradient(420px 260px at 100% 0%, rgba(240, 163, 58, .22), transparent 60%); pointer-events: none; }
 .quote-card .quote-pitch .eyebrow { color: var(--gold); }
 .quote-card h2 { color: #fff; font-size: clamp(26px, 3.4vw, 34px); margin: 0 0 10px; }
