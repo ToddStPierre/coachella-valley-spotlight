@@ -65,6 +65,21 @@
 <div class="chips">
 <a class="chip chip-feature" href="halloween" data-until="2026-11-02">&#127875; Halloween guide</a><a class="chip" href="welcome">New to the valley?</a><a class="chip" href="events">Things to do</a><a class="chip" href="this-weekend/">This weekend</a><a class="chip" href="farmers-markets">Farmers markets</a><a class="chip" href="directory?category=Happy%20hours">Happy hours</a><a class="chip" href="golf/">Golf courses</a><a class="chip" href="deals">Deals</a><a class="chip news-link" href="news">Local news</a>
 <a class="chip" href="directory?category=Home%20services">Home services</a><a class="chip" href="directory?category=Restaurants">Restaurants</a></div>
+<div class="localize-bar" id="localize-bar">
+<span class="localize-icon" aria-hidden="true">&#128205;</span>
+<span class="localize-text">Tell us your town and we&rsquo;ll put your neighborhood first.</span>
+<label class="sr-only" for="localize-select">Your town</label>
+<select id="localize-select">
+<option value="">Choose your town&hellip;</option>
+<option>Bermuda Dunes</option><option>Cathedral City</option><option>Coachella</option><option>Desert Hot Springs</option><option>Indian Wells</option><option>Indio</option><option>La Quinta</option><option>Palm Desert</option><option>Palm Springs</option><option>Rancho Mirage</option><option>Thousand Palms</option>
+</select>
+<button type="button" class="btn btn-ghost btn-sm" id="localize-set">Set my town</button>
+<button type="button" class="localize-geo" id="localize-geo">Use my location</button>
+</div>
+<div class="localize-badge" id="localize-badge" hidden>
+<span>&#128205; <b id="localize-badge-city"></b></span>
+<button type="button" id="localize-change">Change</button>
+</div>
 </div>
 <aside class="hero-panel" aria-labelledby="hp-h" aria-roledescription="carousel"><div class="hp-slides" aria-live="off">
 <div class="hp-slide hp-feature is-on" role="group" aria-roledescription="slide" aria-label="Halloween guide" data-until="2026-11-02"><span class="eyebrow"><span class="stripe-mini"></span>Halloween in the valley</span>
@@ -81,6 +96,15 @@
 <path d="M0 120 L0 108 L200 92 L380 108 L560 94 L760 110 L940 96 L1200 106 L1200 120 Z" fill="#221c18"/></svg></section>
 
 <div class="wrap"><section id="search-results" class="section" hidden></section></div>
+
+<section class="section near-you" id="near-you" hidden><div class="wrap">
+<div class="section-head"><div><span class="eyebrow">Just for you</span><h2>Spotlight on <span id="ny-city">your town</span></h2><p>The events, deals and businesses closest to home, picked first.</p></div><a class="more" id="ny-see-all" href="directory">See all &rarr;</a></div>
+<div class="ny-cols">
+<div><h3>Coming up nearby</h3><div class="grid" data-list="events" data-city="" data-limit="3" id="ny-events"></div></div>
+<div><h3>Deals nearby</h3><div class="grid" data-list="deals" data-city="" data-limit="3" id="ny-deals"></div></div>
+<div><h3>Businesses nearby</h3><div class="grid" data-list="directory" data-city="" data-limit="3" id="ny-directory"></div></div>
+</div>
+</div></section>
 
 <section class="section"><div class="wrap">
 <div class="section-head"><div><span class="eyebrow">On the calendar</span><h2>Coming up around the valley</h2><p>Markets, shows, games and more after this weekend.</p></div><a class="more" href="events">Open the calendar &rarr;</a></div>
@@ -119,6 +143,61 @@
 </div>
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight, a brand of MoreViews Pro LLC. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
-<script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js"></script>
+<script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script>
+<script>
+// Localize: lets a visitor pick (or detect) their town, then puts that town's events, deals and
+// businesses in a "Near You" band above the generic valley content. Runs before app.js renders the
+// [data-list] blocks below, so the data-city attributes it sets are picked up on the very first paint.
+(function () {
+  var KEY = "cvs_city";
+  // Approximate town centers, used only to find the nearest town from the browser's geolocation.
+  var CITIES = {
+    "Palm Springs": [33.8303, -116.5453], "Desert Hot Springs": [33.9611, -116.5017],
+    "Cathedral City": [33.7797, -116.4653], "Rancho Mirage": [33.7397, -116.4128],
+    "Thousand Palms": [33.8225, -116.3800], "Palm Desert": [33.7222, -116.3744],
+    "Indian Wells": [33.7172, -116.3400], "La Quinta": [33.6634, -116.3100],
+    "Bermuda Dunes": [33.7392, -116.2967], "Indio": [33.7206, -116.2156], "Coachella": [33.6803, -116.1739]
+  };
+  function nearestCity(lat, lon) {
+    var best = "", bestD = Infinity;
+    Object.keys(CITIES).forEach(function (c) {
+      var dy = CITIES[c][0] - lat, dx = (CITIES[c][1] - lon) * Math.cos(lat * Math.PI / 180), d = dx * dx + dy * dy;
+      if (d < bestD) { bestD = d; best = c; }
+    });
+    return best;
+  }
+  function getCity() { try { return localStorage.getItem(KEY) || ""; } catch (e) { return ""; } }
+  function setCity(c) { try { localStorage.setItem(KEY, c); } catch (e) {} }
+  var city = getCity();
+  if (city) {
+    ["ny-events", "ny-deals", "ny-directory"].forEach(function (id) { var el = document.getElementById(id); if (el) el.setAttribute("data-city", city); });
+    var ny = document.getElementById("near-you"); if (ny) ny.hidden = false;
+    var bar = document.getElementById("localize-bar"); if (bar) bar.hidden = true;
+    var badge = document.getElementById("localize-badge"); if (badge) badge.hidden = false;
+    var bc = document.getElementById("localize-badge-city"); if (bc) bc.textContent = city;
+    var nc = document.getElementById("ny-city"); if (nc) nc.textContent = city;
+    var see = document.getElementById("ny-see-all"); if (see) see.href = "city/" + city.toLowerCase().replace(/[^a-z]+/g, "-") + "/";
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    function apply(c) { if (!c) return; setCity(c); if (!window.CVS_NOTRACK && window.gtag) window.gtag("event", "localize_set", { city: c }); location.reload(); }
+    var setBtn = document.getElementById("localize-set");
+    if (setBtn) setBtn.addEventListener("click", function () { apply(document.getElementById("localize-select").value); });
+    var geoBtn = document.getElementById("localize-geo");
+    if (geoBtn) geoBtn.addEventListener("click", function () {
+      if (!navigator.geolocation) { geoBtn.textContent = "Location not available — pick above"; return; }
+      geoBtn.textContent = "Finding you…";
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        apply(nearestCity(pos.coords.latitude, pos.coords.longitude));
+      }, function () { geoBtn.textContent = "Couldn’t get your location — pick above"; }, { timeout: 8000 });
+    });
+    var changeBtn = document.getElementById("localize-change");
+    if (changeBtn) changeBtn.addEventListener("click", function () {
+      setCity(""); document.getElementById("localize-badge").hidden = true; document.getElementById("localize-bar").hidden = false;
+      var ny = document.getElementById("near-you"); if (ny) ny.hidden = true;
+    });
+  });
+})();
+</script>
+<script src="assets/app.js"></script>
 </body>
 </html>
