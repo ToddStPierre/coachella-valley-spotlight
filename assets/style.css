@@ -202,7 +202,30 @@ p { margin: 0 0 var(--s2); }
 .empty { padding: var(--s4); text-align: center; color: var(--ink-2); background: var(--paper); border: 1px dashed var(--line); border-radius: var(--radius); }
 
 .page-hero { padding: var(--s5) 0 var(--s3); }
-.page-hero p { color: var(--ink-2); font-size: 19px; max-width: 680px; }
+.page-hero p { color: var(--ink-2); max-width: 680px; }
+
+/* Get 3 Quotes: the lead-matching widget on the directory (and its homepage teaser) */
+.quote-card { background: var(--ink); color: #f7efe4; border-radius: var(--radius); padding: var(--s4); margin-bottom: var(--s4); display: grid; grid-template-columns: 1fr 1.2fr; gap: var(--s4); align-items: center; box-shadow: var(--shadow); border-top: 5px solid; border-image: linear-gradient(100deg, var(--sun) 10%, var(--rose) 55%, var(--dusk) 100%) 1; position: relative; overflow: hidden; }
+.quote-card::after { content: ""; position: absolute; inset: 0; background: radial-gradient(420px 260px at 100% 0%, rgba(240, 163, 58, .22), transparent 60%); pointer-events: none; }
+.quote-card .quote-pitch .eyebrow { color: var(--gold); }
+.quote-card h2 { color: #fff; font-size: clamp(26px, 3.4vw, 34px); margin: 0 0 10px; }
+.quote-card .quote-pitch p { color: #d9cdc2; font-size: 17px; margin: 0; }
+.quote-card .quote-points { list-style: none; margin: var(--s2) 0 0; padding: 0; display: grid; gap: 8px; font-size: 15px; color: #f0e6da; }
+.quote-card .quote-points li { display: flex; align-items: baseline; gap: 8px; }
+.quote-card .quote-points li::before { content: "\2713"; color: var(--gold); font-weight: 700; }
+.quote-form { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; background: var(--paper); border-radius: 12px; padding: var(--s3); }
+.quote-form .full { grid-column: 1 / -1; }
+.quote-form label { display: grid; gap: 5px; font-weight: 600; font-size: 14px; color: var(--ink); }
+.quote-form input, .quote-form select { font: inherit; font-size: 16px; padding: 11px 12px; border: 1.5px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); width: 100%; min-width: 0; }
+.quote-form .btn { width: 100%; justify-content: center; font-size: 17px; }
+.quote-form .form-status { grid-column: 1 / -1; margin: 0; font-weight: 600; color: var(--sun-deep); min-height: 0; }
+.quote-form .fine-print { grid-column: 1 / -1; margin: 0; font-size: 12.5px; color: var(--ink-2); font-weight: 400; }
+@media (max-width: 860px) { .quote-card { grid-template-columns: 1fr; padding: var(--s3); } .quote-form { grid-template-columns: 1fr; } }
+
+/* Homepage teaser strip pointing at the quote widget */
+.quote-teaser { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); flex-wrap: wrap; background: var(--palm-soft); border: 1.5px dashed var(--palm); border-radius: var(--radius); padding: var(--s3); margin-top: var(--s3); }
+.quote-teaser p { margin: 0; font-size: 17px; }
+.quote-teaser strong { color: var(--palm); }
 
 /* Advertise page */
 .ad-hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: var(--s4); align-items: center; padding: var(--s5) 0; }

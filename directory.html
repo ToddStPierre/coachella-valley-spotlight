@@ -53,6 +53,25 @@
 <main id="main" tabindex="-1">
 
 <section class="page-hero"><div class="wrap"><span class="eyebrow"><span class="stripe-mini"></span>Local directory</span><h1>The Valley&rsquo;s Local Pros, <span class="grad">Sorted.</span></h1><p>Find a plumber, a pool guy or a great taco in a couple of taps. Businesses on the Spotlight postcard are featured at the top, and premium listings come first in each category.</p></div></section>
+<section style="padding-bottom:0"><div class="wrap">
+<div class="quote-card" id="quote">
+<div class="quote-pitch"><span class="eyebrow"><span class="stripe-mini"></span>Skip the scrolling</span>
+<h2>Need a pro, not a search? We&rsquo;ll find you 3.</h2>
+<p>Tell us what you need done and where. We match you with up to 3 top-rated local businesses who want the work &mdash; they call you, not the other way around.</p>
+<ul class="quote-points"><li>Free, no obligation to hire anyone</li><li>Real Coachella Valley businesses, not a national lead mill</li><li>Usually hear back within a day</li></ul></div>
+<form class="quote-form" id="quote-form" data-ajax action="https://formspree.io/f/myezyype" data-thanks="Got it! We're matching you with local pros now &mdash; expect a call or text soon.">
+<input type="hidden" name="type" value="quote_request">
+<label class="full">What do you need done?<input name="need" type="text" placeholder="e.g. AC repair, a roof leak, a divorce attorney" required></label>
+<label>Category<select name="category" id="qf-cat" required><option value="">Choose one&hellip;</option><option>Home services</option><option>Automotive</option><option>Legal</option><option>Health and beauty</option><option>Pets</option><option>Other</option></select></label>
+<label>Your city<select name="city" required><option value="">Choose one&hellip;</option><option>Bermuda Dunes</option><option>Cathedral City</option><option>Coachella</option><option>Desert Hot Springs</option><option>Indian Wells</option><option>Indio</option><option>La Quinta</option><option>Palm Desert</option><option>Palm Springs</option><option>Rancho Mirage</option><option>Thousand Palms</option></select></label>
+<label>Your name<input name="name" type="text" autocomplete="name" required></label>
+<label>Phone<input name="phone" type="tel" autocomplete="tel" required></label>
+<button class="btn full" type="submit">Get matched with 3 local pros &rarr;</button>
+<p class="form-status full" role="status"></p>
+<p class="fine-print full">We only share your request with businesses in this directory. No spam, ever.</p>
+</form>
+</div>
+</div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
 <div class="filters"><label class="sr-only" for="f-q">Search</label><input id="f-q" type="search" placeholder="Search">
 <label class="sr-only" for="f-city">City</label><select id="f-city"><option value="">All cities</option></select><label class="sr-only" for="f-cat">Categories</label><select id="f-cat"><option value="">All categories</option></select></div>
@@ -77,5 +96,15 @@
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight, a brand of MoreViews Pro LLC. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
 <script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js"></script>
+<script>
+// Get 3 Quotes: prefill the category from ?category= so a visitor who taps "Home services" on the
+// homepage lands with the quote form already matching what they searched for.
+(function () {
+  var sel = document.getElementById("qf-cat");
+  if (!sel) return;
+  var want = new URLSearchParams(location.search).get("category");
+  if (want && [].some.call(sel.options, function (o) { return o.value === want; })) sel.value = want;
+})();
+</script>
 </body>
 </html>
