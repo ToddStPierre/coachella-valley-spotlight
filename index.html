@@ -65,41 +65,10 @@
 <div class="chips">
 <a class="chip chip-feature" href="halloween" data-until="2026-11-02">&#127875; Halloween guide</a><a class="chip" href="welcome">New to the valley?</a><a class="chip" href="events">Things to do</a><a class="chip" href="this-weekend/">This weekend</a><a class="chip" href="farmers-markets">Farmers markets</a><a class="chip" href="directory?category=Happy%20hours">Happy hours</a><a class="chip" href="golf/">Golf courses</a><a class="chip" href="deals">Deals</a><a class="chip news-link" href="news">Local news</a>
 <a class="chip" href="directory?category=Home%20services">Home services</a><a class="chip" href="directory?category=Restaurants">Restaurants</a></div>
-<div class="hm-find" id="hm-find">
-<a class="hm-pill" id="hm-pill" href="#valley-map"><span class="hm-mini" aria-hidden="true"><svg viewBox="0 0 1000 520" preserveAspectRatio="none" focusable="false"><rect width="1000" height="520" fill="#f3e2c8"/><path d="M0,128 L68,176 L96,282 L200,340 L322,388 L444,418 L548,432 L612,520 L0,520 Z" fill="#5b4a7a" opacity=".5"/><polyline points="0,103 375,239 625,308 1000,424" fill="none" stroke="#221c18" stroke-width="22" opacity=".6"/><g fill="#d9552b"><circle cx="114" cy="232" r="34"/><circle cx="470" cy="380" r="46"/><circle cx="604" cy="461" r="38"/><circle cx="801" cy="382" r="38"/><circle cx="281" cy="301" r="26"/><circle cx="888" cy="437" r="26"/></g></svg></span><span class="hm-text" id="hm-text">Find your town on the map</span><span class="hm-meta" id="hm-meta" hidden></span><span class="hm-arr" aria-hidden="true">&darr;</span></a>
-<button type="button" class="hm-link" id="localize-geo">or use my location</button>
-<button type="button" class="hm-link" id="localize-change" hidden>Change town</button>
-</div>
-</div>
-<aside class="hero-panel" aria-labelledby="hp-h" aria-roledescription="carousel"><div class="hp-slides" aria-live="off">
-<div class="hp-slide hp-feature is-on" role="group" aria-roledescription="slide" aria-label="Halloween guide" data-until="2026-11-02"><span class="eyebrow"><span class="stripe-mini"></span>Halloween in the valley</span>
-<a class="hp-feature-title" href="halloween">Trick-or-treats, haunted houses and parties, town by town &rarr;</a>
-<ol class="hp-list" data-list="events" data-tag="halloween" data-limit="3" data-view="row"></ol>
-<a class="more" href="halloween">See the full Halloween guide &rarr;</a></div>
-<div class="hp-slide" role="group" aria-roledescription="slide" aria-label="This weekend" hidden><span class="eyebrow"><span class="stripe-mini"></span>This weekend</span><h2 id="hp-h" class="sr-only">This weekend</h2>
-<ol class="hp-list" data-when="weekend" data-list="events" data-limit="3" data-view="row"></ol>
-<a class="more" href="this-weekend/">See all weekend events &rarr;</a></div>
-</div></aside>
-</div><svg class="mountains" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
-<path d="M0 120 L0 78 L120 40 L210 70 L330 18 L450 66 L560 36 L650 58 L780 10 L900 62 L1010 30 L1110 56 L1200 34 L1200 120 Z" fill="#c9667a" opacity=".35"/>
-<path d="M0 120 L0 96 L160 64 L260 88 L400 52 L520 90 L640 66 L760 92 L880 58 L1000 86 L1100 70 L1200 84 L1200 120 Z" fill="#5b4a7a" opacity=".55"/>
-<path d="M0 120 L0 108 L200 92 L380 108 L560 94 L760 110 L940 96 L1200 106 L1200 120 Z" fill="#221c18"/></svg></section>
 
-<div class="wrap"><section id="search-results" class="section" hidden></section></div>
-
-<section class="section near-you" id="near-you" hidden><div class="wrap">
-<div class="section-head"><div><span class="eyebrow">Just for you</span><h2>Spotlight on <span id="ny-city">your town</span></h2><p>The events, deals and businesses closest to home, picked first.</p></div><a class="more" id="ny-see-all" href="directory">See all &rarr;</a></div>
-<div class="ny-cols">
-<div><h3>Coming up nearby</h3><div class="grid" data-list="events" data-city="" data-limit="3" id="ny-events"></div></div>
-<div><h3>Deals nearby</h3><div class="grid" data-list="deals" data-city="" data-limit="3" id="ny-deals"></div></div>
-<div><h3>Businesses nearby</h3><div class="grid" data-list="directory" data-city="" data-limit="3" id="ny-directory"></div></div>
 </div>
-</div></section>
-
-<section class="section vmap-section" id="valley-map"><div class="wrap">
-<div class="section-head"><div><span class="eyebrow">Town by town</span><h2>Eleven towns. One valley. <span class="grad">Pick yours.</span></h2><p>Tap a town on the map to see what&rsquo;s there: local businesses, what&rsquo;s coming up, and where the deals are.</p></div><a class="more" href="directory">Whole valley &rarr;</a></div>
-<div class="vmap-grid">
-<div>
+<div class="hero-panel hero-map" id="valley-map" aria-roledescription="carousel">
+<div class="hero-map-head"><span class="eyebrow"><span class="stripe-mini"></span>Pick your town</span><button type="button" class="hm-link" id="localize-geo">&#128205; Use my location</button></div>
 <div class="vmap" id="vmap">
 <svg viewBox="0 0 1000 520" preserveAspectRatio="none" aria-hidden="true" focusable="false">
 <defs>
@@ -130,22 +99,47 @@
 <a class="vm-pin" href="city/thousand-palms/" data-town="Thousand Palms" data-lab="r" style="--x:45.8%;--y:46.7%"><span class="vm-dot"></span><span class="vm-label">Thousand Palms</span></a>
 <a class="vm-pin" href="city/rancho-mirage/" data-town="Rancho Mirage" data-lab="l" style="--x:39%;--y:68.5%"><span class="vm-dot"></span><span class="vm-label">Rancho Mirage</span></a>
 <a class="vm-pin" href="city/palm-desert/" data-town="Palm Desert" data-lab="t" style="--x:47%;--y:73.1%"><span class="vm-dot"></span><span class="vm-label">Palm Desert</span></a>
-<a class="vm-pin" href="city/indian-wells/" data-town="Indian Wells" data-lab="b" style="--x:54.2%;--y:74.4%"><span class="vm-dot"></span><span class="vm-label">Indian Wells</span></a>
-<a class="vm-pin" href="city/bermuda-dunes/" data-town="Bermuda Dunes" data-lab="t" style="--x:63.2%;--y:68.7%"><span class="vm-dot"></span><span class="vm-label">Bermuda Dunes</span></a>
+<a class="vm-pin" href="city/indian-wells/" data-town="Indian Wells" data-lab="b" data-small style="--x:54.2%;--y:74.4%"><span class="vm-dot"></span><span class="vm-label">Indian Wells</span></a>
+<a class="vm-pin" href="city/bermuda-dunes/" data-town="Bermuda Dunes" data-lab="t" data-small style="--x:63.2%;--y:68.7%"><span class="vm-dot"></span><span class="vm-label">Bermuda Dunes</span></a>
 <a class="vm-pin" href="city/la-quinta/" data-town="La Quinta" data-lab="r" style="--x:60.4%;--y:88.7%"><span class="vm-dot"></span><span class="vm-label">La Quinta</span></a>
 <a class="vm-pin" href="city/indio/" data-town="Indio" data-lab="t" style="--x:80.1%;--y:73.5%"><span class="vm-dot"></span><span class="vm-label">Indio</span></a>
 <a class="vm-pin" href="city/coachella/" data-town="Coachella" data-lab="b" style="--x:88.8%;--y:84%"><span class="vm-dot"></span><span class="vm-label">Coachella</span></a>
 </div>
 <div class="vm-towns" id="vm-towns" role="group" aria-label="Choose a town"></div>
-</div>
-<div class="vm-card" id="vm-card" aria-live="polite">
+<div class="hp-slides" aria-live="off">
+<div class="hp-slide is-on" role="group" aria-roledescription="slide" aria-label="Town spotlight"><div class="vm-card" id="vm-card" aria-live="polite">
 <span class="eyebrow"><span class="stripe-mini"></span>Spotlight on</span>
 <h3>Palm Desert</h3>
 <p class="vm-tag">El Paseo shopping, Highway 111 dining, and the middle of the valley.</p>
 <div class="vm-actions"><a class="btn" href="city/palm-desert/">Explore Palm Desert &rarr;</a></div>
 </div>
 </div>
+<div class="hp-slide hp-feature" hidden role="group" aria-roledescription="slide" aria-label="Halloween guide" data-until="2026-11-02"><span class="eyebrow"><span class="stripe-mini"></span>Halloween in the valley</span>
+<a class="hp-feature-title" href="halloween">Trick-or-treats, haunted houses and parties, town by town &rarr;</a>
+<ol class="hp-list" data-list="events" data-tag="halloween" data-limit="2" data-view="row"></ol>
+<a class="more" href="halloween">See the full Halloween guide &rarr;</a></div>
+<div class="hp-slide" role="group" aria-roledescription="slide" aria-label="This weekend" hidden><span class="eyebrow"><span class="stripe-mini"></span>This weekend</span><h2 id="hp-h" class="sr-only">This weekend</h2>
+<ol class="hp-list" data-when="weekend" data-list="events" data-limit="2" data-view="row"></ol>
+<a class="more" href="this-weekend/">See all weekend events &rarr;</a></div>
+</div>
+</div>
+</div><svg class="mountains" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
+<path d="M0 120 L0 78 L120 40 L210 70 L330 18 L450 66 L560 36 L650 58 L780 10 L900 62 L1010 30 L1110 56 L1200 34 L1200 120 Z" fill="#c9667a" opacity=".35"/>
+<path d="M0 120 L0 96 L160 64 L260 88 L400 52 L520 90 L640 66 L760 92 L880 58 L1000 86 L1100 70 L1200 84 L1200 120 Z" fill="#5b4a7a" opacity=".55"/>
+<path d="M0 120 L0 108 L200 92 L380 108 L560 94 L760 110 L940 96 L1200 106 L1200 120 Z" fill="#221c18"/></svg></section>
+
+<div class="wrap"><section id="search-results" class="section" hidden></section></div>
+
+<section class="section near-you" id="near-you" hidden><div class="wrap">
+<div class="section-head"><div><span class="eyebrow">Just for you</span><h2>Spotlight on <span id="ny-city">your town</span></h2><p>The events, deals and businesses closest to home, picked first.</p></div><a class="more" id="ny-see-all" href="directory">See all &rarr;</a></div>
+<div class="ny-cols">
+<div><h3>Coming up nearby</h3><div class="grid" data-list="events" data-city="" data-limit="3" id="ny-events"></div></div>
+<div><h3>Deals nearby</h3><div class="grid" data-list="deals" data-city="" data-limit="3" id="ny-deals"></div></div>
+<div><h3>Businesses nearby</h3><div class="grid" data-list="directory" data-city="" data-limit="3" id="ny-directory"></div></div>
+</div>
 </div></section>
+
+
 <section class="section"><div class="wrap">
 <div class="section-head"><div><span class="eyebrow">On the calendar</span><h2>Coming up around the valley</h2><p>Markets, shows, games and more after this weekend.</p></div><a class="more" href="events">Open the calendar &rarr;</a></div>
 <div class="grid-2" data-when="after-weekend" data-list="events" data-limit="6"><noscript><div class="empty">Turn on JavaScript to see the listings.</div></noscript></div>
@@ -213,9 +207,7 @@
   if (city) {
     ["ny-events", "ny-deals", "ny-directory"].forEach(function (id) { var el = document.getElementById(id); if (el) el.setAttribute("data-city", city); });
     var ny = document.getElementById("near-you"); if (ny) ny.hidden = false;
-    var txt = document.getElementById("hm-text"); if (txt) txt.textContent = "\ud83d\udccd " + city;
     var geo0 = document.getElementById("localize-geo"); if (geo0) geo0.hidden = true;
-    var chg = document.getElementById("localize-change"); if (chg) chg.hidden = false;
     var nc = document.getElementById("ny-city"); if (nc) nc.textContent = city;
     var see = document.getElementById("ny-see-all"); if (see) see.href = "city/" + city.toLowerCase().replace(/[^a-z]+/g, "-") + "/";
   }
@@ -230,20 +222,12 @@
         apply(nearestCity(pos.coords.latitude, pos.coords.longitude));
       }, function () { geoBtn.textContent = "Couldn’t get your location, pick on the map"; }, { timeout: 8000 });
     });
-    // The pill and "Change town" both scroll to the map; the pill re-selects the saved town.
-    function toMap(e, mine) {
-      var m = document.getElementById("valley-map"); if (!m) return;
-      e.preventDefault(); m.scrollIntoView({ behavior: "smooth", block: "start" });
-      if (window.CVS_MAP) window.CVS_MAP.select(mine && city ? city : "", false);
-    }
-    var pill = document.getElementById("hm-pill"); if (pill) pill.addEventListener("click", function (e) { toMap(e, true); });
-    var changeBtn = document.getElementById("localize-change"); if (changeBtn) changeBtn.addEventListener("click", function (e) { toMap(e, false); });
   });
 })();
 </script>
 <script src="assets/app.js"></script>
 <script>
-// Valley map: tap a town pin to see its businesses, upcoming events, deals and top categories.
+// Valley map (in the hero): tap a town pin to see its businesses, upcoming events, deals and top categories.
 // Runs after app.js so it can reuse CVS_RENDER (upcoming events with weekly dates filled in, the sorted directory).
 (function () {
   var map = document.getElementById("vmap"), card = document.getElementById("vm-card");
@@ -322,6 +306,7 @@
     pins.forEach(function (p) { if (p.getAttribute("data-town") === town) p.setAttribute("aria-current", "true"); else p.removeAttribute("aria-current"); });
     if (chips) [].forEach.call(chips.children, function (b) { var on = b.getAttribute("data-town") === town; b.setAttribute("aria-pressed", on ? "true" : "false"); if (on && track) b.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" }); });
     render(town);
+    if (track) { var d0 = document.querySelector(".hero-map .hp-dot"); if (d0 && d0.getAttribute("aria-current") !== "true") d0.click(); var pb = document.querySelector(".hero-map .hp-pause"); if (pb && pb.textContent === "Pause") pb.click(); }
     if (track && !window.CVS_NOTRACK && window.gtag) window.gtag("event", "map_town", { city: town });
   }
 
@@ -342,8 +327,6 @@
   });
   select(TAG[mine] ? mine : "Palm Desert", false);
   window.CVS_MAP = { select: function (t, track) { if (t) select(t, track); } };
-  var meta = document.getElementById("hm-meta");
-  if (meta && TAG[mine]) { var st = stats(mine); meta.textContent = "· " + st.biz + " businesses · " + st.ev.length + " events"; meta.hidden = false; }
 })();
 </script>
 </body>

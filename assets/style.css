@@ -110,20 +110,6 @@ p { margin: 0 0 var(--s2); }
 .chip:hover, .chip.active { border-color: var(--palm); color: var(--palm); background: var(--palm-soft); }
 
 /* Localize: pick-your-town bar in the hero, and the small badge once a town is set. */
-/* Hero: town pill that leads to the valley map (#valley-map) */
-.hm-find { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: var(--s3); }
-.hm-pill { display: inline-flex; align-items: center; gap: 10px; max-width: 100%; padding: 7px 16px 7px 7px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow); text-decoration: none; color: var(--ink); font-weight: 600; font-size: 15.5px; transition: border-color .15s, transform .15s; }
-.hm-pill:hover { border-color: var(--palm); transform: translateY(-1px); }
-.hm-mini { flex: 0 0 auto; width: 64px; height: 34px; border-radius: 999px; overflow: hidden; background: #f3e2c8; }
-.hm-mini svg { width: 100%; height: 100%; display: block; }
-.hm-meta { color: var(--ink-2); font-weight: 500; }
-.hm-meta[hidden] { display: none; }
-.hm-arr { color: var(--sun-deep); }
-.hm-link { background: none; border: 0; padding: 4px; color: var(--ink-2); font-family: var(--body); font-size: 14.5px; text-decoration: underline; cursor: pointer; }
-.hm-link:hover { color: var(--sun-deep); }
-.hm-link[hidden] { display: none; }
-#valley-map { scroll-margin-top: 70px; }
-@media (max-width: 480px) { .hm-meta { display: none; } .hm-pill { font-size: 15px; } }
 .localize-badge button:hover { border-color: var(--palm); }
 
 /* Near You: personalized mini-homepage once a town is known. */
@@ -1069,3 +1055,36 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
   .vm-towns { display: flex; }
   .vm-stats b { font-size: 24px; }
 }
+
+/* Home hero with the valley map: text left, map box right (a .hero-panel, so app.js rotates the slides under the map). */
+.hero { padding-top: var(--s3); }
+@media (max-width: 640px) { .hero { padding-top: var(--s2); } }
+.hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); gap: var(--s4); align-items: start; }
+.hero-grid .hero-inner > .eyebrow:first-child { margin-top: 0; }
+.hero-grid h1 { font-size: clamp(36px, 4.6vw, 56px); }
+.hero p.lede { font-size: 18.5px; }
+.hero-map { position: relative; z-index: 1; background: var(--paper); border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 2px 4px rgba(34,28,24,.05), 0 24px 48px -24px rgba(34,28,24,.35); padding: 12px; margin-top: 0; scroll-margin-top: 80px; }
+.hero-map .hp-slides { margin-top: 2px; }
+.hero-map .hp-slide:not(:first-child) { padding: 16px 6px 0; }
+.hero-map .hp-controls { margin: 10px 6px 2px; }
+.hero-map .hp-ad-img img { max-height: 200px; }
+.hero-map-head { display: flex; justify-content: space-between; align-items: center; padding: 4px 6px 10px; }
+.hero-map-head .eyebrow { margin: 0; }
+.hero-map .vmap { border-radius: 14px; box-shadow: none; }
+.hero-map .vm-card { border: 0; box-shadow: none; padding: 14px 6px 4px; background: none; }
+.hero-map .vm-card > .eyebrow, .hero-map .vm-next { display: none; }
+.hero-map .vm-card h3 { font-size: 28px; margin: 0 0 2px; }
+.hero-map .vm-tag { min-height: 0; font-size: 15px; margin-bottom: 12px; }
+.hero-map .vm-stats b { font-size: 24px; }
+.hero-map .vm-stats a { padding: 8px 6px; }
+.hero-map .vm-cats { margin-bottom: 14px; }
+.hero-map .vm-label { font-size: 11px; padding: 1px 6px; }
+.hero-map .vm-pin[data-small] .vm-label { display: none; }
+.hero-map .vm-pin[data-small]:hover .vm-label, .hero-map .vm-pin[data-small][aria-current="true"] .vm-label { display: block; }
+.hm-link { background: none; border: 0; padding: 4px; color: var(--ink-2); font-family: var(--body); font-size: 14px; text-decoration: underline; cursor: pointer; }
+.hm-link:hover { color: var(--sun-deep); }
+.hm-link[hidden] { display: none; }
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) { .hero-map { padding: 8px; border-radius: 18px; } }
