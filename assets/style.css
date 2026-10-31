@@ -1097,8 +1097,9 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .ss-open ~ .nav-links { margin-left: 0; }
 @media (max-width: 1180px) { .ss-open { min-width: 0; } .ss-open .ss-open-label, .ss-open kbd { display: none; } .ss-open { padding: 9px; } }
 @media (max-width: 920px) { .ss-open { margin-left: auto; width: 40px; height: 40px; justify-content: center; } .ss-open ~ .menu-toggle { margin-left: 8px; } }
-/* Phones: the tab bar's Search tab opens it, so the header keeps just the logo and Menu on one line. */
-@media (max-width: 760px) { .ss-open { display: none; } .ss-open ~ .menu-toggle { margin-left: auto; } }
+/* Phones: logo, search and Menu on one line (tighter spacing; a smaller logo on very narrow phones). */
+@media (max-width: 760px) { .nav { column-gap: 8px; } .ss-open { width: 38px; height: 38px; } .ss-open ~ .menu-toggle { margin-left: 0; } }
+@media (max-width: 380px) { .site-header .brand { font-size: 18px; } .site-header .brand-mark { width: 32px; height: 32px; } }
 .ss-lock, .ss-lock body { overflow: hidden; }
 .ss-backdrop { position: fixed; inset: 0; z-index: 200; background: rgba(34, 28, 24, .45); backdrop-filter: blur(3px); display: flex; justify-content: center; align-items: flex-start; padding: 10vh var(--s2) var(--s2); animation: popup-fade .15s ease; }
 .ss-backdrop[hidden] { display: none; }

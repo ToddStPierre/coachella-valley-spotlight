@@ -457,7 +457,7 @@
     window.addEventListener("scroll", reveal, { passive: true });
   })();
 
-  // Mobile app-style tab bar: a persistent bottom nav (Home / Events / Deals / Directory / Search) on
+  // Mobile app-style tab bar: a persistent bottom nav (Home / Events / Deals / Directory) on
   // every page on a phone, so the four things people actually come back for are always one thumb-tap
   // away instead of buried behind the hamburger menu. Site-wide, not per-page — this is how the whole
   // site should feel on a phone. Skipped on business profiles, which already dock Call/Directions there.
@@ -469,8 +469,7 @@
       { href: "", label: "Home", icon: "🏠", active: p === "/" || p === "/index.html" },
       { href: "events", label: "Events", icon: "🎉", active: on(/\/(events|event|this-weekend)(\/|\.html|$)/) },
       { href: "deals", label: "Deals", icon: "🏷️", active: on(/\/deals(\/|\.html|$)/) },
-      { href: "directory", label: "Directory", icon: "📒", active: on(/\/(directory|business)(\/|\.html|$)/) },
-      { href: "directory#f-q", label: "Search", icon: "🔍", active: false }
+      { href: "directory", label: "Directory", icon: "📒", active: on(/\/(directory|business)(\/|\.html|$)/) }
     ];
     var bar = document.createElement("nav");
     bar.className = "tab-bar";
@@ -485,7 +484,7 @@
 
   // Spotlight search: one instant search over businesses, towns, categories, events, deals and guides,
   // from every page. The engine (assets/search.js) only loads the first time someone opens it.
-  // Openers: the header search button, the phone tab bar's Search tab, the home hero search box, Cmd/Ctrl+K and "/".
+  // Openers: the header search button (on phones too), the home hero search box, Cmd/Ctrl+K and "/".
   (function () {
     var loading = null;
     function openSearch(q, from) {
@@ -504,8 +503,6 @@
       b.addEventListener("click", function () { openSearch("", "header"); });
       nav.insertBefore(b, nav.querySelector(".menu-toggle, .nav-links"));
     }
-    var tab = document.querySelector('.tab-bar a[href$="directory#f-q"]');
-    if (tab) tab.addEventListener("click", function (ev) { ev.preventDefault(); openSearch("", "tabbar"); });
     // Home hero: typing in the big search box opens the instant results with what was typed.
     var hq = document.getElementById("hq");
     if (hq) {
