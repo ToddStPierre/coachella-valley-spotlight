@@ -65,20 +65,10 @@
 <div class="chips">
 <a class="chip chip-feature" href="halloween" data-until="2026-11-02">&#127875; Halloween guide</a><a class="chip" href="welcome">New to the valley?</a><a class="chip" href="events">Things to do</a><a class="chip" href="this-weekend/">This weekend</a><a class="chip" href="farmers-markets">Farmers markets</a><a class="chip" href="directory?category=Happy%20hours">Happy hours</a><a class="chip" href="golf/">Golf courses</a><a class="chip" href="deals">Deals</a><a class="chip news-link" href="news">Local news</a>
 <a class="chip" href="directory?category=Home%20services">Home services</a><a class="chip" href="directory?category=Restaurants">Restaurants</a></div>
-<div class="localize-bar" id="localize-bar">
-<span class="localize-icon" aria-hidden="true">&#128205;</span>
-<span class="localize-text">Tell us your town and we&rsquo;ll put your neighborhood first.</span>
-<label class="sr-only" for="localize-select">Your town</label>
-<select id="localize-select">
-<option value="">Choose your town&hellip;</option>
-<option>Bermuda Dunes</option><option>Cathedral City</option><option>Coachella</option><option>Desert Hot Springs</option><option>Indian Wells</option><option>Indio</option><option>La Quinta</option><option>Palm Desert</option><option>Palm Springs</option><option>Rancho Mirage</option><option>Thousand Palms</option>
-</select>
-<button type="button" class="btn btn-ghost btn-sm" id="localize-set">Set my town</button>
-<button type="button" class="localize-geo" id="localize-geo">Use my location</button>
-</div>
-<div class="localize-badge" id="localize-badge" hidden>
-<span>&#128205; <b id="localize-badge-city"></b></span>
-<button type="button" id="localize-change">Change</button>
+<div class="hm-find" id="hm-find">
+<a class="hm-pill" id="hm-pill" href="#valley-map"><span class="hm-mini" aria-hidden="true"><svg viewBox="0 0 1000 520" preserveAspectRatio="none" focusable="false"><rect width="1000" height="520" fill="#f3e2c8"/><path d="M0,128 L68,176 L96,282 L200,340 L322,388 L444,418 L548,432 L612,520 L0,520 Z" fill="#5b4a7a" opacity=".5"/><polyline points="0,103 375,239 625,308 1000,424" fill="none" stroke="#221c18" stroke-width="22" opacity=".6"/><g fill="#d9552b"><circle cx="114" cy="232" r="34"/><circle cx="470" cy="380" r="46"/><circle cx="604" cy="461" r="38"/><circle cx="801" cy="382" r="38"/><circle cx="281" cy="301" r="26"/><circle cx="888" cy="437" r="26"/></g></svg></span><span class="hm-text" id="hm-text">Find your town on the map</span><span class="hm-meta" id="hm-meta" hidden></span><span class="hm-arr" aria-hidden="true">&darr;</span></a>
+<button type="button" class="hm-link" id="localize-geo">or use my location</button>
+<button type="button" class="hm-link" id="localize-change" hidden>Change town</button>
 </div>
 </div>
 <aside class="hero-panel" aria-labelledby="hp-h" aria-roledescription="carousel"><div class="hp-slides" aria-live="off">
@@ -223,29 +213,31 @@
   if (city) {
     ["ny-events", "ny-deals", "ny-directory"].forEach(function (id) { var el = document.getElementById(id); if (el) el.setAttribute("data-city", city); });
     var ny = document.getElementById("near-you"); if (ny) ny.hidden = false;
-    var bar = document.getElementById("localize-bar"); if (bar) bar.hidden = true;
-    var badge = document.getElementById("localize-badge"); if (badge) badge.hidden = false;
-    var bc = document.getElementById("localize-badge-city"); if (bc) bc.textContent = city;
+    var txt = document.getElementById("hm-text"); if (txt) txt.textContent = "\ud83d\udccd " + city;
+    var geo0 = document.getElementById("localize-geo"); if (geo0) geo0.hidden = true;
+    var chg = document.getElementById("localize-change"); if (chg) chg.hidden = false;
     var nc = document.getElementById("ny-city"); if (nc) nc.textContent = city;
     var see = document.getElementById("ny-see-all"); if (see) see.href = "city/" + city.toLowerCase().replace(/[^a-z]+/g, "-") + "/";
   }
   document.addEventListener("DOMContentLoaded", function () {
-    function apply(c) { if (!c) return; setCity(c); if (!window.CVS_NOTRACK && window.gtag) window.gtag("event", "localize_set", { city: c }); location.reload(); }
-    var setBtn = document.getElementById("localize-set");
-    if (setBtn) setBtn.addEventListener("click", function () { apply(document.getElementById("localize-select").value); });
+    // Location goes straight to the map with the nearest town picked and saved.
+    function apply(c) { if (!c) return; setCity(c); if (!window.CVS_NOTRACK && window.gtag) window.gtag("event", "localize_set", { city: c, from: "location" }); location.hash = "valley-map"; location.reload(); }
     var geoBtn = document.getElementById("localize-geo");
     if (geoBtn) geoBtn.addEventListener("click", function () {
-      if (!navigator.geolocation) { geoBtn.textContent = "Location not available — pick above"; return; }
+      if (!navigator.geolocation) { geoBtn.textContent = "Location not available, pick on the map"; return; }
       geoBtn.textContent = "Finding you…";
       navigator.geolocation.getCurrentPosition(function (pos) {
         apply(nearestCity(pos.coords.latitude, pos.coords.longitude));
-      }, function () { geoBtn.textContent = "Couldn’t get your location — pick above"; }, { timeout: 8000 });
+      }, function () { geoBtn.textContent = "Couldn’t get your location, pick on the map"; }, { timeout: 8000 });
     });
-    var changeBtn = document.getElementById("localize-change");
-    if (changeBtn) changeBtn.addEventListener("click", function () {
-      setCity(""); document.getElementById("localize-badge").hidden = true; document.getElementById("localize-bar").hidden = false;
-      var ny = document.getElementById("near-you"); if (ny) ny.hidden = true;
-    });
+    // The pill and "Change town" both scroll to the map; the pill re-selects the saved town.
+    function toMap(e, mine) {
+      var m = document.getElementById("valley-map"); if (!m) return;
+      e.preventDefault(); m.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (window.CVS_MAP) window.CVS_MAP.select(mine && city ? city : "", false);
+    }
+    var pill = document.getElementById("hm-pill"); if (pill) pill.addEventListener("click", function (e) { toMap(e, true); });
+    var changeBtn = document.getElementById("localize-change"); if (changeBtn) changeBtn.addEventListener("click", function (e) { toMap(e, false); });
   });
 })();
 </script>
@@ -349,6 +341,9 @@
     location.reload();
   });
   select(TAG[mine] ? mine : "Palm Desert", false);
+  window.CVS_MAP = { select: function (t, track) { if (t) select(t, track); } };
+  var meta = document.getElementById("hm-meta");
+  if (meta && TAG[mine]) { var st = stats(mine); meta.textContent = "· " + st.biz + " businesses · " + st.ev.length + " events"; meta.hidden = false; }
 })();
 </script>
 </body>

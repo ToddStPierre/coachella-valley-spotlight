@@ -110,16 +110,20 @@ p { margin: 0 0 var(--s2); }
 .chip:hover, .chip.active { border-color: var(--palm); color: var(--palm); background: var(--palm-soft); }
 
 /* Localize: pick-your-town bar in the hero, and the small badge once a town is set. */
-.localize-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: var(--s3); background: var(--paper); border: 1.5px dashed var(--palm); border-radius: var(--radius); padding: 14px 18px; max-width: 620px; }
-.localize-bar .localize-icon { font-size: 20px; line-height: 1; }
-.localize-bar .localize-text { font-weight: 600; flex: 1 1 220px; min-width: 160px; }
-.localize-bar select { font: inherit; font-size: 15px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--ink); }
-.localize-bar .btn-sm { padding: 8px 14px; font-size: 14.5px; }
-.localize-geo { background: none; border: 0; color: var(--palm); font-weight: 600; font-size: 14.5px; cursor: pointer; text-decoration: underline; padding: 4px; font-family: var(--body); }
-.localize-geo:hover { color: var(--sun-deep); }
-.localize-bar[hidden], .localize-badge[hidden] { display: none; }
-.localize-badge { display: inline-flex; align-items: center; gap: 10px; margin-top: var(--s3); background: var(--palm-soft); border-radius: 999px; padding: 8px 8px 8px 16px; font-weight: 600; color: var(--palm); }
-.localize-badge button { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--ink); cursor: pointer; }
+/* Hero: town pill that leads to the valley map (#valley-map) */
+.hm-find { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: var(--s3); }
+.hm-pill { display: inline-flex; align-items: center; gap: 10px; max-width: 100%; padding: 7px 16px 7px 7px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow); text-decoration: none; color: var(--ink); font-weight: 600; font-size: 15.5px; transition: border-color .15s, transform .15s; }
+.hm-pill:hover { border-color: var(--palm); transform: translateY(-1px); }
+.hm-mini { flex: 0 0 auto; width: 64px; height: 34px; border-radius: 999px; overflow: hidden; background: #f3e2c8; }
+.hm-mini svg { width: 100%; height: 100%; display: block; }
+.hm-meta { color: var(--ink-2); font-weight: 500; }
+.hm-meta[hidden] { display: none; }
+.hm-arr { color: var(--sun-deep); }
+.hm-link { background: none; border: 0; padding: 4px; color: var(--ink-2); font-family: var(--body); font-size: 14.5px; text-decoration: underline; cursor: pointer; }
+.hm-link:hover { color: var(--sun-deep); }
+.hm-link[hidden] { display: none; }
+#valley-map { scroll-margin-top: 70px; }
+@media (max-width: 480px) { .hm-meta { display: none; } .hm-pill { font-size: 15px; } }
 .localize-badge button:hover { border-color: var(--palm); }
 
 /* Near You: personalized mini-homepage once a town is known. */
