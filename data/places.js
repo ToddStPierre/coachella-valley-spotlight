@@ -90,6 +90,7 @@ window.CVS.places = {
     "Garage doors": "Garage door companies install and repair doors, springs and openers, plus driveway gate operators. Heat, wind and sun wear out springs and seals faster here.",
     "Plant nurseries": "Nurseries selling desert trees, palms, cactus, succulents and shrubs that can handle a valley summer, often grown right here.",
     "Gift shops": "Local gift and card shops for greeting cards, gifts, ornaments and seasonal decor.",
+    "Knife sharpening": "Local sharpeners for kitchen knives, salon and grooming shears, clipper blades and garden tools, so your edges cut clean again without buying new.",
     "Custom printing": "Local print shops for custom t-shirts, screen printing, embroidery and branded merch for businesses, teams and events.",
     "Chiropractors": "Local chiropractors for back and neck pain, sports injuries and family care, including prenatal and pediatric chiropractic at some practices.",
     "Massage and day spas": "Day spas and massage studios around the valley, from deep tissue and relaxation massage to float therapy.",
