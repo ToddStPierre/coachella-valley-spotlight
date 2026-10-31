@@ -871,8 +871,15 @@ main:focus { outline: none; }
 .sp-price .amount small { font-family: var(--body); font-size: 16px; font-weight: 500; color: var(--ink-2); }
 .sp-example { position: sticky; top: 90px; }
 .sp-example-label { display: block; font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 10px; }
-.sp-placeholder { margin: 10px 0 12px; aspect-ratio: 4 / 3; border: 2px dashed var(--line); border-radius: 10px; display: grid; place-items: center; color: var(--ink-2); font-size: 14px; background: var(--sand); }
+.sp-placeholder { margin: 10px 0 12px; aspect-ratio: 4 / 3; border: 2px dashed var(--line); border-radius: 10px; display: grid; place-items: center; color: var(--ink-2); font-size: 14px; background: var(--sand); transition: background-color .2s, border-color .2s; }
 .sp-live { display: inline-block; margin-top: 12px; font-size: 15px; }
+.sp-try { display: grid; gap: 8px; margin-bottom: 12px; }
+.sp-try input { font: inherit; font-weight: 500; padding: 11px 13px; border: 1.5px dashed var(--line); border-radius: 10px; background: #fff; color: var(--ink); width: 100%; }
+.sp-try input:focus { outline: none; border-style: solid; border-color: var(--sun); }
+.sponsor-side.is-filled { border-color: var(--sun); box-shadow: 0 0 0 3px rgba(217, 85, 43, .12), var(--shadow); }
+.sponsor-side.is-filled .sp-placeholder { background: #fff; border-style: solid; border-color: var(--sun); color: var(--ink); font-weight: 600; }
+.sp-claim { display: none; width: 100%; justify-content: center; text-align: center; margin-top: 10px; }
+.sp-claim.is-on { display: flex; }
 @media (max-width: 860px) { .sponsor-pitch { grid-template-columns: 1fr; padding: var(--s3); } .sp-example { position: static; } }
 /* Advertise hub (advertise.html): three ways + bundle */
 .ways-hero { padding: var(--s5) 0 var(--s4); }

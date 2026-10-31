@@ -692,6 +692,33 @@
     }, { passive: true });
   })();
 
+  // Advertise page: live sponsor-spot preview. Typing a business name/offer updates the mock ad in real time.
+  (function () {
+    var nameInput = document.getElementById("sp-try-name"), offerInput = document.getElementById("sp-try-offer");
+    if (!nameInput || !offerInput) return;
+    var card = document.getElementById("sp-preview"), ph = document.getElementById("sp-preview-ph"),
+      h = document.getElementById("sp-preview-h"), p = document.getElementById("sp-preview-p"),
+      claimBtn = document.getElementById("sp-claim-btn");
+    var DEFAULT_H = h.textContent, DEFAULT_P = p.textContent, firedGa = false;
+    function render() {
+      var name = nameInput.value.trim(), offer = offerInput.value.trim();
+      ph.textContent = name ? name : "Your photo or ad";
+      h.textContent = name ? name + (offer ? "." : " is sponsored here.") : DEFAULT_H;
+      p.textContent = offer || DEFAULT_P;
+      var filled = !!(name || offer);
+      card.classList.toggle("is-filled", filled);
+      if (claimBtn) {
+        claimBtn.classList.toggle("is-on", filled);
+        var sp = new URLSearchParams(); sp.set("topic", "Sponsor a category");
+        if (name) sp.set("about", name);
+        claimBtn.href = "contact?" + sp.toString() + "#form";
+      }
+      if (filled && !firedGa) { firedGa = true; ga("generate_lead", { form: "sponsor_try_it" }); }
+    }
+    nameInput.addEventListener("input", render);
+    offerInput.addEventListener("input", render);
+  })();
+
   // "Apple / Outlook" calendar links: build the .ics file on click.
   document.addEventListener("click", function (ev) {
     var a = ev.target.closest && ev.target.closest("[data-ics]"); if (!a) return;

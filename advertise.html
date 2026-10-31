@@ -216,13 +216,20 @@
 <div class="plan-btns"><a class="btn" href="contact?topic=Sponsor%20a%20category#form">Ask if my category is open</a><a class="btn btn-ghost" href="tel:+17604225475">Call (760) 422-5475</a></div>
 <p class="note">Home services is taken. Restaurants, fitness, health and beauty, automotive, pets, legal and shopping are open right now.</p>
 </div>
-<div class="sp-example" aria-hidden="true">
-<span class="sp-example-label">What your sponsor spot looks like</span>
-<div class="sponsor-side"><span class="sponsor-tag">Sponsored</span>
-<div class="sp-placeholder"><span>Your photo or ad</span></div>
-<h2>Your headline goes here.</h2><p>A line or two about what you do and why to call you. Add your offer if you have one.</p>
+<div class="sp-example">
+<span class="sp-example-label">Try it &mdash; type your business in</span>
+<div class="sp-try">
+<label class="sr-only" for="sp-try-name">Your business name</label>
+<input id="sp-try-name" type="text" maxlength="40" placeholder="Your business name" autocomplete="organization">
+<label class="sr-only" for="sp-try-offer">Your offer or tagline</label>
+<input id="sp-try-offer" type="text" maxlength="90" placeholder="Your offer or tagline, e.g. Same-day AC repair">
+</div>
+<div class="sponsor-side" id="sp-preview"><span class="sponsor-tag">Sponsored</span>
+<div class="sp-placeholder"><span id="sp-preview-ph">Your photo or ad</span></div>
+<h2 id="sp-preview-h">Your headline goes here.</h2><p id="sp-preview-p">A line or two about what you do and why to call you. Add your offer if you have one.</p>
 <span class="btn">See your business &rarr;</span><p class="sponsor-note">Paid placement.</p></div>
-<a class="sp-live" href="local/home-services/" tabindex="-1">See a live one on the Home services page &rarr;</a>
+<a class="sp-live" href="local/home-services/">See a live one on the Home services page &rarr;</a>
+<a class="btn sp-claim" id="sp-claim-btn" href="contact?topic=Sponsor%20a%20category#form">That&rsquo;s mine &mdash; is my category open? &rarr;</a>
 </div>
 </div></div></section>
 <section class="section" id="plans"><div class="wrap">
