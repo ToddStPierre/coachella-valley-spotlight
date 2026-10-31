@@ -483,6 +483,44 @@
     document.body.classList.add("has-tabbar");
   })();
 
+  // Spotlight search: one instant search over businesses, towns, categories, events, deals and guides,
+  // from every page. The engine (assets/search.js) only loads the first time someone opens it.
+  // Openers: the header search button, the phone tab bar's Search tab, the home hero search box, Cmd/Ctrl+K and "/".
+  (function () {
+    var loading = null;
+    function openSearch(q, from) {
+      if (window.CVS_GA) window.CVS_GA("search_open", { from: from });
+      if (window.CVS_SEARCH) return window.CVS_SEARCH.open(q);
+      if (!loading) loading = new Promise(function (ok) { var s = document.createElement("script"); s.src = ROOT + "assets/search.js?v=20261031a"; s.onload = ok; document.head.appendChild(s); });
+      loading.then(function () { window.CVS_SEARCH.open(q); });
+    }
+    window.CVS_OPEN_SEARCH = openSearch;
+    var nav = document.querySelector(".site-header .nav"), mt = nav && nav.querySelector(".menu-toggle");
+    if (nav) {
+      var mac = /Mac|iPhone|iPad/.test(navigator.platform || "");
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "ss-open"; b.setAttribute("aria-label", "Search the site");
+      b.innerHTML = '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span class="ss-open-label">Search</span><kbd>' + (mac ? "⌘K" : "Ctrl K") + '</kbd>';
+      b.addEventListener("click", function () { openSearch("", "header"); });
+      nav.insertBefore(b, nav.querySelector(".menu-toggle, .nav-links"));
+    }
+    var tab = document.querySelector('.tab-bar a[href$="directory#f-q"]');
+    if (tab) tab.addEventListener("click", function (ev) { ev.preventDefault(); openSearch("", "tabbar"); });
+    // Home hero: typing in the big search box opens the instant results with what was typed.
+    var hq = document.getElementById("hq");
+    if (hq) {
+      // A tap opens it straight away (phones keep the keyboard up that way); keyboard users who tab in open it by typing.
+      hq.addEventListener("click", function () { var v = hq.value; hq.value = ""; openSearch(v, "hero"); });
+      hq.addEventListener("input", function () { var v = hq.value; hq.value = ""; openSearch(v, "hero"); });
+      hq.form.addEventListener("submit", function (ev) { if (!hq.value.trim()) { ev.preventDefault(); ev.stopImmediatePropagation(); openSearch("", "hero"); } }, true);
+    }
+    document.addEventListener("keydown", function (ev) {
+      var t = ev.target, typing = t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+      if ((ev.metaKey || ev.ctrlKey) && (ev.key === "k" || ev.key === "K")) { ev.preventDefault(); openSearch("", "shortcut"); }
+      else if (ev.key === "/" && !typing && !ev.metaKey && !ev.ctrlKey && !ev.altKey) { ev.preventDefault(); openSearch("", "shortcut"); }
+    });
+  })();
+
   // Google Analytics goal events (the tag in each page's <head> sets window.gtag and CVS_NOTRACK).
   function ga(name, params) {
     if (window.CVS_NOTRACK || typeof window.gtag !== "function") return;
