@@ -438,6 +438,25 @@
     if (host && (type === "call" || type === "website")) track(host.getAttribute("data-biz"), type);
   });
 
+  // Mobile sticky call bar: on a business profile page, dock the Call / Directions actions
+  // to the bottom of the screen so they stay one tap away while the visitor scrolls the page
+  // on a phone — that's where "who do I call" searches actually happen.
+  (function () {
+    var callLink = document.querySelector(".cta-row a[data-track=\"call\"]");
+    var dirLink = document.querySelector(".pf-dir");
+    if (!callLink && !dirLink) return;
+    var bar = document.createElement("div");
+    bar.className = "sticky-cta";
+    if (callLink) bar.innerHTML += '<a class="btn" href="' + callLink.getAttribute("href") + '">' + callLink.textContent.replace(/^Call\s*/, "📞 Call ") + "</a>";
+    if (dirLink) bar.innerHTML += '<a class="btn btn-ghost" href="' + dirLink.getAttribute("href") + '" target="_blank" rel="noopener">📍 Directions</a>';
+    document.body.appendChild(bar);
+    document.body.classList.add("has-sticky-cta");
+    var hero = document.querySelector(".pf-hero");
+    function reveal() { bar.classList.toggle("is-visible", !hero || window.scrollY > hero.offsetHeight); }
+    reveal();
+    window.addEventListener("scroll", reveal, { passive: true });
+  })();
+
   // Google Analytics goal events (the tag in each page's <head> sets window.gtag and CVS_NOTRACK).
   function ga(name, params) {
     if (window.CVS_NOTRACK || typeof window.gtag !== "function") return;

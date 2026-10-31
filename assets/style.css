@@ -612,6 +612,24 @@ main:focus { outline: none; }
 .pf-contact li a { font-weight: 600; text-decoration: none; }
 .pf-map { display: block; width: 100%; height: 260px; border: 0; border-radius: 12px; margin-top: 18px; background: var(--sand); }
 .pf-dir { display: inline-block; margin-top: 8px; font-size: 15px; font-weight: 600; text-decoration: none; }
+
+/* Mobile sticky call bar: a persistent one-tap Call/Directions dock on business profile
+   pages, since most local "who do I call" searches happen on a phone mid-scroll. */
+.sticky-cta {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+  display: none; gap: 10px;
+  padding: 10px var(--s2) calc(10px + env(safe-area-inset-bottom));
+  background: rgba(255, 250, 243, .96); backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line); box-shadow: 0 -8px 24px -12px rgba(34, 28, 24, .25);
+  transform: translateY(100%); transition: transform .25s ease;
+}
+.sticky-cta.is-visible { transform: translateY(0); }
+.sticky-cta .btn, .sticky-cta .btn-ghost { flex: 1; padding: 13px 14px; font-size: 15.5px; }
+.sticky-cta .btn-ghost { background: var(--paper); }
+body.has-sticky-cta { padding-bottom: 72px; }
+@media (max-width: 760px) {
+  .sticky-cta { display: flex; }
+}
 .pf-deal { display: grid; grid-template-columns: 180px 1fr; gap: 16px; border: 1.5px dashed var(--sun); border-radius: 12px; padding: 12px; background: #fff4e8; }
 .pf-deal:not(:has(img)) { grid-template-columns: 1fr; }
 .pf-deal img { width: 100%; border-radius: 8px; object-fit: cover; aspect-ratio: 4 / 3; }
