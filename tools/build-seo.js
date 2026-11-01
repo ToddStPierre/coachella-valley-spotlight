@@ -32,6 +32,9 @@ ${footer}
 /* Rough city centers (lat, lng), only used to sort "nearby" links by distance. */
 const CITY_LL = { "Desert Hot Springs": [33.961, -116.502], "Palm Springs": [33.830, -116.545], "Cathedral City": [33.780, -116.466], "Rancho Mirage": [33.740, -116.413], "Thousand Palms": [33.820, -116.390], "Palm Desert": [33.722, -116.374], "Indian Wells": [33.718, -116.341], "Bermuda Dunes": [33.743, -116.290], "La Quinta": [33.663, -116.310], "Indio": [33.720, -116.216], "Coachella": [33.680, -116.174] };
 const cityDist = (a, b) => { const p = CITY_LL[a], q = CITY_LL[b]; return p && q ? Math.hypot(p[0] - q[0], p[1] - q[1]) : 99; };
+// Build time (Pacific). Weekend pages show it, and fast-changing pages carry it as <lastmod> in the sitemap.
+const BUILT = new Date(), BUILT_DAY = BUILT.toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+const BUILT_TEXT = BUILT.toLocaleString("en-US", { timeZone: "America/Los_Angeles", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 const andList = a => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
 
 /* 1. Run the card code from app.js (everything above its PRERENDER-END line). */
@@ -110,7 +113,8 @@ const sponsorSide = p => { const s = adsFor(p)[0]; return s ? `<aside class="spo
 for (const p of landing) {
   const items = C.directory.filter(b => p.items.includes(b));
   const heading = p.kind === "city" ? `Local Businesses in ${p.city}, CA` : p.kind === "category" ? `${p.category} in the Coachella Valley` : `${p.category} in ${p.city}, CA`;
-  const intro = [p.city && places.cities[p.city], p.category && ((places.categories || {})[p.category] || (places.services || {})[p.category])].filter(Boolean);
+  // Combo pages skip the city blurb: it repeated word for word on every city + service page. The city's own page keeps it.
+  const intro = [p.kind !== "combo" && p.city && places.cities[p.city], p.category && ((places.categories || {})[p.category] || (places.services || {})[p.category])].filter(Boolean);
   const names = items.slice(0, 3).map(b => b.name);
   // Public places (dog parks, trails) aren't businesses, so their pages get their own wording.
   const allPublic = items.length && items.every(b => b.public);
@@ -161,8 +165,8 @@ for (const p of landing) {
 <nav class="crumbs" aria-label="Breadcrumb"><a href="directory">Directory</a>${p.kind === "combo" && landing.some(o => o.kind === "city" && o.city === p.city) ? ` &rsaquo; <a href="local/${slugify(p.city)}/">${esc(p.city)}</a>` : ""}</nav>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>Local directory</span>
 <h1>${esc(heading)}</h1>
-${intro.map(t => `<p>${esc(t)}</p>`).join("\n")}
 <p>${esc(countLine)}</p>
+${intro.map(t => `<p>${esc(t)}</p>`).join("\n")}
 ${subChips}
 ${side ? `</div>${side}` : ""}</div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
@@ -183,10 +187,17 @@ const CITY_PAGES = ["Desert Hot Springs", "Palm Springs", "Cathedral City", "Tho
 const DATA_SCRIPTS = '<script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script>';
 fs.rmSync(path.join(root, "city"), { recursive: true, force: true });
 const cityPaths = [];
+const GOLF = (() => { const g = { window: {} }; const f = path.join(root, "data", "golf.js"); if (fs.existsSync(f)) require("vm").runInNewContext(fs.readFileSync(f, "utf8"), g); return (g.window.CVS || {}).golf || []; })();
 for (const city of CITY_PAGES) {
   const slug = slugify(city), url = `city/${slug}/`, q = encodeURIComponent(city);
   const ev = C.events.filter(e => e.city === city), dl = C.deals.filter(d => d.city === city), biz = C.directory.filter(b => b.city === city && !b.sample);
   const intro = places.cities[city] || `${city} is part of the Coachella Valley.`;
+  // Answer first: what's here, in numbers, before the town description.
+  const nGolf = GOLF.filter(c => c.city === city).reduce((n, c) => n + c.courses.length, 0);
+  const pl = (n, one, many) => n + " " + (n === 1 ? one : many);
+  const facts = [ev.length && pl(ev.length, "upcoming event", "upcoming events"), pl(biz.length, "local business", "local businesses"), nGolf && pl(nGolf, "golf course", "golf courses"), dl.length && pl(dl.length, "local deal", "local deals")].filter(Boolean);
+  const nextUp = ev[0] ? ` Next up: ${ev[0].title} on ${new Date(ev[0].date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}.` : "";
+  const glance = `${city} at a glance: ${andList(facts)}.${nextUp}`;
   const block = (attrs, html) => `<div ${attrs}>${html}</div>`;
   const sec = (eyebrow, h2, more, inner, first) => `<section class="section"${first ? "" : ' style="padding-top:0"'}><div class="wrap">
 <div class="section-head"><div><span class="eyebrow">${eyebrow}</span><h2>${h2}</h2></div>${more}</div>
@@ -201,6 +212,7 @@ ${inner}
 <nav class="crumbs" aria-label="Breadcrumb"><a href="./">Home</a> &rsaquo; ${esc(city)}</nav>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>City guide</span>
 <h1>${esc(city)}</h1>
+<p class="glance"><strong>${esc(glance)}</strong></p>
 <p>${esc(intro)}</p>
 <div class="chips">${ev.length ? `<a class="chip" href="events?city=${q}">Things to do</a>` : ""}<a class="chip" href="directory?city=${q}">Local businesses</a>${dl.length ? '<a class="chip" href="#deals">Deals</a>' : ""}</div>
 ${typeMenu}
@@ -253,7 +265,7 @@ const weekendPaths = [];
 <nav class="crumbs" aria-label="Breadcrumb"><a href="./">Home</a> &rsaquo; <a href="events">Events</a> &rsaquo; ${city ? `<a href="this-weekend/">This weekend</a> &rsaquo; ${esc(city)}` : "This weekend"}</nav>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>${esc(longRange)}</span>
 <h1>Things to Do This Weekend in <span class="grad">${esc(where)}.</span></h1>
-<p>${items.length ? `${items.length} event${items.length === 1 ? "" : "s"} ${city ? `in ${esc(city)}` : `across ${cities.length} ${cities.length === 1 ? "city" : "cities"}`} this weekend${picks.length ? `, including ${esc(andList(picks))}` : ""}.${free.length ? ` ${free.length} of them ${free.length === 1 ? "is" : "are"} free.` : ""} This page updates on its own every few hours.` : `Nothing is on the calendar in ${esc(where)} this weekend yet. Here&rsquo;s what&rsquo;s happening nearby.`}</p>
+<p>${items.length ? `${items.length} event${items.length === 1 ? "" : "s"} ${city ? `in ${esc(city)}` : `across ${cities.length} ${cities.length === 1 ? "city" : "cities"}`} this weekend${picks.length ? `, including ${esc(andList(picks))}` : ""}.${free.length ? ` ${free.length} of them ${free.length === 1 ? "is" : "are"} free.` : ""} Updated ${esc(BUILT_TEXT)} Pacific; this page refreshes every few hours.` : `Nothing is on the calendar in ${esc(where)} this weekend yet. Here&rsquo;s what&rsquo;s happening nearby.`}</p>
 <div class="chips">${days.map(d => `<a class="chip" href="${url}#${d}">${esc(C.parse(d).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }))}</a>`).join("")}<a class="chip" href="events">Full calendar</a></div>
 </div></div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">`;
@@ -282,7 +294,7 @@ const weekendPaths = [];
     const shown = items.length ? items : [];
     write(url, page({
       meta: { title, description, url, noindex: city && items.length < INDEX_MIN_WEEKEND },
-      schema: [{ "@context": "https://schema.org", "@type": "CollectionPage", name: title, description,
+      schema: [{ "@context": "https://schema.org", "@type": "CollectionPage", name: title, description, dateModified: BUILT.toISOString(),
         mainEntity: { "@type": "ItemList", itemListElement: shown.slice(0, 30).map((e, i) => ({ "@type": "ListItem", position: i + 1, name: e.title, url: e.feed ? e.url || undefined : `${SITE}/event/${C.eventSlug(e)}/` })) } },
         breadcrumbs([["Home", ""], ["Events", "events"], ["This weekend", "this-weekend/"]].concat(city ? [[city, url]] : []))],
       body
@@ -362,9 +374,11 @@ if (fs.existsSync(path.join(root, "data", "golf.js"))) require("vm").runInNewCon
 const golfPaths = ((golfCtx.window.CVS || {}).golf || []).map(c => `golf/${c.slug}/`);
 const urls = ["", "directory", "deals", "events", "halloween", "welcome", "farmers-markets", "holidays", "golf/", "advertise", "submit", "story", "contact", "mailing-area-el-paseo", "mailing-area-sun-city", "mailing-calendar", "pricing", "legal"]
   .concat(cityPaths, weekendPaths, list.map(b => `business/${b.slug}/`), eventPaths, landing.filter(p => p.index).map(p => p.path), golfPaths);
+// Pages whose content changes day to day as events come and go. Only these get <lastmod>, so it stays a signal Google can trust.
+const FRESH = new Set(["", "events", "holidays"].concat(weekendPaths, cityPaths));
 fs.writeFileSync(path.join(root, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map(u => `  <url><loc>${esc(SITE + "/" + u)}</loc></url>`).join("\n")}
+${urls.map(u => `  <url><loc>${esc(SITE + "/" + u)}</loc>${FRESH.has(u) ? `<lastmod>${BUILT_DAY}</lastmod>` : ""}</url>`).join("\n")}
 </urlset>
 `);
 console.log(`sitemap.xml: ${urls.length} pages`);

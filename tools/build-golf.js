@@ -31,9 +31,32 @@ const submitBand = `<div class="biz-band" style="margin-top:48px"><p><strong>Run
 const cities = [...new Set(list.map(c => c.city))].sort();
 const pub = list.filter(c => c.access === "Public").length;
 const nCourses = list.reduce((n, c) => n + c.courses.length, 0);
+// Quick answers under the list (also FAQPage schema). Every number is computed from data/golf.js, so it stays right as courses are added.
+const allCourses = list.flatMap(c => c.courses.map(x => Object.assign({}, x, { club: c, })));
+const pubCourses = list.filter(c => c.access === "Public").reduce((n, c) => n + c.courses.length, 0);
+const nHoles = list.reduce((n, c) => n + c.holes, 0);
+const byCity = cities.map(city => { const cl = list.filter(c => c.city === city); return { city, clubs: cl.length, courses: cl.reduce((n, c) => n + c.courses.length, 0), pub: cl.filter(c => c.access === "Public").length }; }).sort((a, b) => b.courses - a.courses || b.clubs - a.clubs);
+const longest = allCourses.filter(x => x.yards).sort((a, b) => b.yards - a.yards)[0];
+const longestPub = allCourses.filter(x => x.yards && x.club.access === "Public").sort((a, b) => b.yards - a.yards)[0];
+const nPar3 = allCourses.filter(x => /par-3/i.test(x.style || "")).length, nExec = allCourses.filter(x => /executive/i.test(x.style || "")).length;
+const nOnline = list.filter(c => c.access === "Public" && c.teeTimes).length;
+const pl = (n, one, many) => n + " " + (n === 1 ? one : many);
+const yd = n => n.toLocaleString("en-US");
+const [c1, c2, c3] = byCity;
+const golfFaq = [
+  ["How many golf courses are in the Coachella Valley?", `The Coachella Valley has ${nCourses} golf courses at ${list.length} golf clubs, about ${yd(nHoles)} holes in all. ${pub} of the clubs (${pubCourses} courses) are open to the public, and the other ${list.length - pub} are private clubs. A club with separate nine-hole layouts counts each one as a course.`],
+  ["Which Coachella Valley city has the most golf courses?", `${c1.city}, with ${c1.courses} courses at ${c1.clubs} clubs. Next are ${c2.city} (${c2.courses} courses at ${c2.clubs} clubs) and ${c3.city} (${c3.courses} courses at ${c3.clubs} clubs).`],
+  ["How many public golf courses are in the Coachella Valley?", `${pub} golf clubs with ${pubCourses} courses are open to the public, so anyone can book a tee time. ${nOnline} of them take tee times online. ${c1.city} has the most public clubs (${c1.pub}).`],
+  ["What is the longest golf course in the Coachella Valley?", longest ? `${longest.club.name} in ${longest.club.city}, at ${yd(longest.yards)} yards from the back tees${longest.club.access === "Public" ? ", and it's open to the public." : `. It's a private club. The longest public course is ${longestPub.club.name} in ${longestPub.club.city} (${yd(longestPub.yards)} yards).`}` : ""],
+  ["Are there par-3 or short golf courses in the Coachella Valley?", `Yes. ${pl(nPar3, "course is a par-3 course", "courses are par-3 courses")} and ${pl(nExec, "is an executive course", "are executive courses")}, which are shorter and quicker to play. Each course page shows its layout, par and yardage.`],
+  ["When is golf season in the Coachella Valley?", "Peak season runs about January through April, when rates are highest and tee times go fast. Most courses close for a few weeks between late September and early November to overseed. Summer (June to September) has the lowest rates, best played at dawn or twilight."],
+].filter(([, a]) => a);
+const golfFaqHtml = `<div class="seo-copy guide-faq"><h2>Coachella Valley golf: quick answers</h2>
+<ul class="golf-facts">${byCity.map(b => `<li><a href="golf/?city=${encodeURIComponent(b.city)}">${esc(b.city)}</a>: ${pl(b.courses, "course", "courses")} at ${pl(b.clubs, "club", "clubs")}${b.pub ? ` (${b.pub} public)` : ""}</li>`).join("")}</ul>
+${golfFaq.map(([q, a]) => `<h3>${esc(q)}</h3><p>${esc(a)}</p>`).join("\n")}</div>`;
 const countLine = (clubs, courses) => clubs + (clubs === 1 ? " golf club" : " golf clubs") + " &middot; " + courses + (courses === 1 ? " course" : " courses");
 write("golf/", `${head}${metaTags({ title: "Golf Courses in the Coachella Valley | Coachella Valley Spotlight", description: `All ${list.length} golf clubs (${nCourses} courses) in the Coachella Valley, from Palm Springs to Indio and La Quinta. See which are open to the public, with phone numbers and websites.`, url: "golf/" })}<base href="../">
-${headRest}${ldjson({ "@context": "https://schema.org", "@type": "ItemList", name: "Golf courses in the Coachella Valley", numberOfItems: list.length, itemListElement: list.map((c, i) => ({ "@type": "ListItem", position: i + 1, url: SITE + "/golf/" + c.slug + "/", name: c.name })) })}
+${headRest}${ldjson({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: golfFaq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) })}${ldjson({ "@context": "https://schema.org", "@type": "ItemList", name: "Golf courses in the Coachella Valley", numberOfItems: list.length, itemListElement: list.map((c, i) => ({ "@type": "ListItem", position: i + 1, url: SITE + "/golf/" + c.slug + "/", name: c.name })) })}
 </head>
 <body>
 ${header}
@@ -48,6 +71,7 @@ ${header}
 <p class="golf-count" id="g-count">${countLine(list.length, nCourses)}</p>
 <div class="grid" id="g-list">${list.map(card).join("\n")}</div>
 <p class="risk" style="margin-top:24px">Course details change. Call ahead to confirm tee times, guest rules and rates. Course data from public sources, including OpenStreetMap (&copy; OpenStreetMap contributors).</p>
+${golfFaqHtml}
 ${submitBand}
 </div></section>
 </main>
