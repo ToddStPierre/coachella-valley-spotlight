@@ -24,6 +24,7 @@
     ["Halloween guide", "halloween", "halloween trick treat haunted costume"],
     ["Hiking trails", "local/hiking-trails/", "hike hiking trails outdoors"],
     ["Dog parks", "local/dog-parks/", "dog park pets"],
+    ["Libraries", "local/libraries/", "library libraries books library card wifi"],
     ["Pickleball courts", "local/pickleball/", "pickleball courts"],
     ["Local news", "news", "news headlines"],
     ["Share a story", "story", "story tip share"],

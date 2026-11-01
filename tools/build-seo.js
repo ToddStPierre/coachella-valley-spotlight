@@ -155,6 +155,14 @@ for (const p of landing) {
 <li><b>Dogs:</b> they're banned on most National Monument trails to protect endangered bighorn sheep, leashed or not, and the tribal canyons allow no animals. In warm weather, hot ground can burn paws.</li>
 <li><b>Hours change with the seasons:</b> the Indian Canyons and Tahquitz Canyon go to Friday to Sunday from July 6 to October 1, Thousand Palms opens only on weekends from May to October, and Whitewater needs summer weekend reservations. Check each trail's page.</li>
 </ul></div>` : "";
+  // Libraries pages: how library cards work here (from rivlib.net and ranchomiragelibrary.org, checked 2026-11-01).
+  const libBox = p.category === "Libraries" ? `<div class="pf-card golf-season hike-box"><h2>Getting a library card in the valley</h2><ul>
+<li><b>Riverside County Library System</b> (Cathedral City, Coachella, Desert Hot Springs, Indio, La Quinta and Thousand Palms): any California resident gets a card free. Bring a California driver&rsquo;s license or ID with your current address, or two IDs: one showing who you are and one showing your California mailing address. Kids 15 and under need a form signed by a parent. <a href="https://www.rivlib.net/services/get-library-card/" target="_blank" rel="noopener">County card details</a></li>
+<li><b>Snowbirds and visitors:</b> out-of-state residents can get a county card in person at any branch for $10 a year, renewed in person.</li>
+<li><b>Rancho Mirage Library &amp; Observatory</b> runs its own cards. Most Californians get one free with a California ID showing their current address, and there&rsquo;s a fee for out-of-state patrons. <a href="https://www.ranchomiragelibrary.org/explore/faqs.php" target="_blank" rel="noopener">Rancho Mirage card details</a></li>
+<li><b>Palm Springs and Palm Desert</b> run their own city libraries with their own cards. Check each library&rsquo;s page for what to bring.</li>
+<li><b>Palm Springs&rsquo; main library</b> on Sunrise Way is closed for renovation, tentatively until summer 2027. The library is operating from Rimrock Plaza in the meantime.</li>
+</ul></div>` : "";
   const trail = [["Home", ""], ["Directory", "directory"]];
   if (p.kind === "combo") trail.push([p.city, `local/${slugify(p.city)}/`]);
   trail.push([heading, p.path]);
@@ -174,7 +182,7 @@ ${fig ? sponsorBand(p) : ""}
 ${dogFilter}
 <div class="grid">${cards("directory", items)}</div>
 ${nearLine}
-${hikeBox}
+${hikeBox}${libBox}
 ${related.length ? `<h2 class="month-head" style="margin-top:48px"><span class="stripe-mini"></span>Keep browsing</h2><ul class="link-list">${related.map(o => `<li><a href="${o.path}">${esc(label(o))}</a></li>`).join("")}<li><a href="directory">The full directory</a></li></ul>` : ""}
 <div class="biz-band" style="margin-top:48px"><p><strong>Own a business${p.city ? " in " + esc(p.city) : ""}?</strong><br>Listing it here is free.</p><a class="btn" href="submit">Add my business</a></div>
 </div></section>`

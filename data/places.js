@@ -22,6 +22,7 @@ window.CVS.places = {
   categories: {
     "Legal": "Legal covers locally based law firms and attorneys: estate planning, family law, criminal defense, bankruptcy, personal injury and business and real estate law. These are firms based in the valley, not national advertising networks. A listing here is not a recommendation or legal advice.",
     "Recreation": "Recreation covers places to play around the valley: free public pickleball and tennis courts at city parks, plus clubs you can join. Most public courts are first come, first served, and many are lit for evening play when it's cooler.",
+    "Community": "Community covers public places residents use every week, starting with the valley's public libraries: the Riverside County Library System branches and the city libraries in Palm Springs, Rancho Mirage and Palm Desert.",
     "Attractions": "Attractions covers the valley's museums, gardens and landmark things to see, from the Aerial Tramway and the Air Museum to date farms and history museums.",
     "Outdoors": "Outdoors covers the valley's public hiking trails, from easy oasis walks to all-day mountain climbs in the Santa Rosa and San Jacinto Mountains. Start early, carry more water than you think you need, and check the managing agency's page for seasonal closures.",
     "Pets": "Pets covers the valley's independent veterinary clinics, animal hospitals and pet stores, plus the valley's public dog parks.",
@@ -45,6 +46,7 @@ window.CVS.places = {
     "Nail salons": "Local nail salons for manicures, pedicures, gel, acrylics, dip powder and nail art, many with waxing and lash services too. Walk-ins are often welcome.",
     "Meditation": "Meditation teachers and centers in the valley, from personalized courses to free introductory talks, for stress relief, better sleep and a calmer mind.",
     "Med spas": "Local med spas offering injectables like Botox and fillers, skin treatments, weight loss programs and permanent makeup, in a spa setting with medical oversight.",
+    "Libraries": "Public libraries across the valley. Six are Riverside County Library System branches, in Cathedral City, Coachella, Desert Hot Springs, Indio, La Quinta and Thousand Palms. Palm Springs, Rancho Mirage and Palm Desert run their own. All of them lend books, offer free Wi-Fi and run free programs for kids, teens and adults.",
     "Dog parks": "Public off-leash dog parks run by valley cities, most with separate areas for large and small dogs. Many close for a few weeks each fall for overseeding, so check the city page before you go.",
     "Hiking trails": "Public trails across the valley: palm oases in the Indian Canyons, National Monument trails above Palm Desert and Rancho Mirage, the La Quinta Cove, and high-country hikes from the Palm Springs Aerial Tramway. Some charge admission and some close seasonally or in summer heat.",
     "Pickleball": "Public pickleball courts across the valley, from Palm Springs' new 22-court Demuth Park complex to neighborhood parks in Palm Desert, La Quinta, Indio, Coachella and Rancho Mirage. Most are free and first come, first served, and some have lights and reservation times.",
