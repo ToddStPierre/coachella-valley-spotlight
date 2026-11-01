@@ -138,7 +138,10 @@ for (const p of landing) {
   const label = o => o.kind === "city" ? `All businesses in ${o.city}` : o.kind === "category" ? `${o.category}, valley-wide` : `${o.category} in ${o.city}`;
   // Activity pages (dog parks, hiking trails) get a hero photo, valley-wide and per city.
   const ACT_PHOTO = { "Dog parks": "dog-parks", "Hiking trails": "hiking-trails", "Pickleball": "pickleball", "Tennis": "tennis", "Swimming & water parks": "swimming", "Museums & attractions": "attractions", "Skate parks": "skate-parks", "Disc golf": "disc-golf", "Bowling": "bowling" };
-  const fig = p.kind !== "city" && ACT_PHOTO[p.category] ? photoFigure(p.category, `assets/img/activities/${ACT_PHOTO[p.category]}.jpg`, p.category) : "";
+  // Drawn illustrations (no photo credit needed) for pages with no freely licensed photo.
+  const ACT_ART = { "Libraries": ["assets/img/libraries-valley.svg", "Illustration of a mid-century desert library in the Coachella Valley, with windows full of bookshelves, palm trees and the mountains behind"] };
+  const fig = p.kind === "city" ? "" : ACT_PHOTO[p.category] ? photoFigure(p.category, `assets/img/activities/${ACT_PHOTO[p.category]}.jpg`, p.category)
+    : ACT_ART[p.category] ? `<figure class="city-photo"><img src="${ACT_ART[p.category][0]}" alt="${esc(ACT_ART[p.category][1])}" width="640" height="360"></figure>` : "";
   const side = fig || sponsorSide(p);
   // Hiking trails pages: a "dogs allowed" filter and a desert hiking box.
   const hike = p.category === "Hiking trails";

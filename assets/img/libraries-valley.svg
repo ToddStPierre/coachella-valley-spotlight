@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="lb-t">
+<title id="lb-t">A mid-century desert library in the Coachella Valley: big windows full of bookshelves, palm trees and the mountains behind in late afternoon light</title>
+<defs>
+  <linearGradient id="lb-sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f6d9a8"/>
+    <stop offset=".55" stop-color="#f3bf86"/>
+    <stop offset="1" stop-color="#e99a74"/>
+  </linearGradient>
+  <radialGradient id="lb-sun" cx=".5" cy=".5" r=".5">
+    <stop offset="0" stop-color="#fff2cf"/>
+    <stop offset=".6" stop-color="#ffd36b"/>
+    <stop offset="1" stop-color="#f0a33a"/>
+  </radialGradient>
+  <linearGradient id="lb-glass" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#3d3160"/>
+    <stop offset="1" stop-color="#5b4a7a"/>
+  </linearGradient>
+</defs>
+
+<!-- sky, sun, mountains -->
+<rect width="640" height="360" fill="url(#lb-sky)"/>
+<circle cx="516" cy="92" r="40" fill="url(#lb-sun)"/>
+<path d="M0 196 L80 140 L140 170 L220 104 L290 160 L350 128 L420 176 L500 120 L570 158 L640 132 L640 260 L0 260 Z" fill="#c9667a" opacity=".7"/>
+<path d="M0 222 L110 180 L200 206 L300 170 L400 210 L500 182 L640 214 L640 270 L0 270 Z" fill="#5b4a7a" opacity=".55"/>
+
+<!-- ground -->
+<rect y="262" width="640" height="98" fill="#e9d3ae"/>
+<rect y="262" width="640" height="6" fill="#d7bb8e"/>
+
+<!-- left palm -->
+<g>
+  <path d="M74 300 C76 252 80 204 92 156" stroke="#7a5a3c" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <g fill="#2f5d48">
+    <path d="M92 156 C66 136 40 140 22 154 C48 146 70 150 92 158 Z"/>
+    <path d="M92 156 C74 126 54 114 32 114 C58 124 76 138 92 158 Z"/>
+    <path d="M92 156 C100 124 120 110 144 110 C124 122 108 138 94 158 Z"/>
+    <path d="M92 156 C120 140 146 142 164 158 C140 150 116 152 94 160 Z"/>
+  </g>
+</g>
+
+<!-- library building: low mid-century box with a floating roof -->
+<rect x="150" y="166" width="360" height="104" fill="#fbf3e4"/>
+<path d="M130 158 L530 158 L522 172 L138 172 Z" fill="#221c18"/>
+<rect x="150" y="172" width="360" height="6" fill="#d9552b"/>
+
+<!-- big windows with bookshelves -->
+<g>
+  <rect x="166" y="188" width="96" height="70" fill="url(#lb-glass)"/>
+  <rect x="398" y="188" width="96" height="70" fill="url(#lb-glass)"/>
+  <!-- shelves -->
+  <g fill="#221c18" opacity=".55"><rect x="166" y="210" width="96" height="3"/><rect x="166" y="234" width="96" height="3"/><rect x="398" y="210" width="96" height="3"/><rect x="398" y="234" width="96" height="3"/></g>
+  <!-- books, left window -->
+  <g>
+    <rect x="172" y="196" width="6" height="14" fill="#f0a33a"/><rect x="179" y="198" width="5" height="12" fill="#d9552b"/><rect x="185" y="195" width="7" height="15" fill="#fbf3e4"/><rect x="193" y="199" width="5" height="11" fill="#c9667a"/><rect x="199" y="196" width="6" height="14" fill="#ffd36b"/>
+    <rect x="214" y="197" width="6" height="13" fill="#c9667a"/><rect x="221" y="195" width="5" height="15" fill="#f0a33a"/><rect x="227" y="198" width="7" height="12" fill="#fbf3e4"/><rect x="240" y="196" width="6" height="14" fill="#d9552b"/><rect x="247" y="199" width="5" height="11" fill="#ffd36b"/>
+    <rect x="172" y="220" width="7" height="14" fill="#fbf3e4"/><rect x="180" y="222" width="5" height="12" fill="#f0a33a"/><rect x="186" y="219" width="6" height="15" fill="#c9667a"/><rect x="200" y="221" width="6" height="13" fill="#d9552b"/><rect x="207" y="219" width="5" height="15" fill="#ffd36b"/>
+    <rect x="222" y="222" width="6" height="12" fill="#f0a33a"/><rect x="229" y="219" width="7" height="15" fill="#fbf3e4"/><rect x="237" y="221" width="5" height="13" fill="#c9667a"/><rect x="248" y="220" width="6" height="14" fill="#d9552b"/>
+    <rect x="174" y="244" width="6" height="14" fill="#d9552b"/><rect x="181" y="246" width="5" height="12" fill="#ffd36b"/><rect x="194" y="243" width="7" height="15" fill="#f0a33a"/><rect x="202" y="245" width="5" height="13" fill="#fbf3e4"/><rect x="216" y="244" width="6" height="14" fill="#c9667a"/><rect x="236" y="246" width="6" height="12" fill="#f0a33a"/><rect x="243" y="243" width="5" height="15" fill="#d9552b"/>
+  </g>
+  <!-- books, right window -->
+  <g>
+    <rect x="404" y="197" width="6" height="13" fill="#d9552b"/><rect x="411" y="195" width="5" height="15" fill="#fbf3e4"/><rect x="417" y="198" width="7" height="12" fill="#f0a33a"/><rect x="430" y="196" width="6" height="14" fill="#c9667a"/><rect x="437" y="199" width="5" height="11" fill="#ffd36b"/>
+    <rect x="452" y="196" width="6" height="14" fill="#f0a33a"/><rect x="459" y="198" width="5" height="12" fill="#d9552b"/><rect x="465" y="195" width="7" height="15" fill="#fbf3e4"/><rect x="479" y="197" width="6" height="13" fill="#c9667a"/>
+    <rect x="404" y="221" width="5" height="13" fill="#ffd36b"/><rect x="410" y="219" width="7" height="15" fill="#c9667a"/><rect x="424" y="220" width="6" height="14" fill="#fbf3e4"/><rect x="431" y="222" width="5" height="12" fill="#d9552b"/><rect x="446" y="219" width="6" height="15" fill="#f0a33a"/><rect x="460" y="221" width="5" height="13" fill="#ffd36b"/><rect x="474" y="220" width="7" height="14" fill="#d9552b"/><rect x="482" y="222" width="5" height="12" fill="#fbf3e4"/>
+    <rect x="406" y="245" width="6" height="13" fill="#f0a33a"/><rect x="420" y="243" width="5" height="15" fill="#d9552b"/><rect x="426" y="246" width="7" height="12" fill="#fbf3e4"/><rect x="440" y="244" width="6" height="14" fill="#c9667a"/><rect x="458" y="243" width="5" height="15" fill="#ffd36b"/><rect x="470" y="245" width="6" height="13" fill="#f0a33a"/>
+  </g>
+  <!-- mullions and glare -->
+  <g fill="#fbf3e4"><rect x="212" y="188" width="3" height="70"/><rect x="444" y="188" width="3" height="70"/></g>
+  <path d="M170 256 L200 190 L208 190 L178 256 Z M402 256 L432 190 L440 190 L410 256 Z" fill="#fff" opacity=".12"/>
+</g>
+
+<!-- entrance with an open-book sign -->
+<rect x="286" y="196" width="88" height="74" fill="#c9667a"/>
+<rect x="300" y="210" width="60" height="60" fill="url(#lb-glass)"/>
+<rect x="329" y="210" width="2" height="60" fill="#fbf3e4"/>
+<g transform="translate(330 186)">
+  <path d="M-22 -6 C-14 -10 -6 -10 0 -5 C6 -10 14 -10 22 -6 L22 8 C14 4 6 4 0 9 C-6 4 -14 4 -22 8 Z" fill="#fbf3e4" stroke="#221c18" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M0 -5 L0 9" stroke="#221c18" stroke-width="2"/>
+</g>
+
+<!-- breeze-block screen wall, a mid-century desert detail -->
+<g fill="#e3d2b4">
+  <rect x="510" y="196" width="60" height="74"/>
+</g>
+<g fill="none" stroke="#c9b38c" stroke-width="2">
+  <circle cx="525" cy="211" r="7"/><circle cx="555" cy="211" r="7"/><circle cx="525" cy="237" r="7"/><circle cx="555" cy="237" r="7"/><circle cx="525" cy="261" r="5"/><circle cx="555" cy="261" r="5"/>
+</g>
+
+<!-- right palm -->
+<g>
+  <path d="M598 300 C596 258 592 216 584 176" stroke="#7a5a3c" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <g fill="#2f5d48">
+    <path d="M584 176 C562 158 540 160 524 172 C546 166 566 170 584 178 Z"/>
+    <path d="M584 176 C572 150 556 138 536 138 C558 148 572 160 584 178 Z"/>
+    <path d="M584 176 C592 148 610 136 632 136 C614 148 600 162 586 178 Z"/>
+    <path d="M584 176 C608 164 628 166 640 178 C622 172 604 174 586 180 Z"/>
+  </g>
+</g>
+
+<!-- walkway, barrel cactus and agave -->
+<path d="M300 270 L360 270 L392 360 L268 360 Z" fill="#d7bb8e"/>
+<g fill="#2f5d48">
+  <ellipse cx="230" cy="282" rx="12" ry="10"/><ellipse cx="452" cy="284" rx="11" ry="9"/>
+</g>
+<g fill="#d9552b"><circle cx="230" cy="272" r="2.5"/><circle cx="452" cy="275" r="2.5"/></g>
+<g fill="#5b7a5a">
+  <path d="M120 300 L112 270 L124 296 Z M126 300 L126 264 L132 300 Z M134 300 L146 272 L138 300 Z"/>
+  <path d="M500 304 L490 278 L504 300 Z M508 304 L510 270 L514 304 Z M518 304 L532 280 L522 304 Z"/>
+</g>
+</svg>
