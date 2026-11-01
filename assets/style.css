@@ -1007,6 +1007,8 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .mk-links { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; }
 .mk-links a { font-weight: 600; }
 @media (max-width: 560px) { .mk-table th:nth-child(4), .mk-table td:nth-child(4) { display: none; } }
+/* Holiday guide tree-lighting table: on phones keep the 2026 date column and drop "Where" instead. */
+@media (max-width: 560px) { .mk-table.tl-table th:nth-child(4), .mk-table.tl-table td:nth-child(4) { display: table-cell; } .mk-table.tl-table th:nth-child(2), .mk-table.tl-table td:nth-child(2) { display: none; } }
 
 /* Home: interactive valley map ("Town by town"). Pins sit at real town coordinates, sized by listing count. */
 .vmap-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: var(--s3); align-items: stretch; }

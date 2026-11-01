@@ -20,6 +20,7 @@
     ["Golf courses and clubs", "golf/", "golf course club tee"],
     ["Farmers markets", "farmers-markets", "farmers market produce"],
     ["New to the valley guide", "welcome", "new move moving welcome guide utilities dmv"],
+    ["Holiday events guide", "holidays", "holiday holidays christmas lights tree lighting parade festival of lights wildlights thanksgiving santa"],
     ["Halloween guide", "halloween", "halloween trick treat haunted costume"],
     ["Hiking trails", "local/hiking-trails/", "hike hiking trails outdoors"],
     ["Dog parks", "local/dog-parks/", "dog park pets"],

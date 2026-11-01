@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="hd-t">
+<title id="hd-t">The holidays in the Coachella Valley: palm trees wrapped in lights and a glowing tree under the mountains at night</title>
+<defs>
+  <linearGradient id="hd-sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1f1a33"/>
+    <stop offset=".5" stop-color="#3d3160"/>
+    <stop offset=".8" stop-color="#5b4a7a"/>
+    <stop offset="1" stop-color="#c9667a"/>
+  </linearGradient>
+  <radialGradient id="hd-glow" cx=".5" cy=".5" r=".5">
+    <stop offset="0" stop-color="#ffd36b" stop-opacity=".55"/>
+    <stop offset="1" stop-color="#ffd36b" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="hd-star" cx=".5" cy=".5" r=".5">
+    <stop offset="0" stop-color="#fff6e2" stop-opacity=".9"/>
+    <stop offset="1" stop-color="#fff6e2" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+
+<!-- sky and stars -->
+<rect width="640" height="360" fill="url(#hd-sky)"/>
+<g fill="#fff6e2">
+  <circle cx="44" cy="40" r="1.5"/><circle cx="120" cy="76" r="1.1"/><circle cx="196" cy="28" r="1.4"/><circle cx="270" cy="62" r="1"/>
+  <circle cx="390" cy="24" r="1.3"/><circle cx="470" cy="70" r="1"/><circle cx="548" cy="36" r="1.5"/><circle cx="606" cy="90" r="1.1"/>
+  <circle cx="90" cy="120" r=".9"/><circle cx="520" cy="122" r=".9"/><circle cx="340" cy="100" r="1"/>
+</g>
+
+<!-- mountains -->
+<path d="M0 238 L70 180 L120 206 L190 140 L250 192 L300 166 L360 208 L430 150 L500 196 L560 172 L640 218 L640 360 L0 360 Z" fill="#2a2140"/>
+<path d="M190 140 L172 156 L186 152 L198 160 L210 150 Z M430 150 L414 164 L428 160 L440 168 L450 160 Z" fill="#fff6e2" opacity=".75"/>
+<path d="M0 270 L90 236 L170 258 L260 228 L350 262 L450 232 L540 260 L640 240 L640 360 L0 360 Z" fill="#221c18"/>
+
+<!-- ground -->
+<rect y="300" width="640" height="60" fill="#191512"/>
+
+<!-- left palm wrapped in lights -->
+<g>
+  <path d="M112 300 C114 250 118 200 128 150" stroke="#3a2e26" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <g fill="#221c18">
+    <path d="M128 150 C100 130 74 134 56 148 C82 140 104 144 128 152 Z"/>
+    <path d="M128 150 C110 120 90 108 68 108 C94 118 112 132 128 152 Z"/>
+    <path d="M128 150 C136 118 156 104 180 104 C160 116 144 132 130 152 Z"/>
+    <path d="M128 150 C156 134 182 136 200 152 C176 144 152 146 130 154 Z"/>
+    <path d="M128 150 C128 124 136 104 150 92 C142 112 136 130 130 152 Z"/>
+  </g>
+  <g fill="#f0a33a">
+    <circle cx="113" cy="290" r="3"/><circle cx="114" cy="270" r="3" fill="#d9552b"/><circle cx="115" cy="250" r="3"/>
+    <circle cx="117" cy="230" r="3" fill="#c9667a"/><circle cx="119" cy="210" r="3"/><circle cx="122" cy="190" r="3" fill="#d9552b"/>
+    <circle cx="125" cy="170" r="3"/>
+  </g>
+</g>
+
+<!-- right palm wrapped in lights -->
+<g>
+  <path d="M532 300 C530 256 524 214 514 172" stroke="#3a2e26" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <g fill="#221c18">
+    <path d="M514 172 C490 152 466 154 448 168 C472 160 494 164 514 174 Z"/>
+    <path d="M514 172 C500 144 482 132 462 132 C486 142 502 156 514 174 Z"/>
+    <path d="M514 172 C524 142 542 130 566 130 C546 142 530 156 516 174 Z"/>
+    <path d="M514 172 C540 158 564 160 582 174 C560 166 538 168 516 176 Z"/>
+  </g>
+  <g fill="#f0a33a">
+    <circle cx="531" cy="290" r="3" fill="#c9667a"/><circle cx="530" cy="270" r="3"/><circle cx="528" cy="250" r="3" fill="#d9552b"/>
+    <circle cx="525" cy="230" r="3"/><circle cx="522" cy="210" r="3" fill="#c9667a"/><circle cx="518" cy="190" r="3"/>
+  </g>
+</g>
+
+<!-- glowing holiday tree -->
+<circle cx="320" cy="214" r="120" fill="url(#hd-glow)"/>
+<path d="M320 106 L380 212 L352 212 L398 282 L242 282 L288 212 L260 212 Z" fill="#2f5d48"/>
+<path d="M320 106 L380 212 L352 212 L398 282 L320 282 Z" fill="#26503d"/>
+<rect x="310" y="282" width="20" height="20" fill="#3a2e26"/>
+<g fill="none" stroke="#ffd36b" stroke-width="2" stroke-linecap="round" opacity=".9">
+  <path d="M296 168 Q320 180 346 166"/>
+  <path d="M278 218 Q320 236 364 216"/>
+  <path d="M262 262 Q320 284 380 260"/>
+</g>
+<g>
+  <circle cx="304" cy="174" r="4.5" fill="#d9552b"/><circle cx="336" cy="172" r="4.5" fill="#f0a33a"/>
+  <circle cx="292" cy="226" r="4.5" fill="#f0a33a"/><circle cx="322" cy="232" r="4.5" fill="#c9667a"/><circle cx="352" cy="224" r="4.5" fill="#d9552b"/>
+  <circle cx="276" cy="268" r="4.5" fill="#c9667a"/><circle cx="310" cy="276" r="4.5" fill="#d9552b"/><circle cx="344" cy="276" r="4.5" fill="#f0a33a"/><circle cx="372" cy="266" r="4.5" fill="#c9667a"/>
+</g>
+<circle cx="320" cy="102" r="22" fill="url(#hd-star)"/>
+<path d="M320 88 L324 98 L334 99 L326 105 L329 115 L320 109 L311 115 L314 105 L306 99 L316 98 Z" fill="#ffd36b"/>
+
+<!-- wrapped gifts -->
+<rect x="238" y="284" width="30" height="18" rx="2" fill="#d9552b"/><rect x="250" y="284" width="6" height="18" fill="#ffd36b"/>
+<rect x="374" y="280" width="26" height="22" rx="2" fill="#5b4a7a"/><rect x="384" y="280" width="6" height="22" fill="#f0a33a"/>
+
+<!-- string of lights across the bottom -->
+<path d="M0 318 Q80 334 160 318 T320 318 T480 318 T640 318" fill="none" stroke="#3a2e26" stroke-width="1.5"/>
+<g>
+  <circle cx="40" cy="325" r="3.5" fill="#f0a33a"/><circle cx="100" cy="327" r="3.5" fill="#d9552b"/><circle cx="160" cy="318" r="3.5" fill="#c9667a"/>
+  <circle cx="220" cy="325" r="3.5" fill="#ffd36b"/><circle cx="280" cy="327" r="3.5" fill="#f0a33a"/><circle cx="360" cy="325" r="3.5" fill="#d9552b"/>
+  <circle cx="420" cy="327" r="3.5" fill="#c9667a"/><circle cx="480" cy="318" r="3.5" fill="#ffd36b"/><circle cx="540" cy="325" r="3.5" fill="#f0a33a"/>
+  <circle cx="600" cy="327" r="3.5" fill="#d9552b"/>
+</g>
+</svg>

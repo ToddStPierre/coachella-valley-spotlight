@@ -36,7 +36,7 @@ const SOURCES = [
 const CITIES = ["Palm Springs", "Desert Hot Springs", "Cathedral City", "Rancho Mirage", "Palm Desert", "Indian Wells",
   "La Quinta", "Indio", "Coachella", "Thousand Palms", "Bermuda Dunes", "Thermal", "Mecca"];
 // Routine programs, classes and business meetings: not "things to do" for the calendar.
-const SKIP = /\b(class(es)?|support group|workshop|club|meeting|mixer|leads lunch|networking|orientation|tutoring|bingo|device advice|story ?time|zookeeper academy|me (&|and) you at the zoo|office hours|webinar|training|volunteer|commission|council|board of|ribbon cutting|seminar|cpr|blood drive|cancel+ed|postponed|therapy|social worker|notary|shredding|members?[- ]only|member hike|for seniors|senior services|tax help|health screening|vaccin\w*|clinic|counseling|legal aid|food distribution|pantry)\b/i;
+const SKIP = /\b(class(es)?|support group|workshop|club|meeting|mixer|leads lunch|networking|orientation|tutoring|bingo|device advice|story ?time|zookeeper academy|me (&|and) you at the zoo|office hours|webinar|training|volunteer|commission|council|board of|ribbon cutting|seminar|cpr|blood drive|cancel+ed|postponed|closed (for|on)|therapy|social worker|notary|shredding|members?[- ]only|member hike|for seniors|senior services|tax help|health screening|vaccin\w*|clinic|counseling|legal aid|food distribution|pantry)\b/i;
 // Venues the feeds file under the wrong city.
 const VENUE_CITY = [[/acrisure arena/i, "Thousand Palms"]];
 // Their category names -> ours.

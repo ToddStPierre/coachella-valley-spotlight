@@ -249,7 +249,7 @@
     return e.date <= w[1] && (e.endDate || e.date) >= w[0];
   }
 
-  var TAG_RX = { halloween: /hallowe|trunk.or.treat|haunt|spooktacular|howl-o-ween|d[ií]a de (los )?muertos/i };
+  var TAG_RX = { halloween: /hallowe|trunk.or.treat|haunt|spooktacular|howl-o-ween|d[ií]a de (los )?muertos/i, holidays: /christmas|holiday|tree lighting|festival of lights|wildlights|magic of lights|santa|turkey trot|thanksgiving|nutcracker|hanukkah|menorah|new year.s eve/i };
   // Small blocks: <div data-list="events" data-limit="4"></div>. Optional data-when="weekend" (events only; falls back to upcoming if empty).
   // attr(name) reads the block's attributes; tools/build-seo.js calls this too, so the HTML and the browser show the same cards.
   function pickList(key, attr) {
