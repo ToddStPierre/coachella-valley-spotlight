@@ -810,4 +810,23 @@
     dl.href = url; dl.download = slug.slice(0, 60) + ".ics"; document.body.appendChild(dl); dl.click();
     setTimeout(function () { URL.revokeObjectURL(url); dl.remove(); }, 1000);
   });
+  // Hover notes: any element with data-tip shows its text in a small bubble on hover, focus or tap (stats pages, owner dashboard).
+  (function () {
+    var bub = null, owner = null;
+    function hide() { if (bub) bub.hidden = true; owner = null; }
+    function show(el) {
+      if (!bub) { bub = document.createElement("div"); bub.className = "tip-bubble"; bub.setAttribute("role", "tooltip"); document.body.appendChild(bub); }
+      owner = el; bub.textContent = el.getAttribute("data-tip"); bub.hidden = false;
+      var r = el.getBoundingClientRect(), w = bub.offsetWidth, h = bub.offsetHeight;
+      var x = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, window.innerWidth - w - 8));
+      var y = r.bottom + 8; if (y + h > window.innerHeight - 8) y = r.top - h - 8;
+      bub.style.left = x + "px"; bub.style.top = y + "px";
+    }
+    document.addEventListener("mouseover", function (e) { var el = e.target.closest && e.target.closest("[data-tip]"); if (el) show(el); else if (owner && document.activeElement !== owner) hide(); });
+    document.addEventListener("focusin", function (e) { var el = e.target.closest && e.target.closest("[data-tip]"); if (el) show(el); });
+    document.addEventListener("focusout", function (e) { if (e.target === owner) hide(); });
+    document.addEventListener("click", function (e) { var el = e.target.closest && e.target.closest("[data-tip]"); if (el) { e.preventDefault(); if (owner === el && bub && !bub.hidden) hide(); else show(el); } else hide(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") hide(); });
+    window.addEventListener("scroll", hide, { passive: true });
+  })();
 })();

@@ -4,7 +4,8 @@
   var q = new URLSearchParams(location.search), slug = q.get("b") || "", key = q.get("key") || "";
   var out = document.getElementById("ow-out");
   var flash = "";
-  var LABELS = [["impression", "Listing seen", "Times your listing showed up on someone's screen"], ["profile", "Profile views", "Visits to your profile page"], ["call", "Calls tapped", "Taps on your phone number"], ["website", "Website visits", "Clicks through to your website"]];
+  var LABELS = [["impression", "Listing seen", "Times your listing card showed up on someone's screen while they browsed the directory, search results, a town page or the home page. Visits straight to your profile page are not counted here."], ["profile", "Profile views", "Visits to your profile page, whether people came from our site, Google or a link someone shared."], ["call", "Calls tapped", "Taps on your Call button or phone number on our site."], ["website", "Website visits", "Clicks from our site through to your website."]];
+  function tip(l) { return l[1] + ' <span class="stat-tip" tabindex="0" role="button" aria-label="What does ' + l[1] + ' mean?" data-tip="' + l[2].replace(/"/g, "&quot;") + '">?</span>'; }
   function monthName(ym) { var p = ym.split("-"); return new Date(+p[0], +p[1] - 1, 1).toLocaleString("en-US", { month: "long", year: "numeric" }); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function fail(m) { out.innerHTML = '<div class="empty">' + m + '</div>'; }
@@ -22,7 +23,7 @@
   }
 
   function tiles(set) {
-    return '<div class="stats" style="margin-bottom:12px">' + LABELS.map(function (l) { return '<div class="stat"><b>' + (set[l[0]] || 0).toLocaleString() + '</b><span>' + l[1] + '</span></div>'; }).join("") + '</div>';
+    return '<div class="stats" style="margin-bottom:12px">' + LABELS.map(function (l) { return '<div class="stat"><b>' + (set[l[0]] || 0).toLocaleString() + '</b><span>' + tip(l) + '</span></div>'; }).join("") + '</div>';
   }
 
   function field(name, label, value, opts) {
@@ -47,7 +48,7 @@
       html += '<h2 class="month-head"><span class="stripe-mini"></span>Your numbers: ' + monthName(S.labels.thisMonth) + ' so far</h2>' + tiles(S.thisMonth);
       html += '<h2 class="month-head"><span class="stripe-mini"></span>' + monthName(S.labels.lastMonth) + '</h2>' + tiles(S.lastMonth);
       html += '<h2 class="month-head"><span class="stripe-mini"></span>Last 30 days</h2>' + tiles(S.last30);
-      if (months.length) html += '<details style="margin:8px 0 16px"><summary style="cursor:pointer;font-weight:600">Month by month</summary><div class="table-scroll" style="margin-top:12px"><table class="stats-table"><thead><tr><th>Month</th>' + LABELS.map(function (l) { return "<th>" + l[1] + "</th>"; }).join("") + '</tr></thead><tbody>' +
+      if (months.length) html += '<details style="margin:8px 0 16px"><summary style="cursor:pointer;font-weight:600">Month by month</summary><div class="table-scroll" style="margin-top:12px"><table class="stats-table"><thead><tr><th>Month</th>' + LABELS.map(function (l) { return "<th>" + tip(l) + "</th>"; }).join("") + '</tr></thead><tbody>' +
         months.map(function (m) { return "<tr><td>" + monthName(m) + "</td>" + LABELS.map(function (l) { return "<td>" + (S.months[m][l[0]] || 0) + "</td>"; }).join("") + "</tr>"; }).join("") + '</tbody></table></div></details>';
       html += '<details style="margin:0 0 8px"><summary style="cursor:pointer;font-weight:600">What these numbers mean</summary><dl class="facts" style="margin-top:12px">' + LABELS.map(function (l) { return "<dt>" + l[1] + "</dt><dd>" + l[2] + "</dd>"; }).join("") + '</dl>' +
         '<p class="risk">Counts come from this site only. Bots and people who block tracking are not counted, so real numbers run a little higher. Times are Pacific.</p></details>';

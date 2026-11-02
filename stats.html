@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=20261102c">
 </head>
 <body>
 <header class="site-header"><a class="skip-link" href="#main">Skip to main content</a><div class="stripe"></div><nav class="nav wrap" aria-label="Main">
@@ -41,14 +41,15 @@
 <script>
 (function () {
   var API = "https://cvs-tracker.toddstpierre.workers.dev";
-  var LABELS = [["impression", "Listing seen", "Times your listing showed up on someone's screen"], ["profile", "Profile views", "Visits to your profile page"], ["call", "Calls tapped", "Taps on your phone number"], ["website", "Website visits", "Clicks through to your website"]];
+  var LABELS = [["impression", "Listing seen", "Times your listing card showed up on someone's screen while they browsed the directory, search results, a town page or the home page. Visits straight to your profile page are not counted here."], ["profile", "Profile views", "Visits to your profile page, whether people came from our site, Google or a link someone shared."], ["call", "Calls tapped", "Taps on your Call button or phone number on our site."], ["website", "Website visits", "Clicks from our site through to your website."]];
+  function tip(l) { return l[1] + ' <span class="stat-tip" tabindex="0" role="button" aria-label="What does ' + l[1] + ' mean?" data-tip="' + l[2].replace(/"/g, "&quot;") + '">?</span>'; }
   var out = document.getElementById("st-out"), q = new URLSearchParams(location.search);
   var adminKey = q.get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })();
   var dir = (window.CVS && window.CVS.directory) || [];
   function slugOf(b) { return b.slug || String(b.name).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
   function nameOf(s) { var b = dir.filter(function (x) { return !x.sample && slugOf(x) === s; })[0]; return b ? b.name : s; }
   function monthName(ym) { var p = ym.split("-"); return new Date(+p[0], +p[1] - 1, 1).toLocaleString("en-US", { month: "long", year: "numeric" }); }
-  function tiles(set) { return '<div class="stats" style="margin-bottom:16px">' + LABELS.map(function (l) { return '<div class="stat"><b>' + (set[l[0]] || 0).toLocaleString() + '</b><span>' + l[1] + '</span></div>'; }).join("") + '</div>'; }
+  function tiles(set) { return '<div class="stats" style="margin-bottom:16px">' + LABELS.map(function (l) { return '<div class="stat"><b>' + (set[l[0]] || 0).toLocaleString() + '</b><span>' + tip(l) + '</span></div>'; }).join("") + '</div>'; }
   function fail(msg) { out.innerHTML = '<div class="empty">' + msg + '</div>'; }
 
   if (adminKey) {
@@ -99,7 +100,7 @@
         $("adm-chips").innerHTML = FILTERS.map(function (f) { return '<button type="button" class="chip' + (st.filter === f[0] ? " active" : "") + '" data-f="' + f[0] + '">' + f[1] + " (" + all.filter(function (b) { var o = st.filter; st.filter = f[0]; var ok = pass(b); st.filter = o; return ok; }).length + ")</button>"; }).join("");
         var label = PERIODS.filter(function (p) { return p[0] === st.period; })[0][1];
         $("adm-count").textContent = list.length + " of " + all.length + " listings · " + label + (st.period === "thisMonth" ? " (change vs. last month)" : "");
-        $("adm-head").innerHTML = "<tr><th>Business</th>" + LABELS.map(function (l) { return "<th>" + l[1] + "</th>"; }).join("") + "<th>Private link</th></tr>";
+        $("adm-head").innerHTML = "<tr><th>Business</th>" + LABELS.map(function (l) { return "<th>" + tip(l) + "</th>"; }).join("") + "<th>Private link</th></tr>";
         $("adm-body").innerHTML = list.slice(0, st.shown).map(function (b) {
           var link = base + "?b=" + b.slug + "&key=" + b.key;
           var tags = (b.postcard ? '<span class="adm-tag">Postcard</span>' : b.premium ? '<span class="adm-tag">Premium</span>' : "") + (b.claimed ? '<span class="adm-tag adm-tag-c">Claimed</span>' : "");
@@ -149,7 +150,7 @@
       '<h2 class="month-head"><span class="stripe-mini"></span>' + monthName(d.labels.thisMonth) + ' so far</h2>' + tiles(d.thisMonth) +
       '<h2 class="month-head"><span class="stripe-mini"></span>' + monthName(d.labels.lastMonth) + '</h2>' + tiles(d.lastMonth) +
       '<h2 class="month-head"><span class="stripe-mini"></span>Last 30 days</h2>' + tiles(d.last30) +
-      (months.length ? '<h2 class="month-head"><span class="stripe-mini"></span>Month by month</h2><div class="table-scroll"><table class="stats-table"><thead><tr><th>Month</th>' + LABELS.map(function (l) { return "<th>" + l[1] + "</th>"; }).join("") + '</tr></thead><tbody>' +
+      (months.length ? '<h2 class="month-head"><span class="stripe-mini"></span>Month by month</h2><div class="table-scroll"><table class="stats-table"><thead><tr><th>Month</th>' + LABELS.map(function (l) { return "<th>" + tip(l) + "</th>"; }).join("") + '</tr></thead><tbody>' +
         months.map(function (m) { return "<tr><td>" + monthName(m) + "</td>" + LABELS.map(function (l) { return "<td>" + d.months[m][l[0]] + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>" : "") +
       '<dl class="facts" style="margin-top:24px">' + LABELS.map(function (l) { return "<dt>" + l[1] + "</dt><dd>" + l[2] + "</dd>"; }).join("") + "</dl>";
   }).catch(function () { fail("Could not load your numbers. Try again in a minute."); });
