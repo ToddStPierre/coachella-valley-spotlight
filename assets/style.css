@@ -1368,3 +1368,47 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
   .rp-next h2, .rp-next p, .rp-next .rp-spots { color: var(--ink); }
   .rp-track i, .rp-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; animation: none; }
 }
+
+/* Admin: section tabs, sales cockpit (assets/admin-nav.js, admin-cockpit.js) */
+.adm-nav { position: sticky; top: 88px; z-index: 20; display: flex; gap: 6px; overflow-x: auto; padding: 8px; margin: 0 0 24px; background: rgba(255, 250, 243, .94); backdrop-filter: blur(8px); border: 1px solid var(--line); border-radius: 99px; box-shadow: var(--shadow); scrollbar-width: none; }
+.adm-nav::-webkit-scrollbar { display: none; }
+.adm-nav a { flex: none; padding: 8px 16px; border-radius: 99px; color: var(--ink); text-decoration: none; font-weight: 600; font-size: 15px; }
+.adm-nav a:hover { background: var(--sand); }
+.adm-nav a.active { background: var(--ink); color: #fff; }
+.adm-section { scroll-margin-top: 160px; }
+.ck { margin-bottom: 48px; }
+.ck .month-head { margin-top: 0; }
+.ck-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--s2); margin-bottom: var(--s3); }
+.ck-card { background: var(--ink); color: #f7efe4; border-radius: var(--radius); padding: var(--s3); }
+.ck-card.ck-ok { background: var(--palm); }
+.ck-card-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+.ck-card-top b { font-family: var(--display); font-size: 24px; font-weight: 600; color: #fff; }
+.ck-card-top span { font-family: var(--mono); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--gold); }
+.ck-meter { position: relative; display: flex; height: 18px; border-radius: 99px; background: rgba(255,255,255,.12); overflow: visible; }
+.ck-meter i { display: block; height: 100%; }
+.ck-sold { background: var(--gold); border-radius: 99px 0 0 99px; }
+.ck-pend { background: repeating-linear-gradient(135deg, var(--gold) 0 6px, rgba(240,163,58,.35) 6px 12px); }
+.ck-min { position: absolute; top: -5px; bottom: -5px; width: 3px; margin-left: -1px; background: #fff; border-radius: 2px; }
+.ck-line { margin: 12px 0 2px; color: #e9dccb; }
+.ck-line b, .ck-need b { color: #fff; }
+.ck-need { margin: 0; color: #e9dccb; }
+.ck-open { margin-top: 10px; font-size: 15px; color: #e9dccb; }
+.ck-open summary { cursor: pointer; color: #fff; font-weight: 600; }
+.ck-open p { margin: 8px 0 0; }
+.ck-grid { display: grid; grid-template-columns: minmax(240px, 1fr) 2.2fr; gap: var(--s2); align-items: start; }
+.ck-panel { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s3); }
+.ck-panel h3 { font-family: var(--display); font-size: 22px; margin: 0 0 12px; }
+.ck-panel h3 .ck-sub { font-family: var(--body); font-size: 15px; font-weight: 400; margin-left: 6px; }
+.ck-sub { color: var(--ink-2); font-size: 15px; }
+.ck-todo { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.ck-todo li { padding: 10px 12px; background: var(--sand); border-radius: 10px; font-size: 15px; }
+.ck-todo a { color: var(--ink); text-decoration: none; }
+.ck-todo a:hover { text-decoration: underline; }
+.ck-lead { display: flex; justify-content: space-between; gap: var(--s2); padding: 14px 0; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.ck-lead-main { display: grid; gap: 2px; min-width: 0; }
+.ck-nums { font-size: 15px; }
+.ck-nums em { color: var(--ink-2); font-style: normal; font-size: 14px; }
+.ck-lead-cta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 15px; }
+.ck-lead-cta .btn { padding: 8px 14px; font-size: 14px; }
+.ck-done { opacity: .5; }
+@media (max-width: 860px) { .ck-grid { grid-template-columns: 1fr; } .adm-nav { top: 72px; } }

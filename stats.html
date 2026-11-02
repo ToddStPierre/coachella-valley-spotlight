@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=20261102r">
+<link rel="stylesheet" href="assets/style.css?v=20261102s">
 </head>
 <body data-no-popup>
 <header class="site-header"><a class="skip-link" href="#main">Skip to main content</a><div class="stripe"></div><nav class="nav wrap" aria-label="Main">
@@ -53,8 +53,9 @@
   function fail(msg) { out.innerHTML = '<div class="empty">' + msg + '</div>'; }
 
   if (adminKey) {
-    document.getElementById("st-title").textContent = "All listings";
-    document.getElementById("st-sub").textContent = "Every real business in the directory. Copy a business's private link to send them their numbers.";
+    document.getElementById("st-title").textContent = "Admin"; document.title = "Admin | Coachella Valley Spotlight";
+    document.getElementById("st-eyebrow").textContent = "Site admin";
+    document.getElementById("st-sub").textContent = "Cards, who to pitch, monthly reports, the inbox, every listing and the owners, in one place.";
     var slugs = dir.filter(function (x) { return !x.sample; }).map(slugOf).join(",");
     fetch(API + "/stats/all?key=" + encodeURIComponent(adminKey) + "&slugs=" + slugs).then(function (r) { return r.json(); }).then(function (d) {
       if (d.error) return fail("That admin link is not valid.");
@@ -65,7 +66,7 @@
       var cities = all.map(function (b) { return b.city; }).filter(function (c, i, a) { return c && a.indexOf(c) === i; }).sort();
       var PERIODS = [["thisMonth", "This month"], ["lastMonth", "Last month"], ["last30", "Last 30 days"], ["allTime", "All time"]];
       var st = { period: "thisMonth", sort: "profile", q: "", city: "", filter: "active", shown: 25 };
-      out.innerHTML = '<div class="adm-tiles" id="adm-tiles"></div>' +
+      out.innerHTML = '<h2 class="month-head"><span class="stripe-mini"></span>Listings</h2><p class="risk" style="margin-bottom:16px">Every real business in the directory. Copy a business&rsquo;s private link to send them their numbers.</p><div class="adm-tiles" id="adm-tiles"></div>' +
         '<div class="filters adm-controls">' +
         '<label class="sr-only" for="adm-q">Search</label><input id="adm-q" type="search" placeholder="Search businesses">' +
         '<label class="sr-only" for="adm-city">City</label><select id="adm-city"><option value="">All cities</option>' + cities.map(function (c) { return "<option>" + c + "</option>"; }).join("") + '</select>' +
@@ -171,6 +172,6 @@
 <nav class="footer-towns" aria-label="Towns"><h4>Towns</h4><ul><li><a href="city/bermuda-dunes/">Bermuda Dunes</a></li><li><a href="city/cathedral-city/">Cathedral City</a></li><li><a href="city/coachella/">Coachella</a></li><li><a href="city/desert-hot-springs/">Desert Hot Springs</a></li><li><a href="city/indian-wells/">Indian Wells</a></li><li><a href="city/indio/">Indio</a></li><li><a href="city/la-quinta/">La Quinta</a></li><li><a href="city/palm-desert/">Palm Desert</a></li><li><a href="city/palm-springs/">Palm Springs</a></li><li><a href="city/rancho-mirage/">Rancho Mirage</a></li><li><a href="city/thousand-palms/">Thousand Palms</a></li></ul></nav>
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight, a brand of MoreViews Pro LLC. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
-<script src="data/directory.js"></script><script src="assets/app.js"></script><script src="assets/admin-owners.js"></script><script src="data/mailings.js"></script><script src="assets/admin-mailings.js"></script><script src="assets/admin-signups.js"></script><script src="assets/admin-submissions.js"></script><script src="assets/stats-report.js?v=20261102r"></script>
+<script src="data/directory.js"></script><script src="assets/app.js"></script><script src="assets/admin-owners.js"></script><script src="data/mailings.js"></script><script src="assets/admin-mailings.js"></script><script src="assets/admin-signups.js"></script><script src="assets/admin-submissions.js"></script><script src="data/deals.js"></script><script src="assets/admin-cockpit.js?v=20261102a"></script><script src="assets/admin-reports.js?v=20261102a"></script><script src="assets/admin-nav.js?v=20261102a"></script><script src="assets/stats-report.js?v=20261102r"></script>
 </body>
 </html>
