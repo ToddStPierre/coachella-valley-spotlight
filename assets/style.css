@@ -1222,3 +1222,9 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
   .cov-facts { grid-template-columns: 1fr; gap: 2px; }
   .cov-facts dd { margin-bottom: 8px; }
 }
+
+/* ===== Hold your spot page (reserve.html) ===== */
+.reserve-page { padding: var(--s3) 0 var(--s5); }
+.reserve-page .crumbs { margin-bottom: var(--s2); }
+.reserve-change { margin: 4px 0 0; font-size: 15px; }
+.reserve-change a { color: #f0c27a; font-weight: 600; }
