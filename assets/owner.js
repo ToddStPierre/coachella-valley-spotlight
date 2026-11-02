@@ -76,7 +76,7 @@
       html += '<h2 class="month-head"><span class="stripe-mini"></span>Photos</h2><div class="card" style="padding:28px">' +
         '<p style="margin-top:0">Up to 8 photos for your profile page. Big photos are resized automatically.</p>' +
         '<div class="ow-photos" id="ow-photos">' + (L.gallery.length ? L.gallery.map(function (g) {
-          return '<figure><img src="' + esc(g) + '" alt="" onerror="this.closest(\'figure\').classList.add(\'ow-pending\')"><button type="button" class="btn btn-ghost" data-del="' + esc(g) + '">Remove</button></figure>';
+          return '<figure><img src="' + esc(g) + '" alt="Your listing photo" onerror="this.closest(\'figure\').classList.add(\'ow-pending\')"><button type="button" class="btn btn-ghost" data-del="' + esc(g) + '">Remove</button></figure>';
         }).join("") : '<p class="risk">No photos yet.</p>') + '</div>' +
         (L.gallery.length < 8 ? '<label class="btn btn-ghost" style="margin-top:12px">Add a photo<input type="file" id="ow-file" accept="image/jpeg,image/png,image/webp" hidden></label>' : '') +
         '<p class="form-status" id="ow-photo-msg" role="status">' + esc(flash) + '</p></div>';

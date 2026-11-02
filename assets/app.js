@@ -172,7 +172,7 @@
     },
     news: function (n, opt) {
       var d = parse(n.date);
-      if (n.feed) return '<article class="card story headline">' + (opt && opt.img ? '<img class="headline-img" src="' + ROOT + 'assets/img/cities/' + cityPhoto(n.city) + '.jpg" alt="" loading="lazy" width="800" height="450">' : '') + '<span class="meta">' + esc(n.city) + (d ? ' &middot; ' + fmt(d) : '') + '</span>' +
+      if (n.feed) return '<article class="card story headline">' + (opt && opt.img ? '<img class="headline-img" src="' + ROOT + 'assets/img/cities/' + cityPhoto(n.city) + '.jpg" alt="' + esc(n.city ? n.city + ", Coachella Valley" : "Coachella Valley") + '" loading="lazy" width="800" height="450">' : '') + '<span class="meta">' + esc(n.city) + (d ? ' &middot; ' + fmt(d) : '') + '</span>' +
         '<h3><a href="' + esc(n.url) + '" target="_blank" rel="noopener nofollow">' + esc(n.title) + '</a></h3>' +
         '<a class="card-link" href="' + esc(n.url) + '" target="_blank" rel="noopener nofollow">Read it at ' + esc(n.source) + ' &rarr;</a></article>';
       return '<article class="card story">' + sample(n) + '<span class="meta">' + esc(n.city) + (d ? ' &middot; ' + fmt(d) : '') + '</span>' +
@@ -548,7 +548,7 @@
         '<p class="gr-summary"><b>' + g.rating.toFixed(1) + '</b>' + stars(g.rating) + '<span>' + g.count.toLocaleString() + ' review' + (g.count === 1 ? '' : 's') + ' on Google</span></p>';
       if (g.reviews.length) html += '<div class="gr-list">' + g.reviews.map(function (r) {
         var who = r.authorUrl ? '<a href="' + esc(r.authorUrl) + '"' + ext + '>' + esc(r.author) + '</a>' : esc(r.author);
-        return '<article class="gr-card"><div class="gr-head">' + (r.photo ? '<img src="' + esc(r.photo) + '" alt="" width="36" height="36" loading="lazy" referrerpolicy="no-referrer">' : '') +
+        return '<article class="gr-card"><div class="gr-head">' + (r.photo ? '<img src="' + esc(r.photo) + '" alt="' + esc((r.author || "Reviewer") + " profile photo") + '" width="36" height="36" loading="lazy" referrerpolicy="no-referrer">' : '') +
           '<div><b>' + who + '</b><span>' + stars(r.rating) + ' ' + esc(r.when) + '</span></div></div>' +
           '<p>' + esc(r.text) + '</p>' + (r.url ? '<a class="gr-more" href="' + esc(r.url) + '"' + ext + '>Read on Google &rarr;</a>' : '') + '</article>';
       }).join("") + '</div>';
