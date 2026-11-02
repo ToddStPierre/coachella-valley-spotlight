@@ -6,8 +6,8 @@
 <title>Listing Stats | Coachella Valley Spotlight</title>
 <meta name="robots" content="noindex">
 <meta name="description" content="Listing stats for businesses in the Coachella Valley Spotlight directory.">
-<meta property="og:title" content="Privacy and Terms | Coachella Valley Spotlight">
-<meta property="og:description" content="Privacy policy, terms and disclaimer.">
+<meta property="og:title" content="Your Spotlight Report | Coachella Valley Spotlight">
+<meta property="og:description" content="How neighbors find your business on Coachella Valley Spotlight.">
 <meta property="og:image" content="https://coachellavalleyspotlight.com/assets/img/share-card.png">
 <meta property="og:url" content="https://coachellavalleyspotlight.com/stats">
 <meta property="og:type" content="website">
@@ -18,9 +18,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=20261102c">
+<link rel="stylesheet" href="assets/style.css?v=20261102r">
 </head>
-<body>
+<body data-no-popup>
 <header class="site-header"><a class="skip-link" href="#main">Skip to main content</a><div class="stripe"></div><nav class="nav wrap" aria-label="Main">
 <a class="brand" href="./"><svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><defs><clipPath id="sunc"><circle cx="20" cy="22" r="13"/></clipPath></defs>
 <g clip-path="url(#sunc)"><rect x="0" y="9" width="40" height="5" fill="#f0a33a"/><rect x="0" y="15" width="40" height="4" fill="#d9552b"/><rect x="0" y="20" width="40" height="3" fill="#c9667a"/><rect x="0" y="24" width="40" height="2" fill="#5b4a7a"/></g>
@@ -32,7 +32,7 @@
 </nav></header>
 <main id="main" tabindex="-1">
 <section class="page-hero"><div class="wrap">
-<span class="eyebrow"><span class="stripe-mini"></span>Listing stats</span>
+<span class="eyebrow"><span class="stripe-mini"></span><span id="st-eyebrow">Listing stats</span></span>
 <h1 id="st-title">Your listing numbers</h1>
 <p id="st-sub">How many neighbors saw your listing, opened your profile, called you and visited your website from Coachella Valley Spotlight.</p>
 <div id="st-out"><div class="empty">Loading your numbers...</div></div>
@@ -142,17 +142,14 @@
     })(0);
     return;
   }
+  // The Spotlight Report (assets/stats-report.js) needs the directory and mailing dates, which load after this script.
+  var loaded = new Promise(function (res) { if (document.readyState === "complete") res(); else window.addEventListener("load", res); });
+  document.body.classList.add("is-report");
   fetch(API + "/stats?b=" + encodeURIComponent(slug) + "&key=" + encodeURIComponent(key)).then(function (r) { return r.json(); }).then(function (d) {
-    if (d.error) return fail("That link is not valid. Ask us for a fresh one.");
-    document.getElementById("st-title").textContent = nameOf(slug);
-    var months = Object.keys(d.months).sort().reverse();
-    out.innerHTML =
-      '<h2 class="month-head"><span class="stripe-mini"></span>' + monthName(d.labels.thisMonth) + ' so far</h2>' + tiles(d.thisMonth) +
-      '<h2 class="month-head"><span class="stripe-mini"></span>' + monthName(d.labels.lastMonth) + '</h2>' + tiles(d.lastMonth) +
-      '<h2 class="month-head"><span class="stripe-mini"></span>Last 30 days</h2>' + tiles(d.last30) +
-      (months.length ? '<h2 class="month-head"><span class="stripe-mini"></span>Month by month</h2><div class="table-scroll"><table class="stats-table"><thead><tr><th>Month</th>' + LABELS.map(function (l) { return "<th>" + tip(l) + "</th>"; }).join("") + '</tr></thead><tbody>' +
-        months.map(function (m) { return "<tr><td>" + monthName(m) + "</td>" + LABELS.map(function (l) { return "<td>" + d.months[m][l[0]] + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>" : "") +
-      '<dl class="facts" style="margin-top:24px">' + LABELS.map(function (l) { return "<dt>" + l[1] + "</dt><dd>" + l[2] + "</dd>"; }).join("") + "</dl>";
+    return loaded.then(function () {
+      if (d.error) return fail("That link is not valid. Ask us for a fresh one.");
+      window.CVS_REPORT(out, d, slug, LABELS);
+    });
   }).catch(function () { fail("Could not load your numbers. Try again in a minute."); });
 })();
 </script>
@@ -174,6 +171,6 @@
 <nav class="footer-towns" aria-label="Towns"><h4>Towns</h4><ul><li><a href="city/bermuda-dunes/">Bermuda Dunes</a></li><li><a href="city/cathedral-city/">Cathedral City</a></li><li><a href="city/coachella/">Coachella</a></li><li><a href="city/desert-hot-springs/">Desert Hot Springs</a></li><li><a href="city/indian-wells/">Indian Wells</a></li><li><a href="city/indio/">Indio</a></li><li><a href="city/la-quinta/">La Quinta</a></li><li><a href="city/palm-desert/">Palm Desert</a></li><li><a href="city/palm-springs/">Palm Springs</a></li><li><a href="city/rancho-mirage/">Rancho Mirage</a></li><li><a href="city/thousand-palms/">Thousand Palms</a></li></ul></nav>
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight, a brand of MoreViews Pro LLC. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
-<script src="data/directory.js"></script><script src="assets/app.js"></script><script src="assets/admin-owners.js"></script><script src="data/mailings.js"></script><script src="assets/admin-mailings.js"></script><script src="assets/admin-signups.js"></script><script src="assets/admin-submissions.js"></script>
+<script src="data/directory.js"></script><script src="assets/app.js"></script><script src="assets/admin-owners.js"></script><script src="data/mailings.js"></script><script src="assets/admin-mailings.js"></script><script src="assets/admin-signups.js"></script><script src="assets/admin-submissions.js"></script><script src="assets/stats-report.js?v=20261102r"></script>
 </body>
 </html>
