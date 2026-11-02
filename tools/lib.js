@@ -80,7 +80,7 @@ function fitTitle(t, max = 65) {
 
 function metaTags({ title, description, url, image, noindex }) {
   const abs = SITE + "/" + url;
-  const img = /^https?:/.test(image || "") ? image : SITE + "/" + (image || "assets/img/real-cards.jpg");
+  const img = /^https?:/.test(image || "") ? image : SITE + "/" + (image || "assets/img/share-card.png");
   return `<title>${esc(fitTitle(title))}</title>
 <meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${esc(abs)}">
