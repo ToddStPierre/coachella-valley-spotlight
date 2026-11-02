@@ -1412,3 +1412,31 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .ck-lead-cta .btn { padding: 8px 14px; font-size: 14px; }
 .ck-done { opacity: .5; }
 @media (max-width: 860px) { .ck-grid { grid-template-columns: 1fr; } .adm-nav { top: 72px; } }
+/* Who to pitch: status, follow-ups and the contact log */
+.ck-chips { margin: 4px 0 8px; }
+.ck-lead-main { flex: 1 1 320px; }
+.ck-status { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
+.ck-pill { display: inline-block; padding: 2px 10px; border-radius: 99px; background: var(--sand); border: 1px solid var(--line); font-size: 13px; font-weight: 600; }
+.ck-pill-hot { background: #fde7c8; border-color: var(--gold); }
+.ck-pill-win { background: var(--palm-soft); border-color: var(--palm); color: var(--palm); }
+.ck-pill-lost { color: var(--ink-2); }
+.ck-due { font-size: 14px; color: var(--ink-2); }
+.ck-late { color: var(--sun-deep); font-weight: 600; }
+.ck-last { font-size: 14px; color: var(--ink-2); }
+.ck-links { font-size: 14px; }
+.ck-log { flex: 1 1 100%; background: var(--sand); border-radius: 12px; padding: var(--s2); display: grid; gap: 12px; }
+.ck-chan { display: flex; gap: 6px; flex-wrap: wrap; }
+.ck-log-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.ck-log label { display: grid; gap: 4px; font-size: 14px; font-weight: 600; }
+.ck-log select, .ck-log input, .ck-log textarea { font: inherit; font-size: 15px; font-weight: 400; padding: 8px 10px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); }
+.ck-note textarea { width: 100%; resize: vertical; }
+.ck-quick { display: flex; gap: 6px; flex-wrap: wrap; }
+.ck-quick button { font: inherit; font-size: 13px; padding: 6px 10px; border-radius: 99px; border: 1px solid var(--line); background: var(--paper); cursor: pointer; }
+.ck-quick button:hover { border-color: var(--ink-2); }
+.ck-log-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.ck-log-actions .btn { padding: 8px 16px; font-size: 14px; }
+.ck-msg { font-size: 14px; font-weight: 600; color: var(--sun-deep); }
+.ck-hist { margin: 0; padding: 12px 0 0 18px; border-top: 1px solid var(--line); display: grid; gap: 8px; font-size: 14px; }
+.ck-del { border: 0; background: none; color: var(--ink-2); font-size: 18px; line-height: 1; cursor: pointer; padding: 0 4px; }
+.ck-del:hover { color: var(--sun-deep); }
+.ck-chan .chip.active { background: var(--ink); color: #fff; border-color: var(--ink); }
