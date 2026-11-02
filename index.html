@@ -39,7 +39,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=20261102e">
+<link rel="stylesheet" href="assets/style.css?v=20261102f">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://coachellavalleyspotlight.com/#org","name":"Coachella Valley Spotlight","url":"https://coachellavalleyspotlight.com/","telephone":"+1-760-422-5475","areaServed":{"@type":"Place","name":"Coachella Valley, California"},"description":"A local guide to the Coachella Valley: a free business directory, events calendar and local deals, plus the Spotlight shared postcard mailed to Palm Desert homes."},{"@type":"WebSite","@id":"https://coachellavalleyspotlight.com/#website","name":"Coachella Valley Spotlight","url":"https://coachellavalleyspotlight.com/","publisher":{"@id":"https://coachellavalleyspotlight.com/#org"}}]}</script>
 </head>
 <body>
@@ -67,53 +67,17 @@
 <a class="chip" href="directory?category=Home%20services">Home services</a><a class="chip" href="directory?category=Restaurants">Restaurants</a></div>
 
 </div>
-<div class="hero-panel hero-map" id="valley-map" aria-roledescription="carousel">
-<div class="hero-map-head"><span class="eyebrow"><span class="stripe-mini"></span>Pick your town</span><button type="button" class="hm-link" id="localize-geo">&#128205; Use my location</button></div>
-<div class="vmap" id="vmap">
-<svg viewBox="0 0 1000 520" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-<defs>
-<linearGradient id="vm-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e9d3"/><stop offset="1" stop-color="#ecd3b0"/></linearGradient>
-<linearGradient id="vm-mtn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6f9a"/><stop offset="1" stop-color="#5b4a7a"/></linearGradient>
-<radialGradient id="vm-sun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#f0a33a" stop-opacity=".55"/><stop offset="1" stop-color="#f0a33a" stop-opacity="0"/></radialGradient>
-</defs>
-<rect width="1000" height="520" fill="url(#vm-floor)"/>
-<circle cx="930" cy="40" r="170" fill="url(#vm-sun)"/>
-<path d="M0,0 L0,78 L50,64 L110,36 L160,22 L210,0 Z" fill="#5b4a7a" opacity=".22"/>
-<path d="M290,0 L330,26 L380,42 L430,70 L475,62 L520,100 L580,112 L640,150 L700,140 L760,180 L830,190 L900,226 L1000,232 L1000,0 Z" fill="#c9667a" opacity=".16"/>
-<path d="M330,0 L370,22 L420,30 L470,48 L520,70 L580,80 L650,118 L720,112 L790,150 L860,160 L930,196 L1000,200 L1000,0 Z" fill="#5b4a7a" opacity=".2"/>
-<path d="M0,128 L36,140 L68,176 L88,232 L96,282 L130,316 L200,340 L262,356 L322,388 L384,396 L444,418 L500,414 L548,432 L574,462 L592,498 L612,520 L0,520 Z" fill="#c9667a" opacity=".22" transform="translate(0,-22)"/>
-<path d="M0,128 L36,140 L68,176 L88,232 L96,282 L130,316 L200,340 L262,356 L322,388 L384,396 L444,418 L500,414 L548,432 L574,462 L592,498 L612,520 L0,520 Z" fill="url(#vm-mtn)" opacity=".5"/>
-<polyline points="0,103 208,178 375,239 479,274 625,308 792,363 917,404 1000,424" fill="none" stroke="#221c18" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
-<polyline points="0,103 208,178 375,239 479,274 625,308 792,363 917,404 1000,424" fill="none" stroke="#f5ede1" stroke-width="1.5" stroke-dasharray="10 9" opacity=".9"/>
-<polyline points="104,192 135,246 250,287 354,335 458,369 563,383 667,397 771,397 896,424" fill="none" stroke="#b8401c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 7" opacity=".55"/>
-<g font-family="JetBrains Mono, monospace" font-size="15" font-weight="700" fill="#221c18" opacity=".55">
-<text x="22" y="92" transform="rotate(20 22 92)">&#8592; I-10 to L.A.</text>
-<text x="842" y="370" transform="rotate(17 842 370)">I-10</text>
-<text x="930" y="505" font-size="13" text-anchor="end">Salton Sea &#8600;</text>
-<text x="30" y="500" font-size="13" fill="#fffaf3" opacity=".9">Santa Rosa Mtns</text>
-</g>
-</svg>
-<a class="vm-pin" href="city/desert-hot-springs/" data-town="Desert Hot Springs" data-lab="r" style="--x:20.5%;--y:10.2%"><span class="vm-dot"></span><span class="vm-label">Desert Hot Springs</span></a>
-<a class="vm-pin" href="city/palm-springs/" data-town="Palm Springs" data-lab="t" style="--x:11.4%;--y:44.6%"><span class="vm-dot"></span><span class="vm-label">Palm Springs</span></a>
-<a class="vm-pin" href="city/cathedral-city/" data-town="Cathedral City" data-lab="l" style="--x:28.1%;--y:57.9%"><span class="vm-dot"></span><span class="vm-label">Cathedral City</span></a>
-<a class="vm-pin" href="city/thousand-palms/" data-town="Thousand Palms" data-lab="r" style="--x:45.8%;--y:46.7%"><span class="vm-dot"></span><span class="vm-label">Thousand Palms</span></a>
-<a class="vm-pin" href="city/rancho-mirage/" data-town="Rancho Mirage" data-lab="l" style="--x:39%;--y:68.5%"><span class="vm-dot"></span><span class="vm-label">Rancho Mirage</span></a>
-<a class="vm-pin" href="city/palm-desert/" data-town="Palm Desert" data-lab="t" style="--x:47%;--y:73.1%"><span class="vm-dot"></span><span class="vm-label">Palm Desert</span></a>
-<a class="vm-pin" href="city/indian-wells/" data-town="Indian Wells" data-lab="b" data-small style="--x:54.2%;--y:74.4%"><span class="vm-dot"></span><span class="vm-label">Indian Wells</span></a>
-<a class="vm-pin" href="city/bermuda-dunes/" data-town="Bermuda Dunes" data-lab="t" data-small style="--x:63.2%;--y:68.7%"><span class="vm-dot"></span><span class="vm-label">Bermuda Dunes</span></a>
-<a class="vm-pin" href="city/la-quinta/" data-town="La Quinta" data-lab="r" style="--x:60.4%;--y:88.7%"><span class="vm-dot"></span><span class="vm-label">La Quinta</span></a>
-<a class="vm-pin" href="city/indio/" data-town="Indio" data-lab="t" style="--x:80.1%;--y:73.5%"><span class="vm-dot"></span><span class="vm-label">Indio</span></a>
-<a class="vm-pin" href="city/coachella/" data-town="Coachella" data-lab="b" style="--x:88.8%;--y:84%"><span class="vm-dot"></span><span class="vm-label">Coachella</span></a>
-</div>
-<div class="vm-towns" id="vm-towns" role="group" aria-label="Choose a town"></div>
+<div class="hero-panel" aria-label="Plan my night, holidays and this weekend" aria-roledescription="carousel">
 <div class="hp-slides" aria-live="off">
-<div class="hp-slide is-on" role="group" aria-roledescription="slide" aria-label="Town spotlight"><div class="vm-card" id="vm-card" aria-live="polite">
-<span class="eyebrow"><span class="stripe-mini"></span>Spotlight on</span>
-<h3>Palm Desert</h3>
-<p class="vm-tag">El Paseo shopping, Highway 111 dining, and the middle of the valley.</p>
-<div class="vm-actions"><a class="btn" href="city/palm-desert/">Explore Palm Desert &rarr;</a></div>
-</div>
-</div>
+<div class="hp-slide is-on" role="group" aria-roledescription="slide" aria-label="Plan my night"><span class="eyebrow"><span class="stripe-mini"></span>Plan my night</span>
+<div class="pn" id="plan-night">
+<form class="pn-form" novalidate><p class="hp-feature-title pn-title">Your night out, planned in 3 taps.</p>
+<div class="pn-q"><label class="pn-k" for="pn-town">Where</label><select id="pn-town" name="town"><option value="">Anywhere in the valley</option><option>Palm Springs</option><option>Desert Hot Springs</option><option>Cathedral City</option><option>Rancho Mirage</option><option>Thousand Palms</option><option>Palm Desert</option><option>Indian Wells</option><option>La Quinta</option><option>Bermuda Dunes</option><option>Indio</option><option>Coachella</option></select></div>
+<fieldset class="pn-q"><legend class="pn-k">Who&rsquo;s coming</legend><div class="pn-opts"><label class="pn-opt"><input type="radio" name="who" value="date" checked><span>Date night</span></label><label class="pn-opt"><input type="radio" name="who" value="friends"><span>Friends</span></label><label class="pn-opt"><input type="radio" name="who" value="family"><span>Family</span></label><label class="pn-opt"><input type="radio" name="who" value="solo"><span>Just me</span></label></div></fieldset>
+<fieldset class="pn-q"><legend class="pn-k">When</legend><div class="pn-opts"><label class="pn-opt"><input type="radio" name="when" value="tonight" checked><span>Tonight</span></label><label class="pn-opt"><input type="radio" name="when" value="tomorrow"><span>Tomorrow</span></label><label class="pn-opt"><input type="radio" name="when" value="weekend"><span>This weekend</span></label></div></fieldset>
+<button class="btn pn-go" type="submit">Plan my night &rarr;</button></form>
+<div class="pn-out" hidden aria-live="polite"></div>
+</div></div>
 <div class="hp-slide hp-feature" hidden role="group" aria-roledescription="slide" aria-label="Holiday guide" data-until="2027-01-02"><span class="eyebrow"><span class="stripe-mini"></span>Holidays in the valley</span>
 <a class="hp-feature-title" href="holidays">Light shows, the Festival of Lights Parade and every tree lighting &rarr;</a>
 <ol class="hp-list" data-list="events" data-tag="holidays" data-limit="2" data-view="row"></ol>
@@ -157,6 +121,54 @@
 <div class="grid" data-list="directory" data-mix="valley" data-limit="9"><noscript><div class="empty">Turn on JavaScript to see the listings.</div></noscript></div>
 <div class="quote-teaser"><p>Need a plumber, a lawyer or a mechanic? <strong>Skip the scrolling &mdash; get matched with 3 local pros, free.</strong></p><a class="btn" href="directory#quote">Get matched &rarr;</a></div>
 <p style="margin-top:24px"><a class="btn btn-ghost" href="submit">List my business free</a></p>
+</div></section>
+<section class="section vmap-section" id="valley-map"><div class="wrap">
+<div class="section-head"><div><span class="eyebrow">Town by town</span><h2>Eleven towns. One valley. <span class="grad">Pick yours.</span></h2><p>Tap a town on the map to see what&rsquo;s there: local businesses, what&rsquo;s coming up, and where the deals are.</p></div><span class="more-links"><button type="button" class="hm-link" id="localize-geo">&#128205; Use my location</button><a class="more" href="directory">Whole valley &rarr;</a></span></div>
+<div class="vmap-grid"><div>
+<div class="vmap" id="vmap">
+<svg viewBox="0 0 1000 520" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+<defs>
+<linearGradient id="vm-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e9d3"/><stop offset="1" stop-color="#ecd3b0"/></linearGradient>
+<linearGradient id="vm-mtn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6f9a"/><stop offset="1" stop-color="#5b4a7a"/></linearGradient>
+<radialGradient id="vm-sun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#f0a33a" stop-opacity=".55"/><stop offset="1" stop-color="#f0a33a" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1000" height="520" fill="url(#vm-floor)"/>
+<circle cx="930" cy="40" r="170" fill="url(#vm-sun)"/>
+<path d="M0,0 L0,78 L50,64 L110,36 L160,22 L210,0 Z" fill="#5b4a7a" opacity=".22"/>
+<path d="M290,0 L330,26 L380,42 L430,70 L475,62 L520,100 L580,112 L640,150 L700,140 L760,180 L830,190 L900,226 L1000,232 L1000,0 Z" fill="#c9667a" opacity=".16"/>
+<path d="M330,0 L370,22 L420,30 L470,48 L520,70 L580,80 L650,118 L720,112 L790,150 L860,160 L930,196 L1000,200 L1000,0 Z" fill="#5b4a7a" opacity=".2"/>
+<path d="M0,128 L36,140 L68,176 L88,232 L96,282 L130,316 L200,340 L262,356 L322,388 L384,396 L444,418 L500,414 L548,432 L574,462 L592,498 L612,520 L0,520 Z" fill="#c9667a" opacity=".22" transform="translate(0,-22)"/>
+<path d="M0,128 L36,140 L68,176 L88,232 L96,282 L130,316 L200,340 L262,356 L322,388 L384,396 L444,418 L500,414 L548,432 L574,462 L592,498 L612,520 L0,520 Z" fill="url(#vm-mtn)" opacity=".5"/>
+<polyline points="0,103 208,178 375,239 479,274 625,308 792,363 917,404 1000,424" fill="none" stroke="#221c18" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
+<polyline points="0,103 208,178 375,239 479,274 625,308 792,363 917,404 1000,424" fill="none" stroke="#f5ede1" stroke-width="1.5" stroke-dasharray="10 9" opacity=".9"/>
+<polyline points="104,192 135,246 250,287 354,335 458,369 563,383 667,397 771,397 896,424" fill="none" stroke="#b8401c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 7" opacity=".55"/>
+<g font-family="JetBrains Mono, monospace" font-size="15" font-weight="700" fill="#221c18" opacity=".55">
+<text x="22" y="92" transform="rotate(20 22 92)">&#8592; I-10 to L.A.</text>
+<text x="842" y="370" transform="rotate(17 842 370)">I-10</text>
+<text x="930" y="505" font-size="13" text-anchor="end">Salton Sea &#8600;</text>
+<text x="30" y="500" font-size="13" fill="#fffaf3" opacity=".9">Santa Rosa Mtns</text>
+</g>
+</svg>
+<a class="vm-pin" href="city/desert-hot-springs/" data-town="Desert Hot Springs" data-lab="r" style="--x:20.5%;--y:10.2%"><span class="vm-dot"></span><span class="vm-label">Desert Hot Springs</span></a>
+<a class="vm-pin" href="city/palm-springs/" data-town="Palm Springs" data-lab="t" style="--x:11.4%;--y:44.6%"><span class="vm-dot"></span><span class="vm-label">Palm Springs</span></a>
+<a class="vm-pin" href="city/cathedral-city/" data-town="Cathedral City" data-lab="l" style="--x:28.1%;--y:57.9%"><span class="vm-dot"></span><span class="vm-label">Cathedral City</span></a>
+<a class="vm-pin" href="city/thousand-palms/" data-town="Thousand Palms" data-lab="r" style="--x:45.8%;--y:46.7%"><span class="vm-dot"></span><span class="vm-label">Thousand Palms</span></a>
+<a class="vm-pin" href="city/rancho-mirage/" data-town="Rancho Mirage" data-lab="l" style="--x:39%;--y:68.5%"><span class="vm-dot"></span><span class="vm-label">Rancho Mirage</span></a>
+<a class="vm-pin" href="city/palm-desert/" data-town="Palm Desert" data-lab="t" style="--x:47%;--y:73.1%"><span class="vm-dot"></span><span class="vm-label">Palm Desert</span></a>
+<a class="vm-pin" href="city/indian-wells/" data-town="Indian Wells" data-lab="b" data-small style="--x:54.2%;--y:74.4%"><span class="vm-dot"></span><span class="vm-label">Indian Wells</span></a>
+<a class="vm-pin" href="city/bermuda-dunes/" data-town="Bermuda Dunes" data-lab="t" data-small style="--x:63.2%;--y:68.7%"><span class="vm-dot"></span><span class="vm-label">Bermuda Dunes</span></a>
+<a class="vm-pin" href="city/la-quinta/" data-town="La Quinta" data-lab="r" style="--x:60.4%;--y:88.7%"><span class="vm-dot"></span><span class="vm-label">La Quinta</span></a>
+<a class="vm-pin" href="city/indio/" data-town="Indio" data-lab="t" style="--x:80.1%;--y:73.5%"><span class="vm-dot"></span><span class="vm-label">Indio</span></a>
+<a class="vm-pin" href="city/coachella/" data-town="Coachella" data-lab="b" style="--x:88.8%;--y:84%"><span class="vm-dot"></span><span class="vm-label">Coachella</span></a>
+</div>
+<div class="vm-towns" id="vm-towns" role="group" aria-label="Choose a town"></div>
+</div>
+<div class="vm-card" id="vm-card" aria-live="polite">
+<span class="eyebrow"><span class="stripe-mini"></span>Spotlight on</span>
+<h3>Palm Desert</h3>
+<p class="vm-tag">El Paseo shopping, Highway 111 dining, and the middle of the valley.</p>
+<div class="vm-actions"><a class="btn" href="city/palm-desert/">Explore Palm Desert &rarr;</a></div>
+</div></div>
 </div></section>
 <section class="owner-band" id="find-your-business"><div class="wrap owner-band-grid">
 <div class="owner-band-copy"><span class="eyebrow" style="color:var(--gold)"><span class="stripe-mini"></span>For business owners</span>
@@ -233,9 +245,9 @@
   });
 })();
 </script>
-<script src="assets/app.js"></script><script src="assets/owner-lookup.js?v=20261102a"></script>
+<script src="assets/app.js"></script><script src="assets/owner-lookup.js?v=20261102a"></script><script src="assets/plan-night.js?v=20261102a"></script>
 <script>
-// Valley map (in the hero): tap a town pin to see its businesses, upcoming events, deals and top categories.
+// Valley map ("Town by town" section): tap a town pin to see its businesses, upcoming events, deals and top categories.
 // Runs after app.js so it can reuse CVS_RENDER (upcoming events with weekly dates filled in, the sorted directory).
 (function () {
   var map = document.getElementById("vmap"), card = document.getElementById("vm-card");
@@ -314,7 +326,6 @@
     pins.forEach(function (p) { if (p.getAttribute("data-town") === town) p.setAttribute("aria-current", "true"); else p.removeAttribute("aria-current"); });
     if (chips) [].forEach.call(chips.children, function (b) { var on = b.getAttribute("data-town") === town; b.setAttribute("aria-pressed", on ? "true" : "false"); if (on && track) b.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" }); });
     render(town);
-    if (track) { var d0 = document.querySelector(".hero-map .hp-dot"); if (d0 && d0.getAttribute("aria-current") !== "true") d0.click(); var pb = document.querySelector(".hero-map .hp-pause"); if (pb && pb.textContent === "Pause") pb.click(); }
     if (track && !window.CVS_NOTRACK && window.gtag) window.gtag("event", "map_town", { city: town });
   }
 

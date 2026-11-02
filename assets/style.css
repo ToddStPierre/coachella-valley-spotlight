@@ -115,10 +115,11 @@ p { margin: 0 0 var(--s2); }
 /* Near You: personalized mini-homepage once a town is known. */
 .near-you { background: var(--palm-soft); border-radius: var(--radius); }
 .near-you .section-head h2 { color: var(--palm); }
-.ny-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s3); }
+/* One full-width row each (events, deals, businesses), 3 across, so no column runs longer than the others. */
+.ny-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
+.ny-cols .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
 .ny-cols h3 { font-size: 17px; margin-bottom: 10px; }
-.ny-cols .grid { grid-template-columns: 1fr; gap: 14px; }
-@media (max-width: 860px) { .ny-cols { grid-template-columns: 1fr; } }
+@media (max-width: 860px) { .ny-cols .grid { grid-template-columns: 1fr; } }
 
 .biz-band { background: var(--ink); color: #f7efe4; border-radius: var(--radius); padding: var(--s3); display: flex; align-items: center; justify-content: space-between; gap: var(--s2); flex-wrap: wrap; }
 .biz-band p { margin: 0; font-size: 18px; }
@@ -1058,38 +1059,59 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
   .vm-stats b { font-size: 24px; }
 }
 
-/* Home hero with the valley map: text left, map box right (a .hero-panel, so app.js rotates the slides under the map). */
+/* Home hero: text left, rotating box right (Plan my night first, then the holiday guide, this weekend and the postcard ads; app.js rotates it). */
 .hero { padding-top: var(--s3); }
 @media (max-width: 640px) { .hero { padding-top: var(--s2); } }
-.hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); gap: var(--s4); align-items: start; }
+.hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: var(--s4); align-items: start; }
 .hero-grid .hero-inner > .eyebrow:first-child { margin-top: 0; }
 .hero-grid h1 { font-size: clamp(36px, 4.6vw, 56px); }
 .hero p.lede { font-size: 18.5px; }
-.hero-map { position: relative; z-index: 1; background: var(--paper); border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 2px 4px rgba(34,28,24,.05), 0 24px 48px -24px rgba(34,28,24,.35); padding: 12px; margin-top: 0; scroll-margin-top: 80px; }
-.hero-map .hp-slides { margin-top: 2px; }
-.hero-map .hp-slide:not(:first-child) { padding: 16px 6px 0; }
-.hero-map .hp-controls { margin: 10px 6px 2px; }
-.hero-map .hp-ad-img img { max-height: 200px; }
-.hero-map-head { display: flex; justify-content: space-between; align-items: center; padding: 4px 6px 10px; }
-.hero-map-head .eyebrow { margin: 0; }
-.hero-map .vmap { border-radius: 14px; box-shadow: none; }
-.hero-map .vm-card { border: 0; box-shadow: none; padding: 14px 6px 4px; background: none; }
-.hero-map .vm-card > .eyebrow, .hero-map .vm-next { display: none; }
-.hero-map .vm-card h3 { font-size: 28px; margin: 0 0 2px; }
-.hero-map .vm-tag { min-height: 0; font-size: 15px; margin-bottom: 12px; }
-.hero-map .vm-stats b { font-size: 24px; }
-.hero-map .vm-stats a { padding: 8px 6px; }
-.hero-map .vm-cats { margin-bottom: 14px; }
-.hero-map .vm-label { font-size: 11px; padding: 1px 6px; }
-.hero-map .vm-pin[data-small] .vm-label { display: none; }
-.hero-map .vm-pin[data-small]:hover .vm-label, .hero-map .vm-pin[data-small][aria-current="true"] .vm-label { display: block; }
+.hero .hero-panel { border-radius: 22px; box-shadow: 0 2px 4px rgba(34,28,24,.05), 0 24px 48px -24px rgba(34,28,24,.35); margin-top: 0; }
+.hero .hp-ad-img img { max-height: 230px; }
 .hm-link { background: none; border: 0; padding: 4px; color: var(--ink-2); font-family: var(--body); font-size: 14px; text-decoration: underline; cursor: pointer; }
 .hm-link:hover { color: var(--sun-deep); }
 .hm-link[hidden] { display: none; }
 @media (max-width: 900px) {
   .hero-grid { grid-template-columns: minmax(0, 1fr); }
 }
-@media (max-width: 640px) { .hero-map { padding: 8px; border-radius: 18px; } }
+.vmap-section { scroll-margin-top: 80px; }
+.vmap-section .vm-pin[data-small] .vm-label { display: none; }
+.vmap-section .vm-pin[data-small]:hover .vm-label, .vmap-section .vm-pin[data-small][aria-current="true"] .vm-label { display: block; }
+
+/* Plan my night (assets/plan-night.js), the first slide of the home hero box */
+.pn-title { margin-bottom: 14px; }
+.pn-q { border: 0; padding: 0; margin: 0 0 12px; min-width: 0; }
+.pn-k { display: block; font-family: var(--mono); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 6px; padding: 0; }
+.pn-q select { width: 100%; font: inherit; font-size: 15.5px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--ink); }
+.pn-opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.pn-opt { position: relative; cursor: pointer; }
+.pn-opt input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.pn-opt span { display: inline-block; padding: 7px 13px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); font-size: 14.5px; font-weight: 500; transition: background .15s, color .15s, border-color .15s; }
+.pn-opt:hover span { border-color: var(--sun-deep); }
+.pn-opt input:checked + span { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.pn-opt input:focus-visible + span { outline: 2px solid var(--sun-deep); outline-offset: 2px; }
+.pn-go { width: 100%; margin-top: 4px; }
+.pn-form[hidden], .pn-out[hidden] { display: none; }
+.pn-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; margin: 0 0 8px; }
+.pn-head b { font-family: var(--display); font-size: 21px; line-height: 1.2; }
+.pn-head span { font-family: var(--mono); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--sun-deep); }
+.pn-stops { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 0; }
+.pn-stop { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 10px 0; border-top: 1px dashed var(--line); }
+.pn-stop:first-child { border-top: 0; }
+.pn-time { font-family: var(--mono); font-size: 12.5px; font-weight: 700; color: var(--ink); background: var(--sand); border-radius: 8px; padding: 6px 4px; text-align: center; }
+.pn-body { display: grid; gap: 2px; min-width: 0; }
+.pn-role { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.pn-name { font-weight: 700; font-size: 16px; line-height: 1.3; color: var(--ink); text-decoration: none; }
+.pn-name:hover { color: var(--sun-deep); text-decoration: underline; }
+.pn-body small { font-size: 13.5px; color: var(--ink-2); line-height: 1.35; }
+.pn-body .pn-deal { color: var(--sun-deep); font-weight: 600; }
+.pn-pick { justify-self: start; margin-top: 3px; font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: linear-gradient(90deg, var(--gold), var(--sun)); color: var(--ink); }
+.pn-swap { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--paper); color: var(--ink-2); font-size: 17px; line-height: 1; cursor: pointer; transition: transform .25s, color .15s, border-color .15s; }
+.pn-swap:hover { color: var(--sun-deep); border-color: var(--sun-deep); transform: rotate(90deg); }
+.pn-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pn-actions .btn { padding: 10px 14px; font-size: 14.5px; }
+.pn-reset { background: none; border: 0; color: var(--ink-2); font: inherit; font-size: 14px; text-decoration: underline; cursor: pointer; padding: 4px; }
+@media (prefers-reduced-motion: reduce) { .pn-swap { transition: none; } .pn-swap:hover { transform: none; } }
 
 /* Spotlight search (assets/search.js; the header button is added by app.js) */
 .ss-open { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); color: var(--ink-2); font: inherit; font-size: 15px; font-weight: 500; cursor: pointer; min-width: 168px; transition: border-color .15s, box-shadow .15s; }
