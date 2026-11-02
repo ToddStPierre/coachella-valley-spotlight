@@ -1,7 +1,7 @@
 /* Plan My Night: three taps (where, who, when) build a timed night out from the site's own events,
    happy hours, deals and restaurants. Lives in the home hero's first slide (any element with id="plan-night").
    Premium and postcard businesses are picked first for their slot and carry a "Spotlight pick" badge.
-   Plans are shareable: ?plan=<town>~<who>~<YYYY-MM-DD>~<stop ids> rebuilds the exact same night.
+   Plans are shareable: ?plan=<town>~<who>~<YYYY-MM-DD>~<start, minutes after midnight>~<stop ids> rebuilds the exact same night.
    Needs app.js first (reuses CVS_RENDER: upcoming events with weekly dates filled in, the sorted directory). */
 (function () {
   var root = document.getElementById("plan-night");
@@ -105,25 +105,26 @@
   }
 
   // A plan is a list of slots; each slot keeps its whole ranked pool so "Swap" can step through it.
-  function build(town, who, day, ids) {
-    var nowM = day === T0 ? new Date().getHours() * 60 + new Date().getMinutes() : 0;
+  function build(town, who, day, start, ids) {
+    // Only shows that start at or after the visitor's start time.
     var shows = rank(events.filter(function (e) {
       if (!on(e, day) || SHOWS[who].indexOf(e.category) < 0) return false;
-      // Night plans want evening shows (4 PM on); a family day can start earlier.
-      var m = mins(e.time); return m === null || (m >= nowM - 30 && (who === "family" || m >= 16 * 60));
+      var m = mins(e.time); return m === null || m >= start;
     }), town, SHOWS[who], day);
     // "Anywhere": build the night around the best show's town so the stops aren't across the valley.
-    // Shows with a real start time first, so the night can be timed around them.
+    // Shows with a real start time first, and best of all ones late enough for drinks and dinner before.
     function near(e) { return !town ? 0 : e.city === town ? 0 : km(town, e.city) < 12 ? 1 : 2; }
-    shows.sort(function (a, b) { return near(a) - near(b) || (mins(a.time) === null) - (mins(b.time) === null); });
+    function fit(e) { var m = mins(e.time); return m === null ? 2 : who !== "family" && m < start + 150 ? 1 : 0; }
+    shows.sort(function (a, b) { return near(a) - near(b) || fit(a) - fit(b); });
     if (!town && shows.length) town = shows[0].city;
     var drinks = rank(biz.filter(function (b) { return isDrinks(b) && (!b.happyHour || hhOn(b.happyHour, day)); }), town, null, day);
     var eat = rank(biz.filter(isEat(who)), town, EAT[who], day);
     var slots = [];
     function slot(role, pool, kind) { if (pool.length) slots.push({ role: role, pool: pool, i: 0, kind: kind }); }
     if (who === "family") {
-      var famShows = shows.filter(function (e) { var m = mins(e.time); return m === null || m < 18 * 60; });
-      slot("Something to do", famShows.length ? famShows : rank(biz.filter(isDo), town, null, day), famShows.length ? "event" : "biz");
+      var famShows = shows.filter(function (e) { var m = mins(e.time); return m === null || m < Math.max(18 * 60, start + 60); });
+      // An evening family plan is just dinner, then dessert (attractions are closed by then).
+      if (start < 17 * 60) slot("Something to do", famShows.length ? famShows : rank(biz.filter(isDo), town, null, day), famShows.length ? "event" : "biz");
       slot("A sweet stop", rank(biz.filter(isTreat), town, null, day), "biz");
       slot("Dinner", eat, "biz");
     } else {
@@ -151,29 +152,39 @@
     }
   }
 
-  // Times: built around the event when there is one, otherwise a standard evening.
+  // Times: nothing before the visitor's start time, and on a night out dinner is never before 5 PM.
+  // Base order is [drinks, dinner, show or nightcap] (family: [activity, sweet stop, dinner]).
   function times(slots, who) {
     var ev = null; slots.forEach(function (s) { if (s.kind === "event") ev = s; });
-    var T = ev ? mins(ev.pool[ev.i].time) : null;
-    var base = who === "family" ? [14 * 60, 16 * 60, 17 * 60 + 30] : [17 * 60, 18 * 60 + 30, 20 * 60 + 30];
-    if (T !== null && who !== "family") {
-      if (T >= 19 * 60 && T <= 22 * 60) base = [T - 165, T - 90, T];
-      else if (T < 17 * 60) base = [T + 150, T + 225, T];
-      else if (T > 22 * 60) base = [18 * 60, 19 * 60 + 30, T];
-      else base = [T - 120, T + 120, T];
-    }
-    if (T !== null && who === "family") base = [T, Math.max(T + 120, 15 * 60), Math.max(T + 210, 17 * 60)];
-    // Tonight with no show to time around: start from now, not from a time that has already passed.
-    var now = new Date(), nowM = now.getHours() * 60 + now.getMinutes() + 30;
-    if (T === null && state && state.day === T0 && nowM > base[0]) base = base.map(function (m) { return m + nowM - base[0]; });
+    var T = ev ? mins(ev.pool[ev.i].time) : null, S = state.start, D0 = 17 * 60, base;
+    if (who === "family" && S >= 17 * 60) base = [S + 90, S];
+    else if (who === "family") base = T !== null ? [T, Math.max(T, S) + 120, Math.max(T, S) + 210] : [S, S + 120, S + 210];
+    // Room for drinks and dinner before the show.
+    else if (T !== null && T - S >= 150 && T - 90 >= D0) base = [Math.max(S, T - 165), T - 90, T];
+    // Room for drinks only: drinks, the show, then dinner after.
+    else if (T !== null && T - S >= 60) base = [Math.max(S, T - 90), Math.max(T + 120, D0), T];
+    // Show right away: the show, dinner, then drinks.
+    else if (T !== null) base = [Math.max(T + 120, D0) + 75, Math.max(T + 120, D0), T];
+    // No show, late start: dinner first, then drinks and a nightcap.
+    else if (S >= 20 * 60) base = [S + 75, S, S + 150];
+    else if (S >= 19 * 60) base = [S + 105, S, S + 195];
+    else base = [Math.max(S, 15 * 60), Math.max(S + 90, D0), Math.max(S + 90, D0) + 120];
     slots.forEach(function (s, n) { s.at = s.kind === "event" && mins(s.pool[s.i].time) !== null ? mins(s.pool[s.i].time) : base[n]; });
     return slots.slice().sort(function (a, b) { return a.at - b.at; });
   }
 
   var state = null;
 
+  // Labels follow the actual order: drinks after dinner are "After dinner", a daytime dinner is "Lunch".
+  function roleOf(s) {
+    var din = null; state.slots.forEach(function (o) { if (o.role === "Dinner") din = o; });
+    if (s.role === "Dinner" && s.at < 16 * 60) return "Lunch";
+    if ((s.role === "Drinks first" || s.role === "Happy hour") && din && din.at < s.at) return "After dinner";
+    return s.role;
+  }
+
   function stopHtml(s, n) {
-    var x = s.pool[s.i], html;
+    var x = s.pool[s.i], html, role = roleOf(s);
     if (s.kind === "event") {
       var href = !x.feed ? ROOT + "event/" + (R.eventSlug ? R.eventSlug(x) : "") + "/" : (x.url || ROOT + "events");
       var ext = x.feed && x.url ? ' target="_blank" rel="noopener"' : "";
@@ -186,9 +197,9 @@
         (deal ? '<small class="pn-note pn-deal">&#9733; ' + esc(deal) + '</small>' : x.happyHour && s.role !== "Dinner" ? '<small class="pn-note">Happy hour: ' + esc(x.happyHour) + '</small>' : "") +
         (pick ? '<span class="pn-pick">Spotlight pick</span>' : "");
     }
-    var more = s.pool.length > 2 ? '<button type="button" class="pn-swap" data-swap="' + n + '" aria-label="Swap ' + esc(s.role) + ' for another pick" title="Swap this stop">&#8635;</button>' : "";
+    var more = s.pool.length > 2 ? '<button type="button" class="pn-swap" data-swap="' + n + '" aria-label="Swap ' + esc(role) + ' for another pick" title="Swap this stop">&#8635;</button>' : "";
     var when = s.kind === "event" && mins(x.time) === null ? "See times" : clock(s.at);
-    return '<li class="pn-stop"><span class="pn-time">' + when + '</span><div class="pn-body"><span class="pn-role">' + esc(s.role) + '</span>' + html + '</div>' + more + '</li>';
+    return '<li class="pn-stop"><span class="pn-time">' + when + '</span><div class="pn-body"><span class="pn-role">' + esc(role) + '</span>' + html + '</div>' + more + '</li>';
   }
 
   function paint() {
@@ -212,7 +223,7 @@
   function shareUrl() {
     var ids = state.slots.map(function (s) { var x = s.pool[s.i]; return s.kind === "event" ? evId(x) : slugOf(x); });
     var u = new URL(location.href); u.search = ""; u.hash = "";
-    u.searchParams.set("plan", [state.town, state.who, state.day].concat(ids).join("~"));
+    u.searchParams.set("plan", [state.town, state.who, state.day, state.start].concat(ids).join("~"));
     return u.toString();
   }
 
@@ -223,26 +234,36 @@
     times(state.slots, state.who).forEach(function (s, n) {
       var x = s.pool[s.i], name = s.kind === "event" ? x.title : x.name, place = s.kind === "event" ? x.venue + ", " + x.city : (x.address || x.city);
       lines.push("BEGIN:VEVENT", "UID:" + day + "-" + n + "-" + Date.now() + "@coachellavalleyspotlight.com", "DTSTAMP:" + new Date().toISOString().replace(/[-:]|\.\d+/g, ""),
-        "DTSTART:" + t(s.at), "DTEND:" + t(s.at + 90), "SUMMARY:" + (s.role + ": " + name).replace(/[,;]/g, "\\$&"),
+        "DTSTART:" + t(s.at), "DTEND:" + t(s.at + 90), "SUMMARY:" + (roleOf(s) + ": " + name).replace(/[,;]/g, "\\$&"),
         "LOCATION:" + String(place).replace(/[,;]/g, "\\$&"), "DESCRIPTION:Planned on Coachella Valley Spotlight. " + shareUrl().replace(/[,;]/g, "\\$&"), "END:VEVENT");
     });
     lines.push("END:VCALENDAR");
     return lines.join("\r\n");
   }
 
-  function run(town, who, day, ids) {
-    state = { town: town, who: who, day: day, slots: build(town, who, day, ids) };
+  function run(town, who, day, start, ids) {
+    // Tonight can't start in the past: move the start to half an hour from now if it already went by.
+    if (day === T0) { var n = new Date(), soon = Math.ceil((n.getHours() * 60 + n.getMinutes() + 30) / 15) * 15; if (soon > start) start = soon; }
+    state = { town: town, who: who, day: day, start: start, slots: build(town, who, day, start, ids) };
     paint();
   }
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     var f = new FormData(form), when = f.get("when") || "tonight", who = f.get("who") || "date", town = f.get("town") || "";
-    run(town, who, dayFor(when), null);
+    var start = +f.get("start") || DEFAULT_START[who];
+    run(town, who, dayFor(when), start, null);
     pauseCarousel();
-    gtag("plan_build", { town: town || "anywhere", who: who, when: when });
+    gtag("plan_build", { town: town || "anywhere", who: who, when: when, start: clock(start) });
   });
-  form.addEventListener("change", pauseCarousel);
+  // Start time follows the kind of night (5 PM, or 2 PM for family) until the visitor picks one themselves.
+  var DEFAULT_START = { date: 17 * 60, friends: 17 * 60, solo: 17 * 60, family: 14 * 60 };
+  var startSel = form.querySelector("select[name=start]"), startPicked = false;
+  form.addEventListener("change", function (e) {
+    pauseCarousel();
+    if (e.target === startSel) startPicked = true;
+    else if (e.target.name === "who" && startSel && !startPicked) startSel.value = DEFAULT_START[e.target.value];
+  });
 
   out.addEventListener("click", function (e) {
     var sw = e.target.closest("[data-swap]");
@@ -283,8 +304,11 @@
     var p = shared.split("~"), who0 = WHO[p[1]] ? p[1] : "date", town0 = CITIES[p[0]] ? p[0] : "";
     if (sel) sel.value = town0;
     var r = form.querySelector('input[name=who][value="' + who0 + '"]'); if (r) r.checked = true;
+    // Links from before the start time was added have the stops right after the date.
+    var hasStart = /^\d+$/.test(p[3] || ""), start0 = hasStart ? +p[3] : DEFAULT_START[who0];
+    if (startSel && startSel.querySelector('option[value="' + start0 + '"]')) { startSel.value = start0; startPicked = true; }
     if (/^\d{4}-\d\d-\d\d$/.test(p[2] || "") && p[2] >= T0) {
-      run(town0, who0, p[2], p.slice(3));
+      run(town0, who0, p[2], start0, p.slice(hasStart ? 4 : 3));
       gtag("plan_open_shared", { who: who0 });
       setTimeout(pauseCarousel, 0);
       var hero = root.closest(".hero"); if (hero && window.innerWidth < 900) setTimeout(function () { root.scrollIntoView({ block: "start", behavior: "smooth" }); }, 300);
