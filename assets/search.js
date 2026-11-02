@@ -34,7 +34,7 @@
     ["My Spotlight account", "account", "account login sign saved favorites"]
   ];
   // A few words people type that don't appear in listings as-is.
-  var SYN = { ac: "air conditioning", hvac: "air conditioning", aircon: "air conditioning", vet: "veterinar", vets: "veterinar", food: "restaurant", eat: "restaurant", dinner: "restaurant", lunch: "restaurant", breakfast: "breakfast", coffee: "caf", haircut: "hair", barber: "barber", nails: "nail", gym: "gym", workout: "fitness", exterminator: "pest", bugs: "pest", lawyer: "law", attorney: "law", dentist: "dentist", doctor: "medical", pool: "pool", tacos: "mexican", taco: "mexican", sushi: "sushi", pizza: "pizza", drinks: "happy hour", beer: "brew" };
+  var SYN = { ac: "air conditioning", hvac: "air conditioning", aircon: "air conditioning", vet: "veterinar", vets: "veterinar", sitter: "pet sitting", petsitter: "pet sitting", food: "restaurant", eat: "restaurant", dinner: "restaurant", lunch: "restaurant", breakfast: "breakfast", coffee: "caf", haircut: "hair", barber: "barber", nails: "nail", gym: "gym", workout: "fitness", exterminator: "pest", bugs: "pest", lawyer: "law", attorney: "law", dentist: "dentist", doctor: "medical", pool: "pool", tacos: "mexican", taco: "mexican", sushi: "sushi", pizza: "pizza", drinks: "happy hour", beer: "brew" };
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function slugify(s) { return String(s).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
