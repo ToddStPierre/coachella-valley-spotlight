@@ -1282,3 +1282,5 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .owner-band .ol p { color: var(--ink-2); }
 .owner-band .ol .ol-kicker { color: var(--palm); }
 .owner-band .ol .ol-missing p { color: var(--ink); }
+/* Home: breathing room between the dark "Find your business" band and the "Own a local business?" strip */
+.owner-band + .wrap .biz-band { margin-top: var(--s5); }
