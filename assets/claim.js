@@ -3,7 +3,8 @@
   var API = "https://cvs-tracker.toddstpierre.workers.dev";
   // Formspree drops emails sent from the tracker's servers, so the browser sends the tracker's email notice.
   function mailTodd(n) { if (!n) return; var fd = new FormData(); Object.keys(n).forEach(function (k) { if (n[k] != null) fd.append(k, String(n[k])); }); fetch("https://formspree.io/f/myezyype", { method: "POST", headers: { Accept: "application/json" }, body: fd }).catch(function () {}); }
-  var slug = new URLSearchParams(location.search).get("b") || "";
+  // Also accept "?b%3D<slug>", which some emailed links end up with after Gmail rewrites them.
+  var slug = new URLSearchParams(location.search).get("b") || (location.search.match(/[?&]b(?:=|%3D)([a-z0-9-]+)/i) || [])[1] || "";
   var biz = ((window.CVS && window.CVS.directory) || []).filter(function (b) { return b.slug === slug; })[0];
   var form = document.getElementById("claim-form"), msg = document.getElementById("cl-msg");
   if (!biz) { form.innerHTML = '<p class="full">We couldn&rsquo;t find that listing. Go back to the <a href="directory.html">directory</a> and use the claim link on your business&rsquo;s page.</p>'; return; }
