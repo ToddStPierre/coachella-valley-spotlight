@@ -60,7 +60,7 @@
 <section style="padding-bottom:var(--s5)"><div class="wrap">
 <div class="mc-grid" id="mc-grid"><p>Loading the calendar&hellip;</p></div>
 <p style="margin-top:32px"><strong>What if a card doesn&rsquo;t reach 8?</strong> It moves to the next mailing date. Your spot, your category and your payment carry over, or we refund you if you would rather not wait.</p>
-<p style="margin-top:12px;color:var(--ink-2)">$300 per spot, or less per spot for bigger ads (2 spots $550, 4 spots $1,000, a full side $2,000), with design, printing and postage included, plus a free Premium listing on this site while your ad runs. Want a card in your neighborhood? <a href="contact">Tell us where</a>.</p>
+<p style="margin-top:12px;color:var(--ink-2)">$300 per spot, or less per spot for bigger ads (2 spots $550, 4 spots $1,000, a full side $2,000), with design, printing, postage and QR code tracking included, plus a free Premium listing on this site while your ad runs. Want a card in your neighborhood? <a href="contact">Tell us where</a>.</p>
 </div></section>
 </main>
 
@@ -96,7 +96,7 @@
     var d = left(m.deadline);
     return '<article class="mc-card" id="mc-' + i + '"><span class="mc-status" data-status>' + (d < 0 ? "Closed for booking" : "Open") + '</span>' +
       '<h2>' + esc(m.name) + '</h2><p class="mc-area">' + esc(m.area) + ' &middot; ' + esc(m.homes) + '</p>' +
-      '<dl class="mc-dates"><dt>Mails</dt><dd>' + nice(m.mail) + '</dd><dt>Artwork due</dt><dd>' + nice(m.deadline) + (d >= 0 ? ' <span style="font-weight:400;color:var(--ink-2)">(' + (d === 0 ? "today" : d + (d === 1 ? " day" : " days") + " left") + ')</span>' : "") + '</dd></dl>' +
+      '<dl class="mc-dates"><dt>Tentative Mail Date</dt><dd>' + nice(m.mail) + '</dd><dt>Tentative Artwork Date</dt><dd>' + nice(m.deadline) + (d >= 0 ? ' <span style="font-weight:400;color:var(--ink-2)">(' + (d === 0 ? "today" : d + (d === 1 ? " day" : " days") + " left") + ')</span>' : "") + '</dd></dl>' +
       '<p class="mc-fill" data-fill>Checking open spots&hellip;</p><div class="mc-bar"><span data-bar></span></div>' +
       (d < 0 ? "" : '<a class="btn" href="pricing?route=' + encodeURIComponent(m.route) + '">Hold a spot on this card</a>') + '</article>';
   }).join("");

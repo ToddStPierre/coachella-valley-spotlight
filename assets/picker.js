@@ -36,7 +36,7 @@
     var m = mailing(r); if (!dateEl) return;
     if (!m) { dateEl.textContent = "Mailing date coming soon"; return; }
     var d = daysLeft(m.deadline);
-    dateEl.innerHTML = "Mails " + nice(m.mail) + " &middot; Artwork due " + nice(m.deadline) +
+    dateEl.innerHTML = "Tentative Mail Date: " + nice(m.mail) + " &middot; Tentative Artwork Date: " + nice(m.deadline) +
       (d < 0 ? '<span class="picker-left">Booking for this card is closed. The next date is coming soon.</span>' : '<span class="picker-left">' + (d === 0 ? "Last day to book" : d + (d === 1 ? " day" : " days") + " left to book") + (m.minSold ? " &middot; This card mails once " + m.minSold + " spots are sold" : "") + '</span>');
   }
 
