@@ -134,7 +134,7 @@
   }
   function cardArt(b, prem) {
     var img = prem && (b.image || (b.gallery || [])[0]);
-    if (img) return '<img class="card-img" src="' + ROOT + esc(img) + '" alt="" loading="lazy" width="640" height="360">';
+    if (img) return '<img class="card-img" src="' + ROOT + esc(img) + '" alt="' + esc(b.imageAlt || (b.image ? b.name + " ad" : "Photo from " + b.name)) + '" loading="lazy" width="640" height="360">';
     return '<span class="cat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + (SERVICE_ICONS[b.service] || ICONS[b.category] || STORE) + '</svg></span>';
   }
 

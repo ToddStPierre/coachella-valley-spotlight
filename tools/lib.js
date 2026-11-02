@@ -62,10 +62,26 @@ function shell() {
 }
 
 /* Social and canonical tags for a generated page. url is the path from the site root, e.g. "business/x/". */
+/* Search engines (Bing flags "title too long") want a short <title>. Try shorter forms of
+   "Name | Service in City, CA | Brand" in order until one fits; og:title keeps the full text. */
+function fitTitle(t, max = 65) {
+  if (t.length <= max) return t;
+  const tries = [
+    s => s.replace(/ \| Coachella Valley Spotlight$/, ""),
+    s => s.replace(/, CA$/, ""),
+    s => s.replace(/ \| [^|]* in ([^|]+)$/, " | $1"),
+    s => s.replace(/, \d{4}$/, ""),
+    s => s.split(" | ")[0]
+  ];
+  let s = t;
+  for (const f of tries) { s = f(s); if (s.length <= max) return s; }
+  return s.slice(0, max - 1).replace(/\s+\S*$/, "") + "…";
+}
+
 function metaTags({ title, description, url, image, noindex }) {
   const abs = SITE + "/" + url;
   const img = /^https?:/.test(image || "") ? image : SITE + "/" + (image || "assets/img/real-cards.jpg");
-  return `<title>${esc(title)}</title>
+  return `<title>${esc(fitTitle(title))}</title>
 <meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${esc(abs)}">
 ${noindex ? '<meta name="robots" content="noindex, follow">\n' : ""}<meta property="og:type" content="website">
