@@ -1440,3 +1440,12 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .ck-del { border: 0; background: none; color: var(--ink-2); font-size: 18px; line-height: 1; cursor: pointer; padding: 0 4px; }
 .ck-del:hover { color: var(--sun-deep); }
 .ck-chan .chip.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+/* Admin: publish a submission (assets/admin-submissions.js) */
+.pub-form { margin-top: 14px; padding: var(--s2); background: var(--sand); border-radius: 12px; }
+.pub-kinds { display: flex; gap: 6px; flex-wrap: wrap; }
+.pub-kinds .chip.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+.pub-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.pub-msg { font-weight: 600; color: var(--sun-deep); font-size: 15px; }
+.pub-warn { margin: 0; padding: 8px 12px; border-radius: 10px; background: #fde7c8; font-size: 14px; }
+.pub-done { margin: 8px 0 0; color: var(--palm); font-weight: 600; font-size: 15px; }
+.pub-ok { padding: 12px 16px; border-radius: 12px; background: var(--palm-soft); color: var(--palm); font-weight: 600; margin: 0 0 16px; }
