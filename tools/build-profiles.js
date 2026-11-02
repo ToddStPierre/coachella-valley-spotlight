@@ -78,7 +78,7 @@ ${owner ? '<p class="pf-mention"><svg viewBox="0 0 24 24" width="22" height="22"
 </div>
 <div class="pf-main">
 ${(prem && b.about) ? `<div class="pf-card"><h2>About</h2><p>${esc(b.about)}</p></div>` : ""}
-${offer ? `<div class="pf-card"><h2>Deals</h2><div class="pf-deal">${b.image ? `<img src="${esc(b.image)}" alt="" loading="lazy">` : ""}<div><b>${esc(offer.title)}</b>${offer.details ? `<p>${esc(offer.details)}</p>` : ""}<p class="pf-deal-meta">${offer.expires ? `Good through ${esc(nice(offer.expires))}` : "Ongoing"} &middot; Mention Coachella Valley Spotlight</p>${tel ? `<a class="btn" href="tel:${tel}" data-track="call">Call to claim</a>` : ""}</div></div></div>` : ""}
+${offer ? `<div class="pf-card"><h2>Deals</h2><div class="pf-deal">${b.image ? `<img src="${esc(b.image)}" alt="${esc(offer.title + " from " + b.name)}" loading="lazy">` : ""}<div><b>${esc(offer.title)}</b>${offer.details ? `<p>${esc(offer.details)}</p>` : ""}<p class="pf-deal-meta">${offer.expires ? `Good through ${esc(nice(offer.expires))}` : "Ongoing"} &middot; Mention Coachella Valley Spotlight</p>${tel ? `<a class="btn" href="tel:${tel}" data-track="call">Call to claim</a>` : ""}</div></div></div>` : ""}
 <div class="pf-card pf-contact">
 <ul>
 ${b.address ? `<li>${I.pin}<span>${esc(b.address)}</span></li>` : ""}
