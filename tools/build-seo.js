@@ -383,7 +383,7 @@ for (const file of ["index.html", "directory.html", "deals.html", "events.html",
 const golfCtx = { window: {} };
 if (fs.existsSync(path.join(root, "data", "golf.js"))) require("vm").runInNewContext(fs.readFileSync(path.join(root, "data", "golf.js"), "utf8"), golfCtx);
 const golfPaths = ((golfCtx.window.CVS || {}).golf || []).map(c => `golf/${c.slug}/`);
-const urls = ["", "directory", "deals", "events", "halloween", "welcome", "farmers-markets", "holidays", "golf/", "advertise", "submit", "story", "contact", "mailing-area-el-paseo", "mailing-area-sun-city", "mailing-calendar", "pricing", "legal"]
+const urls = ["", "directory", "deals", "events", "halloween", "welcome", "farmers-markets", "holidays", "golf/", "advertise", "submit", "story", "contact", "mailing-area-el-paseo", "mailing-area-sun-city", "mailing-calendar", "coverage-map", "pricing", "legal"]
   .concat(cityPaths, weekendPaths, list.map(b => `business/${b.slug}/`), eventPaths, landing.filter(p => p.index).map(p => p.path), golfPaths);
 // Pages whose content changes day to day as events come and go. Only these get <lastmod>, so it stays a signal Google can trust.
 const FRESH = new Set(["", "events", "holidays"].concat(weekendPaths, cityPaths));

@@ -26,6 +26,7 @@
     ["Dog parks", "local/dog-parks/", "dog park pets"],
     ["Libraries", "local/libraries/", "library libraries books library card wifi"],
     ["Pickleball courts", "local/pickleball/", "pickleball courts"],
+    ["Postcard coverage map", "coverage-map", "postcard mailing routes coverage map advertise zip el paseo sun city"],
     ["Local news", "news", "news headlines"],
     ["Share a story", "story", "story tip share"],
     ["Advertise on the Spotlight postcard", "advertise", "advertise postcard marketing ad sponsor"],

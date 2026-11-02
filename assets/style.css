@@ -1158,3 +1158,67 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 
 /* Golf list page: "quick answers" city counts */
 .golf-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 6px 24px; margin: 0 0 var(--s2); padding-left: 18px; color: var(--ink-2); }
+
+/* ===== Coverage map (coverage-map.html) ===== */
+.cov-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: var(--s3); align-items: start; }
+.cov-grid > * { min-width: 0; }
+.cov-map { --open: #2e5c4f; --almost: #c9852a; --full: #8a7d74; --soon: #5b4a7a; }
+.cov-zones { position: absolute; inset: 0; }
+.cov-town { position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, -50%); font-family: var(--mono); font-size: 11px; letter-spacing: .04em; color: #221c18; opacity: .5; white-space: nowrap; pointer-events: none; }
+.cov-zone { position: absolute; left: var(--x); top: var(--y); width: var(--w); height: var(--h); transform: translate(-50%, -50%); border-radius: 50%; border: 2.5px solid var(--c, var(--open)); background: color-mix(in srgb, var(--c, var(--open)) 26%, transparent); cursor: pointer; padding: 0; transition: transform .15s ease, background .15s ease, box-shadow .15s ease; }
+.cov-zone[data-state="almost"] { --c: var(--almost); }
+.cov-zone[data-state="full"], .cov-zone[data-state="closed"] { --c: var(--full); }
+.cov-zone[data-state="soon"] { --c: var(--soon); border-style: dashed; background: color-mix(in srgb, var(--soon) 12%, transparent); }
+.cov-zone:hover, .cov-zone:focus-visible { transform: translate(-50%, -50%) scale(1.08); }
+.cov-zone.is-on { background: color-mix(in srgb, var(--c, var(--open)) 48%, transparent); box-shadow: 0 0 0 5px color-mix(in srgb, var(--c, var(--open)) 22%, transparent); }
+.cov-zone-lab { position: absolute; left: 50%; bottom: calc(100% + 4px); transform: translateX(-50%); white-space: nowrap; font-family: var(--body); font-weight: 600; font-size: 13px; background: var(--paper); color: var(--ink); padding: 2px 8px; border-radius: 999px; box-shadow: 0 1px 4px rgba(34,28,24,.18); }
+.cov-zone[data-z="la-quinta"] .cov-zone-lab { bottom: auto; top: calc(100% + 4px); }
+.cov-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; list-style: none; padding: 0; margin: 12px 0 0; font-size: 14px; color: var(--ink-2); }
+.cov-legend li { display: flex; align-items: center; gap: 7px; }
+.cov-key { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #2e5c4f; background: rgba(46,92,79,.3); }
+.cov-key.almost { border-color: #c9852a; background: rgba(201,133,42,.3); }
+.cov-key.full { border-color: #8a7d74; background: rgba(138,125,116,.3); }
+.cov-key.soon { border: 2px dashed #5b4a7a; background: rgba(91,74,122,.12); }
+.cov-pick-h { margin: 0 0 8px; font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.cov-list { display: grid; gap: 6px; }
+.cov-item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); font: 500 15px var(--body); color: var(--ink); cursor: pointer; }
+.cov-item:hover { border-color: var(--ink-2); }
+.cov-item.is-on { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.cov-dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: #2e5c4f; }
+.cov-item[data-state="almost"] .cov-dot { background: #c9852a; }
+.cov-item[data-state="full"] .cov-dot, .cov-item[data-state="closed"] .cov-dot { background: #8a7d74; }
+.cov-item[data-state="soon"] .cov-dot { background: transparent; border: 2px dashed #5b4a7a; }
+.cov-item-name { flex: 1; font-weight: 600; }
+.cov-item-st { font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.cov-panel { margin-top: 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow); }
+.cov-panel h2 { margin: 0; font-size: 26px; }
+.cov-blurb { margin: 0; color: var(--ink-2); font-size: 15.5px; }
+.cov-badge { display: inline-block; align-self: flex-start; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--palm-soft); color: var(--palm); }
+[data-state="almost"] > .cov-badge, .cov-badge[data-state="almost"] { background: #fbe6c8; color: #9a5a12; }
+[data-state="full"] > .cov-badge, .cov-badge[data-state="full"], [data-state="closed"] > .cov-badge, .cov-badge[data-state="closed"] { background: #efe3dc; color: var(--ink-2); }
+[data-state="soon"] > .cov-badge, .cov-badge[data-state="soon"] { background: #ece6f3; color: #5b4a7a; }
+.cov-facts { display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; margin: 4px 0 0; }
+.cov-facts dt { font-family: var(--mono); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); padding-top: 3px; }
+.cov-facts dd { margin: 0; font-weight: 600; }
+.cov-muted { font-weight: 400; color: var(--ink-2); font-size: 14px; }
+.cov-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 6px; }
+.cov-more { font-weight: 600; font-size: 15px; }
+.cov-foot { margin: 0; font-size: 13px; color: var(--ink-2); }
+.cov-h2 { margin: var(--s5) 0 var(--s2); font-size: 28px; }
+.cov-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.cov-card { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 6px; }
+.cov-card h3 { margin: 4px 0 0; font-size: 20px; }
+.cov-card-meta, .cov-card-fill { margin: 0; font-size: 14.5px; color: var(--ink-2); }
+.cov-card-fill b { color: var(--ink); }
+.cov-card-link { margin-top: auto; padding-top: 6px; font-weight: 600; }
+@media (max-width: 860px) {
+  .cov-grid { grid-template-columns: 1fr; }
+  .cov-map { aspect-ratio: 1000 / 680; }
+  .cov-town { font-size: 9.5px; }
+  .cov-zone-lab { font-size: 11.5px; padding: 1px 6px; }
+  .cov-list { grid-template-columns: 1fr 1fr; }
+  .cov-item { padding: 9px 10px; font-size: 14px; flex-wrap: wrap; gap: 4px 8px; }
+  .cov-item-st { width: 100%; padding-left: 18px; }
+  .cov-facts { grid-template-columns: 1fr; gap: 2px; }
+  .cov-facts dd { margin-bottom: 8px; }
+}
