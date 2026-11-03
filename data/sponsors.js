@@ -18,7 +18,7 @@ window.CVS.sponsors = [
   { id: "antex-exterminating", name: "Antex Exterminating", placements: ["category:Home services"],
     image: "assets/img/ads/antex-exterminating.jpg", alt: "Antex Exterminating ad from the El Paseo Spotlight card", w: 440, h: 415,
     headline: "Bugs, rodents or gophers? Call Antex.",
-    text: "Family-owned pest control with more than 20 years in the business, for homes and businesses across the valley. Roaches, ants, spiders, rodents, gophers and inspections, using products that are safe around kids and pets.",
-    short: "Family-owned pest and gopher control, safe around kids and pets.",
+    text: "Family-owned pest control with more than 20 years in the business, for homes and businesses across the valley. Roaches, ants, spiders, rodents, gophers, weed control, landscape spraying and inspections, using products that are safe around kids and pets.",
+    short: "Family-owned pest, gopher and weed control plus landscape spraying, safe around kids and pets.",
     cta: "See Antex Exterminating", url: "business/antex-exterminating/", start: "2026-10-28" },
 ];

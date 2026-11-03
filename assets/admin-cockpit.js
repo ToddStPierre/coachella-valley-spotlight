@@ -4,11 +4,15 @@
    3) "Who to pitch": free listings with recent traffic whose category is still open on a card, each with a
       ready Gmail draft (no price, per the cold rule) that carries their Spotlight Report link.
    Every email, call or text is logged to the tracker (GET /admin/pitches, POST /admin/pitch): status, follow-up date
-   and a dated contact history per business. Due follow-ups show up in "Do today". */
+   and a dated contact history per business. Due follow-ups show up in "Do today".
+   Also runs inside cockpit.html, which leads.html embeds (CVS_COCKPIT_EMBED). Reps have no admin key, so they get
+   the public card progress only (CVS_COCKPIT_CARDS_ONLY) and none of the admin calls are made. */
 (function () {
   var API = "https://cvs-tracker.toddstpierre.workers.dev", SPOTS = "https://local-spotlight-reservations.toddstpierre.workers.dev";
   var SITE = "https://coachellavalleyspotlight.com/", FROM = "todd@coachellavalleyspotlight.com";
-  var admin = (new URLSearchParams(location.search).get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })()); if (!admin || window.CVS_IS_REPORT) return;
+  var admin = (new URLSearchParams(location.search).get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })()); var CARDS_ONLY = !admin && !!window.CVS_COCKPIT_CARDS_ONLY, EMBED = !!window.CVS_COCKPIT_EMBED;
+  if ((!admin && !CARDS_ONLY) || window.CVS_IS_REPORT) return;
+  var ADM = EMBED ? 'stats.html' : '', TOP = EMBED ? ' target="_top"' : '';
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function pl(x, one, many) { return x === 1 ? one : many; }
   function today() { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Los_Angeles" }).format(new Date()); }
@@ -53,12 +57,13 @@
   var dir = (window.CVS && window.CVS.directory) || [];
 
   function j(url) { return fetch(url).then(function (r) { return r.json(); }).catch(function () { return null; }); }
+  function aj(url) { return CARDS_ONLY ? Promise.resolve(null) : j(url); } // admin-only calls
   Promise.all([
     Promise.all(cards.map(function (m) { return j(SPOTS + "/api/spots?route=" + m.route); })),
-    j(API + "/admin/submissions?key=" + encodeURIComponent(admin)),
-    j(API + "/admin/owners?key=" + encodeURIComponent(admin)),
-    j(API + "/stats/all?key=" + encodeURIComponent(admin)),
-    j(API + "/admin/pitches?key=" + encodeURIComponent(admin))
+    aj(API + "/admin/submissions?key=" + encodeURIComponent(admin)),
+    aj(API + "/admin/owners?key=" + encodeURIComponent(admin)),
+    aj(API + "/stats/all?key=" + encodeURIComponent(admin)),
+    aj(API + "/admin/pitches?key=" + encodeURIComponent(admin))
   ]).then(function (r) {
     dir = (window.CVS && window.CVS.directory) || dir;
     var spots = r[0], subs = r[1], owners = r[2], stats = r[3];
@@ -87,12 +92,17 @@
         '<details class="ck-open"><summary>' + open[m.route].length + ' categories still open</summary><p>' + open[m.route].map(esc).join(" &middot; ") + '</p></details></div>';
     }).join("");
 
+    if (CARDS_ONLY) {
+      box.innerHTML = '<h2 class="month-head"><span class="stripe-mini"></span>Sales cockpit</h2>' + (cards.length ? '<div class="ck-cards">' + cardHtml + '</div>' : '<div class="empty">No upcoming cards.</div>');
+      return;
+    }
+
     // 2) Do today
     var todo = [];
     var newSubs = subs && subs.submissions ? subs.submissions.filter(function (s) { return !s.done; }).length : 0;
     var claims = owners && owners.claims ? owners.claims.length : 0;
-    if (claims) todo.push('<a href="#owners-admin"><b>' + claims + '</b> claim ' + pl(claims, "request", "requests") + ' to approve (call first)</a>');
-    if (newSubs) todo.push('<a href="#submissions-admin"><b>' + newSubs + '</b> new form ' + pl(newSubs, "submission", "submissions") + '</a>');
+    if (claims) todo.push('<a href="' + ADM + '#owners-admin"' + TOP + '><b>' + claims + '</b> claim ' + pl(claims, "request", "requests") + ' to approve (call first)</a>');
+    if (newSubs) todo.push('<a href="' + ADM + '#submissions-admin"' + TOP + '><b>' + newSubs + '</b> new form ' + pl(newSubs, "submission", "submissions") + '</a>');
     cards.forEach(function (m) { var l = days(m.deadline); if (l >= 0 && l <= 7) todo.push("<span><b>" + esc(m.name) + "</b> booking closes " + (l ? "in " + l + " " + pl(l, "day", "days") : "today") + "</span>"); });
     dir.forEach(function (b) {
       if (b.offer && b.offer.expires) { var l = days(b.offer.expires); if (l >= 0 && l <= 14) todo.push('<span><b>' + esc(b.name) + '</b> offer ends ' + nice(b.offer.expires) + ' (' + l + ' ' + pl(l, "day", "days") + '). Ask for a new one.</span>'); }
@@ -242,6 +252,7 @@
         r.status = d.pitch.status; r.follow_up = d.pitch.follow_up;
         r.log.unshift({ id: Date.now(), slug: slug, channel: body.channel, note: body.note, status: body.status, created_at: d.pitch.updated_at });
         st.openRow = ""; drawLeads();
+        if (EMBED && window.parent !== window) window.parent.postMessage({ cockpit: "saved" }, location.origin); // the Leads list refreshes
         // the new log line has a temporary id; reload ids so delete works on it
         j(API + "/admin/pitches?key=" + encodeURIComponent(admin)).then(function (p) { if (p && p.log) rec[slug].log = p.log.filter(function (l) { return l.slug === slug; }); });
       }).catch(function (err) { btn.disabled = false; msg.textContent = "Not saved: " + err.message; });

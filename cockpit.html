@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales cockpit | Coachella Valley Spotlight</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/img/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css?v=20261102bk2">
+<style>
+  /* Embedded in leads.html, which supplies the "Sales cockpit" heading and page margins. */
+  html, body { background: transparent; }
+  body { margin: 0; }
+  #ck-root { display: flow-root; }
+  #cockpit-admin { margin-bottom: 0; }
+  #cockpit-admin > .month-head { display: none; }
+</style>
+</head>
+<body>
+<div id="ck-root"><div id="st-out"></div></div>
+<script src="data/directory.js"></script><script src="data/deals.js"></script><script src="data/mailings.js"></script>
+<script>
+(function () {
+  var API = "https://cvs-tracker.toddstpierre.workers.dev", root = document.getElementById("ck-root");
+  // Keep the frame in leads.html as tall as the content.
+  function send() { if (window.parent !== window) window.parent.postMessage({ cockpitHeight: Math.ceil(root.getBoundingClientRect().height) + 2 }, location.origin); }
+  if (window.ResizeObserver) new ResizeObserver(send).observe(root);
+  function start(cardsOnly) {
+    window.CVS_COCKPIT_EMBED = true; window.CVS_COCKPIT_CARDS_ONLY = cardsOnly;
+    var s = document.createElement("script"); s.src = "assets/admin-cockpit.js?v=20261103d"; document.body.appendChild(s);
+  }
+  var admin = new URLSearchParams(location.search).get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })();
+  if (admin) return start(false);
+  // A signed-in admin gets the admin key for this tab, like stats.html. A rep gets the card progress only.
+  (function wait(n) {
+    if (!window.CVS_AUTH) return n > 100 ? null : setTimeout(function () { wait(n + 1); }, 100);
+    window.CVS_AUTH.ready.then(function (u) {
+      if (!u) return;
+      return window.CVS_AUTH.token().then(function (t) {
+        var h = { headers: { Authorization: "Bearer " + t } };
+        return fetch(API + "/admin/session", h).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+          if (d && d.key) { try { sessionStorage.setItem("cvs_admin", d.key); } catch (e) {} return start(false); }
+          return fetch(API + "/leads/me", h).then(function (r) { if (r.ok) start(true); });
+        });
+      });
+    }).catch(function () {});
+  })(0);
+})();
+</script>
+<script type="module" src="assets/auth.js"></script>
+</body>
+</html>
