@@ -6,5 +6,4 @@
    and the deal shows on their profile page if their listing has no offer of its own. */
 window.CVS = window.CVS || {};
 window.CVS.deals = [
-  { offer: "Free appetizer for the table", business: "Ristorante Mamma Gina", slug: "ristorante-mamma-gina", city: "Palm Desert", category: "Restaurants", details: "With the purchase of 2 entrees. Show the ad. One per table, dining room only (not the Enoteca Bar or happy hour), not valid with other offers.", expires: "2026-11-25", url: "business/ristorante-mamma-gina/" }
 ];
