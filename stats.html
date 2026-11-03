@@ -59,10 +59,13 @@
     document.getElementById("st-title").textContent = "Admin"; document.title = "Admin | Coachella Valley Spotlight";
     document.getElementById("st-eyebrow").textContent = "Site admin";
     document.getElementById("st-sub").textContent = "Cards, who to pitch, monthly reports, the inbox, every listing and the owners, in one place.";
-    var slugs = dir.filter(function (x) { return !x.sample; }).map(slugOf).join(",");
-    fetch(API + "/stats/all?key=" + encodeURIComponent(adminKey) + "&slugs=" + slugs).then(function (r) { return r.json(); }).then(function (d) {
+    // Wait for data/directory.js (it loads after this script) so every listing is asked for, even ones with no traffic yet.
+    new Promise(function (res) { if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", res); else res(); }).then(function () {
+      dir = (window.CVS && window.CVS.directory) || dir;
+      var slugs = dir.filter(function (x) { return !x.sample; }).map(slugOf).join(",");
+      return fetch(API + "/stats/all?key=" + encodeURIComponent(adminKey) + "&slugs=" + slugs);
+    }).then(function (r) { return r.json(); }).then(function (d) {
       if (d.error) return fail("That admin link is not valid.");
-      dir = (window.CVS && window.CVS.directory) || dir; // the directory script loads after this one
       var base = location.href.split("?")[0], info = {};
       dir.forEach(function (x) { if (!x.sample) info[slugOf(x)] = x; });
       var all = d.businesses.map(function (b) { var x = info[b.slug] || {}; b.name = nameOf(b.slug); b.city = x.city || ""; b.premium = !!(x.premium || x.featured); b.postcard = !!x.postcard; b.claimed = !!x.claimed; b.pub = !!x.public; return b; });
