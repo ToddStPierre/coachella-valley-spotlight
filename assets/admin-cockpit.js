@@ -29,11 +29,15 @@
     "Veterinarians": "Veterinary/Pet Care", "Pet stores": "Veterinary/Pet Care", "Pet sitting": "Veterinary/Pet Care",
     "Bakeries": "Bakery & Desserts", "Candy and sweets": "Bakery & Desserts", "Art classes": "Arts & Classes",
     "Gift shops": "Boutique/Retail", "Plant nurseries": "Boutique/Retail", "Custom printing": "Boutique/Retail",
-    "Real estate and mortgage": "Real Estate Agent", "Estate planning": "Estate Attorney", "Hearing aids": "Hearing Aids", "Jewelers": "Jewelers"
+    "Real estate and mortgage": "Real Estate Agent", "Estate planning": "Estate Attorney", "Hearing aids": "Hearing Aids", "Jewelers": "Jewelers",
+    "Cannabis dispensaries": "Cannabis",
+    "American restaurants": "Restaurant - American", "Cafes and delis": "Restaurant - Cafe & Deli", "Italian restaurants": "Restaurant - Italian",
+    "Mediterranean and European restaurants": "Restaurant - Mediterranean", "Mexican restaurants": "Restaurant - Mexican", "Pizza and burgers": "Restaurant - Pizza",
+    "Seafood restaurants": "Restaurant - Seafood", "Steakhouses": "Restaurant - Steakhouse"
   };
   // Both routes are in Palm Desert, so businesses from these towns are ranked first.
   var NEAR = ["Palm Desert", "Indian Wells", "Rancho Mirage", "La Quinta", "Bermuda Dunes", "Thousand Palms", "Cathedral City"];
-  function catFor(b) { return CAT[b.service] || (b.category === "Restaurants" && b.service !== "Bakeries" ? "Restaurant" : ""); }
+  function catFor(b) { return CAT[b.service] || (b.category === "Restaurants" && b.service !== "Bakeries" ? "Restaurant - Other" : ""); }
 
   var STATUSES = ["New", "Contacted", "Waiting on reply", "Interested", "Spot Held", "Sold", "Not Interested", "Bad Contact Info", "Do Not Contact"];
   var CLOSED = ["Sold", "Not Interested", "Bad Contact Info", "Do Not Contact"];
