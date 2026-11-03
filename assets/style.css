@@ -1472,3 +1472,15 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .qr-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
 .qr-tip { font-size: 13px; color: var(--ink-2); margin: 14px 0 0; }
 .qr-x { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: #fff; font-size: 20px; line-height: 1; cursor: pointer; }
+
+/* Admin: "Site backup" panel (assets/admin-backup.js) */
+.adm-backup { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; margin: -16px 0 32px; }
+.adm-backup-text { display: grid; gap: 3px; min-width: 0; flex: 1 1 320px; }
+.adm-backup-text b { font-family: var(--display); font-size: 19px; }
+.adm-backup-text small { color: var(--ink-2); font-size: 13px; }
+.adm-backup code { font-size: 13px; }
+.bk-ok { color: var(--palm); font-weight: 600; }
+.bk-bad { color: var(--sun-deep); font-weight: 600; }
+.bk-run { font-weight: 600; }
+.bk-run::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 50%; background: var(--gold); animation: bk-pulse 1s ease-in-out infinite alternate; }
+@keyframes bk-pulse { from { opacity: .3; } to { opacity: 1; } }
