@@ -9,6 +9,17 @@
   var status = document.createElement("p"); status.id = "own-msg"; status.className = "form-status"; status.setAttribute("role", "status"); status.style.cssText = "font-weight:600;margin-top:16px";
   document.getElementById("st-out").after(box); box.after(status);
   var base = location.origin + location.pathname.replace(/stats\.html$/, "");
+  // The "give an owner access" picker: A to Z, narrowed by the search box. Nothing is picked until Todd picks it.
+  function listingOptions(term, keep) {
+    term = term.trim().toLowerCase();
+    var list = dir.filter(function (b) { return b.slug && (b.name + " " + (b.city || "")).toLowerCase().indexOf(term) > -1; })
+      .sort(function (x, y) { return x.name.localeCompare(y.name); });
+    if (!list.length) return '<option value="" disabled>No listings match</option>';
+    return list.map(function (b) {
+      var on = b.slug === keep || (term && list.length === 1);
+      return '<option value="' + esc(b.slug) + '"' + (on ? " selected" : "") + '>' + esc(b.name) + (b.city ? " (" + esc(b.city) + ")" : "") + '</option>';
+    }).join("");
+  }
   function link(o) { return base + "owner.html?b=" + o.slug + "&key=" + o.key; }
   function post(path, body) { body.key = admin; return fetch(API + path, { method: "POST", body: JSON.stringify(body) }).then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || "Failed"); return d; }); }); }
 
@@ -31,7 +42,8 @@
         '<div class="table-scroll"><table class="stats-table"><thead><tr><th>Listing</th><th>Owner</th><th>Dashboard</th><th></th></tr></thead><tbody>' + (owners || '<tr><td colspan="4">No owners yet.</td></tr>') + '</tbody></table></div>' +
 
         '<details style="margin-top:16px"><summary style="cursor:pointer;font-weight:600">Give an owner access without a claim request</summary><form class="form" id="own-manual" style="margin-top:12px">' +
-        '<label>Listing<select name="b">' + dir.filter(function (b) { return b.slug; }).map(function (b) { return '<option value="' + esc(b.slug) + '">' + esc(b.name) + '</option>'; }).join("") + '</select></label>' +
+        '<label class="full">Find the listing<input type="search" id="own-find" placeholder="Type a business name or city" autocomplete="off"></label>' +
+        '<label class="full">Listing<select name="b" id="own-pick" size="8" required>' + listingOptions("") + '</select></label>' +
         '<label>Owner name<input name="name" required></label><label>Owner email<input name="email" type="email" required></label>' +
         '<div class="full"><button class="btn" type="submit">Create dashboard link</button></div></form></details>';
     }).catch(function () {});
@@ -53,6 +65,11 @@
       load();
     }).catch(function (err) { msg(err.message); a.disabled = false; });
   });
+  box.addEventListener("input", function (e) {
+    if (e.target.id !== "own-find") return;
+    var pick = document.getElementById("own-pick"); pick.innerHTML = listingOptions(e.target.value, pick.value);
+  });
+  box.addEventListener("keydown", function (e) { if (e.target.id === "own-find" && e.key === "Enter") e.preventDefault(); });
   box.addEventListener("submit", function (e) {
     if (e.target.id !== "own-manual") return; e.preventDefault();
     var f = e.target; msg("Working…");
