@@ -3,7 +3,7 @@
    or deals.js on GitHub (POST /admin/submissions/publish), marks the submission done, and the site rebuilds in about a minute. */
 (function () {
   var API = "https://cvs-tracker.toddstpierre.workers.dev";
-  var admin = (new URLSearchParams(location.search).get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })()); if (!admin) return;
+  var admin = (new URLSearchParams(location.search).get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })()); if (!admin || window.CVS_IS_REPORT) return;
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   var LABEL = { submit: "Listing / event / deal", story: "Story idea", advertise: "Ad inquiry", contact: "Contact / suggestion" };
   var SKIP = ["source"];

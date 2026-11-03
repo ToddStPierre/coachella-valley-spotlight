@@ -2,7 +2,7 @@
    Saving posts to the tracker, which commits data/mailings.js; the site rebuilds in about a minute. */
 (function () {
   var API = "https://cvs-tracker.toddstpierre.workers.dev";
-  var admin = (new URLSearchParams(location.search).get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })()); if (!admin) return;
+  var admin = (new URLSearchParams(location.search).get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })()); if (!admin || window.CVS_IS_REPORT) return;
   var ROUTES = { "el-paseo": "El Paseo", "sun-city-palm-desert": "Sun City Palm Desert" };
   var list = JSON.parse(JSON.stringify(window.CVS_MAILINGS || []));
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }

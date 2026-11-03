@@ -45,6 +45,9 @@
   function tip(l) { return l[1] + ' <span class="stat-tip" tabindex="0" role="button" aria-label="What does ' + l[1] + ' mean?" data-tip="' + l[2].replace(/"/g, "&quot;") + '">?</span>'; }
   var out = document.getElementById("st-out"), q = new URLSearchParams(location.search);
   var adminKey = q.get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })();
+  // A business's private link (?b=&key=) always shows that business, even in a tab signed in as admin.
+  var isReportLink = !!(q.get("b") && q.get("key") && !q.get("admin"));
+  window.CVS_IS_REPORT = isReportLink; // the admin-*.js panels check this and stay out of the report
   var dir = (window.CVS && window.CVS.directory) || [];
   function slugOf(b) { return b.slug || String(b.name).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
   function nameOf(s) { var b = dir.filter(function (x) { return !x.sample && slugOf(x) === s; })[0]; return b ? b.name : s; }
@@ -52,7 +55,7 @@
   function tiles(set) { return '<div class="stats" style="margin-bottom:16px">' + LABELS.map(function (l) { return '<div class="stat"><b>' + (set[l[0]] || 0).toLocaleString() + '</b><span>' + tip(l) + '</span></div>'; }).join("") + '</div>'; }
   function fail(msg) { out.innerHTML = '<div class="empty">' + msg + '</div>'; }
 
-  if (adminKey) {
+  if (adminKey && !isReportLink) {
     document.getElementById("st-title").textContent = "Admin"; document.title = "Admin | Coachella Valley Spotlight";
     document.getElementById("st-eyebrow").textContent = "Site admin";
     document.getElementById("st-sub").textContent = "Cards, who to pitch, monthly reports, the inbox, every listing and the owners, in one place.";
@@ -110,7 +113,7 @@
         }).join("") || '<tr><td colspan="' + (LABELS.length + 2) + '">Nothing matches.</td></tr>';
         $("adm-more-wrap").innerHTML = list.length > st.shown ? '<button type="button" class="btn btn-ghost" id="adm-more">Show ' + Math.min(25, list.length - st.shown) + " more (" + (list.length - st.shown) + " left)</button>" : "";
       }
-      $("adm-q").addEventListener("input", function (e) { st.q = e.target.value.trim().toLowerCase(); st.shown = 25; draw(); });
+      $("adm-q").addEventListener("input", function (e) { st.q = e.target.value.trim().toLowerCase(); if (st.q) st.filter = "all"; st.shown = 25; draw(); });
       $("adm-city").addEventListener("change", function (e) { st.city = e.target.value; st.shown = 25; draw(); });
       $("adm-period").addEventListener("change", function (e) { st.period = e.target.value; st.shown = 25; draw(); });
       $("adm-sort").addEventListener("change", function (e) { st.sort = e.target.value; draw(); });
