@@ -18,7 +18,7 @@ window.CVS.sponsors = [
   { id: "antex-exterminating", name: "Antex Exterminating", placements: ["category:Home services"],
     image: "assets/img/ads/antex-exterminating.jpg", alt: "Antex Exterminating ad from the El Paseo Spotlight card", w: 440, h: 415,
     headline: "Bugs, rodents or gophers? Call Antex.",
-    text: "Family-owned pest control with more than 20 years in the business, for homes and businesses across the valley. Roaches, ants, spiders, rodents, gophers and inspections, using products that are safe around kids and pets. First treatment $82 (regularly $120) when you mention Coachella Valley Spotlight.",
-    short: "Family-owned pest and gopher control, safe around kids and pets. First treatment $82 (regularly $120) when you mention Coachella Valley Spotlight.",
+    text: "Family-owned pest control with more than 20 years in the business, for homes and businesses across the valley. Roaches, ants, spiders, rodents, gophers and inspections, using products that are safe around kids and pets.",
+    short: "Family-owned pest and gopher control, safe around kids and pets.",
     cta: "See Antex Exterminating", url: "business/antex-exterminating/", start: "2026-10-28" },
 ];
