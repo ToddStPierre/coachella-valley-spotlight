@@ -35,10 +35,6 @@
   .chip b { font-weight: 600; margin-left: 4px; opacity: .75; }
   .sub { display: flex; gap: 8px; padding-top: 8px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); align-items: center; }
   .sub select { width: auto; padding: 4px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
-  #cockpit-wrap { max-width: 1400px; margin: 16px auto 0; padding: 0 16px; }
-  #cockpit-wrap > summary { cursor: pointer; font-family: "Fraunces", Georgia, serif; font-weight: 700; font-size: 20px; padding: 4px 0 10px; }
-  #cockpit-frame { display: block; width: 100%; height: 320px; border: 0; }
-  @media (max-width: 860px) { #cockpit-wrap { padding: 0 12px; } }
   main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 16px; padding: 16px; max-width: 1400px; margin: 0 auto; }
   #list { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
   .row { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 11px 13px; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr); gap: 3px; min-width: 0; }
@@ -121,7 +117,6 @@
     <span id="who" style="margin-left:auto"></span>
   </div>
 </header>
-<details id="cockpit-wrap" hidden><summary>Sales cockpit</summary><iframe id="cockpit-frame" title="Sales cockpit" scrolling="no" allow="clipboard-write"></iframe></details>
 <main>
   <div id="list"><div class="loading">Loading contacts…</div></div>
   <div id="detail"><div class="empty">Pick a business on the left.</div></div>
@@ -522,29 +517,12 @@ function downloadCsv() {
     .catch(function (err) { toast(err.message || String(err), true); });
 }
 
-// ----- sales cockpit: the admin page's cockpit, in a frame so its styles and this page's can't clash -----
-function mountCockpit() {
-  var wrap = $('cockpit-wrap'), frame = $('cockpit-frame');
-  // Starts collapsed, remembers if it was left open, and only loads the frame once it's opened.
-  function load() { if (!frame.getAttribute('src')) frame.src = 'cockpit.html'; }
-  try { if (localStorage.getItem('cvs_cockpit_open') === '1') wrap.open = true; } catch (e) {}
-  wrap.addEventListener('toggle', function () { if (wrap.open) load(); try { localStorage.setItem('cvs_cockpit_open', wrap.open ? '1' : '0'); } catch (e) {} });
-  window.addEventListener('message', function (e) {
-    if (e.origin !== location.origin || !e.data) return;
-    if (e.data.cockpitHeight) frame.style.height = e.data.cockpitHeight + 'px';
-    if (e.data.cockpit === 'saved') reload('Logged from the cockpit');
-  });
-  if (ADMIN) { try { sessionStorage.setItem('cvs_admin', ADMIN); } catch (e) {} }
-  if (wrap.open) load();
-  wrap.hidden = false;
-}
-
 // ----- load -----
 function gate(html) { $('list').innerHTML = '<div class="empty">' + html + '</div>'; $('detail').innerHTML = ''; }
 (ADMIN ? Promise.resolve(true) : authReady()).then(function (u) {
   if (!u) { gate('Sign in to see your leads.<br><br><a class="btn primary" href="' + esc(window.CVS_AUTH.signInUrl()) + '">Sign in</a>'); return; }
   if (!ADMIN && !u.emailVerified) { gate('Please confirm your email first. We sent a link to <b>' + esc(u.email) + '</b>. Then reload this page.'); return; }
-  return reload().then(mountCockpit).catch(function (err) {
+  return reload().catch(function (err) {
     if (err.status === 403) gate('This account (' + esc(u.email || '') + ') isn\'t set up for leads. Ask Todd to add it.');
     else gate('Couldn\'t load the leads: ' + esc(err.message || err));
   });
