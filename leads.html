@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leads | Coachella Valley Spotlight</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/img/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5ede1; --paper: #fffaf3; --ink: #221c18; --ink-2: #5d5048; --line: #e4d6c3;
+    --sun: #d9552b; --sun-deep: #b8401c; --gold: #f0a33a; --palm: #2e5c4f; --palm-soft: #e3ece6;
+    --rose: #c9667a; --dusk: #5b4a7a; --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  header { position: sticky; top: 0; z-index: 5; background: var(--paper); border-bottom: 1px solid var(--line); padding: 12px 16px; }
+  .top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-family: "Fraunces", Georgia, serif; font-weight: 700; font-size: 19px; line-height: 1.05; margin-right: 8px; white-space: nowrap; }
+  .brand small { display: block; font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 500; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); margin-top: 2px; }
+  .brand small b { color: var(--sun); font-weight: 500; }
+  .brand-mark { width: 36px; height: 36px; flex: none; }
+  @media (max-width: 520px) { .brand { font-size: 16px; } .brand-mark { width: 30px; height: 30px; } #q { order: 3; flex-basis: 100%; } #setBtn { margin-left: auto; } .top .btn { padding: 7px 10px; font-size: 14px; } }
+  #q { flex: 1 1 220px; min-width: 0; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  .btn { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 8px 12px; cursor: pointer; white-space: nowrap; color: var(--ink); text-decoration: none; display: inline-block; }
+  .btn.primary { background: var(--sun); border-color: var(--sun); color: #fff; font-weight: 600; }
+  .btn.primary:hover { background: var(--sun-deep); }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .chips { display: flex; gap: 6px; overflow-x: auto; padding-top: 10px; scrollbar-width: none; }
+  .chip { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 5px 11px; font-size: 13px; cursor: pointer; white-space: nowrap; }
+  .chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .chip b { font-weight: 600; margin-left: 4px; opacity: .75; }
+  .sub { display: flex; gap: 8px; padding-top: 8px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); align-items: center; }
+  .sub select { width: auto; padding: 4px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 16px; padding: 16px; max-width: 1400px; margin: 0 auto; }
+  #list { display: flex; flex-direction: column; gap: 8px; }
+  .row { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 11px 13px; cursor: pointer; display: grid; gap: 3px; }
+  .row:hover { border-color: var(--ink-2); }
+  .row.sel { border-color: var(--sun); box-shadow: 0 0 0 2px rgba(217, 85, 43, .15); }
+  .row .l1 { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .row .name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .meta { font-size: 12.5px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pill { font-size: 11.5px; padding: 2px 8px; border-radius: 999px; background: #eee5d8; color: var(--ink-2); white-space: nowrap; flex: none; }
+  .pill.sold { background: var(--palm); color: #fff; }
+  .pill.hot { background: var(--gold); color: var(--ink); }
+  .pill.bad { background: #f3d4cc; color: var(--sun-deep); }
+  .pill.due { background: var(--sun); color: #fff; }
+  .more { text-align: center; padding: 8px; }
+  .group-head { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); padding: 10px 2px 0; display: flex; justify-content: space-between; }
+  .sub #cat { max-width: 220px; }
+  #detail { position: sticky; top: 140px; align-self: start; max-height: calc(100vh - 156px); overflow: auto; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+  .empty { color: var(--ink-2); text-align: center; padding: 40px 10px; }
+  .dhead { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
+  .dhead h2 { margin: 0 0 4px; font-size: 21px; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 4px; }
+  .actions a { text-decoration: none; }
+  .back { display: none; }
+  section.box { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 12px; }
+  section.box h3 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  label { display: grid; gap: 3px; font-size: 12.5px; color: var(--ink-2); }
+  label.full { grid-column: 1 / -1; }
+  input[type=text], input[type=email], input[type=tel], input[type=date], select, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: #fff; color: var(--ink); }
+  textarea { min-height: 64px; resize: vertical; }
+  .seg { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg button { border: 1px solid var(--line); background: #fff; border-radius: 9px; padding: 6px 12px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--palm); border-color: var(--palm); color: #fff; }
+  .quick { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .quick button { font-size: 12px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); background: #fff; cursor: pointer; }
+  .hist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .hist li { font-size: 13.5px; padding-left: 12px; border-left: 3px solid var(--line); }
+  .hist li:first-child { border-left-color: var(--sun); }
+  .savebar { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+  .st-row { display: grid; grid-template-columns: minmax(0, 1fr) 190px auto auto auto; gap: 6px; align-items: center; }
+  .st-row .btn { padding: 8px 10px; }
+  @media (max-width: 860px) { .st-row { grid-template-columns: minmax(0, 1fr) auto auto auto; } .st-row select { grid-column: 1 / -1; order: 5; } }
+  #toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 20; }
+  #toast.on { opacity: 1; }
+  #toast.err { background: var(--sun-deep); }
+  .loading { padding: 60px; text-align: center; color: var(--ink-2); }
+  .locked { background: #f3ebe0; border-radius: 10px; padding: 9px 12px; font-size: 13.5px; color: var(--ink-2); margin-top: 12px; }
+  #who a { color: var(--ink-2); }
+  @media (max-width: 860px) {
+    main { grid-template-columns: 1fr; padding: 12px; }
+    #detail { display: none; position: fixed; inset: 0; top: 0; max-height: none; border-radius: 0; border: 0; z-index: 10; padding: 16px; }
+    body.open #detail { display: block; }
+    .back { display: inline-block; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <a class="brand" href="./" title="Open the website"><svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><defs><clipPath id="sunc"><circle cx="20" cy="22" r="13"/></clipPath></defs><g clip-path="url(#sunc)"><rect x="0" y="9" width="40" height="5" fill="#f0a33a"/><rect x="0" y="15" width="40" height="4" fill="#d9552b"/><rect x="0" y="20" width="40" height="3" fill="#c9667a"/><rect x="0" y="24" width="40" height="2" fill="#5b4a7a"/></g><path d="M2 36 L13 24 L19 30 L26 21 L38 36 Z" fill="#221c18"/></svg><span>Coachella Valley<small>Spotlight · <b>Leads</b></small></span></a>
+    <input id="q" type="search" placeholder="Search name, category, email, notes…" autocomplete="off">
+    <button class="btn" id="dupBtn" type="button" title="Find and merge duplicate businesses" hidden>Duplicates</button>
+    <button class="btn" id="setBtn" type="button" title="Edit the status list" hidden>⚙ Statuses</button>
+    <a class="btn" id="csvBtn" href="#" title="Download every lead as a spreadsheet file" hidden>Backup</a>
+    <button class="btn primary" id="newBtn" type="button">+ New</button>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="sub">
+    <select id="card" aria-label="Card"><option value="">All cards</option><option>El Paseo</option><option>Sun City</option></select>
+    <select id="sort" aria-label="Sort">
+      <option value="recent">Recently contacted</option>
+      <option value="follow">Follow-up date</option>
+      <option value="name">Name A–Z</option>
+      <option value="cat">Category A–Z</option>
+    </select>
+    <select id="cat" aria-label="Category"><option value="">All categories</option></select>
+    <label style="display:flex;gap:5px;align-items:center;font-size:13px"><input type="checkbox" id="showDnc"> Show do-not-contact</label>
+    <span id="count"></span>
+    <span id="who" style="margin-left:auto"></span>
+  </div>
+</header>
+<main>
+  <div id="list"><div class="loading">Loading contacts…</div></div>
+  <div id="detail"><div class="empty">Pick a business on the left.</div></div>
+</main>
+<div id="toast" role="status"></div>
+
+<script>
+// ----- server calls -----
+// Leads live in the tracker (cvs-tracker Worker, D1). Same function names and data as the old Apps Script CRM,
+// so a lead's id stands in for the sheet row number. Who you are: the admin key this tab already has (from the
+// admin page), or your site account. Reps are listed in the Worker (REPS) and only see this page.
+var API = 'https://cvs-tracker.toddstpierre.workers.dev';
+var ADMIN = new URLSearchParams(location.search).get('admin') || (function () { try { return sessionStorage.getItem('cvs_admin'); } catch (e) { return null; } })();
+function authReady() {
+  return new Promise(function (resolve) { (function wait() { if (window.CVS_AUTH) window.CVS_AUTH.ready.then(resolve); else setTimeout(wait, 50); })(); });
+}
+function api(fn) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  return (ADMIN ? Promise.resolve(null) : authReady().then(function () { return window.CVS_AUTH.token(); })).then(function (tok) {
+    var h = { 'Content-Type': 'application/json' }; if (tok) h.Authorization = 'Bearer ' + tok;
+    return fetch(API + '/leads', { method: 'POST', headers: h, body: JSON.stringify({ fn: fn, args: args, key: ADMIN || undefined }) });
+  }).then(function (r) { return r.json().then(function (d) { if (!r.ok) { var e = new Error(d.error || 'Something went wrong.'); e.status = r.status; throw e; } return d.result; }); });
+}
+
+// ----- state -----
+var H = [], ROWS = [], TODAY = '', FILTER = 'all', SEL = null, LIMIT = 150, ME = { role: 'rep', rep: '' };
+function isAdmin() { return ME.role === 'admin'; }
+// Reps can change leads that are theirs or Company's; the Worker enforces it too.
+function canEdit(r) { return isAdmin() || g(r, 'Sales Rep') === 'Company' || g(r, 'Sales Rep') === ME.rep; }
+// The status list is saved in the tracker: [{ name, type }] with type new | open | hot | won | lost.
+var STATUSES = [];
+// Sales reps are set in the Worker. A contact's rep is picked when it's added (a rep's own leads are always theirs) and can't be changed.
+var REPS = ['Company'];
+var TYPES = [['new', 'New'], ['open', 'Open'], ['hot', 'Hot'], ['won', 'Won'], ['lost', 'Lost']];
+// Suggested new names for the old free-typed statuses, used to pre-fill Clean up.
+var SUGGEST = {
+  'Sent Email': 'Contacted', 'No Response': 'Contacted', 'Held - Not Sent': 'New',
+  'Interested - Stalled': 'Interested', 'Spot Held - Pending': 'Spot Held', 'Committed - Ad Revision': 'Spot Held',
+  'Declined': 'Not Interested', 'Bounced': 'Bad Contact Info', 'Opted Out': 'Do Not Contact'
+};
+function statusNames() { return STATUSES.map(function (s) { return s.name; }); }
+function typeOf(v) {
+  if (!v) return 'new';
+  for (var i = 0; i < STATUSES.length; i++) if (STATUSES[i].name.toLowerCase() === String(v).trim().toLowerCase()) return STATUSES[i].type;
+  return 'unknown';
+}
+var OUTCOMES = {
+  Call: ['Talked - interested', 'Talked - not interested', 'Talked - call back', 'Left voicemail', 'No answer', 'Gatekeeper - call back', 'Wrong number'],
+  Email: ['Sent', 'They replied', 'Bounced'],
+  Text: ['Sent', 'They replied'],
+  Visit: ['Talked - interested', 'Talked - not interested', 'Left a card'],
+  Note: ['']
+};
+var LABELS = { 'Email Status': 'Status', 'Phone Status': 'Last call result', 'Reply / Notes': 'Notes', 'Listing': 'Directory listing (web address)' };
+var FIELDS = [
+  ['Business', 'text', 'full'], ['Category', 'text'], ['Card / Route', 'card'],
+  ['Contact Name', 'text'], ['Phone', 'tel'], ['Email', 'email'], ['Website', 'text'],
+  ['Email Status', 'status'], ['Phone Status', 'text'], ['Do Not Contact', 'dnc'],
+  ['Next Step', 'text', 'full'], ['Follow-up Date', 'date'], ['Reply / Notes', 'area', 'full'], ['Listing', 'listing', 'full']
+];
+
+function g(r, k) { var i = H.indexOf(k); return i < 0 ? '' : (r.v[i] || ''); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function $(id) { return document.getElementById(id); }
+function toast(msg, err) { var t = $('toast'); t.textContent = msg; t.className = 'on' + (err ? ' err' : ''); clearTimeout(toast.t); toast.t = setTimeout(function () { t.className = ''; }, 2600); }
+function iso(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+function addDays(n) { var d = new Date(TODAY + 'T12:00:00'); d.setDate(d.getDate() + n); return iso(d); }
+// Sheets shows dates its own way (e.g. 10/29/2026); normalize to YYYY-MM-DD for comparing and for <input type=date>.
+function normDate(s) {
+  if (!s) return '';
+  var m = String(s).match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if (m) return m[1] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[3]).slice(-2);
+  m = String(s).match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/); if (m) return (m[3].length === 2 ? '20' + m[3] : m[3]) + '-' + ('0' + m[1]).slice(-2) + '-' + ('0' + m[2]).slice(-2);
+  return '';
+}
+function niceDate(s) { var d = normDate(s); if (!d) return ''; var x = new Date(d + 'T12:00:00'); return x.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+
+// ----- buckets for the filter chips -----
+function dnc(r) { return !!g(r, 'Do Not Contact') || /do not contact|opted out/i.test(g(r, 'Email Status')); }
+function status(r) { return g(r, 'Email Status'); }
+function isSold(r) { return typeOf(status(r)) === 'won'; }
+function isHot(r) { return typeOf(status(r)) === 'hot'; }
+function isLost(r) { return typeOf(status(r)) === 'lost'; }
+function followDue(r) { var f = normDate(g(r, 'Follow-up Date')); return f && f <= TODAY; }
+function never(r) { return typeOf(status(r)) === 'new' && !g(r, 'Last Contacted') && !g(r, 'Phone Status'); }
+function callList(r) { return g(r, 'Phone') && !isSold(r) && !isLost(r); }
+var CHIPS = [
+  ['all', 'All', function () { return true; }],
+  ['due', 'Follow-ups due', followDue],
+  ['hot', 'Hot', isHot],
+  ['sold', 'Sold', isSold],
+  ['call', 'Call list', callList],
+  ['never', 'Never contacted', never],
+  ['nores', 'Waiting on reply', function (r) { return typeOf(status(r)) === 'open'; }]
+];
+
+// Category as typed in the sheet, tidied: trimmed and first letter capitalized, so "dentist" and "Dentist" group together.
+function catOf(r) { var c = g(r, 'Category').trim(); return c ? c.charAt(0).toUpperCase() + c.slice(1) : 'No category'; }
+function renderCats() {
+  var counts = {}, sel = $('cat'), cur = sel.value;
+  ROWS.forEach(function (r) { var c = catOf(r); counts[c] = (counts[c] || 0) + 1; });
+  var cats = Object.keys(counts).sort(function (a, b) { return a === 'No category' ? 1 : b === 'No category' ? -1 : a.localeCompare(b); });
+  sel.innerHTML = '<option value="">All categories</option>' + cats.map(function (c) { return '<option value="' + esc(c) + '"' + (c === cur ? ' selected' : '') + '>' + esc(c) + ' (' + counts[c] + ')</option>'; }).join('');
+}
+
+function visible() {
+  var q = $('q').value.trim().toLowerCase(), card = $('card').value, cat = $('cat').value, showD = $('showDnc').checked;
+  var fn = CHIPS.filter(function (c) { return c[0] === FILTER; })[0][2];
+  var out = ROWS.filter(function (r) {
+    if (!showD && dnc(r) && FILTER !== 'sold') return false;
+    if (card && !(g(r, 'Card / Route').indexOf(card) > -1 || /both/i.test(g(r, 'Card / Route')))) return false;
+    if (cat && catOf(r) !== cat) return false;
+    if (!fn(r)) return false;
+    return !q || r.v.join(' ').toLowerCase().indexOf(q) > -1;
+  });
+  var s = $('sort').value;
+  out.sort(function (a, b) {
+    if (s === 'name') return g(a, 'Business').localeCompare(g(b, 'Business'));
+    if (s === 'cat') { var ca = catOf(a), cb = catOf(b); if (ca !== cb) return ca === 'No category' ? 1 : cb === 'No category' ? -1 : ca.localeCompare(cb); return g(a, 'Business').localeCompare(g(b, 'Business')); }
+    if (s === 'follow') { var fa = normDate(g(a, 'Follow-up Date')) || '9999', fb = normDate(g(b, 'Follow-up Date')) || '9999'; return fa < fb ? -1 : fa > fb ? 1 : 0; }
+    var la = normDate(g(a, 'Last Contacted')), lb = normDate(g(b, 'Last Contacted')); return la < lb ? 1 : la > lb ? -1 : 0;
+  });
+  return out;
+}
+
+function pill(r) {
+  if (followDue(r)) return '<span class="pill due">Follow up ' + esc(niceDate(g(r, 'Follow-up Date'))) + '</span>';
+  var s = status(r); if (!s) return never(r) ? '<span class="pill">New</span>' : '';
+  var t = typeOf(s), c = t === 'won' ? 'sold' : t === 'hot' ? 'hot' : t === 'lost' ? 'bad' : '';
+  return '<span class="pill ' + c + '"' + (t === 'unknown' ? ' title="Not on your status list. Use ⚙ Statuses › Clean up."' : '') + '>' + esc(s) + (t === 'unknown' ? ' ?' : '') + '</span>';
+}
+
+function renderChips() {
+  var base = ROWS.filter(function (r) { return $('showDnc').checked || !dnc(r); });
+  $('chips').innerHTML = CHIPS.map(function (c) {
+    var n = (c[0] === 'sold' ? ROWS : base).filter(c[2]).length;
+    return '<button class="chip" type="button" data-f="' + c[0] + '" aria-pressed="' + (FILTER === c[0]) + '">' + c[1] + '<b>' + n + '</b></button>';
+  }).join('');
+}
+
+function renderList() {
+  var rows = visible();
+  $('count').textContent = rows.length + ' shown';
+  if (!rows.length) { $('list').innerHTML = '<div class="empty">No businesses match.</div>'; return; }
+  var byCat = $('sort').value === 'cat', lastCat = null, catCounts = {};
+  if (byCat) rows.forEach(function (r) { var c = catOf(r); catCounts[c] = (catCounts[c] || 0) + 1; });
+  $('list').innerHTML = rows.slice(0, LIMIT).map(function (r) {
+    var head = '';
+    if (byCat && catOf(r) !== lastCat) { lastCat = catOf(r); head = '<div class="group-head"><span>' + esc(lastCat) + '</span><span>' + catCounts[lastCat] + '</span></div>'; }
+    var last = g(r, 'Last Contacted');
+    var meta = [g(r, 'Category'), g(r, 'Card / Route'), last ? 'Last: ' + niceDate(last) : ''].filter(Boolean).join(' · ');
+    var next = g(r, 'Next Step');
+    return head + '<div class="row' + (SEL && SEL.row === r.row ? ' sel' : '') + '" data-row="' + r.row + '">' +
+      '<div class="l1"><span class="name">' + esc(g(r, 'Business')) + '</span>' + pill(r) + '</div>' +
+      (meta ? '<div class="meta">' + esc(meta) + '</div>' : '') +
+      (next ? '<div class="meta">→ ' + esc(next) + '</div>' : '') + '</div>';
+  }).join('') + (rows.length > LIMIT ? '<div class="more"><button class="btn" id="moreBtn" type="button">Show more (' + (rows.length - LIMIT) + ' left)</button></div>' : '');
+}
+
+function field(f, r) {
+  var k = f[0], t = f[1], v = r ? g(r, k) : '', id = 'f_' + H.indexOf(k), cls = f[2] === 'full' ? ' class="full"' : '';
+  var input;
+  if (t === 'area') input = '<textarea id="' + id + '">' + esc(v) + '</textarea>';
+  else if (t === 'status') {
+    var names = statusNames(), opts = (v && names.indexOf(v) < 0 ? [[v, v + ' (old)']] : []).concat(v ? [] : [['', '(none yet)']]).concat(names.map(function (n) { return [n, n]; }));
+    input = '<select id="' + id + '">' + opts.map(function (o) { return '<option' + (o[0] === v ? ' selected' : '') + ' value="' + esc(o[0]) + '">' + esc(o[1]) + '</option>'; }).join('') + '</select>';
+  }
+  else if (t === 'dnc') input = '<select id="' + id + '">' + ['', 'Yes', 'Email bad'].concat(['', 'Yes', 'Email bad'].indexOf(v) < 0 ? [v] : []).map(function (s) { return '<option' + (s === v ? ' selected' : '') + ' value="' + esc(s) + '">' + (s || 'No') + '</option>'; }).join('') + '</select>';
+  else if (t === 'card') input = '<select id="' + id + '">' + ['', 'El Paseo', 'Sun City', 'Both'].concat(['', 'El Paseo', 'Sun City', 'Both'].indexOf(v) < 0 ? [v] : []).map(function (s) { return '<option' + (s === v ? ' selected' : '') + ' value="' + esc(s) + '">' + (s || '—') + '</option>'; }).join('') + '</select>';
+  else if (t === 'date') input = '<input type="date" id="' + id + '" value="' + esc(normDate(v)) + '">';
+  else if (t === 'listing') input = '<input type="text" id="' + id + '" value="' + esc(v) + '" placeholder="e.g. reliable-roofing"' + (isAdmin() ? '' : ' disabled title="Todd links listings."') + '>';
+  else input = '<input type="' + t + '" id="' + id + '" value="' + esc(v) + '">';
+  return '<label' + cls + '>' + esc(LABELS[k] || k) + input + '</label>';
+}
+
+function renderDetail(r) {
+  SEL = r;
+  if (!r) { $('detail').innerHTML = '<div class="empty">Pick a business on the left.</div>'; return; }
+  var phone = g(r, 'Phone'), email = (g(r, 'Email').split(/[,;\s]+/)[0] || ''), site = g(r, 'Website');
+  var tel = phone.replace(/[^\d+]/g, '');
+  var hist = g(r, 'Outreach History').split(/;\s*/).filter(Boolean).reverse();
+  var dncNote = dnc(r) ? '<span class="pill bad">Do not contact' + (g(r, 'Do Not Contact') ? ': ' + esc(g(r, 'Do Not Contact')) : '') + '</span>' : '';
+  $('detail').innerHTML =
+    '<button class="btn back" type="button" id="backBtn">← Back</button>' +
+    '<div class="dhead"><div><h2>' + esc(g(r, 'Business')) + '</h2><div class="meta" style="color:var(--ink-2)">' +
+      esc([g(r, 'Category'), g(r, 'Contact Name'), g(r, 'Card / Route'), g(r, 'Sales Rep') ? 'Rep: ' + g(r, 'Sales Rep') : ''].filter(Boolean).join(' · ')) + '</div></div>' + pill(r) + '</div>' +
+    (dncNote ? '<div style="margin-top:8px">' + dncNote + '</div>' : '') +
+    '<div class="actions">' +
+      (tel ? '<a class="btn primary" href="tel:' + esc(tel) + '">Call ' + esc(phone) + '</a><a class="btn" href="sms:' + esc(tel) + '">Text</a>' : '') +
+      (email ? '<a class="btn" href="mailto:' + esc(email) + '" target="_blank">Email</a>' : '') +
+      (site ? '<a class="btn" href="' + esc(/^https?:/.test(site) ? site : 'https://' + site) + '" target="_blank" rel="noopener">Website</a>' : '') +
+      (g(r, 'Listing') ? '<a class="btn" href="business/' + esc(g(r, 'Listing')) + '/" target="_blank" rel="noopener">Our listing</a>' : '') +
+    '</div>' +
+    (canEdit(r) ? '' : '<div class="locked">This is ' + esc(g(r, 'Sales Rep')) + '\'s lead, so you can see it but not change it. Ask Todd if you should be working it.</div>') +
+    '<section class="box"><h3>Log activity</h3>' +
+      '<div class="seg" id="types">' + Object.keys(OUTCOMES).map(function (t, i) { return '<button type="button" data-t="' + t + '" aria-pressed="' + (i === 0) + '">' + t + '</button>'; }).join('') + '</div>' +
+      '<div class="grid" style="margin-top:10px">' +
+        '<label>Result<select id="a_out"></select></label>' +
+        '<label>Change status<select id="a_status"><option value="">(leave as is)</option>' + statusNames().map(function (s) { return '<option>' + esc(s) + '</option>'; }).join('') + '</select></label>' +
+        '<label class="full">Note<input type="text" id="a_note" placeholder="What happened? e.g. talked to Lisa, wants the El Paseo spot"></label>' +
+        '<label>Next step<input type="text" id="a_next" value="' + esc(g(r, 'Next Step')) + '"></label>' +
+        '<label>Follow up on<input type="date" id="a_fu" value="' + esc(normDate(g(r, 'Follow-up Date'))) + '">' +
+          '<span class="quick"><button type="button" data-d="1">Tomorrow</button><button type="button" data-d="3">3 days</button><button type="button" data-d="7">1 week</button><button type="button" data-d="">Clear</button></span></label>' +
+      '</div>' +
+      '<div class="savebar"><button class="btn primary" type="button" id="logBtn">Log it</button></div>' +
+    '</section>' +
+    '<section class="box"><h3>History</h3>' + (hist.length ? '<ul class="hist">' + hist.map(function (h) { return '<li>' + esc(h) + '</li>'; }).join('') + '</ul>' : '<div class="meta" style="color:var(--ink-2)">Nothing logged yet.</div>') + '</section>' +
+    '<section class="box"><h3>Details</h3><div class="grid">' +
+      '<label class="full">Sales Rep 🔒<input type="text" value="' + esc(g(r, 'Sales Rep') || '—') + '" disabled title="Set when the contact was added. It can\'t be changed in the CRM."></label>' + FIELDS.filter(function (f) { return H.indexOf(f[0]) > -1; }).map(function (f) { return field(f, r); }).join('') + '</div>' +
+      '<div class="savebar"><button class="btn primary" type="button" id="saveBtn">Save details</button></div></section>';
+  setOutcomes('Call');
+  if (!canEdit(r)) ['logBtn', 'saveBtn'].forEach(function (id) { $(id).disabled = true; });
+  renderList();
+}
+
+function setOutcomes(t) {
+  $('a_out').innerHTML = OUTCOMES[t].map(function (o) { return '<option>' + esc(o) + '</option>'; }).join('');
+  $('a_out').parentNode.style.display = t === 'Note' ? 'none' : '';
+}
+
+function replaceRow(res) {
+  for (var i = 0; i < ROWS.length; i++) if (ROWS[i].row === res.row) { ROWS[i] = res; return res; }
+  ROWS.push(res); return res;
+}
+
+function newContact() {
+  SEL = null;
+  document.body.classList.add('open');
+  $('detail').innerHTML = '<button class="btn back" type="button" id="backBtn">← Back</button><h2 style="margin:0 0 10px">New business</h2><div class="grid">' +
+    '<label class="full">Sales Rep (locked once added)<select id="f_rep">' + REPS.map(function (s) { return '<option' + (s === 'Company' || REPS.length === 1 ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select></label>' +
+    FIELDS.filter(function (f) { return H.indexOf(f[0]) > -1 && f[0] !== 'Listing'; }).map(function (f) { return field(f, null); }).join('') +
+    '</div><div class="savebar"><button class="btn primary" type="button" id="addBtn">Add business</button></div>';
+}
+
+// ----- Settings: the status list, plus Clean up for old values still in the sheet -----
+var DRAFT = [];
+function readDraft() {
+  document.querySelectorAll('.st-row').forEach(function (el, i) {
+    DRAFT[i].name = el.querySelector('input').value; DRAFT[i].type = el.querySelector('select').value;
+  });
+}
+function renderSettings() {
+  SEL = null; renderList();
+  document.body.classList.add('open');
+  var names = statusNames(), counts = {};
+  ROWS.forEach(function (r) { var s = status(r).trim(); if (s && names.indexOf(s) < 0) counts[s] = (counts[s] || 0) + 1; });
+  var old = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; });
+  $('detail').innerHTML = '<button class="btn back" type="button" id="backBtn">← Back</button>' +
+    '<h2 style="margin:0 0 4px">Statuses</h2><div class="meta" style="color:var(--ink-2);margin-bottom:12px">This list feeds every status dropdown, for you and the reps. The type decides the color and the filter: <b>New</b> = not contacted yet, <b>Open</b> = waiting on them, <b>Hot</b> = interested, <b>Won</b> = paid, <b>Lost</b> = dead or do-not-contact.</div>' +
+    '<div id="stList" style="display:grid;gap:8px">' + DRAFT.map(function (s, i) {
+      return '<div class="st-row">' +
+        '<input type="text" value="' + esc(s.name) + '" aria-label="Status name">' +
+        '<select aria-label="Type">' + TYPES.map(function (t) { return '<option value="' + t[0] + '"' + (t[0] === s.type ? ' selected' : '') + '>' + t[1] + '</option>'; }).join('') + '</select>' +
+        '<button class="btn" type="button" data-up="' + i + '" title="Move up"' + (i ? '' : ' disabled') + '>↑</button>' +
+        '<button class="btn" type="button" data-down="' + i + '" title="Move down"' + (i < DRAFT.length - 1 ? '' : ' disabled') + '>↓</button>' +
+        '<button class="btn" type="button" data-del="' + i + '" title="Remove">✕</button></div>';
+    }).join('') + '</div>' +
+    '<div class="savebar" style="justify-content:space-between"><button class="btn" type="button" id="stAdd">+ Add status</button><button class="btn primary" type="button" id="stSave">Save list</button></div>' +
+    '<section class="box"><h3>Clean up old statuses</h3>' +
+    (old.length ? '<div class="meta" style="color:var(--ink-2);margin-bottom:10px">These are on some leads but not on your list. Pick what each should become, then apply. Only the status changes.</div>' +
+      '<div style="display:grid;gap:8px">' + old.map(function (o) {
+        var sug = SUGGEST[o] && names.indexOf(SUGGEST[o]) > -1 ? SUGGEST[o] : '';
+        return '<label style="display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:8px;align-items:center;color:var(--ink)"><span><b>' + esc(o) + '</b> <span style="color:var(--ink-2)">(' + counts[o] + ')</span></span>' +
+          '<select class="cu" data-old="' + esc(o) + '"><option value="">Leave as is</option>' + names.map(function (n) { return '<option' + (n === sug ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</select></label>';
+      }).join('') + '</div><div class="savebar"><button class="btn primary" type="button" id="cuApply">Apply changes</button></div>'
+      : '<div class="meta" style="color:var(--ink-2)">All clean. Every lead\'s status is on your list.</div>') +
+    '</section>';
+}
+function reload(msg) {
+  return api('getData').then(function (d) {
+    H = d.headers; ROWS = d.rows; TODAY = d.today; STATUSES = d.statuses || []; REPS = d.reps && d.reps.length ? d.reps : ['Company']; ME = d.me || ME;
+    $('setBtn').hidden = !isAdmin(); $('csvBtn').hidden = !isAdmin();
+    $('who').innerHTML = esc(ME.rep) + (isAdmin() ? ' (admin)' : '') + (ADMIN ? '' : ' · <a href="account">My Spotlight</a>');
+    renderCats(); renderChips(); renderList(); renderDupBtn(); if (msg) toast(msg);
+  });
+}
+
+// ----- Duplicates: rows with the same business name (ignoring case, punctuation and The/Inc/LLC/Co) -----
+function dupKey(n) { return String(n).toLowerCase().replace(/\b(the|inc|llc|co)\b/g, '').replace(/[^a-z0-9]/g, ''); }
+function dupGroups() {
+  var m = {};
+  ROWS.forEach(function (r) { var k = dupKey(g(r, 'Business')); if (k) (m[k] = m[k] || []).push(r); });
+  return Object.keys(m).map(function (k) { return m[k]; }).filter(function (x) { return x.length > 1; })
+    // Same name but two different directory listings = two branches (Casa Mendoza La Quinta / Palm Desert), not a duplicate.
+    .filter(function (x) { var s = {}; x.forEach(function (r) { if (g(r, 'Listing')) s[g(r, 'Listing')] = 1; }); return Object.keys(s).length < 2; })
+    .sort(function (a, b) { return b.length - a.length || g(a[0], 'Business').localeCompare(g(b[0], 'Business')); });
+}
+function renderDupBtn() {
+  var n = dupGroups().length, b = $('dupBtn');
+  b.hidden = !n || !isAdmin(); b.textContent = 'Duplicates (' + n + ')';
+}
+function renderDups() {
+  SEL = null; renderList(); document.body.classList.add('open');
+  var groups = dupGroups();
+  var extra = groups.reduce(function (s, x) { return s + x.length - 1; }, 0);
+  $('detail').innerHTML = '<button class="btn back" type="button" id="backBtn">← Back</button>' +
+    '<h2 style="margin:0 0 4px">Duplicates</h2>' +
+    (groups.length ? '<div class="meta" style="color:var(--ink-2);margin-bottom:12px"><b>' + groups.length + ' businesses</b> are in the list more than once (' + extra + ' extra copies). ' +
+      'Merging keeps one row per business: the most filled-in copy, with blanks filled from the others, history and notes combined, the earliest first-contact and latest last-contact dates, and the most advanced status. ' +
+      'The history from the removed copies moves to the one that\'s kept.</div>' +
+      '<div class="savebar" style="justify-content:flex-start;margin:0 0 12px"><button class="btn primary" type="button" id="mergeAll">Merge all ' + groups.length + '</button></div>' +
+      '<div style="display:grid;gap:8px">' + groups.slice(0, 300).map(function (x, i) {
+        var emails = {}; x.forEach(function (r) { g(r, 'Email').split(/[,;\s]+/).forEach(function (e) { if (e) emails[e.toLowerCase()] = 1; }); });
+        var sts = {}; x.forEach(function (r) { if (status(r)) sts[status(r)] = 1; });
+        return '<div class="row" style="cursor:default" data-g="' + i + '"><div class="l1"><span class="name">' + esc(g(x[0], 'Business')) + '</span><span class="pill">' + x.length + ' rows</span></div>' +
+          '<div class="meta">Rows ' + x.map(function (r) { return r.row; }).join(', ') + (Object.keys(sts).length ? ' · ' + esc(Object.keys(sts).join(', ')) : '') + '</div>' +
+          (Object.keys(emails).length ? '<div class="meta">' + esc(Object.keys(emails).join(', ')) + '</div>' : '') +
+          '<div style="margin-top:6px"><button class="btn" type="button" data-merge="' + i + '">Merge these ' + x.length + '</button></div></div>';
+      }).join('') + '</div>'
+      : '<div class="meta" style="color:var(--ink-2)">No duplicates. Every business is in the list once.</div>');
+}
+function doMerge(groups, btn) {
+  btn.disabled = true; btn.textContent = 'Merging…';
+  api('mergeDuplicates', groups.map(function (x) { return x.map(function (r) { return r.row; }); }))
+    .then(function (res) { return reload().then(function () { renderDups(); toast('Merged ' + res.merged + ' (' + res.deleted + ' copies removed).'); }); })
+    .catch(function (err) { btn.disabled = false; btn.textContent = 'Try again'; toast(err.message || String(err), true); });
+}
+
+function collect() {
+  var out = {};
+  FIELDS.forEach(function (f) { var el = $('f_' + H.indexOf(f[0])); if (el) out[f[0]] = el.value; });
+  return out;
+}
+
+// ----- events -----
+document.addEventListener('click', function (e) {
+  var t = e.target;
+  var chip = t.closest('.chip'); if (chip) { FILTER = chip.getAttribute('data-f'); LIMIT = 150; renderChips(); renderList(); return; }
+  var row = t.closest('.row[data-row]'); if (row) { var n = +row.getAttribute('data-row'); renderDetail(ROWS.filter(function (r) { return r.row === n; })[0]); document.body.classList.add('open'); $('detail').scrollTop = 0; return; }
+  if (t.id === 'moreBtn') { LIMIT += 150; renderList(); return; }
+  if (t.id === 'backBtn') { document.body.classList.remove('open'); return; }
+  if (t.id === 'newBtn') { newContact(); return; }
+  if (t.id === 'csvBtn') { e.preventDefault(); downloadCsv(); return; }
+  if (t.id === 'dupBtn') { renderDups(); return; }
+  if (t.id === 'mergeAll') { var all = dupGroups(); if (confirm('Merge ' + all.length + ' duplicate businesses into one each? This can\'t be undone.')) doMerge(all, t); return; }
+  if (t.hasAttribute && t.hasAttribute('data-merge')) { doMerge([dupGroups()[+t.getAttribute('data-merge')]], t); return; }
+  if (t.id === 'setBtn') { DRAFT = STATUSES.map(function (s) { return { name: s.name, type: s.type }; }); renderSettings(); return; }
+  if (t.hasAttribute && (t.hasAttribute('data-up') || t.hasAttribute('data-down') || t.hasAttribute('data-del'))) {
+    readDraft();
+    var i;
+    if (t.hasAttribute('data-up')) { i = +t.getAttribute('data-up'); DRAFT.splice(i - 1, 0, DRAFT.splice(i, 1)[0]); }
+    else if (t.hasAttribute('data-down')) { i = +t.getAttribute('data-down'); DRAFT.splice(i + 1, 0, DRAFT.splice(i, 1)[0]); }
+    else DRAFT.splice(+t.getAttribute('data-del'), 1);
+    renderSettings(); return;
+  }
+  if (t.id === 'stAdd') { readDraft(); DRAFT.push({ name: '', type: 'open' }); renderSettings(); var ins = document.querySelectorAll('.st-row input'); ins[ins.length - 1].focus(); return; }
+  if (t.id === 'stSave') {
+    readDraft();
+    var clean = DRAFT.filter(function (s) { return s.name.trim(); });
+    if (!clean.length) { toast('Keep at least one status.', true); return; }
+    t.disabled = true;
+    api('saveStatuses', clean).then(function (list) { STATUSES = list; DRAFT = list.map(function (s) { return { name: s.name, type: s.type }; }); renderChips(); renderSettings(); toast('Status list saved.'); })
+      .catch(function (err) { t.disabled = false; toast(err.message || String(err), true); });
+    return;
+  }
+  if (t.id === 'cuApply') {
+    var map = {}, n = 0;
+    document.querySelectorAll('select.cu').forEach(function (s) { if (s.value) { map[s.getAttribute('data-old')] = s.value; n++; } });
+    if (!n) { toast('Pick at least one new status first.', true); return; }
+    t.disabled = true;
+    api('renameStatuses', map).then(function (changed) { return reload().then(function () { renderSettings(); toast(changed + ' rows updated.'); }); })
+      .catch(function (err) { t.disabled = false; toast(err.message || String(err), true); });
+    return;
+  }
+  var ty = t.closest('#types button'); if (ty) { document.querySelectorAll('#types button').forEach(function (b) { b.setAttribute('aria-pressed', b === ty); }); setOutcomes(ty.getAttribute('data-t')); return; }
+  if (t.closest('.quick button')) { var d = t.getAttribute('data-d'); $('a_fu').value = d === '' ? '' : addDays(+d); return; }
+  if (t.id === 'logBtn' && SEL) {
+    var type = document.querySelector('#types button[aria-pressed="true"]').getAttribute('data-t');
+    var a = { type: type, outcome: type === 'Note' ? '' : $('a_out').value, note: $('a_note').value.trim(), status: $('a_status').value, nextStep: $('a_next').value.trim(), followUp: $('a_fu').value };
+    if (type === 'Note' && !a.note) { toast('Type a note first.', true); return; }
+    t.disabled = true;
+    api('logActivity', SEL.row, g(SEL, 'Business'), a).then(function (res) { replaceRow(res); renderChips(); renderDetail(res); toast(type + ' logged.'); })
+      .catch(function (err) { t.disabled = false; toast(err.message || String(err), true); });
+    return;
+  }
+  if (t.id === 'saveBtn' && SEL) {
+    t.disabled = true;
+    api('saveContact', SEL.row, g(SEL, 'Business'), collect()).then(function (res) { replaceRow(res); renderCats(); renderChips(); renderDetail(res); toast('Saved.'); })
+      .catch(function (err) { t.disabled = false; toast(err.message || String(err), true); });
+    return;
+  }
+  if (t.id === 'addBtn') {
+    var f = collect(); if (!f.Business) { toast('Business name is required.', true); return; }
+    f['Sales Rep'] = $('f_rep').value;
+    t.disabled = true;
+    api('addContact', f).then(function (res) { replaceRow(res); renderCats(); renderChips(); renderDetail(res); toast('Added.'); })
+      .catch(function (err) { t.disabled = false; toast(err.message || String(err), true); });
+  }
+});
+['q', 'card', 'cat', 'sort', 'showDnc'].forEach(function (id) { $(id).addEventListener(id === 'q' ? 'input' : 'change', function () { LIMIT = 150; renderChips(); renderList(); }); });
+
+function downloadCsv() {
+  fetch(API + '/leads/export?key=' + encodeURIComponent(ADMIN || ''), { headers: {} }).then(function (r) {
+    if (r.ok) return r.blob();
+    // Signed in without the admin key in this tab: ask with the account instead.
+    return window.CVS_AUTH.token().then(function (tok) { return fetch(API + '/leads/export', { headers: { Authorization: 'Bearer ' + tok } }); })
+      .then(function (r2) { if (!r2.ok) throw new Error('Not allowed'); return r2.blob(); });
+  }).then(function (b) { var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'leads-' + TODAY + '.csv'; a.click(); })
+    .catch(function (err) { toast(err.message || String(err), true); });
+}
+
+// ----- load -----
+function gate(html) { $('list').innerHTML = '<div class="empty">' + html + '</div>'; $('detail').innerHTML = ''; }
+(ADMIN ? Promise.resolve(true) : authReady()).then(function (u) {
+  if (!u) { gate('Sign in to see your leads.<br><br><a class="btn primary" href="' + esc(window.CVS_AUTH.signInUrl()) + '">Sign in</a>'); return; }
+  if (!ADMIN && !u.emailVerified) { gate('Please confirm your email first. We sent a link to <b>' + esc(u.email) + '</b>. Then reload this page.'); return; }
+  return reload().catch(function (err) {
+    if (err.status === 403) gate('This account (' + esc(u.email || '') + ') isn\'t set up for leads. Ask Todd to add it.');
+    else gate('Couldn\'t load the leads: ' + esc(err.message || err));
+  });
+});
+</script>
+<script type="module" src="assets/auth.js"></script>
+</body>
+</html>

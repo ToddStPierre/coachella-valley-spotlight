@@ -24,10 +24,11 @@ let user = null, data = { favorites: [], prefs: {} }, loaded = false;
 const OWNER_API = "https://cvs-tracker.toddstpierre.workers.dev";
 let readyResolve; const ready = new Promise(r => { readyResolve = r; });
 window.CVS_AUTH = { ready, user: () => user, token: () => (user ? user.getIdToken() : Promise.resolve(null)), signInUrl: n => ROOT + "account?next=" + encodeURIComponent(n || location.pathname + location.search) };
-let mine = null, isAdmin = false;
+let mine = null, isAdmin = false, leadsMe = null;
 async function loadMine() {
-  mine = null; isAdmin = false;
+  mine = null; isAdmin = false; leadsMe = null;
   if (!user) return;
+  try { const r = await fetch(OWNER_API + "/leads/me", { headers: { Authorization: "Bearer " + await user.getIdToken() } }); if (r.ok) leadsMe = await r.json(); } catch (e) {}
   try { const r = await fetch(OWNER_API + "/admin/session", { headers: { Authorization: "Bearer " + await user.getIdToken() } }); isAdmin = r.ok; } catch (e) {}
   try {
     const r = await fetch(OWNER_API + "/owner/mine", { headers: { Authorization: "Bearer " + await user.getIdToken() } });
@@ -190,6 +191,7 @@ ${savedHTML()}
 </div>
 <aside class="acct-side">
 ${isAdmin ? `<div class="card acct-card acct-owner"><h2>Site admin</h2><p>Stats for every listing, claims, sign-ups and form submissions.</p><a class="btn" href="${ROOT}stats.html">Open the admin page</a></div>` : ""}
+${leadsMe ? `<div class="card acct-card acct-owner"><h2>Leads</h2><p>${leadsMe.role === "admin" ? "Every business you and the reps are working." : "Your sales list, " + esc(leadsMe.rep) + ": log calls, emails and follow-ups."}</p><a class="btn" href="${ROOT}leads.html">Open leads</a></div>` : ""}
 <div class="card acct-card"><h2>Your account</h2><p>${esc(user.email)}</p><button type="button" class="btn btn-ghost" data-act="out">Sign out</button></div>
 ${mine && mine.listings && mine.listings.length ? `<div class="card acct-card acct-owner"><h2>Your business</h2>${mine.listings.map(l => `<p><b>${esc(l.name)}</b><br><a href="${ROOT}owner.html?b=${encodeURIComponent(l.slug)}">Manage listing and stats &rarr;</a></p>`).join("")}</div>` : ""}
 <div class="card acct-card"><h2>Email preferences</h2><form class="acct-prefs">${PREFS.map(([k, t]) => `<label class="acct-check"><input type="checkbox" name="${k}"${p[k] ? " checked" : ""}> ${t}</label>`).join("")}

@@ -59,6 +59,7 @@
     dir = (window.CVS && window.CVS.directory) || dir;
     var spots = r[0], subs = r[1], owners = r[2], stats = r[3];
     var rec = {}; // slug -> {status, follow_up, log: [newest first]}
+    var contacts = (r[4] && r[4].contacts) || {}; // slug -> {email, phone} from the leads list (2026-11-02)
     ((r[4] && r[4].pitches) || []).forEach(function (p) { rec[p.slug] = { status: p.status, follow_up: p.follow_up, log: [] }; });
     ((r[4] && r[4].log) || []).forEach(function (l) { (rec[l.slug] = rec[l.slug] || { status: "Contacted", follow_up: null, log: [] }).log.push(l); });
     var pitchErr = !r[4] || r[4].error;
@@ -126,7 +127,8 @@
         (x.pv ? " and your page was opened " + x.pv + " " + pl(x.pv, "time", "times") : "") + ". Here's your report:\n" + report +
         "\n\nThose are neighbors looking for " + (x.b.service || "local businesses").toLowerCase() + " in the valley. If you'd like to be the name they already know before they search, the " + x.cat.replace(/\//g, " and ").toLowerCase() + " spot on our " + m.name + " postcard is still open. It goes to " + m.homes + " on " + niceLong(m.mail) + ", one business per category, and booking closes " + niceLong(m.deadline) + "." +
         "\n\nWant me to hold it for you? Just reply \"hold it.\"\n\nTodd\nCoachella Valley Spotlight\n(760) 422-5475\n\nIf you'd rather not hear from me, just say so and I won't email again.";
-      return { su: su, body: body, gmail: "https://mail.google.com/mail/?authuser=" + encodeURIComponent(FROM) + "&view=cm&fs=1&su=" + encodeURIComponent(su) + "&body=" + encodeURIComponent(body), report: report };
+      var to = (contacts[x.b.slug] || {}).email || "";
+      return { su: su, body: body, gmail: "https://mail.google.com/mail/?authuser=" + encodeURIComponent(FROM) + "&view=cm&fs=1" + (to ? "&to=" + encodeURIComponent(to) : "") + "&su=" + encodeURIComponent(su) + "&body=" + encodeURIComponent(body), report: report };
     }
     function when(iso) { return new Date(iso).toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short", day: "numeric" }); }
     function chanLabel(c) { var f = CHANNELS.filter(function (k) { return k[0] === c; })[0]; return f ? f[1] : c; }
@@ -227,7 +229,9 @@
       var f = e.target.closest("[data-log]"); if (!f) return;
       e.preventDefault();
       var slug = f.dataset.log, btn = f.querySelector("[type=submit]"), msg = f.querySelector(".ck-msg");
-      var body = { key: admin, b: slug, status: f.status.value, follow_up: f.follow_up.value, channel: st.channel, note: f.note.value.trim() };
+      var lb = info[slug] || {};
+      // name, category, phone and url start a new lead when this listing isn't on the leads list yet
+      var body = { key: admin, b: slug, status: f.status.value, follow_up: f.follow_up.value, channel: st.channel, note: f.note.value.trim(), name: lb.name, category: lb.service || lb.category, phone: lb.phone, url: lb.url };
       btn.disabled = true; msg.textContent = "Saving…";
       fetch(API + "/admin/pitch", { method: "POST", body: JSON.stringify(body) }).then(function (res) { return res.json().then(function (d) { if (!res.ok) throw new Error(d.error || "Failed"); return d; }); }).then(function (d) {
         var r = rec[slug] = rec[slug] || { log: [] };

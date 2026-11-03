@@ -6,11 +6,11 @@
   function csv(rows, cols) {
     return [cols.join(",")].concat(rows.map(function (r) { return cols.map(function (c) { return '"' + String(r[c] == null ? "" : r[c]).replace(/"/g, '""') + '"'; }).join(","); })).join("\n");
   }
-  // Admin tools: the Spotlight CRM web app (only opens for Todd's Google account) and the Leads sheet behind it.
+  // Admin tools: the Leads page (the CRM, now in the tracker; reps sign in to it too) and the old Leads sheet (read-only backup).
   var tools = document.createElement("div"); tools.id = "admin-tools";
   tools.style.cssText = "display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px";
-  tools.innerHTML = '<a class="btn" href="https://script.google.com/macros/s/AKfycbxoR9cjYeAqmaemNXfJXsrVj3MWRn7GV5pBhmJYgALNuhTOo8lu63lJLLh6s4tB5wybtQ/exec" target="_blank" rel="noopener">Leads CRM &#8599;</a>' +
-    '<a class="btn btn-ghost" href="https://docs.google.com/spreadsheets/d/1aZ1mYh7xaHBfU7BJShJNSUWgtKbijx-rkxZaKgLCaAs/edit" target="_blank" rel="noopener">Leads sheet &#8599;</a>';
+  tools.innerHTML = '<a class="btn" href="leads.html" target="_blank">Leads &#8599;</a>' +
+    '<a class="btn btn-ghost" href="https://docs.google.com/spreadsheets/d/1aZ1mYh7xaHBfU7BJShJNSUWgtKbijx-rkxZaKgLCaAs/edit" target="_blank" rel="noopener">Old Leads sheet &#8599;</a>';
   document.getElementById("st-out").before(tools);
 
   // Site visitors (counted by app.js on every page; no longer shown publicly)
