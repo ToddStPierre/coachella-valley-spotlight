@@ -1474,7 +1474,7 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .qr-x { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: #fff; font-size: 20px; line-height: 1; cursor: pointer; }
 
 /* Admin: "Site backup" panel (assets/admin-backup.js) */
-.adm-backup { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; margin: -16px 0 32px; }
+.adm-backup { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; margin: 6px 0 0; flex: 1 1 100%; }
 .adm-backup-text { display: grid; gap: 3px; min-width: 0; flex: 1 1 320px; }
 .adm-backup-text b { font-family: var(--display); font-size: 19px; }
 .adm-backup-text small { color: var(--ink-2); font-size: 13px; }

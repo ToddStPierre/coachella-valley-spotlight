@@ -15,7 +15,9 @@
     '<small>Runs on Todd&rsquo;s Mac and saves everything (site, database, ad bookings, member accounts) to Google Drive &rsaquo; Coachella Valley Spotlight Backups. Takes a few minutes.</small></div>' +
     '<a class="btn" href="cvsbackup://run" id="bk-run">Back up now</a>';
   var tools = document.getElementById("admin-tools"), out = document.getElementById("st-out");
-  if (tools) tools.after(box); else if (out) out.before(box); else return;
+  // Inside the Leads buttons row (full width, its own line), so the sales cockpit, which also inserts itself
+  // right after that row, can't push it down the page.
+  if (tools) tools.appendChild(box); else if (out) out.before(box); else return;
   var status = document.getElementById("bk-status"), last = null, poll = null, clickedAt = 0;
 
   function paint(rows) {
