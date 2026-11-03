@@ -1459,3 +1459,16 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .pub-warn { margin: 0; padding: 8px 12px; border-radius: 10px; background: #fde7c8; font-size: 14px; }
 .pub-done { margin: 8px 0 0; color: var(--palm); font-weight: 600; font-size: 15px; }
 .pub-ok { padding: 12px 16px; border-radius: 12px; background: var(--palm-soft); color: var(--palm); font-weight: 600; margin: 0 0 16px; }
+
+/* Admin: postcard QR code pop-up (assets/admin-qr.js) */
+.qr-backdrop { position: fixed; inset: 0; background: rgba(34, 28, 24, .55); display: grid; place-items: center; z-index: 200; padding: 16px; }
+.qr-modal { position: relative; background: var(--paper); border-radius: var(--radius); padding: 28px; width: min(440px, 100%); max-height: calc(100vh - 32px); overflow: auto; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, .25); }
+.qr-modal h3 { margin: 0; font-family: var(--display); font-size: 24px; padding: 0 28px; }
+.qr-sub { margin: 2px 0 14px; font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.qr-img { width: 240px; height: 240px; margin: 0 auto; display: grid; place-items: center; color: var(--ink-2); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.qr-img svg { width: 100%; height: 100%; display: block; }
+.qr-link { margin: 12px 0 0; font-size: 13px; word-break: break-all; }
+.qr-note { font-size: 14px; color: var(--ink-2); margin: 10px 0 0; }
+.qr-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
+.qr-tip { font-size: 13px; color: var(--ink-2); margin: 14px 0 0; }
+.qr-x { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: #fff; font-size: 20px; line-height: 1; cursor: pointer; }
