@@ -23,7 +23,7 @@
       .sort(function (a, b) { return a.deadline < b.deadline ? -1 : 1; })[0] || null;
   }
 
-  function funnel(p) {
+  function funnel(p, b) {
     var acts = (p.call || 0) + (p.website || 0), top = Math.max(p.impression || 0, 1);
     function row(cls, label, val, note) {
       var w = val ? Math.max(4, Math.round(val / top * 100)) : 0;
@@ -35,7 +35,9 @@
       row("rp-seen", "Saw your listing", p.impression, "In the directory, search results, town pages and the home page.") +
       row("rp-open", "Opened your profile", p.profile, p.impression && p.profile ? rate + "% of the times you were seen" : "") +
       row("rp-act", "Called or visited your website", acts, n(p.call) + " " + pl(p.call, "call", "calls") + " tapped &middot; " + n(p.website) + " website " + pl(p.website, "visit", "visits")) +
-      '</div>';
+      '</div>' +
+      // Postcard advertisers (or anyone with scans or claims): the QR code and deal numbers.
+      ((b && b.postcard) || p.scan || p.claim ? '<div class="rp-qr"><div><b>' + n(p.scan) + '</b><span>' + pl(p.scan || 0, "person", "people") + ' scanned your postcard QR code</span></div><div><b>' + n(p.claim) + '</b><span>' + pl(p.claim || 0, "deal", "deals") + ' claimed</span></div></div>' : "");
   }
 
   function chart(months, thisMonth) {
@@ -111,7 +113,7 @@
 
     out.innerHTML =
       '<div class="rp">' +
-        '<div class="rp-card"><div class="rp-card-head"><h2>From seen to called</h2><span class="rp-period">' + (when === "in the last 30 days" ? "Last 30 days" : "All time") + '</span></div>' + funnel(p) +
+        '<div class="rp-card"><div class="rp-card-head"><h2>From seen to called</h2><span class="rp-period">' + (when === "in the last 30 days" ? "Last 30 days" : "All time") + '</span></div>' + funnel(p, b) +
           '<p class="rp-take">' + takeaway(p, b) + '</p></div>' +
         next(p, b, slug) +
         (Object.keys(d.months).length ? '<div class="rp-card"><div class="rp-card-head"><h2>Month by month</h2><span class="rp-period">Times seen</span></div>' + chart(d.months, d.labels.thisMonth) +

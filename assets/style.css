@@ -232,6 +232,9 @@ p { margin: 0 0 var(--s2); }
 .stat b { display: block; font-family: var(--display); font-size: 38px; font-weight: 600; line-height: 1; margin-bottom: 6px; }
 .stat span { color: var(--ink-2); font-size: 16px; }
 @media (max-width: 760px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+/* Six stat tiles (seen, profile, calls, website, QR scans, deals claimed): 3 across, 2 on phones. */
+.stats:has(> .stat:nth-child(6)) { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 760px) { .stats:has(> .stat:nth-child(6)) { grid-template-columns: repeat(2, 1fr); } }
 
 .steps { counter-reset: step; }
 .step { padding-top: var(--s3); }
@@ -649,6 +652,8 @@ body.has-tabbar { padding-bottom: 64px; }
 .pf-deal b { font-family: var(--display); font-size: 20px; color: var(--sun-deep); display: block; margin-bottom: 4px; }
 .pf-deal-meta { font-size: 14px; }
 .pf-deal .btn { margin-top: 6px; }
+.pf-deal-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.pf-deal-tag { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; background: var(--sun); color: #fff; border-radius: 999px; padding: 3px 10px; vertical-align: middle; margin-left: 6px; white-space: nowrap; }
 .pf-hours { white-space: pre-line; color: var(--ink) !important; }
 .pf-side .profile-ad { margin: 0; }
 .pf-side .facts dd { color: var(--ink); }
@@ -1325,6 +1330,11 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .rp-open .rp-track i { background: linear-gradient(90deg, var(--rose), var(--dusk)); animation-delay: .15s; }
 .rp-act .rp-track i { background: var(--palm); animation-delay: .3s; }
 .rp-note { margin: 6px 0 0; font-size: 15px; color: var(--ink-2); }
+/* Spotlight Report: postcard QR scans and deals claimed */
+.rp-qr { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s2); margin-top: 22px; }
+.rp-qr > div { border: 1.5px dashed var(--sun); background: #fff4e8; border-radius: 12px; padding: 12px 16px; display: flex; align-items: baseline; gap: 10px; }
+.rp-qr b { font-family: var(--display); font-size: 32px; font-weight: 600; line-height: 1; color: var(--sun-deep); }
+@media (max-width: 520px) { .rp-qr { grid-template-columns: 1fr; } }
 @keyframes rp-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .rp-take { max-width: none; margin: var(--s3) 0 0; padding: var(--s2) var(--s3); background: var(--palm-soft); border-radius: 12px; border-left: 4px solid var(--palm); }
 .rp-next { background: var(--ink); color: #f7efe4; border-radius: var(--radius); padding: var(--s4); display: grid; grid-template-columns: 1fr auto; gap: var(--s3); align-items: center; position: relative; overflow: hidden; }

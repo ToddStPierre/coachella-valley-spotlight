@@ -3,7 +3,7 @@
    Runs automatically on GitHub when you push. Run it locally with: node tools/build-profiles.js */
 const fs = require("fs"), path = require("path");
 const { schemaType, root, SITE, loadData, esc, slugOf, ldjson, landingPages, shell, metaTags, breadcrumbs } = require("./lib");
-const list = (loadData().directory || []).filter(b => !b.sample);
+const DATA = loadData(), list = (DATA.directory || []).filter(b => !b.sample), deals = DATA.deals || [];
 const { head, headRest, header, footer } = shell();
 const landing = landingPages(list);
 const nice = d => { const [y, m, dd] = d.split("-").map(Number); return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m - 1] + " " + dd + ", " + y; };
@@ -22,7 +22,12 @@ for (const b of list) {
   const schema = { "@context": "https://schema.org", "@type": schemaType(b), "@id": SITE + "/" + url + "#business", name: b.name, image: b.image ? SITE + "/" + b.image : undefined, description: b.about || b.blurb, telephone: b.phone || undefined, url: b.url || undefined, address: { "@type": "PostalAddress", streetAddress: b.address || undefined, addressLocality: b.city, addressRegion: "CA", addressCountry: "US" }, areaServed: b.area || "Coachella Valley" };
   const prem = !!(b.premium || b.featured);
   const today = new Date().toISOString().slice(0, 10);
-  const offer = prem && b.offer && b.offer.title && (!b.offer.expires || b.offer.expires >= today) ? b.offer : null;
+  // The deal: the owner's own offer (Premium, edited on their dashboard), else a deals.js deal for this business
+  // (matched by slug, or by name for entries without one). "Claim this deal" opens the same ticket as the deals page,
+  // and a postcard QR scan (s.html -> ?from=qr) opens it automatically.
+  const dl = deals.find(d => (d.slug ? d.slug === slug : d.business === b.name) && (!d.expires || d.expires >= today));
+  const offer = (prem && b.offer && b.offer.title && (!b.offer.expires || b.offer.expires >= today) ? b.offer : null) ||
+    (dl ? { title: dl.offer, details: dl.details, expires: dl.expires } : null);
   const rows = [["Area served", b.area], ["Address", b.address], ["Hours", (prem || b.public) && b.hours], ["Size", b.size], ["Happy hour", b.happyHour]].filter(r => r[1]);
   const gallery = prem ? (b.gallery || []) : [];
   // Related: same service (or category) in the same city first, then valley-wide. Up to 4.
@@ -78,7 +83,7 @@ ${owner ? '<p class="pf-mention"><svg viewBox="0 0 24 24" width="22" height="22"
 </div>
 <div class="pf-main">
 ${(prem && b.about) ? `<div class="pf-card"><h2>About</h2><p>${esc(b.about)}</p></div>` : ""}
-${offer ? `<div class="pf-card"><h2>Deals</h2><div class="pf-deal">${b.image ? `<img src="${esc(b.image)}" alt="${esc(offer.title + " from " + b.name)}" loading="lazy">` : ""}<div><b>${esc(offer.title)}</b>${offer.details ? `<p>${esc(offer.details)}</p>` : ""}<p class="pf-deal-meta">${offer.expires ? `Good through ${esc(nice(offer.expires))}` : "Ongoing"} &middot; Mention Coachella Valley Spotlight</p>${tel ? `<a class="btn" href="tel:${tel}" data-track="call">Call to claim</a>` : ""}</div></div></div>` : ""}
+${offer ? `<div class="pf-card" id="deal"><h2>Deals${b.postcard ? ' <span class="pf-deal-tag">On the postcard</span>' : ""}</h2><div class="pf-deal">${b.image ? `<img src="${esc(b.image)}" alt="${esc(offer.title + " from " + b.name)}" loading="lazy">` : ""}<div><b>${esc(offer.title)}</b>${offer.details ? `<p>${esc(offer.details)}</p>` : ""}<p class="pf-deal-meta">${offer.expires ? `Good through ${esc(nice(offer.expires))}` : "Ongoing"} &middot; Show your code or mention Coachella Valley Spotlight</p><div class="pf-deal-btns"><button type="button" class="btn" data-claim-offer data-slug="${esc(slug)}" data-business="${esc(b.name)}" data-city="${esc(b.city || "")}" data-offer="${esc(offer.title)}" data-details="${esc(offer.details || "")}" data-expires="${esc(offer.expires || "")}" data-phone="${esc(b.phone || "")}">Claim this deal</button>${tel ? `<a class="btn btn-ghost" href="tel:${tel}" data-track="call">Call</a>` : ""}</div></div></div></div>` : ""}
 <div class="pf-card pf-contact">
 <ul>
 ${b.address ? `<li>${I.pin}<span>${esc(b.address)}</span></li>` : ""}

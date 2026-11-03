@@ -4,7 +4,7 @@
   var q = new URLSearchParams(location.search), slug = q.get("b") || "", key = q.get("key") || "";
   var out = document.getElementById("ow-out");
   var flash = "";
-  var LABELS = [["impression", "Listing seen", "Times your listing card showed up on someone's screen while they browsed the directory, search results, a town page or the home page. Visits straight to your profile page are not counted here."], ["profile", "Profile views", "Visits to your profile page, whether people came from our site, Google or a link someone shared."], ["call", "Calls tapped", "Taps on your Call button or phone number on our site."], ["website", "Website visits", "Clicks from our site through to your website."]];
+  var LABELS = [["impression", "Listing seen", "Times your listing card showed up on someone's screen while they browsed the directory, search results, a town page or the home page. Visits straight to your profile page are not counted here."], ["profile", "Profile views", "Visits to your profile page, whether people came from our site, Google or a link someone shared."], ["call", "Calls tapped", "Taps on your Call button or phone number on our site."], ["website", "Website visits", "Clicks from our site through to your website."], ["scan", "QR scans", "Times someone scanned the QR code on your postcard ad. Each scan opens your page on our site, and your deal if you have one."], ["claim", "Deals claimed", "Times someone opened your deal to claim it: from your page, the deals page or a postcard scan. Each one shows a code they can show you to redeem."]];
   function tip(l) { return l[1] + ' <span class="stat-tip" tabindex="0" role="button" aria-label="What does ' + l[1] + ' mean?" data-tip="' + l[2].replace(/"/g, "&quot;") + '">?</span>'; }
   function monthName(ym) { var p = ym.split("-"); return new Date(+p[0], +p[1] - 1, 1).toLocaleString("en-US", { month: "long", year: "numeric" }); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -43,7 +43,7 @@
     var sv = +d.saves || 0;
     html += '<p class="ow-saves"><span class="ow-heart" aria-hidden="true">&#9829;</span> ' + (sv ? '<strong>' + sv + (sv === 1 ? ' person has' : ' people have') + ' saved ' + esc(L.name) + '</strong> to their My Spotlight.' : 'When people tap the heart on your listing to save it, you&rsquo;ll see how many here.') + (sv && !L.premium ? ' Premium puts your special offer in front of everyone who saved you.' : '') + '</p>';
 
-    if (L.premium && d.stats) {
+    if ((L.premium || L.postcard) && d.stats) {
       var S = d.stats, months = Object.keys(S.months || {}).sort().reverse();
       html += '<h2 class="month-head"><span class="stripe-mini"></span>Your numbers: ' + monthName(S.labels.thisMonth) + ' so far</h2>' + tiles(S.thisMonth);
       html += '<h2 class="month-head"><span class="stripe-mini"></span>' + monthName(S.labels.lastMonth) + '</h2>' + tiles(S.lastMonth);

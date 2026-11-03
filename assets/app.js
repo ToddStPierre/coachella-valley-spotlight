@@ -290,9 +290,11 @@
   function closeDealModal() { var o = document.querySelector(".deal-modal-backdrop"); if (!o) return; o.remove(); if (o._return) o._return.focus(); document.removeEventListener("keydown", escClose); }
   function escClose(e) { if (e.key === "Escape") closeDealModal(); }
 
-  function openDealModal(x, trigger) {
-    var key = dealKey(x), code = claimCode(key), d = parse(x.expires);
-    var phone = phoneIn(x.details), tel = phone.replace(/[^\d]/g, "");
+  // auto: opened for them after a postcard QR scan. That only counts as a claim once they tap Text, Email or Call.
+  function openDealModal(x, trigger, auto) {
+    // One code per business (from its slug when known), so the owner has a single code to tally at the counter.
+    var key = dealKey(x), code = claimCode(x.slug || key), d = parse(x.expires);
+    var phone = phoneIn(x.details) || x.phone || "", tel = phone.replace(/[^\d]/g, "");
     var body = x.offer + " at " + x.business + " (" + x.details + "). Code " + code + ". " + location.origin + ROOT + "deals";
     var o = document.createElement("div"); o.className = "deal-modal-backdrop"; o._return = trigger;
     o.innerHTML = '<div class="deal-modal" role="dialog" aria-modal="true" aria-labelledby="dm-title">' +
@@ -309,6 +311,10 @@
       '</div></div>';
     document.body.appendChild(o);
     markClaimed(key); paintClaimed();
+    // Counted per business so owners see "Deals claimed" on their dashboard (tracker event "claim").
+    var claimSlug = x.slug || (directory.filter(function (b) { return b.name === x.business && !b.sample; })[0] || {}).slug;
+    if (!auto) track(claimSlug, "claim");
+    else o.querySelector(".deal-modal-actions").addEventListener("click", function once(e) { if (e.target.closest("a")) { track(claimSlug, "claim"); this.removeEventListener("click", once); } });
     if (!window.CVS_NOTRACK && window.gtag) window.gtag("event", "deal_claim", { business: x.business, offer: x.offer });
     o.querySelector(".deal-modal-close").focus();
     document.addEventListener("keydown", escClose);
@@ -320,6 +326,15 @@
     var x = dealsByKey[btn.getAttribute("data-claim")];
     if (x) openDealModal(x, btn);
   });
+  // Profile pages: the Deals card's "Claim this deal" (tools/build-profiles.js puts the deal in data- attributes).
+  function profileDeal(el) { var a = function (k) { return el.getAttribute("data-" + k) || ""; }; return { slug: a("slug"), business: a("business"), city: a("city"), offer: a("offer"), details: a("details"), expires: a("expires"), phone: a("phone"), url: "" }; }
+  document.addEventListener("click", function (e) { var b = e.target.closest("[data-claim-offer]"); if (b) openDealModal(profileDeal(b), b); });
+  // Arrived from a postcard QR code (s.html sends ?from=qr): open their deal ticket right away.
+  if (/[?&]from=qr\b/.test(location.search)) {
+    var qrDeal = document.querySelector("[data-claim-offer]");
+    if (qrDeal) setTimeout(function () { openDealModal(profileDeal(qrDeal), qrDeal, true); }, 350);
+    if (!window.CVS_NOTRACK && window.gtag) window.gtag("event", "qr_scan", { business: document.body.getAttribute("data-profile") || "" });
+  }
 
   function text(item) { return Object.keys(item).map(function (k) { return typeof item[k] === "string" ? item[k] : ""; }).join(" ").toLowerCase(); }
 

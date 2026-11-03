@@ -36,7 +36,9 @@
       var body = "Hi " + (first || "there") + ",\n\nHere's how " + x.b.name + " did on Coachella Valley Spotlight in " + mon + ":\n\n" +
         "- Seen " + m.impression + " " + pl(m.impression, "time", "times") + " in the directory and on town pages\n" +
         "- " + m.profile + " profile " + pl(m.profile, "visit", "visits") + "\n" +
-        "- " + (m.call || 0) + " " + pl(m.call || 0, "call", "calls") + " and " + (m.website || 0) + " website " + pl(m.website || 0, "visit", "visits") + " straight from your listing\n\n" +
+        "- " + (m.call || 0) + " " + pl(m.call || 0, "call", "calls") + " and " + (m.website || 0) + " website " + pl(m.website || 0, "visit", "visits") + " straight from your listing\n" +
+        (m.scan ? "- " + m.scan + " " + pl(m.scan, "person", "people") + " scanned the QR code on your postcard ad\n" : "") +
+        (m.claim ? "- " + m.claim + " " + pl(m.claim, "person", "people") + " claimed your deal\n" : "") + "\n" +
         "Your full report, with the month-by-month chart, is here (it's private to you):\n" + link + "\n\n" +
         (acts ? "" : "Want more of those views to turn into calls? A fresh special on your listing gives people a reason to reach out. Reply with one and I'll put it up.\n\n") +
         "Thanks for being part of it.\n\nTodd\nCoachella Valley Spotlight\n(760) 422-5475";
