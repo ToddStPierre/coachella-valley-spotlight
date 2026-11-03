@@ -121,7 +121,7 @@
     <span id="who" style="margin-left:auto"></span>
   </div>
 </header>
-<details id="cockpit-wrap" hidden open><summary>Sales cockpit</summary><iframe id="cockpit-frame" title="Sales cockpit" scrolling="no" allow="clipboard-write"></iframe></details>
+<details id="cockpit-wrap" hidden><summary>Sales cockpit</summary><iframe id="cockpit-frame" title="Sales cockpit" scrolling="no" allow="clipboard-write"></iframe></details>
 <main>
   <div id="list"><div class="loading">Loading contacts…</div></div>
   <div id="detail"><div class="empty">Pick a business on the left.</div></div>
@@ -525,15 +525,17 @@ function downloadCsv() {
 // ----- sales cockpit: the admin page's cockpit, in a frame so its styles and this page's can't clash -----
 function mountCockpit() {
   var wrap = $('cockpit-wrap'), frame = $('cockpit-frame');
-  try { if (localStorage.getItem('cvs_cockpit_closed') === '1') wrap.open = false; } catch (e) {}
-  wrap.addEventListener('toggle', function () { try { localStorage.setItem('cvs_cockpit_closed', wrap.open ? '0' : '1'); } catch (e) {} });
+  // Starts collapsed, remembers if it was left open, and only loads the frame once it's opened.
+  function load() { if (!frame.getAttribute('src')) frame.src = 'cockpit.html'; }
+  try { if (localStorage.getItem('cvs_cockpit_open') === '1') wrap.open = true; } catch (e) {}
+  wrap.addEventListener('toggle', function () { if (wrap.open) load(); try { localStorage.setItem('cvs_cockpit_open', wrap.open ? '1' : '0'); } catch (e) {} });
   window.addEventListener('message', function (e) {
     if (e.origin !== location.origin || !e.data) return;
     if (e.data.cockpitHeight) frame.style.height = e.data.cockpitHeight + 'px';
     if (e.data.cockpit === 'saved') reload('Logged from the cockpit');
   });
   if (ADMIN) { try { sessionStorage.setItem('cvs_admin', ADMIN); } catch (e) {} }
-  frame.src = 'cockpit.html';
+  if (wrap.open) load();
   wrap.hidden = false;
 }
 
