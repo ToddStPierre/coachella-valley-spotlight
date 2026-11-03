@@ -36,8 +36,8 @@
   .sub { display: flex; gap: 8px; padding-top: 8px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); align-items: center; }
   .sub select { width: auto; padding: 4px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
   main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 16px; padding: 16px; max-width: 1400px; margin: 0 auto; }
-  #list { display: flex; flex-direction: column; gap: 8px; }
-  .row { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 11px 13px; cursor: pointer; display: grid; gap: 3px; }
+  #list { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .row { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 11px 13px; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr); gap: 3px; min-width: 0; }
   .row:hover { border-color: var(--ink-2); }
   .row.sel { border-color: var(--sun); box-shadow: 0 0 0 2px rgba(217, 85, 43, .15); }
   .row .l1 { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
@@ -84,7 +84,7 @@
   .locked { background: #f3ebe0; border-radius: 10px; padding: 9px 12px; font-size: 13.5px; color: var(--ink-2); margin-top: 12px; }
   #who a { color: var(--ink-2); }
   @media (max-width: 860px) {
-    main { grid-template-columns: 1fr; padding: 12px; }
+    main { grid-template-columns: minmax(0, 1fr); padding: 12px; }
     #detail { display: none; position: fixed; inset: 0; top: 0; max-height: none; border-radius: 0; border: 0; z-index: 10; padding: 16px; }
     body.open #detail { display: block; }
     .back { display: inline-block; }
