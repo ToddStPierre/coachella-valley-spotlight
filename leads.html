@@ -305,7 +305,7 @@ function renderDetail(r) {
     (dncNote ? '<div style="margin-top:8px">' + dncNote + '</div>' : '') +
     '<div class="actions">' +
       (tel ? '<a class="btn primary" href="tel:' + esc(tel) + '">Call ' + esc(phone) + '</a><a class="btn" href="sms:' + esc(tel) + '">Text</a>' : '') +
-      (email ? '<a class="btn" href="https://mail.google.com/mail/?view=cm&fs=1&to=' + esc(encodeURIComponent(email)) + '" target="_blank" rel="noopener">Email</a>' : '') +
+      (email ? '<a class="btn" href="https://mail.google.com/mail/?view=cm&fs=1&to=' + esc(encodeURIComponent(email)) + '&su=' + esc(encodeURIComponent('Your ' + g(r, 'Business') + ' listing on Coachella Valley Spotlight')) + '" target="_blank" rel="noopener">Email</a>' : '') +
       (site ? '<a class="btn" href="' + esc(/^https?:/.test(site) ? site : 'https://' + site) + '" target="_blank" rel="noopener">Website</a>' : '') +
       (g(r, 'Listing') ? '<a class="btn" href="business/' + esc(g(r, 'Listing')) + '/" target="_blank" rel="noopener">Our listing</a>' : '') +
     '</div>' +
