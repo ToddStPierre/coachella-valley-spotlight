@@ -198,6 +198,7 @@ function niceDate(s) { var d = normDate(s); if (!d) return ''; var x = new Date(
 function dnc(r) { return !!g(r, 'Do Not Contact') || /do not contact|opted out/i.test(g(r, 'Email Status')); }
 function status(r) { return g(r, 'Email Status'); }
 function isSold(r) { return typeOf(status(r)) === 'won'; }
+function isHeld(r) { return /held/i.test(status(r) || ''); }
 function isHot(r) { return typeOf(status(r)) === 'hot'; }
 function isLost(r) { return typeOf(status(r)) === 'lost'; }
 function followDue(r) { var f = normDate(g(r, 'Follow-up Date')); return f && f <= TODAY; }
@@ -207,6 +208,7 @@ var CHIPS = [
   ['all', 'All', function () { return true; }],
   ['due', 'Follow-ups due', followDue],
   ['hot', 'Hot', isHot],
+  ['held', 'Spot Held', isHeld],
   ['sold', 'Sold', isSold],
   ['call', 'Call list', callList],
   ['never', 'Never contacted', never],
