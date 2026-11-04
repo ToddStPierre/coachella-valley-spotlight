@@ -45,6 +45,7 @@
   .row .meta { font-size: 12.5px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pill { font-size: 11.5px; padding: 2px 8px; border-radius: 999px; background: #eee5d8; color: var(--ink-2); white-space: nowrap; flex: none; }
   .pill.sold { background: var(--palm); color: #fff; }
+  .pill.held { background: #8a5a84; color: #fff; }
   .pill.hot { background: var(--gold); color: var(--ink); }
   .pill.bad { background: #f3d4cc; color: var(--sun-deep); }
   .pill.due { background: var(--sun); color: #fff; }
@@ -244,7 +245,7 @@ function visible() {
 function pill(r) {
   if (followDue(r)) return '<span class="pill due">Follow up ' + esc(niceDate(g(r, 'Follow-up Date'))) + '</span>';
   var s = status(r); if (!s) return never(r) ? '<span class="pill">New</span>' : '';
-  var t = typeOf(s), c = t === 'won' ? 'sold' : t === 'hot' ? 'hot' : t === 'lost' ? 'bad' : '';
+  var t = typeOf(s), c = /held/i.test(String(s).trim()) ? 'held' : t === 'won' ? 'sold' : t === 'hot' ? 'hot' : t === 'lost' ? 'bad' : '';
   return '<span class="pill ' + c + '"' + (t === 'unknown' ? ' title="Not on your status list. Use ⚙ Statuses › Clean up."' : '') + '>' + esc(s) + (t === 'unknown' ? ' ?' : '') + '</span>';
 }
 
