@@ -36,7 +36,7 @@
 
   function render(d) {
     var L = d.listing;
-    document.getElementById("ow-title").textContent = L.name;
+    document.getElementById("ow-title").textContent = L.name + (L.city && L.name.indexOf(L.city) === -1 ? " (" + L.city + ")" : "");
     document.getElementById("ow-sub").innerHTML = "Hi " + esc(d.owner.name || "there") + ". Update your listing below. Changes go live on the site in about a minute. <a href=\"business/" + esc(L.slug) + "/\" target=\"_blank\" rel=\"noopener\">View your public page &rarr;</a>";
     var html = '';
     html += '<p class="meta" style="font-family:var(--mono);font-size:13px;margin:0 0 8px">' + esc(L.category) + ' &middot; ' + esc(L.city) + ' &middot; ' + (L.premium ? '<span style="color:#7a4a00">PREMIUM LISTING</span>' : 'BASIC LISTING') + '</p>';
