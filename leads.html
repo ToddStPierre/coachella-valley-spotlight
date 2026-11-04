@@ -297,17 +297,33 @@ function renderDetail(r) {
   var phone = g(r, 'Phone'), email = (g(r, 'Email').split(/[,;\s]+/)[0] || ''), site = g(r, 'Website');
   var tel = phone.replace(/[^\d+]/g, '');
   var hist = g(r, 'Outreach History').split(/;\s*/).filter(Boolean).reverse();
-  // Pitch button: only when the lead has no listing linked yet (and we have an email). Opens Gmail with a free-listing + postcard pitch prewritten.
-  var pitchBtn = (email && !g(r, 'Listing')) ? (function () {
-    var who = (g(r, 'Contact Name') || '').trim().split(/\s+/)[0];
+  // Pitch button (whenever we have an email). No listing yet -> free-listing + postcard pitch.
+  // Already has a listing -> links their page, asks them to claim it (account first), plus the postcard pitch.
+  var pitchBtn = email ? (function () {
+    var who = (g(r, 'Contact Name') || '').trim().split(/\s+/)[0] || 'there';
     var biz = g(r, 'Business'), cat = (g(r, 'Category') || '').trim();
-    var su = 'A free listing for ' + biz + ' on Coachella Valley Spotlight';
-    var body = 'Hi ' + (who || 'there') + ',\n\n' +
-      'I run Coachella Valley Spotlight (coachellavalleyspotlight.com), the local directory people here use to find and call local businesses. I\'d like to add ' + biz + ' to it — a free listing, no catch. You get a page with your phone, website, hours and a map, and it shows up when neighbors search for what you do.\n\n' +
-      'If you\'d like it, just reply and I\'ll set it up — or add it yourself here: coachellavalleyspotlight.com/submit\n\n' +
-      'One more thing worth a look: we also mail a shared postcard to valley homes, one business per category' + (cat ? ' (so only one ' + cat + ' per card)' : '') + '. It\'s an affordable way to get in front of thousands of local households. See the routes, homes reached and open spots here: coachellavalleyspotlight.com/coverage-map\n\n' +
-      'Either way, happy to get your free listing up. Just let me know.\n\nTodd';
-    return '<a class="btn primary" href="https://mail.google.com/mail/?view=cm&fs=1&to=' + esc(encodeURIComponent(email)) + '&su=' + esc(encodeURIComponent(su)) + '&body=' + esc(encodeURIComponent(body)) + '" target="_blank" rel="noopener">Free listing + postcard</a>';
+    var listing = (g(r, 'Listing') || '').trim();
+    var postcard = 'we also mail a shared postcard to valley homes, one business per category' + (cat ? ' (so only one ' + cat + ' per card)' : '') + '. It\'s an affordable way to get in front of thousands of local households. See the routes, homes reached and open spots here: coachellavalleyspotlight.com/coverage-map';
+    var su, body, label;
+    if (listing) {
+      var slug = listing.replace(/\/+$/, '').split('/').pop();
+      su = 'Your ' + biz + ' listing on Coachella Valley Spotlight — claim it free';
+      body = 'Hi ' + who + ',\n\n' +
+        biz + ' is listed on Coachella Valley Spotlight, the local directory people here use to find and call local businesses. Here\'s your page:\ncoachellavalleyspotlight.com/business/' + slug + '/\n\n' +
+        'It\'s free, and you can claim it to manage it yourself — update your hours, phone, website and photos, and see how many people view your page and call you. To claim it: create a free My Spotlight account at coachellavalleyspotlight.com/account using this email and confirm the link we send, then open coachellavalleyspotlight.com/claim?b=' + slug + ' to finish.\n\n' +
+        'While I\'ve got you — ' + postcard + '\n\n' +
+        'Just reply if you\'d like a hand with any of it.\n\nTodd';
+      label = 'Claim + postcard';
+    } else {
+      su = 'A free listing for ' + biz + ' on Coachella Valley Spotlight';
+      body = 'Hi ' + who + ',\n\n' +
+        'I run Coachella Valley Spotlight (coachellavalleyspotlight.com), the local directory people here use to find and call local businesses. I\'d like to add ' + biz + ' to it — a free listing, no catch. You get a page with your phone, website, hours and a map, and it shows up when neighbors search for what you do.\n\n' +
+        'If you\'d like it, just reply and I\'ll set it up — or add it yourself here: coachellavalleyspotlight.com/submit\n\n' +
+        'One more thing worth a look: ' + postcard + '\n\n' +
+        'Either way, happy to get your free listing up. Just let me know.\n\nTodd';
+      label = 'Free listing + postcard';
+    }
+    return '<a class="btn primary" href="https://mail.google.com/mail/?view=cm&fs=1&to=' + esc(encodeURIComponent(email)) + '&su=' + esc(encodeURIComponent(su)) + '&body=' + esc(encodeURIComponent(body)) + '" target="_blank" rel="noopener">' + label + '</a>';
   })() : '';
   var dncNote = dnc(r) ? '<span class="pill bad">Do not contact' + (g(r, 'Do Not Contact') ? ': ' + esc(g(r, 'Do Not Contact')) : '') + '</span>' : '';
   $('detail').innerHTML =
