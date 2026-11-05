@@ -350,6 +350,8 @@ function renderDetail(r) {
     }
     return '<a class="btn primary" href="https://mail.google.com/mail/?view=cm&fs=1&to=' + esc(encodeURIComponent(email)) + '&su=' + esc(encodeURIComponent(su)) + '&body=' + esc(encodeURIComponent(body)) + '" target="_blank" rel="noopener">' + label + '</a>';
   })() : '';
+  // Claim + postcard is Todd's pitch: only admins see it. Reps still get Free listing + postcard.
+  if ((g(r, 'Listing') || '').trim() && !isAdmin()) pitchBtn = '';
   var dncNote = dnc(r) ? '<span class="pill bad">Do not contact' + (g(r, 'Do Not Contact') ? ': ' + esc(g(r, 'Do Not Contact')) : '') + '</span>' : '';
   $('detail').innerHTML =
     '<button class="btn back" type="button" id="backBtn">← Back</button>' +
