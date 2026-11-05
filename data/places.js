@@ -108,6 +108,7 @@ window.CVS.places = {
     "Lashes and brows": "Estheticians for eyelash extensions, eyebrow shaping and waxing, and microblading.",
     "Women's organizations": "Local organizations offering women mentorship, coaching and community.",
     "Podiatrists": "Foot and ankle doctors for surgery, diabetic foot care, wound care and everyday foot pain.",
+    "Smog check": "Smog inspection stations for registration renewals, title transfers and out-of-state vehicles.",
     "BBQ & grill cleaning": "Mobile BBQ and grill cleaning services that come to your home to deep-clean, de-grease and service your grill, plus parts, repair and preventative maintenance. A clean grill cooks better and cuts the risk of a grease fire.",
     "Chiropractors": "Local chiropractors for back and neck pain, sports injuries and family care, including prenatal and pediatric chiropractic at some practices.",
     "Massage and day spas": "Day spas and massage studios around the valley, from deep tissue and relaxation massage to float therapy.",
