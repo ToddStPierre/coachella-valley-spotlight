@@ -95,6 +95,7 @@ window.CVS.places = {
     "Knife sharpening": "Local sharpeners for kitchen knives, salon and grooming shears, clipper blades and garden tools, so your edges cut clean again without buying new.",
     "Custom printing": "Local print shops for custom t-shirts, screen printing, embroidery and branded merch for businesses, teams and events.",
     "Flea & vintage markets": "Open-air flea and vintage markets where dozens of dealers sell antiques, mid-century and Modernism-era furniture, decor, clothing and collectibles. Most run on set weekends in the cooler months, so check the dates before you go.",
+    "Cleaning services": "Local cleaning companies for offices and vacation rentals, including Airbnb turnovers between guests. Ask for a free estimate and what is included.",
     "BBQ & grill cleaning": "Mobile BBQ and grill cleaning services that come to your home to deep-clean, de-grease and service your grill, plus parts, repair and preventative maintenance. A clean grill cooks better and cuts the risk of a grease fire.",
     "Chiropractors": "Local chiropractors for back and neck pain, sports injuries and family care, including prenatal and pediatric chiropractic at some practices.",
     "Massage and day spas": "Day spas and massage studios around the valley, from deep tissue and relaxation massage to float therapy.",
