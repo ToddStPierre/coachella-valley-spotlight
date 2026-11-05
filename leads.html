@@ -363,6 +363,7 @@ function renderDetail(r) {
       (email ? '<a class="btn" href="https://mail.google.com/mail/?view=cm&fs=1&to=' + esc(encodeURIComponent(email)) + '&su=' + esc(encodeURIComponent('Your ' + g(r, 'Business') + ' listing on Coachella Valley Spotlight')) + '" target="_blank" rel="noopener">Email</a>' : '') +
       (site ? '<a class="btn" href="' + esc(/^https?:/.test(site) ? site : 'https://' + site) + '" target="_blank" rel="noopener">Website</a>' : '') +
       (g(r, 'Listing') ? '<a class="btn" href="business/' + esc(g(r, 'Listing')) + '/" target="_blank" rel="noopener">Our listing</a>' : '') +
+      (g(r, 'Listing') ? '<button class="btn" type="button" id="reportBtn" title="Open this listing\'s Spotlight Report: views, profile visits and calls">Listing activity</button>' : '') +
       pitchBtn +
       '<button class="btn" type="button" data-pay-open>Payment links</button>' +
     '</div>' +
@@ -545,6 +546,13 @@ document.addEventListener('click', function (e) {
   var chip = t.closest('.chip'); if (chip) { FILTER = chip.getAttribute('data-f'); LIMIT = 150; renderChips(); renderList(); return; }
   var row = t.closest('.row[data-row]'); if (row) { var n = +row.getAttribute('data-row'); renderDetail(ROWS.filter(function (r) { return r.row === n; })[0]); document.body.classList.add('open'); $('detail').scrollTop = 0; return; }
   if (t.id === 'moreBtn') { LIMIT += 150; renderList(); return; }
+  if (t.id === 'reportBtn' && SEL) { // open the window first so the popup blocker allows it, then point it at the report
+    var w = window.open('', '_blank'); t.disabled = true;
+    api('reportLink', SEL.row).then(function (d) { if (w) w.location.href = d.url; else location.href = d.url; })
+      .catch(function (err) { if (w) w.close(); toast(err.message || String(err), true); })
+      .then(function () { t.disabled = false; });
+    return;
+  }
   if (t.id === 'backBtn') { document.body.classList.remove('open'); return; }
   if (t.id === 'newBtn') { newContact(); return; }
   if (t.id === 'csvBtn') { e.preventDefault(); downloadCsv(); return; }
