@@ -104,6 +104,7 @@ window.CVS.places = {
     "Date shakes": "The valley's signature treat: date shakes made with Medjool dates, many grown right here.",
     "Farms and CSA boxes": "Local farms selling produce, meat, honey and eggs through farmers markets and CSA boxes.",
     "Tire shops": "Tire shops for new tires, wheels and tire service.",
+    "Natural foods markets": "Natural foods stores for organic groceries, vitamins and supplements.",
     "BBQ & grill cleaning": "Mobile BBQ and grill cleaning services that come to your home to deep-clean, de-grease and service your grill, plus parts, repair and preventative maintenance. A clean grill cooks better and cuts the risk of a grease fire.",
     "Chiropractors": "Local chiropractors for back and neck pain, sports injuries and family care, including prenatal and pediatric chiropractic at some practices.",
     "Massage and day spas": "Day spas and massage studios around the valley, from deep tissue and relaxation massage to float therapy.",
