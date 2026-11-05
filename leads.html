@@ -125,6 +125,7 @@
       <option value="cat">Category A–Z</option>
     </select>
     <select id="cat" aria-label="Category"><option value="">All categories</option></select>
+    <select id="repFilter" aria-label="Sales rep"><option value="">All sales reps</option></select>
     <label style="display:flex;gap:5px;align-items:center;font-size:13px"><input type="checkbox" id="showDnc"> Show do-not-contact</label>
     <span id="count"></span>
     <span id="who" style="margin-left:auto"></span>
@@ -237,13 +238,21 @@ function renderCats() {
   sel.innerHTML = '<option value="">All categories</option>' + cats.map(function (c) { return '<option value="' + esc(c) + '"' + (c === cur ? ' selected' : '') + '>' + esc(c) + ' (' + counts[c] + ')</option>'; }).join('');
 }
 
+function renderReps() {
+  var counts = {}, sel = $('repFilter'), cur = sel.value;
+  ROWS.forEach(function (r) { var n = g(r, 'Sales Rep') || 'No rep'; counts[n] = (counts[n] || 0) + 1; });
+  var names = Object.keys(counts).sort(function (a, b) { return a === 'No rep' ? 1 : b === 'No rep' ? -1 : a.localeCompare(b); });
+  sel.innerHTML = '<option value="">All sales reps</option>' + names.map(function (n) { return '<option value="' + esc(n) + '"' + (n === cur ? ' selected' : '') + '>' + esc(n) + ' (' + counts[n] + ')</option>'; }).join('');
+}
+
 function visible() {
-  var q = $('q').value.trim().toLowerCase(), card = $('card').value, cat = $('cat').value, showD = $('showDnc').checked;
+  var q = $('q').value.trim().toLowerCase(), card = $('card').value, cat = $('cat').value, repF = $('repFilter').value, showD = $('showDnc').checked;
   var fn = CHIPS.filter(function (c) { return c[0] === FILTER; })[0][2];
   var out = ROWS.filter(function (r) {
     if (!showD && dnc(r) && FILTER !== 'sold') return false;
     if (card && !(g(r, 'Card / Route').indexOf(card) > -1 || /both/i.test(g(r, 'Card / Route')))) return false;
     if (cat && catOf(r) !== cat) return false;
+    if (repF && (g(r, 'Sales Rep') || 'No rep') !== repF) return false;
     if (!fn(r)) return false;
     return !q || r.v.join(' ').toLowerCase().indexOf(q) > -1;
   });
@@ -435,7 +444,7 @@ function reload(msg) {
     H = d.headers; ROWS = d.rows; TODAY = d.today; STATUSES = d.statuses || []; REPS = d.reps && d.reps.length ? d.reps : ['Company']; ME = d.me || ME;
     $('setBtn').hidden = !isAdmin(); $('csvBtn').hidden = !isAdmin(); $('payBtn').hidden = false;
     $('who').innerHTML = esc(ME.rep) + (isAdmin() ? ' (admin)' : '') + (ADMIN ? '' : ' · <a href="account">My Spotlight</a>');
-    renderCats(); renderChips(); renderList(); renderDupBtn(); if (msg) toast(msg);
+    renderCats(); renderReps(); renderChips(); renderList(); renderDupBtn(); if (msg) toast(msg);
   });
 }
 
@@ -581,7 +590,7 @@ document.addEventListener('click', function (e) {
   }
   if (t.id === 'saveBtn' && SEL) {
     t.disabled = true;
-    api('saveContact', SEL.row, g(SEL, 'Business'), collect()).then(function (res) { replaceRow(res); renderCats(); renderChips(); renderDetail(res); toast('Saved.'); })
+    api('saveContact', SEL.row, g(SEL, 'Business'), collect()).then(function (res) { replaceRow(res); renderCats(); renderReps(); renderChips(); renderDetail(res); toast('Saved.'); })
       .catch(function (err) { t.disabled = false; toast(err.message || String(err), true); });
     return;
   }
@@ -589,11 +598,11 @@ document.addEventListener('click', function (e) {
     var f = collect(); if (!f.Business) { toast('Business name is required.', true); return; }
     f['Sales Rep'] = $('f_rep').value;
     t.disabled = true;
-    api('addContact', f).then(function (res) { replaceRow(res); renderCats(); renderChips(); renderDetail(res); toast('Added.'); })
+    api('addContact', f).then(function (res) { replaceRow(res); renderCats(); renderReps(); renderChips(); renderDetail(res); toast('Added.'); })
       .catch(function (err) { t.disabled = false; toast(err.message || String(err), true); });
   }
 });
-['q', 'card', 'cat', 'sort', 'showDnc'].forEach(function (id) { $(id).addEventListener(id === 'q' ? 'input' : 'change', function () { LIMIT = 150; renderChips(); renderList(); }); });
+['q', 'card', 'cat', 'repFilter', 'sort', 'showDnc'].forEach(function (id) { $(id).addEventListener(id === 'q' ? 'input' : 'change', function () { LIMIT = 150; renderChips(); renderList(); }); });
 
 function downloadCsv() {
   fetch(API + '/leads/export?key=' + encodeURIComponent(ADMIN || ''), { headers: {} }).then(function (r) {
