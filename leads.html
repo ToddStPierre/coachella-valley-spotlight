@@ -81,6 +81,17 @@
   #toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 20; }
   #toast.on { opacity: 1; }
   #toast.err { background: var(--sun-deep); }
+  #payPanel { position: fixed; top: 64px; right: 16px; width: 430px; max-width: calc(100vw - 32px); max-height: calc(100vh - 80px); overflow: auto; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 12px 34px rgba(34, 28, 24, .22); padding: 14px 16px; z-index: 15; }
+  .pay-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .pay-head h3 { margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); }
+  .pay-close { border: 0; background: none; font-size: 20px; line-height: 1; cursor: pointer; color: var(--ink-2); padding: 2px 6px; }
+  .pay-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); margin-top: 10px; }
+  .pay-row + .pay-row { margin-top: 0; }
+  .pay-row b { font-weight: 600; }
+  .pay-row b span { color: var(--sun-deep); margin-left: 6px; }
+  .pay-row code { grid-column: 1; font: 500 11.5px/1.35 "JetBrains Mono", ui-monospace, monospace; color: var(--ink-2); word-break: break-all; user-select: all; }
+  .pay-row .btn { grid-column: 2; grid-row: 1 / span 2; min-width: 100px; text-align: center; }
+  .pay-row .btn.done { background: var(--palm); border-color: var(--palm); color: #fff; }
   .loading { padding: 60px; text-align: center; color: var(--ink-2); }
   .locked { background: #f3ebe0; border-radius: 10px; padding: 9px 12px; font-size: 13.5px; color: var(--ink-2); margin-top: 12px; }
   #who a { color: var(--ink-2); }
@@ -101,6 +112,7 @@
     <button class="btn" id="dupBtn" type="button" title="Find and merge duplicate businesses" hidden>Duplicates</button>
     <button class="btn" id="setBtn" type="button" title="Edit the status list" hidden>⚙ Statuses</button>
     <a class="btn" id="csvBtn" href="#" title="Download every lead as a spreadsheet file" hidden>Backup</a>
+    <button class="btn" id="payBtn" type="button" data-pay-open title="Copy a payment link to send to a lead" hidden>Payment links</button>
     <button class="btn primary" id="newBtn" type="button">+ New</button>
   </div>
   <div class="chips" id="chips"></div>
@@ -122,6 +134,7 @@
   <div id="list"><div class="loading">Loading contacts…</div></div>
   <div id="detail"><div class="empty">Pick a business on the left.</div></div>
 </main>
+<div id="payPanel" role="dialog" aria-label="Payment links" hidden></div>
 <div id="toast" role="status"></div>
 
 <script>
@@ -340,6 +353,7 @@ function renderDetail(r) {
       (site ? '<a class="btn" href="' + esc(/^https?:/.test(site) ? site : 'https://' + site) + '" target="_blank" rel="noopener">Website</a>' : '') +
       (g(r, 'Listing') ? '<a class="btn" href="business/' + esc(g(r, 'Listing')) + '/" target="_blank" rel="noopener">Our listing</a>' : '') +
       pitchBtn +
+      '<button class="btn" type="button" data-pay-open>Payment links</button>' +
     '</div>' +
     (canEdit(r) ? '' : '<div class="locked">This is ' + esc(g(r, 'Sales Rep')) + '\'s lead, so you can see it but not change it. Ask Todd if you should be working it.</div>') +
     '<section class="box"><h3>Log activity</h3>' +
@@ -419,7 +433,7 @@ function renderSettings() {
 function reload(msg) {
   return api('getData').then(function (d) {
     H = d.headers; ROWS = d.rows; TODAY = d.today; STATUSES = d.statuses || []; REPS = d.reps && d.reps.length ? d.reps : ['Company']; ME = d.me || ME;
-    $('setBtn').hidden = !isAdmin(); $('csvBtn').hidden = !isAdmin();
+    $('setBtn').hidden = !isAdmin(); $('csvBtn').hidden = !isAdmin(); $('payBtn').hidden = false;
     $('who').innerHTML = esc(ME.rep) + (isAdmin() ? ' (admin)' : '') + (ADMIN ? '' : ' · <a href="account">My Spotlight</a>');
     renderCats(); renderChips(); renderList(); renderDupBtn(); if (msg) toast(msg);
   });
@@ -473,8 +487,50 @@ function collect() {
 }
 
 // ----- events -----
+// ----- Payment links: Stripe links a rep can copy and send to a lead. To change one, edit this list. -----
+var PAY_LINKS = [
+  { name: '1 Ad Spot', price: '$300', url: 'https://pay.coachellavalleyspotlight.com/b/aFaaEX6E01cW1Mkg6S9MY0B' },
+  { name: '2 Ad Spots', price: '$550', url: 'https://pay.coachellavalleyspotlight.com/b/4gM00jaUg3l462AdYK9MY0C' },
+  { name: '4 Ad Spots', price: '$1,000', url: 'https://pay.coachellavalleyspotlight.com/b/bJebJ15zW3l4bmU8Eq9MY0D' },
+  { name: 'Full side', price: '$2,000', url: 'https://pay.coachellavalleyspotlight.com/b/eVq4gz0fCdZIbmUcUG9MY0E' }
+];
+function togglePayPanel() {
+  var p = $('payPanel');
+  if (!p.hidden) { p.hidden = true; return; }
+  p.innerHTML = '<div class="pay-head"><h3>Payment links</h3><button class="pay-close" type="button" data-pay-close aria-label="Close">×</button></div>' +
+    PAY_LINKS.map(function (l, i) {
+      return '<div class="pay-row"><b>' + esc(l.name) + '<span>' + esc(l.price) + '</span></b><code>' + esc(l.url) + '</code>' +
+        '<button class="btn" type="button" data-pay-copy="' + i + '">Copy</button></div>';
+    }).join('');
+  p.hidden = false;
+}
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text).catch(function () { return copyFallback(text); });
+  return copyFallback(text);
+}
+function copyFallback(text) { // older browsers, and when the browser refuses the clipboard call
+  var a = document.createElement('textarea'); a.value = text; a.setAttribute('readonly', ''); a.style.position = 'fixed'; a.style.opacity = '0';
+  document.body.appendChild(a); a.select();
+  var ok = false; try { ok = document.execCommand('copy'); } catch (err) {}
+  a.remove();
+  return ok ? Promise.resolve() : Promise.reject(new Error('copy failed'));
+}
 document.addEventListener('click', function (e) {
-  var t = e.target;
+  var t = e.target, payPanel = $('payPanel');
+  if (t.closest('[data-pay-open]')) { togglePayPanel(); return; }
+  if (t.closest('[data-pay-close]')) { payPanel.hidden = true; return; }
+  var payCopy = t.closest('[data-pay-copy]');
+  if (payCopy) {
+    var link = PAY_LINKS[+payCopy.getAttribute('data-pay-copy')];
+    copyText(link.url).then(function () {
+      payCopy.textContent = 'Copied ✓'; payCopy.classList.add('done');
+      clearTimeout(payCopy.t); payCopy.t = setTimeout(function () { payCopy.textContent = 'Copy'; payCopy.classList.remove('done'); }, 2000);
+      toast('Copied the ' + link.name + ' ' + link.price + ' link.');
+    }).catch(function () { toast('Couldn\'t copy. Select the link and copy it by hand.', true); });
+    return;
+  }
+  if (t.closest('#payPanel')) return;
+  if (!payPanel.hidden) payPanel.hidden = true;
   var chip = t.closest('.chip'); if (chip) { FILTER = chip.getAttribute('data-f'); LIMIT = 150; renderChips(); renderList(); return; }
   var row = t.closest('.row[data-row]'); if (row) { var n = +row.getAttribute('data-row'); renderDetail(ROWS.filter(function (r) { return r.row === n; })[0]); document.body.classList.add('open'); $('detail').scrollTop = 0; return; }
   if (t.id === 'moreBtn') { LIMIT += 150; renderList(); return; }
