@@ -20,7 +20,7 @@ const RENDER = window.CVS_RENDER || {}, ROOT = RENDER.root || "";
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const PREFS = [["news", "Valley news and good stories"], ["deals", "Local deals and coupons"], ["events", "Things to do this weekend"]];
 
-let user = null, data = { favorites: [], prefs: {} }, loaded = false;
+let user = null, data = { favorites: [], prefs: {} }, loaded = false, prefsSaved = false;
 const OWNER_API = "https://cvs-tracker.toddstpierre.workers.dev";
 let readyResolve; const ready = new Promise(r => { readyResolve = r; });
 window.CVS_AUTH = { ready, user: () => user, token: () => (user ? user.getIdToken() : Promise.resolve(null)), signInUrl: n => ROOT + "account?next=" + encodeURIComponent(n || location.pathname + location.search) };
@@ -54,6 +54,7 @@ async function loadUser() {
   try {
     const snap = await getDoc(doc(db, "users", user.uid));
     data = snap.exists() ? Object.assign({ favorites: [], prefs: {} }, snap.data()) : { favorites: [], prefs: { news: true, deals: true, events: true } };
+    prefsSaved = snap.exists();
     try { if (!sessionStorage.getItem("cvs_saves_synced")) { sessionStorage.setItem("cvs_saves_synced", "1"); syncSaves(); } } catch (e) {}
   } catch (e) { console.warn("[cvs-auth] load failed", e); }
   loaded = true;
@@ -61,13 +62,15 @@ async function loadUser() {
 async function saveUser(patch) {
   Object.assign(data, patch);
   await setDoc(doc(db, "users", user.uid), { email: user.email, favorites: data.favorites || [], prefs: data.prefs || {}, updatedAt: serverTimestamp() });
+  prefsSaved = true;
   syncSaves();
 }
-// Tell the tracker this person's full saved list so it can count saves per business/event (never blocks the UI).
+// Tell the tracker this person's full saved list (to count saves per business/event) and their email choices
+// (for the admin page's members list). Never blocks the UI.
 async function syncSaves() {
   if (!user) return;
   try {
-    await fetch(OWNER_API + "/saves/sync", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + await user.getIdToken() }, body: JSON.stringify({ items: data.favorites || [] }) });
+    await fetch(OWNER_API + "/saves/sync", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + await user.getIdToken() }, body: JSON.stringify({ items: data.favorites || [], prefs: data.prefs || {}, prefsSaved }) });
   } catch (e) {}
 }
 
