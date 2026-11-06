@@ -26,9 +26,9 @@
   }
   function row(l) {
     return '<tr data-id="' + esc(l.id) + '"><td><select data-f="kind"><option value="income"' + (l.kind === "income" ? " selected" : "") + '>Income</option><option value="expense"' + (l.kind === "expense" ? " selected" : "") + '>Expense</option></select></td>' +
-      '<td><input data-f="label" value="' + esc(l.label) + '" placeholder="e.g. Spot 3 · Business, or Printing"></td>' +
+      '<td><input data-f="label" value="' + esc(l.label) + '" placeholder="e.g. Spot 3 · Business, or Printing" style="width:100%;min-width:300px"></td>' +
       '<td><input data-f="amount" inputmode="decimal" value="' + esc(((l.amount || 0) / 100).toFixed(2)) + '" style="width:8em;text-align:right' + (l.kind === "income" && !l.amount ? ';border-color:var(--sun)' : '') + '"></td>' +
-      '<td><input data-f="note" value="' + esc(l.note) + '" placeholder="Optional note"></td>' +
+      '<td><input data-f="note" value="' + esc(l.note) + '" placeholder="Optional note" style="width:100%;min-width:220px"></td>' +
       '<td style="white-space:nowrap"><span class="mny-st" style="font-size:13px;color:var(--ink-2);margin-right:8px"></span><button type="button" class="btn btn-ghost" data-del>Delete</button></td></tr>';
   }
   function render() {
