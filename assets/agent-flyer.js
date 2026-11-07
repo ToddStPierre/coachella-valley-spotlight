@@ -72,7 +72,9 @@
     function make(sizes, descLines, k, cut) {
       var doc = new window.jspdf.jsPDF({ unit: "pt", format: "letter" });
       var W = 612, H = 792, M = 36, GAP = 20, COLW = (W - 2 * M - GAP) / 2;
-      var FOOT_H = 112, FINE_H = 26, bodyBottom = H - M - FOOT_H - FINE_H - 12;
+      // Bottom of the page: the agent's band, then a row with the fine print and our events-page QR on the right.
+      var BOT = H - 22, FOOT_H = 112, FINE_H = 56, bodyBottom = BOT - FINE_H - FOOT_H - 12;
+      var EVENTS_URL = "https://coachellavalleyspotlight.com/events?utm_source=agent-flyer";
       var month = MONTHS[m] + " " + y, name = clean(agent.name);
       doc.setProperties({ title: "Coachella Valley events, " + month, author: name, subject: "Things to do in the Coachella Valley", creator: "Coachella Valley Spotlight" });
       var fill = function (c) { doc.setFillColor(c[0], c[1], c[2]); }, color = function (c) { doc.setTextColor(c[0], c[1], c[2]); }, stroke = function (c) { doc.setDrawColor(c[0], c[1], c[2]); };
@@ -90,8 +92,15 @@
         return 128;
       }
 
+      // QR code drawn as vector squares on a white pad.
+      function drawQR(url, qx, qy, q) {
+        var qr = window.qrcode(0, "M"); qr.addData(url); qr.make();
+        var n = qr.getModuleCount(), cell = q / n;
+        doc.setFillColor(255, 255, 255); doc.rect(qx - 4, qy - 4, q + 8, q + 8, "F"); fill(C.ink);
+        for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (qr.isDark(r, c)) doc.rect(qx + c * cell, qy + r * cell, cell + 0.15, cell + 0.15, "F");
+      }
       function footer() {
-        var top = H - M - FINE_H - FOOT_H, x = M + 14, right = W - M - 14;
+        var top = BOT - FINE_H - FOOT_H, x = M + 14, right = W - M - 14;
         fill(C.sand); doc.roundedRect(M, top, W - 2 * M, FOOT_H, 10, 10, "F");
         fill(C.sun); doc.rect(M + 10, top, W - 2 * M - 20, 3, "F");
         // Photo, round
@@ -106,10 +115,8 @@
         // QR to their website, then the logo, from the right edge
         var site = clean(agent.website);
         if (site && window.qrcode) {
-          var qr = window.qrcode(0, "M"); qr.addData("https://" + site.replace(/^https?:\/\//i, "")); qr.make();
-          var n = qr.getModuleCount(), q = 70, cell = q / n, qx = right - q, qy = top + (FOOT_H - q) / 2 - 5;
-          doc.setFillColor(255, 255, 255); doc.rect(qx - 4, qy - 4, q + 8, q + 8, "F"); fill(C.ink);
-          for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (qr.isDark(r, c)) doc.rect(qx + c * cell, qy + r * cell, cell + 0.15, cell + 0.15, "F");
+          var q = 70, qx = right - q, qy = top + (FOOT_H - q) / 2 - 5;
+          drawQR("https://" + site.replace(/^https?:\/\//i, ""), qx, qy, q);
           doc.setFont("helvetica", "normal"); doc.setFontSize(6.5); color(C.ink2); doc.text("Scan for my website", qx + q / 2, qy + q + 11, { align: "center" });
           right = qx - 16;
         }
@@ -131,9 +138,15 @@
         var more = [site, agent.dre ? "DRE# " + clean(agent.dre).replace(/^dre\s*#?\s*/i, "") : ""].filter(Boolean).join("   ");
         if (more) { yy += 13; doc.text(doc.splitTextToSize(more, tw)[0], x, yy); }
         if (agent.note) { doc.setFont("helvetica", "italic"); doc.setFontSize(8.5); color(C.ink); doc.splitTextToSize(clean(agent.note), tw).slice(0, top + FOOT_H - yy > 32 ? 2 : 1).forEach(function (l) { yy += 11; doc.text(l, x, yy); }); }
-        // Fine print
+        // Bottom row: our events page QR on the right with its label, the fine print on the left.
+        var row = top + FOOT_H, sq = 46, sx = W - M - sq - 4, sy = row + 8;
+        if (window.qrcode) drawQR(EVENTS_URL, sx, sy, sq);
+        doc.setFont("helvetica", "bold"); doc.setFontSize(8); color(C.sunDeep);
+        doc.text("More valley events, updated daily", sx - 12, sy + 18, { align: "right" });
+        doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); color(C.ink2);
+        doc.text("Scan, or visit coachellavalleyspotlight.com/events", sx - 12, sy + 29, { align: "right" });
         doc.setFont("helvetica", "normal"); doc.setFontSize(6.5); color(C.ink2);
-        doc.text(doc.splitTextToSize("Equal Housing Opportunity. Event listings courtesy of Coachella Valley Spotlight, coachellavalleyspotlight.com. Dates, times and details can change, so please check with the organizer before you go. If your property is currently listed for sale, this is not a solicitation.", W - 2 * M), M, H - M - FINE_H + 10);
+        doc.text(doc.splitTextToSize("Equal Housing Opportunity. Event listings courtesy of Coachella Valley Spotlight, coachellavalleyspotlight.com. Dates, times and details can change, so please check with the organizer before you go. If your property is currently listed for sale, this is not a solicitation.", sx - 12 - 190 - M), M, sy + 6);
       }
 
       // Flow: blocks laid down in two columns on one page. full: the page ran out of room.
