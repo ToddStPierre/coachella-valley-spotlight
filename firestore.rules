@@ -1,13 +1,20 @@
 rules_version = '2';
 // Coachella Valley Spotlight. Each signed-in user can read and write only their own users/{uid} document.
+// agent (optional): a real estate agent's profile for the monthly events PDF (agents.html). photo and logo are small data URLs.
+// After changing this file, publish it in the Firebase console (Firestore Database > Rules); pushing to GitHub does not deploy it.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{uid} {
       allow read, delete: if request.auth != null && request.auth.uid == uid;
       allow create, update: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['email', 'favorites', 'prefs', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['email', 'favorites', 'prefs', 'updatedAt', 'agent'])
         && request.resource.data.favorites is list && request.resource.data.favorites.size() <= 500
-        && request.resource.data.prefs is map && request.resource.data.prefs.keys().hasOnly(['news', 'deals', 'events']);
+        && request.resource.data.prefs is map && request.resource.data.prefs.keys().hasOnly(['news', 'deals', 'events'])
+        && (!('agent' in request.resource.data) || (request.resource.data.agent is map
+          && request.resource.data.agent.keys().hasOnly(['name', 'title', 'brokerage', 'phone', 'email', 'website', 'dre', 'note', 'photo', 'logo', 'cities'])
+          && request.resource.data.agent.cities is list && request.resource.data.agent.cities.size() <= 20
+          && request.resource.data.agent.photo is string && request.resource.data.agent.photo.size() <= 200000
+          && request.resource.data.agent.logo is string && request.resource.data.agent.logo.size() <= 200000));
     }
   }
 }

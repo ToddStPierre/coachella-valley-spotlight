@@ -1,7 +1,9 @@
 /* Accounts for Coachella Valley Spotlight (Firebase Auth + Firestore).
    Loaded on every page by app.js. Adds the "Sign in" / "My Spotlight" menu link, wires the heart (save) buttons,
    and renders account.html (sign in, create account, reset password, saved places, email preferences).
-   Firestore: users/{uid} = { email, favorites: ["biz:slug" | "event:slug"], prefs: {news, deals, events}, updatedAt }.
+   Firestore: users/{uid} = { email, favorites: ["biz:slug" | "event:slug"], prefs: {news, deals, events}, updatedAt,
+   agent?: { name, title, brokerage, phone, email, website, dre, note, photo, logo, cities[] } } (real estate agents; photo/logo
+   are small data URLs). The agent profile feeds the monthly events PDF on agents.html (assets/agent-flyer.js).
    The config is public by design; the Firestore rules (firestore.rules) keep each user to their own document. */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -23,7 +25,9 @@ const PREFS = [["news", "Valley news and good stories"], ["deals", "Local deals 
 let user = null, data = { favorites: [], prefs: {} }, loaded = false, prefsSaved = false;
 const OWNER_API = "https://cvs-tracker.toddstpierre.workers.dev";
 let readyResolve; const ready = new Promise(r => { readyResolve = r; });
-window.CVS_AUTH = { ready, user: () => user, token: () => (user ? user.getIdToken() : Promise.resolve(null)), signInUrl: n => ROOT + "account?next=" + encodeURIComponent(n || location.pathname + location.search) };
+window.CVS_AUTH = { ready, user: () => user, token: () => (user ? user.getIdToken() : Promise.resolve(null)), signInUrl: n => ROOT + "account?next=" + encodeURIComponent(n || location.pathname + location.search),
+  // Real estate agent profile (agents.html): loaded() is true once the user doc has been read; "cvs:user" fires after each load.
+  loaded: () => loaded, agent: () => data.agent || null, agentForm: (el, done) => agentForm(el, done) };
 let mine = null, isAdmin = false, leadsMe = null;
 async function loadMine() {
   mine = null; isAdmin = false; leadsMe = null;
@@ -61,7 +65,9 @@ async function loadUser() {
 }
 async function saveUser(patch) {
   Object.assign(data, patch);
-  await setDoc(doc(db, "users", user.uid), { email: user.email, favorites: data.favorites || [], prefs: data.prefs || {}, updatedAt: serverTimestamp() });
+  const d = { email: user.email, favorites: data.favorites || [], prefs: data.prefs || {}, updatedAt: serverTimestamp() };
+  if (data.agent) d.agent = data.agent;
+  await setDoc(doc(db, "users", user.uid), d);
   prefsSaved = true;
   syncSaves();
 }
@@ -197,6 +203,7 @@ ${isAdmin ? `<div class="card acct-card acct-owner"><h2>Site admin</h2><p>Stats 
 ${leadsMe ? `<div class="card acct-card acct-owner"><h2>Leads</h2><p>${leadsMe.role === "admin" ? "Every business you and the reps are working." : "Your sales list, " + esc(leadsMe.rep) + ": log calls, emails and follow-ups."}</p><a class="btn" href="${ROOT}leads.html">Open leads</a></div>` : ""}
 <div class="card acct-card"><h2>Your account</h2><p>${esc(user.email)}</p><button type="button" class="btn btn-ghost" data-act="out">Sign out</button></div>
 ${mine && mine.listings && mine.listings.length ? `<div class="card acct-card acct-owner"><h2>Your business</h2>${mine.listings.map(l => { const city = ((RENDER.directory || []).find(b => RENDER.slugOf(b) === l.slug) || {}).city || ""; return `<p><b>${esc(l.name)}</b>${city && !l.name.includes(city) ? ` (${esc(city)})` : ""}<br><a href="${ROOT}owner.html?b=${encodeURIComponent(l.slug)}">Manage listing and stats &rarr;</a></p>`; }).join("")}</div>` : ""}
+<div class="card acct-card acct-agent" id="agent">${agentCardHTML()}</div>
 <div class="card acct-card"><h2>Email preferences</h2><form class="acct-prefs">${PREFS.map(([k, t]) => `<label class="acct-check"><input type="checkbox" name="${k}"${p[k] ? " checked" : ""}> ${t}</label>`).join("")}
 <button class="btn" type="submit">Save preferences</button><p class="form-status" role="status" aria-live="polite"></p></form></div>
 ${mine && mine.listings && mine.listings.length ? "" : `<div class="card acct-card"><h2>Own a local business?</h2>${mine && mine.notice ? `<p><b>${esc(mine.notice)}</b></p>` : ""}<p>Find your listing and tap &ldquo;Claim this listing.&rdquo; Once we approve it, sign in here with the same email to manage it and see its stats.</p><a class="btn btn-ghost" href="${ROOT}directory">Find my business</a></div>`}
@@ -204,6 +211,8 @@ ${mine && mine.listings && mine.listings.length ? "" : `<div class="card acct-ca
   box.querySelector('[data-act="out"]').addEventListener("click", () => { try { sessionStorage.removeItem("cvs_admin"); } catch (e) {} signOut(auth); });
   const v = box.querySelector('[data-act="verify"]');
   if (v) v.addEventListener("click", async () => { try { await sendEmailVerification(user); v.textContent = "Sent!"; v.disabled = true; } catch (e) { v.textContent = "Try again in a minute"; } });
+  wireAgentCard(box.querySelector(".acct-agent"));
+  if (location.hash === "#agent") { const ag = box.querySelector(".acct-agent"); if (ag) { if (!data.agent) { const b = ag.querySelector('[data-act="agent-edit"]'); if (b) b.click(); } ag.scrollIntoView({ block: "start" }); } }
   const pf = box.querySelector(".acct-prefs");
   pf.addEventListener("submit", async e => {
     e.preventDefault(); const st = pf.querySelector(".form-status");
@@ -211,6 +220,103 @@ ${mine && mine.listings && mine.listings.length ? "" : `<div class="card acct-ca
     try { await saveUser({ prefs }); st.textContent = "Saved."; } catch (err) { st.textContent = "Couldn't save. Please try again."; }
   });
   paintHearts();
+}
+
+/* ---------- real estate agent profile (monthly events PDF) ---------- */
+const AGENT_FIELDS = [["name", "Your name", "name", true], ["title", "Title (e.g. REALTOR®)", "organization-title"], ["brokerage", "Brokerage", "organization", true],
+  ["phone", "Phone", "tel", true], ["email", "Email", "email"], ["website", "Website", "url"], ["dre", "DRE #", "off"]];
+const VALLEY_CITIES = ["Bermuda Dunes", "Cathedral City", "Coachella", "Desert Hot Springs", "Indian Wells", "Indio", "La Quinta", "Palm Desert", "Palm Springs", "Rancho Mirage", "Thousand Palms"];
+function agentCardHTML() {
+  const a = data.agent;
+  if (!a) return `<h2>Real estate agent?</h2><p>Get a free monthly <b>valley events flyer</b> (PDF) with your photo and contact info already on it. Mail it, email it or hand it out to your farm.</p>
+<button type="button" class="btn" data-act="agent-edit">Set up my agent profile</button>`;
+  return `<h2>Your agent profile</h2><div class="agent-mini">${a.photo ? `<img src="${esc(a.photo)}" alt="">` : ""}<div><b>${esc(a.name)}</b><br>${esc([a.title, a.brokerage].filter(Boolean).join(", "))}<br>${esc(a.phone || "")}</div></div>
+<a class="btn" href="${ROOT}agents">Get this month's events PDF &rarr;</a> <button type="button" class="linklike" data-act="agent-edit">Edit profile</button>`;
+}
+function wireAgentCard(card) {
+  if (!card) return;
+  const b = card.querySelector('[data-act="agent-edit"]');
+  if (b) b.addEventListener("click", () => agentForm(card, () => { card.innerHTML = agentCardHTML(); wireAgentCard(card); }));
+}
+// Shrink a picked image to fit in maxPx (keeps it small enough to live in the Firestore doc).
+function shrinkImage(file, maxPx, type) {
+  return new Promise((res, rej) => {
+    if (!file || !/^image\//.test(file.type)) return rej(new Error("Please pick a photo (JPG or PNG)."));
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, maxPx / Math.max(img.width, img.height)), c = document.createElement("canvas");
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      const g = c.getContext("2d");
+      if (type === "image/jpeg") { g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); }
+      g.drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+      let out = c.toDataURL(type, .85);
+      if (out.length > 160000) out = c.toDataURL("image/jpeg", .7);
+      res(out);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("That image didn't open. Try a JPG or PNG.")); };
+    img.src = url;
+  });
+}
+function agentForm(el, done) {
+  if (!user) { location.href = window.CVS_AUTH.signInUrl(); return; }
+  const a = Object.assign({ email: user.email, cities: [] }, data.agent || {});
+  const pics = { photo: a.photo || "", logo: a.logo || "" };
+  el.innerHTML = `<h2>${data.agent ? "Edit your agent profile" : "Your agent profile"}</h2><p class="acct-lead">This goes on your monthly events flyer. Only you can see it here.</p>
+<form class="form agent-form" novalidate>
+${AGENT_FIELDS.map(([k, t, ac, req]) => `<label class="full">${t}${req ? "" : ' <span class="opt">(optional)</span>'}<input name="${k}" value="${esc(a[k] || "")}" autocomplete="${ac}"${k === "email" ? ' type="email"' : k === "phone" ? ' type="tel"' : k === "website" ? ' inputmode="url" placeholder="yoursite.com"' : ""}${req ? " required" : ""} maxlength="${k === "website" ? 120 : 80}"></label>`).join("")}
+<label class="full">A short note for your neighbors <span class="opt">(optional)</span><textarea name="note" maxlength="160" rows="2" placeholder="Thinking of buying or selling? I'm always happy to talk.">${esc(a.note || "")}</textarea></label>
+<div class="full agent-pics">
+<label class="agent-pic"><span class="agent-pic-img round" data-prev="photo">${pics.photo ? `<img src="${esc(pics.photo)}" alt="">` : "Photo"}</span><span>Your photo <span class="opt">(optional)</span></span><input type="file" accept="image/*" data-pic="photo"></label>
+<label class="agent-pic"><span class="agent-pic-img" data-prev="logo">${pics.logo ? `<img src="${esc(pics.logo)}" alt="">` : "Logo"}</span><span>Brokerage logo <span class="opt">(optional)</span></span><input type="file" accept="image/*" data-pic="logo"></label>
+</div>
+<fieldset class="full agent-cities"><legend>Cities you farm <span class="opt">(optional, picks the events on your flyer)</span></legend>
+${VALLEY_CITIES.map(c => `<label class="acct-check"><input type="checkbox" name="city" value="${esc(c)}"${(a.cities || []).includes(c) ? " checked" : ""}> ${esc(c)}</label>`).join("")}</fieldset>
+<div class="full"><button class="btn" type="submit">Save my profile</button> <button class="linklike" type="button" data-act="cancel">Cancel</button></div>
+<p class="full form-status" role="status" aria-live="polite"></p></form>`;
+  const f = el.querySelector("form"), st = f.querySelector(".form-status");
+  el.querySelectorAll("[data-pic]").forEach(inp => inp.addEventListener("change", async () => {
+    const k = inp.getAttribute("data-pic");
+    try {
+      pics[k] = await shrinkImage(inp.files[0], 400, k === "photo" ? "image/jpeg" : "image/png");
+      el.querySelector(`[data-prev="${k}"]`).innerHTML = `<img src="${pics[k]}" alt="">`; st.textContent = "";
+    } catch (e) { st.textContent = e.message; }
+  }));
+  f.querySelector('[data-act="cancel"]').addEventListener("click", () => done && done());
+  f.addEventListener("submit", async e => {
+    e.preventDefault();
+    const out = {};
+    AGENT_FIELDS.forEach(([k]) => { out[k] = f.elements[k].value.trim(); });
+    out.note = f.elements.note.value.trim();
+    out.website = out.website.replace(/^https?:\/\//i, "").replace(/\/$/, "");
+    out.cities = [...f.querySelectorAll('input[name="city"]:checked')].map(x => x.value);
+    out.photo = pics.photo; out.logo = pics.logo;
+    const miss = AGENT_FIELDS.find(([k, , , req]) => req && !out[k]);
+    if (miss) { st.textContent = "Please add your " + miss[1].toLowerCase() + "."; f.elements[miss[0]].focus(); return; }
+    if (out.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(out.email)) { st.textContent = "That email doesn't look right."; f.elements.email.focus(); return; }
+    const first = !data.agent, btn = f.querySelector("button[type=submit]");
+    btn.disabled = true; st.textContent = "Saving…";
+    const before = data.agent;
+    try {
+      await saveUser({ agent: out });
+      if (first) agentNotice(out);
+      if (window.CVS_GA) window.CVS_GA(first ? "agent_profile_create" : "agent_profile_update", {});
+      document.dispatchEvent(new CustomEvent("cvs:user", { detail: { user, agent: out } }));
+      done && done(out);
+    } catch (err) {
+      console.warn("[cvs-auth] agent save failed", err);
+      data.agent = before;
+      st.textContent = "We couldn't save your profile just now. Please try again, or call or text (760) 422-5475."; btn.disabled = false;
+    }
+  });
+}
+// Let Todd know a new agent signed up (browser to Formspree, like mailTodd in app.js).
+function agentNotice(a) {
+  const fd = new FormData();
+  fd.append("_subject", "Coachella Valley Spotlight: new real estate agent profile");
+  fd.append("source", "Coachella Valley Spotlight / agent profile");
+  [["name", a.name], ["brokerage", a.brokerage], ["title", a.title], ["phone", a.phone], ["email", a.email || user.email], ["account_email", user.email],
+    ["website", a.website], ["dre", a.dre], ["cities", (a.cities || []).join(", ") || "Whole valley"]].forEach(([k, v]) => { if (v) fd.append(k, v); });
+  fetch("https://formspree.io/f/myezyype", { method: "POST", headers: { Accept: "application/json" }, body: fd }).catch(() => {});
 }
 
 /* ---------- sign-up prompts (only for signed-out visitors) ---------- */
@@ -258,4 +364,5 @@ onAuthStateChanged(auth, async u => {
     const n = next(); if (n) { location.href = n; return; }
   }
   paintHearts(); renderAccount();
+  document.dispatchEvent(new CustomEvent("cvs:user", { detail: { user: u, agent: data.agent || null } }));
 });
