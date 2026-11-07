@@ -204,7 +204,8 @@
 
   /* ---------- page ---------- */
   if (!app) return;
-  var state = { y: 0, m: 0, scope: "farm", off: {} };
+  var state = { y: 0, m: 0, cities: null, off: {} };
+  var CITIES = ["Bermuda Dunes", "Cathedral City", "Coachella", "Desert Hot Springs", "Indian Wells", "Indio", "La Quinta", "Palm Desert", "Palm Springs", "Rancho Mirage", "Thousand Palms"];
   function months() { var out = []; for (var i = 0; i < 3; i++) { var d = new Date(today.getFullYear(), today.getMonth() + i, 1); out.push({ y: d.getFullYear(), m: d.getMonth() }); } return out; }
   // Agents usually want a family-friendly flyer: nightlife starts unticked (they can tick it back on).
   function defaultOff(e) { return /nightlife/i.test(e.category || "") || /\b(drag|bingo|karaoke|burlesque|21\+|adults? only)\b/i.test(e.title + " " + (e.description || "")); }
@@ -224,9 +225,13 @@
       return;
     }
     if (!agent) { var c = document.createElement("div"); c.className = "card acct-card"; app.innerHTML = ""; app.appendChild(c); A.agentForm(c, render); return; }
-    if (!state.y) { var mm = months()[today.getDate() > 20 ? 1 : 0]; state.y = mm.y; state.m = mm.m; state.scope = agent.cities && agent.cities.length ? "farm" : "all"; }
-    var farm = agent.cities && agent.cities.length ? agent.cities : null;
-    var list = monthEvents(state.y, state.m, state.scope === "farm" ? farm : null);
+    if (!state.y) { var mm = months()[today.getDate() > 20 ? 1 : 0]; state.y = mm.y; state.m = mm.m; }
+    // Cities: one, several, or none ticked = the whole valley. Starts from the farm cities in their profile.
+    if (!state.cities) state.cities = (agent.cities || []).filter(function (c) { return CITIES.indexOf(c) > -1; });
+    var picks = state.cities, whole = !picks.length;
+    var list = monthEvents(state.y, state.m, whole ? null : picks);
+    var valley = monthEvents(state.y, state.m, null), perCity = {};
+    valley.dated.concat(valley.weekly).forEach(function (x) { if (x.e.city) perCity[x.e.city] = (perCity[x.e.city] || 0) + 1; });
     var all = list.dated.concat(list.weekly);
     all.forEach(function (x) { if (!(x.key in state.off)) state.off[x.key] = defaultOff(x.e); });
     var on = all.filter(function (x) { return !state.off[x.key]; }).length;
@@ -239,20 +244,29 @@
       '<button type="button" class="linklike" data-act="edit">Edit my info</button></div>' +
       '<div class="card acct-card"><form class="form agent-opts" onsubmit="return false">' +
       '<label>Month<select name="month">' + months().map(function (o) { return '<option value="' + o.y + "-" + o.m + '"' + (o.y === state.y && o.m === state.m ? " selected" : "") + '>' + MONTHS[o.m] + " " + o.y + '</option>'; }).join("") + '</select></label>' +
-      '<label>Events from<select name="scope">' + (farm ? '<option value="farm"' + (state.scope === "farm" ? " selected" : "") + '>My cities (' + esc(farm.join(", ")) + ')</option>' : "") + '<option value="all"' + (state.scope === "all" ? " selected" : "") + '>The whole valley</option></select></label>' +
+      '<fieldset class="full agent-where"><legend>Events from <span class="opt">(pick one city or several)</span></legend>' +
+      '<label class="agent-city agent-city-all"><input type="checkbox" data-city=""' + (whole ? " checked" : "") + '> The whole valley</label>' +
+      CITIES.map(function (c) { return '<label class="agent-city"><input type="checkbox" data-city="' + esc(c) + '"' + (picks.indexOf(c) > -1 ? " checked" : "") + '> <span>' + esc(c) + ' <span class="opt">(' + (perCity[c] || 0) + ')</span></span></label>'; }).join("") +
+      '</fieldset>' +
       '</form>' +
       '<div class="agent-list-head"><b>' + on + ' of ' + all.length + ' events picked</b><span><button type="button" class="linklike" data-all="1">All</button> &middot; <button type="button" class="linklike" data-all="0">None</button></span></div>' +
       (all.length ? '<div class="agent-list">' +
         list.dated.map(function (x) { return row(x, DOW[x.day.getDay()].slice(0, 3) + " " + MONTHS[x.day.getMonth()].slice(0, 3) + " " + x.day.getDate()); }).join("") +
         (list.weekly.length ? '<p class="agent-list-sub">Every week</p>' + list.weekly.map(function (x) { return row(x, x.e.weekly + "s"); }).join("") : "") + '</div>'
-        : '<div class="empty">No events are listed for ' + MONTHS[state.m] + ' yet' + (state.scope === "farm" ? " in your cities. Try the whole valley." : ". More get added every week, so check back soon.") + '</div>') +
+        : '<div class="empty">No events are listed for ' + MONTHS[state.m] + ' yet' + (!whole ? " in " + (picks.length > 1 ? "these cities" : picks[0]) + ". Try adding cities or the whole valley." : ". More get added every week, so check back soon.") + '</div>') +
       '<p class="agent-fit" aria-live="polite"></p>' +
-      (state.scope === "farm" && all.length && all.length < 6 ? '<p class="acct-hint" style="margin-top:10px">Only a few events in your cities so far. Switch to the whole valley for a fuller flyer.</p>' : "") +
+      (!whole && all.length && all.length < 6 ? '<p class="acct-hint" style="margin-top:10px">Only a few events in ' + (picks.length > 1 ? "these cities" : esc(picks[0])) + ' so far. Add more cities or pick the whole valley for a fuller flyer.</p>' : "") +
       '<div class="agent-go"><button type="button" class="btn" data-act="pdf"' + (on ? "" : " disabled") + '>Download my PDF &darr;</button><p class="form-status" role="status" aria-live="polite"></p></div>' +
       '</div></div>';
     var f = app.querySelector(".agent-opts");
     f.month.addEventListener("change", function () { var p = f.month.value.split("-"); state.y = +p[0]; state.m = +p[1]; render(); });
-    f.scope.addEventListener("change", function () { state.scope = f.scope.value; render(); });
+    f.querySelectorAll("[data-city]").forEach(function (cb) { cb.addEventListener("change", function () {
+      var c = cb.getAttribute("data-city");
+      if (!c) state.cities = []; // "The whole valley" clears the cities
+      else state.cities = cb.checked ? state.cities.concat(c) : state.cities.filter(function (x) { return x !== c; });
+      render();
+      var again = app.querySelector('[data-city="' + c + '"]'); if (again) again.focus();
+    }); });
     // Ticking an event only updates the count (no re-render, so the list keeps its scroll position).
     app.querySelectorAll("[data-key]").forEach(function (cb) { cb.addEventListener("change", function () {
       state.off[cb.getAttribute("data-key")] = !cb.checked;
