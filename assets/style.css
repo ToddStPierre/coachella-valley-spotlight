@@ -1484,3 +1484,48 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .bk-run { font-weight: 600; }
 .bk-run::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 50%; background: var(--gold); animation: bk-pulse 1s ease-in-out infinite alternate; }
 @keyframes bk-pulse { from { opacity: .3; } to { opacity: 1; } }
+
+/* Real estate agent events flyer (agents.html) and the agent profile (account page, assets/auth.js) */
+.agent-hero { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--s4); align-items: start; }
+.agent-steps { margin: var(--s3) 0 0; padding-left: 22px; display: grid; gap: 10px; color: var(--ink-2); }
+.agent-steps b { color: var(--ink); }
+.agent-sample { margin: 0; }
+.agent-sample img { width: 100%; height: auto; display: block; border-radius: 6px; border: 1px solid var(--line); box-shadow: var(--shadow); background: #fff; }
+.agent-sample figcaption { font-size: 14px; color: var(--ink-2); margin-top: 8px; text-align: center; }
+.agent-builder { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: var(--s3); align-items: start; }
+.agent-me { display: grid; gap: 12px; justify-items: start; }
+.agent-me img, .agent-mini img { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; box-shadow: var(--shadow); }
+.agent-me span { color: var(--ink-2); font-size: 15px; }
+.agent-mini { display: flex; gap: 14px; align-items: center; margin: 4px 0 14px; color: var(--ink-2); font-size: 15px; }
+.agent-mini img { width: 64px; height: 64px; flex: none; }
+.agent-mini b { color: var(--ink); }
+.agent-opts { margin-bottom: 18px; }
+.agent-list-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; margin-bottom: 8px; }
+.agent-list { max-height: 460px; overflow: auto; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+.agent-ev { display: flex; gap: 12px; align-items: flex-start; padding: 10px 14px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.agent-ev:last-child { border-bottom: 0; }
+.agent-ev input { width: 20px; height: 20px; margin-top: 2px; flex: none; }
+.agent-ev b { display: block; font-weight: 600; }
+.agent-ev small { display: block; color: var(--ink-2); font-size: 14px; }
+.agent-list-sub { margin: 0; padding: 10px 14px 6px; font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--palm); background: var(--palm-soft); }
+.agent-go { margin-top: 18px; display: grid; gap: 10px; justify-items: start; }
+.agent-go .btn { font-size: 18px; padding: 15px 26px; }
+.agent-fine { font-size: 14px; color: var(--ink-2); max-width: 760px; margin-top: var(--s3); }
+.agent-cta { max-width: 640px; }
+.agent-cta .btn { margin-top: 6px; }
+.agent-form .opt { font-weight: 400; color: var(--ink-2); font-size: 14px; }
+.agent-pics { display: flex; gap: var(--s3); flex-wrap: wrap; }
+.agent-pic { display: grid !important; justify-items: center; gap: 6px; font-size: 14px !important; text-align: center; cursor: pointer; }
+.agent-pic input { font-size: 13px; max-width: 200px; padding: 6px !important; }
+.agent-pic-img { width: 96px; height: 96px; border-radius: 12px; border: 1.5px dashed var(--line); background: #fff; display: grid; place-items: center; color: var(--ink-2); overflow: hidden; }
+.agent-pic-img.round { border-radius: 50%; }
+.agent-pic-img img { width: 100%; height: 100%; object-fit: cover; }
+.agent-pic-img:not(.round) img { object-fit: contain; }
+.agent-cities { border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.agent-cities legend { font-weight: 600; padding: 0 6px; }
+.acct-side .agent-form { grid-template-columns: 1fr; }
+.acct-side .agent-cities { grid-template-columns: 1fr 1fr; }
+@media (max-width: 900px) { .agent-hero, .agent-builder { grid-template-columns: 1fr; } .agent-sample { max-width: 320px; } }
+.form .agent-cities .acct-check { display: flex; gap: 8px; font-weight: 500; font-size: 15px; align-items: center; }
+.form .agent-cities .acct-check input { width: 18px; height: 18px; padding: 0; flex: none; }
+.agent-form .linklike { margin-left: 12px; }

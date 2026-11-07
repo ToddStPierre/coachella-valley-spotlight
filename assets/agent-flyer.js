@@ -1,0 +1,276 @@
+/* Real estate agent monthly events flyer (agents.html).
+   A signed-in My Spotlight member with an agent profile (assets/auth.js, users/{uid}.agent) picks a month and
+   the events they want, and downloads a US Letter PDF of valley events with their photo, contact info, logo and
+   a QR code to their website on every page. Built in the browser with jsPDF (assets/vendor, MIT), which loads
+   on the first download only, like the QR library. Events: data/events.js + data/feed-events.js, the same lists
+   the Events page uses. Weekly events go in an "Every week" box instead of being repeated. */
+(function () {
+  var D = window.CVS || {};
+  var R = window.CVS_RENDER || {}, ROOT = R.root || "";
+  var app = document.getElementById("agent-app");
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var DOW = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  var today = new Date(); today.setHours(0, 0, 0, 0);
+  function parse(d) { if (!d) return null; var p = d.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function ga(n, p) { if (window.CVS_GA) window.CVS_GA(n, p || {}); }
+
+  /* ---------- events for a month ---------- */
+  // Returns { dated: [{e, day, key}], weekly: [{e, key}] } for month m (0-11) of year y, from today on.
+  function monthEvents(y, m, cities) {
+    var first = new Date(y, m, 1), last = new Date(y, m + 1, 0), from = first < today ? today : first;
+    var inCity = function (e) { return !cities || !cities.length || !e.city || cities.indexOf(e.city) > -1; };
+    var dated = [], weekly = [];
+    (D.events || []).concat(D.feedEvents || []).forEach(function (e, i) {
+      if (!e || e.sample || !e.title || !inCity(e)) return;
+      var key = (e.feed ? "f" : "h") + i + "-" + String(e.title).slice(0, 20);
+      if (e.weekly) {
+        var dow = DOW.indexOf(e.weekly); if (dow < 0) return;
+        var s = parse(e.from), u = parse(e.until), a = s && s > from ? new Date(s) : new Date(from), b = u && u < last ? u : last;
+        while (a.getDay() !== dow) a.setDate(a.getDate() + 1);
+        if (a <= b) weekly.push({ e: e, key: key, dow: dow });
+        return;
+      }
+      var s2 = parse(e.date), e2 = parse(e.endDate || e.date);
+      if (!s2 || e2 < from || s2 > last) return;
+      dated.push({ e: e, key: key, day: s2 < from ? from : s2, end: e.endDate ? e2 : null });
+    });
+    dated.sort(function (a, b) { return a.day - b.day || String(a.e.time || "").localeCompare(String(b.e.time || "")); });
+    weekly.sort(function (a, b) { return ((a.dow + 6) % 7) - ((b.dow + 6) % 7) || a.e.title.localeCompare(b.e.title); });
+    return { dated: dated, weekly: weekly };
+  }
+
+  /* ---------- PDF ---------- */
+  var libs = null;
+  function loadScript(src) { return new Promise(function (res, rej) { var s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = function () { rej(new Error("The PDF maker didn't load. Check your connection and try again.")); }; document.head.appendChild(s); }); }
+  function loadLibs() {
+    if (!libs) libs = Promise.all([window.jspdf ? 0 : loadScript(ROOT + "assets/vendor/jspdf-2.5.2.umd.min.js"), window.qrcode ? 0 : loadScript(ROOT + "assets/vendor/qrcode-generator-1.4.4.js")])
+      .catch(function (e) { libs = null; throw e; });
+    return libs;
+  }
+  // The PDF's built-in fonts only print Latin-1: straighten quotes and dashes, drop emoji and the rest.
+  function clean(s) {
+    return String(s == null ? "" : s).replace(/[‘’‛′]/g, "'").replace(/[“”″]/g, '"').replace(/[–—−]/g, "-")
+      .replace(/…/g, "...").replace(/•/g, "·").replace(/ /g, " ").replace(/[^\x20-\x7e\xa0-\xff]/g, "").replace(/\s+/g, " ").trim();
+  }
+  var C = { ink: [34, 28, 24], ink2: [93, 80, 72], line: [228, 214, 195], sand: [245, 237, 225], sun: [217, 85, 43], sunDeep: [184, 64, 28], gold: [240, 163, 58], rose: [201, 102, 122], dusk: [91, 74, 122], palm: [46, 92, 79] };
+  function shortDay(d) { return DOW[d.getDay()].slice(0, 3).toUpperCase() + "  " + MONTHS[d.getMonth()].slice(0, 3).toUpperCase() + " " + d.getDate(); }
+  function imgType(u) { return /^data:image\/png/.test(u) ? "PNG" : "JPEG"; }
+  function imgSize(u) { return new Promise(function (res) { var i = new Image(); i.onload = function () { res({ w: i.naturalWidth, h: i.naturalHeight }); }; i.onerror = function () { res(null); }; i.src = u; }); }
+
+  // agent: the profile; y, m: month; list: monthEvents() result already filtered to the chosen events.
+  function buildPDF(agent, y, m, list) {
+    return loadLibs().then(function () {
+      return Promise.all([agent.photo ? imgSize(agent.photo) : null, agent.logo ? imgSize(agent.logo) : null]);
+    }).then(function (sizes) {
+      // Try full descriptions first; if 1-line or no descriptions save a page, use that (most months then fit on one page).
+      var best = null;
+      [2, 1, 0].forEach(function (lines) { if (best && best.pages === 1) return; var r = make(sizes, lines); if (!best || r.pages < best.pages) best = r; });
+      return best;
+    });
+    function make(sizes, descLines) {
+      var doc = new window.jspdf.jsPDF({ unit: "pt", format: "letter" });
+      var W = 612, H = 792, M = 36, GAP = 20, COLW = (W - 2 * M - GAP) / 2;
+      var FOOT_H = 112, FINE_H = 26, bodyBottom = H - M - FOOT_H - FINE_H - 12;
+      var month = MONTHS[m] + " " + y, name = clean(agent.name);
+      doc.setProperties({ title: "Coachella Valley events, " + month, author: name, subject: "Things to do in the Coachella Valley", creator: "Coachella Valley Spotlight" });
+      var fill = function (c) { doc.setFillColor(c[0], c[1], c[2]); }, color = function (c) { doc.setTextColor(c[0], c[1], c[2]); }, stroke = function (c) { doc.setDrawColor(c[0], c[1], c[2]); };
+
+      function header(first) {
+        // Sunset stripes, the site's mark
+        [[C.gold, 7], [C.sun, 5], [C.rose, 4], [C.dusk, 3]].reduce(function (yy, s) { fill(s[0]); doc.rect(0, yy, W, s[1], "F"); return yy + s[1] + 1.5; }, 0);
+        if (!first) {
+          doc.setFont("times", "bold"); doc.setFontSize(16); color(C.ink);
+          doc.text("Coachella Valley events, " + month + " (continued)", M, 52);
+          return 72;
+        }
+        doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setCharSpace(1.6); color(C.sunDeep);
+        doc.text("THINGS TO DO IN THE COACHELLA VALLEY", M, 50); doc.setCharSpace(0);
+        doc.setFont("times", "bold"); doc.setFontSize(30); color(C.ink);
+        doc.text(month + " Events", M, 82);
+        doc.setFont("helvetica", "normal"); doc.setFontSize(10.5); color(C.ink2);
+        doc.text(doc.splitTextToSize("Concerts, festivals, markets and community events around the valley, picked for you by " + name + ".", W - 2 * M), M, 100);
+        stroke(C.line); doc.setLineWidth(0.75); doc.line(M, 112, W - M, 112);
+        return 128;
+      }
+
+      function footer() {
+        var top = H - M - FINE_H - FOOT_H, x = M + 14, right = W - M - 14;
+        fill(C.sand); doc.roundedRect(M, top, W - 2 * M, FOOT_H, 10, 10, "F");
+        fill(C.sun); doc.rect(M + 10, top, W - 2 * M - 20, 3, "F");
+        // Photo, round
+        if (agent.photo && sizes[0]) {
+          var d = 80, cx = x + d / 2, cy = top + FOOT_H / 2, s = sizes[0], k = Math.max(d / s.w, d / s.h);
+          doc.saveGraphicsState(); doc.circle(cx, cy, d / 2, null); doc.clip(); doc.discardPath();
+          doc.addImage(agent.photo, imgType(agent.photo), cx - s.w * k / 2, cy - s.h * k / 2, s.w * k, s.h * k, "photo");
+          doc.restoreGraphicsState();
+          doc.setLineWidth(2); doc.setDrawColor(255, 255, 255); doc.circle(cx, cy, d / 2, "S");
+          x += d + 16;
+        }
+        // QR to their website, then the logo, from the right edge
+        var site = clean(agent.website);
+        if (site && window.qrcode) {
+          var qr = window.qrcode(0, "M"); qr.addData("https://" + site.replace(/^https?:\/\//i, "")); qr.make();
+          var n = qr.getModuleCount(), q = 70, cell = q / n, qx = right - q, qy = top + (FOOT_H - q) / 2 - 5;
+          doc.setFillColor(255, 255, 255); doc.rect(qx - 4, qy - 4, q + 8, q + 8, "F"); fill(C.ink);
+          for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (qr.isDark(r, c)) doc.rect(qx + c * cell, qy + r * cell, cell + 0.15, cell + 0.15, "F");
+          doc.setFont("helvetica", "normal"); doc.setFontSize(6.5); color(C.ink2); doc.text("Scan for my website", qx + q / 2, qy + q + 11, { align: "center" });
+          right = qx - 16;
+        }
+        if (agent.logo && sizes[1]) {
+          var L = sizes[1], lk = Math.min(96 / L.w, 52 / L.h), lw = L.w * lk, lh = L.h * lk;
+          doc.addImage(agent.logo, imgType(agent.logo), right - lw, top + (FOOT_H - lh) / 2, lw, lh, "logo");
+          right -= lw + 16;
+        }
+        // Contact text
+        var tw = right - x, yy = top + 28;
+        doc.setFont("times", "bold"); doc.setFontSize(17); color(C.ink); doc.text(doc.splitTextToSize(name, tw)[0], x, yy);
+        var sub = clean([agent.title, agent.brokerage].filter(Boolean).join(" | "));
+        doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); color(C.ink2);
+        if (sub) { yy += 14; doc.text(doc.splitTextToSize(sub, tw)[0], x, yy); }
+        doc.setFont("helvetica", "bold"); doc.setFontSize(10.5); color(C.sunDeep);
+        var contact = [agent.phone, agent.email].map(clean).filter(Boolean).join("   ");
+        if (contact) { yy += 16; doc.text(doc.splitTextToSize(contact, tw)[0], x, yy); }
+        doc.setFont("helvetica", "normal"); doc.setFontSize(9); color(C.ink2);
+        var more = [site, agent.dre ? "DRE# " + clean(agent.dre).replace(/^dre\s*#?\s*/i, "") : ""].filter(Boolean).join("   ");
+        if (more) { yy += 13; doc.text(doc.splitTextToSize(more, tw)[0], x, yy); }
+        if (agent.note) { doc.setFont("helvetica", "italic"); doc.setFontSize(8.5); color(C.ink); doc.splitTextToSize(clean(agent.note), tw).slice(0, top + FOOT_H - yy > 32 ? 2 : 1).forEach(function (l) { yy += 11; doc.text(l, x, yy); }); }
+        // Fine print
+        doc.setFont("helvetica", "normal"); doc.setFontSize(6.5); color(C.ink2);
+        doc.text(doc.splitTextToSize("Equal Housing Opportunity. Event listings courtesy of Coachella Valley Spotlight, coachellavalleyspotlight.com. Dates, times and details can change, so please check with the organizer before you go. If your property is currently listed for sale, this is not a solicitation.", W - 2 * M), M, H - M - FINE_H + 10);
+      }
+
+      // Flow: blocks laid down column by column, page by page.
+      var page = 1, col = 0, top0 = header(true), yy = top0;
+      footer();
+      function colX() { return M + col * (COLW + GAP); }
+      function room(h) {
+        if (yy + h <= bodyBottom) return;
+        if (col === 0) { col = 1; yy = top0; return; }
+        doc.addPage(); page++; col = 0; top0 = header(false); yy = top0; footer();
+      }
+      // Venue without its street address ("Palm Canyon Theatre, 538 N Palm Canyon Dr" -> "Palm Canyon Theatre").
+      function venue(e) { var v = String(e.venue || "").replace(/,\s*\d.*$/, "").replace(/^\d+[^,]*$/, ""); return [v, v.indexOf(e.city || "~") > -1 ? "" : e.city].filter(Boolean).join(", "); }
+      // compact: title and one line, no description (the "Every week" list).
+      function eventBlock(e, sub, compact) {
+        var t = doc.setFont("helvetica", "bold").setFontSize(10.5) && doc.splitTextToSize(clean(e.title), COLW);
+        var meta = clean([sub, e.time, venue(e), e.price].filter(Boolean).join("  ·  "));
+        doc.setFont("helvetica", "normal"); doc.setFontSize(8.5);
+        var mm = doc.splitTextToSize(meta, COLW).slice(0, compact ? 1 : 2);
+        var full = e.description && !compact ? doc.splitTextToSize(clean(e.description), COLW) : [], dd = full.slice(0, descLines);
+        if (dd.length && full.length > dd.length) dd[dd.length - 1] = dd[dd.length - 1].replace(/\s*\S*$/, "") + "...";
+        return { h: t.length * 12.5 + mm.length * 10.5 + dd.length * 10.5 + 9, draw: function () {
+          var x = colX();
+          doc.setFont("helvetica", "bold"); doc.setFontSize(10.5); color(C.ink); t.forEach(function (l) { yy += 12.5; doc.text(l, x, yy - 3); });
+          doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); color(C.palm); mm.forEach(function (l) { yy += 10.5; doc.text(l, x, yy - 2); });
+          color(C.ink2); dd.forEach(function (l) { yy += 10.5; doc.text(l, x, yy - 2); });
+          yy += 9;
+        } };
+      }
+      function heading(label, c) {
+        return { h: 20, label: label, color: c, draw: function () {
+          var x = colX();
+          doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setCharSpace(1.2); color(c || C.sunDeep); doc.text(label, x, yy + 10); doc.setCharSpace(0);
+          stroke(C.line); doc.setLineWidth(0.6); doc.line(x + doc.getTextWidth(label) + label.length * 1.2 + 6, yy + 7, x + COLW, yy + 7);
+          yy += 20;
+        } };
+      }
+      function place(blocks) { // a heading stays with its first event
+        var first = blocks[0].h + (blocks[1] ? blocks[1].h : 0);
+        room(first);
+        blocks.forEach(function (b, i) {
+          if (i > 1) {
+            var where = page + ":" + col; room(b.h);
+            if (where !== page + ":" + col && blocks[0].label) heading(blocks[0].label + " (CONT.)", blocks[0].color).draw();
+          }
+          b.draw();
+        });
+      }
+      var byDay = [];
+      list.dated.forEach(function (x) { var last = byDay[byDay.length - 1]; if (last && +last.day === +x.day) last.items.push(x); else byDay.push({ day: x.day, items: [x] }); });
+      byDay.forEach(function (g) {
+        place([heading(shortDay(g.day))].concat(g.items.map(function (x) {
+          return eventBlock(x.e, x.end ? "Through " + MONTHS[x.end.getMonth()].slice(0, 3) + " " + x.end.getDate() : "");
+        })));
+      });
+      if (list.weekly.length) place([heading("EVERY WEEK", C.palm)].concat(list.weekly.map(function (x) { return eventBlock(x.e, x.e.weekly + "s", true); })));
+      if (!list.dated.length && !list.weekly.length) { doc.setFont("helvetica", "italic"); doc.setFontSize(11); color(C.ink2); doc.text("No events picked for this month.", M, yy + 14); }
+      // Page numbers when there's more than one
+      var total = doc.getNumberOfPages();
+      if (total > 1) for (var p = 1; p <= total; p++) { doc.setPage(p); doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); color(C.ink2); doc.text("Page " + p + " of " + total, W - M, 50, { align: "right" }); }
+      return { doc: doc, pages: total, file: "valley-events-" + MONTHS[m].toLowerCase() + "-" + y + ".pdf" };
+    }
+  }
+  window.CVS_AGENT_FLYER = { monthEvents: monthEvents, buildPDF: buildPDF };
+
+  /* ---------- page ---------- */
+  if (!app) return;
+  var state = { y: 0, m: 0, scope: "farm", off: {} };
+  function months() { var out = []; for (var i = 0; i < 3; i++) { var d = new Date(today.getFullYear(), today.getMonth() + i, 1); out.push({ y: d.getFullYear(), m: d.getMonth() }); } return out; }
+  // Agents usually want a family-friendly flyer: nightlife starts unticked (they can tick it back on).
+  function defaultOff(e) { return /nightlife/i.test(e.category || "") || /\b(drag|bingo|karaoke|burlesque|21\+|adults? only)\b/i.test(e.title + " " + (e.description || "")); }
+
+  function render() {
+    var A = window.CVS_AUTH;
+    if (!A || !A.loaded()) { app.innerHTML = '<div class="card acct-card"><p>' + (state.slow ? 'Sign-in is taking a while to load. Check your connection and <a href="">refresh the page</a>.' : "Loading&hellip;") + '</p></div>'; return; }
+    var user = A.user(), agent = A.agent();
+    if (!user) {
+      app.innerHTML = '<div class="card acct-card agent-cta"><h2>Start with a free My Spotlight account</h2><p>Create your account, add your photo and contact info once, and download a fresh events flyer every month.</p>' +
+        '<a class="btn" href="' + ROOT + 'account?mode=up&next=' + encodeURIComponent(location.pathname) + '">Create my free account</a> ' +
+        '<a class="btn btn-ghost" href="' + ROOT + 'account?next=' + encodeURIComponent(location.pathname) + '">Sign in</a></div>';
+      return;
+    }
+    if (!agent) { var c = document.createElement("div"); c.className = "card acct-card"; app.innerHTML = ""; app.appendChild(c); A.agentForm(c, render); return; }
+    if (!state.y) { var mm = months()[today.getDate() > 20 ? 1 : 0]; state.y = mm.y; state.m = mm.m; state.scope = agent.cities && agent.cities.length ? "farm" : "all"; }
+    var farm = agent.cities && agent.cities.length ? agent.cities : null;
+    var list = monthEvents(state.y, state.m, state.scope === "farm" ? farm : null);
+    var all = list.dated.concat(list.weekly);
+    all.forEach(function (x) { if (!(x.key in state.off)) state.off[x.key] = defaultOff(x.e); });
+    var on = all.filter(function (x) { return !state.off[x.key]; }).length;
+    var row = function (x, when) {
+      return '<label class="agent-ev"><input type="checkbox" data-key="' + esc(x.key) + '"' + (state.off[x.key] ? "" : " checked") + '><span><b>' + esc(x.e.title) + '</b><small>' + esc([when, x.e.time, [x.e.venue, x.e.city].filter(Boolean).join(", ")].filter(Boolean).join(" · ")) + '</small></span></label>';
+    };
+    app.innerHTML =
+      '<div class="agent-builder">' +
+      '<div class="card acct-card agent-me">' + (agent.photo ? '<img src="' + esc(agent.photo) + '" alt="">' : "") + '<div><b>' + esc(agent.name) + '</b><br><span>' + esc([agent.title, agent.brokerage].filter(Boolean).join(", ")) + '</span><br><span>' + esc([agent.phone, agent.email].filter(Boolean).join(" · ")) + '</span></div>' +
+      '<button type="button" class="linklike" data-act="edit">Edit my info</button></div>' +
+      '<div class="card acct-card"><form class="form agent-opts" onsubmit="return false">' +
+      '<label>Month<select name="month">' + months().map(function (o) { return '<option value="' + o.y + "-" + o.m + '"' + (o.y === state.y && o.m === state.m ? " selected" : "") + '>' + MONTHS[o.m] + " " + o.y + '</option>'; }).join("") + '</select></label>' +
+      '<label>Events from<select name="scope">' + (farm ? '<option value="farm"' + (state.scope === "farm" ? " selected" : "") + '>My cities (' + esc(farm.join(", ")) + ')</option>' : "") + '<option value="all"' + (state.scope === "all" ? " selected" : "") + '>The whole valley</option></select></label>' +
+      '</form>' +
+      '<div class="agent-list-head"><b>' + on + ' of ' + all.length + ' events on your flyer</b><span><button type="button" class="linklike" data-all="1">All</button> &middot; <button type="button" class="linklike" data-all="0">None</button></span></div>' +
+      (all.length ? '<div class="agent-list">' +
+        list.dated.map(function (x) { return row(x, DOW[x.day.getDay()].slice(0, 3) + " " + MONTHS[x.day.getMonth()].slice(0, 3) + " " + x.day.getDate()); }).join("") +
+        (list.weekly.length ? '<p class="agent-list-sub">Every week</p>' + list.weekly.map(function (x) { return row(x, x.e.weekly + "s"); }).join("") : "") + '</div>'
+        : '<div class="empty">No events are listed for ' + MONTHS[state.m] + ' yet' + (state.scope === "farm" ? " in your cities. Try the whole valley." : ". More get added every week, so check back soon.") + '</div>') +
+      (state.scope === "farm" && all.length && all.length < 6 ? '<p class="acct-hint" style="margin-top:10px">Only a few events in your cities so far. Switch to the whole valley for a fuller flyer.</p>' : "") +
+      '<div class="agent-go"><button type="button" class="btn" data-act="pdf"' + (on ? "" : " disabled") + '>Download my PDF &darr;</button><p class="form-status" role="status" aria-live="polite"></p></div>' +
+      '</div></div>';
+    var f = app.querySelector(".agent-opts");
+    f.month.addEventListener("change", function () { var p = f.month.value.split("-"); state.y = +p[0]; state.m = +p[1]; render(); });
+    f.scope.addEventListener("change", function () { state.scope = f.scope.value; render(); });
+    // Ticking an event only updates the count (no re-render, so the list keeps its scroll position).
+    app.querySelectorAll("[data-key]").forEach(function (cb) { cb.addEventListener("change", function () {
+      state.off[cb.getAttribute("data-key")] = !cb.checked;
+      var n = all.filter(function (x) { return !state.off[x.key]; }).length;
+      app.querySelector(".agent-list-head b").textContent = n + " of " + all.length + " events on your flyer";
+      app.querySelector('[data-act="pdf"]').disabled = !n;
+    }); });
+    app.querySelectorAll("[data-all]").forEach(function (b) { b.addEventListener("click", function () { var v = b.getAttribute("data-all") === "1"; all.forEach(function (x) { state.off[x.key] = !v; }); render(); }); });
+    app.querySelector('[data-act="edit"]').addEventListener("click", function () { var c = app.querySelector(".agent-me"); c.classList.remove("agent-me"); A.agentForm(c, render); });
+    var go = app.querySelector('[data-act="pdf"]'), st = app.querySelector(".agent-go .form-status");
+    go.addEventListener("click", function () {
+      var pick = { dated: list.dated.filter(function (x) { return !state.off[x.key]; }), weekly: list.weekly.filter(function (x) { return !state.off[x.key]; }) };
+      go.disabled = true; st.textContent = "Making your PDF…";
+      buildPDF(agent, state.y, state.m, pick).then(function (r) {
+        r.doc.save(r.file);
+        st.textContent = "Downloaded: " + r.file + " (" + r.pages + " page" + (r.pages > 1 ? "s" : "") + "). Come back next month for a fresh one.";
+        ga("agent_flyer_download", { month: MONTHS[state.m] + " " + state.y, events: pick.dated.length + pick.weekly.length, pages: r.pages });
+      }).catch(function (e) { console.warn(e); st.textContent = e.message || "Something went wrong making the PDF. Please try again."; })
+        .then(function () { go.disabled = false; });
+    });
+  }
+  render();
+  document.addEventListener("cvs:user", render);
+  setTimeout(function () { state.slow = true; if (!window.CVS_AUTH || !window.CVS_AUTH.loaded()) render(); }, 12000);
+})();
