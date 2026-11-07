@@ -213,6 +213,10 @@
     var A = window.CVS_AUTH;
     if (!A || !A.loaded()) { app.innerHTML = '<div class="card acct-card"><p>' + (state.slow ? 'Sign-in is taking a while to load. Check your connection and <a href="">refresh the page</a>.' : "Loading&hellip;") + '</p></div>'; return; }
     var user = A.user(), agent = A.agent();
+    // Agents who are set up skip the sales pitch at the top (remembered so it doesn't flash on the next visit).
+    var ready = !!(user && agent);
+    document.documentElement.classList.toggle("agent-ready", ready);
+    try { ready ? localStorage.setItem("cvs_agent", "1") : localStorage.removeItem("cvs_agent"); } catch (e) {}
     if (!user) {
       app.innerHTML = '<div class="card acct-card agent-cta"><h2>Start with a free My Spotlight account</h2><p>Create your account, add your photo and contact info once, and download a fresh events flyer every month.</p>' +
         '<a class="btn" href="' + ROOT + 'account?mode=up&next=' + encodeURIComponent(location.pathname) + '">Create my free account</a> ' +

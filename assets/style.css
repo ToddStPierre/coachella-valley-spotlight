@@ -1536,3 +1536,5 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .acct-chg:not(:empty) { margin-bottom: 14px; }
 .acct-chg .form { grid-template-columns: 1fr; }
 .agent-card-btns { display: grid; gap: 10px; justify-items: start; }
+.agent-ready #agent-intro { display: none; }
+.agent-ready .agent-make { padding-top: var(--s4); }
