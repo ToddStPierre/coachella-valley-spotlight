@@ -6,7 +6,7 @@
    are small data URLs). The agent profile feeds the monthly events PDF on agents.html (assets/agent-flyer.js).
    The config is public by design; the Firestore rules (firestore.rules) keep each user to their own document. */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, EmailAuthProvider, reauthenticateWithCredential, updatePassword, verifyBeforeUpdateEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app = initializeApp({
@@ -201,7 +201,10 @@ ${savedHTML()}
 <aside class="acct-side">
 ${isAdmin ? `<div class="card acct-card acct-owner"><h2>Site admin</h2><p>Stats for every listing, claims, sign-ups and form submissions.</p><a class="btn" href="${ROOT}stats.html">Open the admin page</a></div>` : ""}
 ${leadsMe ? `<div class="card acct-card acct-owner"><h2>Leads</h2><p>${leadsMe.role === "admin" ? "Every business you and the reps are working." : "Your sales list, " + esc(leadsMe.rep) + ": log calls, emails and follow-ups."}</p><a class="btn" href="${ROOT}leads.html">Open leads</a></div>` : ""}
-<div class="card acct-card"><h2>Your account</h2><p>${esc(user.email)}</p><button type="button" class="btn btn-ghost" data-act="out">Sign out</button></div>
+<div class="card acct-card acct-me"><h2>Your account</h2><p>${esc(user.email)}</p>
+<p class="acct-links"><button type="button" class="linklike" data-act="chg-email">Change email</button> &middot; <button type="button" class="linklike" data-act="chg-pw">Change password</button></p>
+<div class="acct-chg"></div>
+<button type="button" class="btn btn-ghost" data-act="out">Sign out</button></div>
 ${mine && mine.listings && mine.listings.length ? `<div class="card acct-card acct-owner"><h2>Your business</h2>${mine.listings.map(l => { const city = ((RENDER.directory || []).find(b => RENDER.slugOf(b) === l.slug) || {}).city || ""; return `<p><b>${esc(l.name)}</b>${city && !l.name.includes(city) ? ` (${esc(city)})` : ""}<br><a href="${ROOT}owner.html?b=${encodeURIComponent(l.slug)}">Manage listing and stats &rarr;</a></p>`; }).join("")}</div>` : ""}
 <div class="card acct-card acct-agent" id="agent">${agentCardHTML()}</div>
 <div class="card acct-card"><h2>Email preferences</h2><form class="acct-prefs">${PREFS.map(([k, t]) => `<label class="acct-check"><input type="checkbox" name="${k}"${p[k] ? " checked" : ""}> ${t}</label>`).join("")}
@@ -212,6 +215,7 @@ ${mine && mine.listings && mine.listings.length ? "" : `<div class="card acct-ca
   const v = box.querySelector('[data-act="verify"]');
   if (v) v.addEventListener("click", async () => { try { await sendEmailVerification(user); v.textContent = "Sent!"; v.disabled = true; } catch (e) { v.textContent = "Try again in a minute"; } });
   wireAgentCard(box.querySelector(".acct-agent"));
+  wireAccountEdit(box.querySelector(".acct-me"));
   if (location.hash === "#agent") { const ag = box.querySelector(".acct-agent"); if (ag) { if (!data.agent) { const b = ag.querySelector('[data-act="agent-edit"]'); if (b) b.click(); } ag.scrollIntoView({ block: "start" }); } }
   const pf = box.querySelector(".acct-prefs");
   pf.addEventListener("submit", async e => {
@@ -220,6 +224,49 @@ ${mine && mine.listings && mine.listings.length ? "" : `<div class="card acct-ca
     try { await saveUser({ prefs }); st.textContent = "Saved."; } catch (err) { st.textContent = "Couldn't save. Please try again."; }
   });
   paintHearts();
+}
+
+/* ---------- change email / password (account page) ---------- */
+// Both need the current password (Firebase asks for a recent sign-in). A new email is changed only after the person
+// clicks the link Firebase sends to it.
+function wireAccountEdit(card) {
+  if (!card) return;
+  const slot = card.querySelector(".acct-chg");
+  const open = mode => {
+    const em = mode === "email";
+    slot.innerHTML = `<form class="form acct-form" novalidate>
+${em ? '<label class="full">New email<input name="next" type="email" autocomplete="email" required></label>' : '<label class="full">New password<input name="next" type="password" autocomplete="new-password" minlength="8" required></label><p class="full acct-hint">At least 8 characters.</p>'}
+<label class="full">Current password<input name="cur" type="password" autocomplete="current-password" required></label>
+<div class="full"><button class="btn" type="submit">${em ? "Change my email" : "Change my password"}</button> <button type="button" class="linklike" data-act="chg-cancel">Cancel</button></div>
+<p class="full form-status" role="status" aria-live="polite"></p></form>`;
+    const f = slot.querySelector("form"), st = f.querySelector(".form-status"), btn = f.querySelector("button[type=submit]");
+    f.querySelector('[data-act="chg-cancel"]').addEventListener("click", () => { slot.innerHTML = ""; });
+    f.next.focus();
+    f.addEventListener("submit", async e => {
+      e.preventDefault();
+      const nx = f.next.value.trim(), cur = f.cur.value;
+      if (em && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nx)) { st.textContent = MSG["auth/invalid-email"]; f.next.focus(); return; }
+      if (!em && nx.length < 8) { st.textContent = MSG["auth/weak-password"]; f.next.focus(); return; }
+      if (!cur) { st.textContent = "Please enter your current password."; f.cur.focus(); return; }
+      btn.disabled = true; st.textContent = "One moment…";
+      try {
+        await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, cur));
+        if (em) {
+          await verifyBeforeUpdateEmail(user, nx);
+          slot.innerHTML = `<p class="acct-hint">Almost done: we sent a link to <b>${esc(nx)}</b>. Click it to switch your account to that email, then sign in with it.</p>`;
+        } else {
+          await updatePassword(user, nx);
+          slot.innerHTML = '<p class="acct-hint">Your password is changed.</p>';
+        }
+      } catch (err) {
+        const c = err && err.code;
+        st.textContent = c === "auth/invalid-credential" || c === "auth/wrong-password" ? "That current password isn't right." : c === "auth/email-already-in-use" ? "There's already an account with that email." : errText(err);
+        btn.disabled = false;
+      }
+    });
+  };
+  card.querySelector('[data-act="chg-email"]').addEventListener("click", () => open("email"));
+  card.querySelector('[data-act="chg-pw"]').addEventListener("click", () => open("pw"));
 }
 
 /* ---------- real estate agent profile (monthly events PDF) ---------- */
@@ -231,7 +278,7 @@ function agentCardHTML() {
   if (!a) return `<h2>Real estate agent?</h2><p>Get a free monthly <b>valley events flyer</b> (PDF) with your photo and contact info already on it. Mail it, email it or hand it out to your farm.</p>
 <button type="button" class="btn" data-act="agent-edit">Set up my agent profile</button>`;
   return `<h2>Your agent profile</h2><div class="agent-mini">${a.photo ? `<img src="${esc(a.photo)}" alt="">` : ""}<div><b>${esc(a.name)}</b><br>${esc([a.title, a.brokerage].filter(Boolean).join(", "))}<br>${esc(a.phone || "")}</div></div>
-<a class="btn" href="${ROOT}agents">Get this month's events PDF &rarr;</a> <button type="button" class="linklike" data-act="agent-edit">Edit profile</button>`;
+<div class="agent-card-btns"><a class="btn" href="${ROOT}agents">Get this month's events PDF &rarr;</a><button type="button" class="btn btn-ghost" data-act="agent-edit">Edit my agent info</button></div>`;
 }
 function wireAgentCard(card) {
   if (!card) return;

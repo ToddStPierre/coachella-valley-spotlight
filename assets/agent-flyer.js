@@ -1,7 +1,7 @@
 /* Real estate agent monthly events flyer (agents.html).
    A signed-in My Spotlight member with an agent profile (assets/auth.js, users/{uid}.agent) picks a month and
    the events they want, and downloads a US Letter PDF of valley events with their photo, contact info, logo and
-   a QR code to their website on every page. Built in the browser with jsPDF (assets/vendor, MIT), which loads
+   a QR code to their website on a one-page flyer. Built in the browser with jsPDF (assets/vendor, MIT), which loads
    on the first download only, like the QR library. Events: data/events.js + data/feed-events.js, the same lists
    the Events page uses. Weekly events go in an "Every week" box instead of being repeated. */
 (function () {
@@ -63,12 +63,13 @@
     return loadLibs().then(function () {
       return Promise.all([agent.photo ? imgSize(agent.photo) : null, agent.logo ? imgSize(agent.logo) : null]);
     }).then(function (sizes) {
-      // Try full descriptions first; if 1-line or no descriptions save a page, use that (most months then fit on one page).
-      var best = null;
-      [2, 1, 0].forEach(function (lines) { if (best && best.pages === 1) return; var r = make(sizes, lines); if (!best || r.pages < best.pages) best = r; });
-      return best;
+      // Always one page, at full text size. If the events don't all fit, keep the ones that do (in date order) and
+      // say how many more are on the website; the page tells the agent to untick some to choose which ones make it.
+      var r = make(sizes, 2, 1, false);
+      return r.shown === r.total ? r : make(sizes, 2, 1, true);
     });
-    function make(sizes, descLines) {
+    // descLines: description lines per event; k: text scale; cut: stop when the page is full and add a "more" line.
+    function make(sizes, descLines, k, cut) {
       var doc = new window.jspdf.jsPDF({ unit: "pt", format: "letter" });
       var W = 612, H = 792, M = 36, GAP = 20, COLW = (W - 2 * M - GAP) / 2;
       var FOOT_H = 112, FINE_H = 26, bodyBottom = H - M - FOOT_H - FINE_H - 12;
@@ -76,14 +77,9 @@
       doc.setProperties({ title: "Coachella Valley events, " + month, author: name, subject: "Things to do in the Coachella Valley", creator: "Coachella Valley Spotlight" });
       var fill = function (c) { doc.setFillColor(c[0], c[1], c[2]); }, color = function (c) { doc.setTextColor(c[0], c[1], c[2]); }, stroke = function (c) { doc.setDrawColor(c[0], c[1], c[2]); };
 
-      function header(first) {
+      function header() {
         // Sunset stripes, the site's mark
         [[C.gold, 7], [C.sun, 5], [C.rose, 4], [C.dusk, 3]].reduce(function (yy, s) { fill(s[0]); doc.rect(0, yy, W, s[1], "F"); return yy + s[1] + 1.5; }, 0);
-        if (!first) {
-          doc.setFont("times", "bold"); doc.setFontSize(16); color(C.ink);
-          doc.text("Coachella Valley events, " + month + " (continued)", M, 52);
-          return 72;
-        }
         doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setCharSpace(1.6); color(C.sunDeep);
         doc.text("THINGS TO DO IN THE COACHELLA VALLEY", M, 50); doc.setCharSpace(0);
         doc.setFont("times", "bold"); doc.setFontSize(30); color(C.ink);
@@ -140,51 +136,53 @@
         doc.text(doc.splitTextToSize("Equal Housing Opportunity. Event listings courtesy of Coachella Valley Spotlight, coachellavalleyspotlight.com. Dates, times and details can change, so please check with the organizer before you go. If your property is currently listed for sale, this is not a solicitation.", W - 2 * M), M, H - M - FINE_H + 10);
       }
 
-      // Flow: blocks laid down column by column, page by page.
-      var page = 1, col = 0, top0 = header(true), yy = top0;
+      // Flow: blocks laid down in two columns on one page. full: the page ran out of room.
+      var col = 0, top0 = header(), yy = top0, full = false, shown = 0, total = list.dated.length + list.weekly.length;
+      var limit = bodyBottom - (cut ? 16 : 0); // room for the "more events" line
       footer();
       function colX() { return M + col * (COLW + GAP); }
       function room(h) {
-        if (yy + h <= bodyBottom) return;
-        if (col === 0) { col = 1; yy = top0; return; }
-        doc.addPage(); page++; col = 0; top0 = header(false); yy = top0; footer();
+        if (yy + h <= limit) return true;
+        if (col === 0) { col = 1; yy = top0; return yy + h <= limit; }
+        return false;
       }
       // Venue without its street address ("Palm Canyon Theatre, 538 N Palm Canyon Dr" -> "Palm Canyon Theatre").
       function venue(e) { var v = String(e.venue || "").replace(/,\s*\d.*$/, "").replace(/^\d+[^,]*$/, ""); return [v, v.indexOf(e.city || "~") > -1 ? "" : e.city].filter(Boolean).join(", "); }
       // compact: title and one line, no description (the "Every week" list).
       function eventBlock(e, sub, compact) {
-        var t = doc.setFont("helvetica", "bold").setFontSize(10.5) && doc.splitTextToSize(clean(e.title), COLW);
+        var t = doc.setFont("helvetica", "bold").setFontSize(10.5 * k) && doc.splitTextToSize(clean(e.title), COLW);
         var meta = clean([sub, e.time, venue(e), e.price].filter(Boolean).join("  ·  "));
-        doc.setFont("helvetica", "normal"); doc.setFontSize(8.5);
+        doc.setFont("helvetica", "normal"); doc.setFontSize(8.5 * k);
         var mm = doc.splitTextToSize(meta, COLW).slice(0, compact ? 1 : 2);
         var full = e.description && !compact ? doc.splitTextToSize(clean(e.description), COLW) : [], dd = full.slice(0, descLines);
         if (dd.length && full.length > dd.length) dd[dd.length - 1] = dd[dd.length - 1].replace(/\s*\S*$/, "") + "...";
-        return { h: t.length * 12.5 + mm.length * 10.5 + dd.length * 10.5 + 9, draw: function () {
+        return { h: (t.length * 12.5 + mm.length * 10.5 + dd.length * 10.5 + 9) * k, draw: function () {
           var x = colX();
-          doc.setFont("helvetica", "bold"); doc.setFontSize(10.5); color(C.ink); t.forEach(function (l) { yy += 12.5; doc.text(l, x, yy - 3); });
-          doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); color(C.palm); mm.forEach(function (l) { yy += 10.5; doc.text(l, x, yy - 2); });
-          color(C.ink2); dd.forEach(function (l) { yy += 10.5; doc.text(l, x, yy - 2); });
-          yy += 9;
+          doc.setFont("helvetica", "bold"); doc.setFontSize(10.5 * k); color(C.ink); t.forEach(function (l) { yy += 12.5 * k; doc.text(l, x, yy - 3 * k); });
+          doc.setFont("helvetica", "normal"); doc.setFontSize(8.5 * k); color(C.palm); mm.forEach(function (l) { yy += 10.5 * k; doc.text(l, x, yy - 2 * k); });
+          color(C.ink2); dd.forEach(function (l) { yy += 10.5 * k; doc.text(l, x, yy - 2 * k); });
+          yy += 9 * k; shown++;
         } };
       }
       function heading(label, c) {
-        return { h: 20, label: label, color: c, draw: function () {
+        return { h: 20 * k, label: label, color: c, draw: function () {
           var x = colX();
           doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setCharSpace(1.2); color(c || C.sunDeep); doc.text(label, x, yy + 10); doc.setCharSpace(0);
           stroke(C.line); doc.setLineWidth(0.6); doc.line(x + doc.getTextWidth(label) + label.length * 1.2 + 6, yy + 7, x + COLW, yy + 7);
-          yy += 20;
+          yy += 20 * k;
         } };
       }
       function place(blocks) { // a heading stays with its first event
-        var first = blocks[0].h + (blocks[1] ? blocks[1].h : 0);
-        room(first);
-        blocks.forEach(function (b, i) {
+        if (full) return;
+        if (!room(blocks[0].h + (blocks[1] ? blocks[1].h : 0))) { full = true; return; }
+        for (var i = 0; i < blocks.length; i++) {
           if (i > 1) {
-            var where = page + ":" + col; room(b.h);
-            if (where !== page + ":" + col && blocks[0].label) heading(blocks[0].label + " (CONT.)", blocks[0].color).draw();
+            var was = col;
+            if (!room(blocks[i].h)) { full = true; return; }
+            if (was !== col) { var hd = heading(blocks[0].label + " (CONT.)", blocks[0].color); if (!room(hd.h + blocks[i].h)) { full = true; return; } hd.draw(); }
           }
-          b.draw();
-        });
+          blocks[i].draw();
+        }
       }
       var byDay = [];
       list.dated.forEach(function (x) { var last = byDay[byDay.length - 1]; if (last && +last.day === +x.day) last.items.push(x); else byDay.push({ day: x.day, items: [x] }); });
@@ -195,10 +193,11 @@
       });
       if (list.weekly.length) place([heading("EVERY WEEK", C.palm)].concat(list.weekly.map(function (x) { return eventBlock(x.e, x.e.weekly + "s", true); })));
       if (!list.dated.length && !list.weekly.length) { doc.setFont("helvetica", "italic"); doc.setFontSize(11); color(C.ink2); doc.text("No events picked for this month.", M, yy + 14); }
-      // Page numbers when there's more than one
-      var total = doc.getNumberOfPages();
-      if (total > 1) for (var p = 1; p <= total; p++) { doc.setPage(p); doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); color(C.ink2); doc.text("Page " + p + " of " + total, W - M, 50, { align: "right" }); }
-      return { doc: doc, pages: total, file: "valley-events-" + MONTHS[m].toLowerCase() + "-" + y + ".pdf" };
+      if (cut && shown < total) {
+        doc.setFont("helvetica", "bold"); doc.setFontSize(9); color(C.sunDeep);
+        doc.text("+ " + (total - shown) + " more event" + (total - shown > 1 ? "s" : "") + " this month at coachellavalleyspotlight.com/events", W - M, bodyBottom + 4, { align: "right" });
+      }
+      return { doc: doc, pages: 1, shown: shown, total: total, file: "valley-events-" + MONTHS[m].toLowerCase() + "-" + y + ".pdf" };
     }
   }
   window.CVS_AGENT_FLYER = { monthEvents: monthEvents, buildPDF: buildPDF };
@@ -238,11 +237,12 @@
       '<label>Month<select name="month">' + months().map(function (o) { return '<option value="' + o.y + "-" + o.m + '"' + (o.y === state.y && o.m === state.m ? " selected" : "") + '>' + MONTHS[o.m] + " " + o.y + '</option>'; }).join("") + '</select></label>' +
       '<label>Events from<select name="scope">' + (farm ? '<option value="farm"' + (state.scope === "farm" ? " selected" : "") + '>My cities (' + esc(farm.join(", ")) + ')</option>' : "") + '<option value="all"' + (state.scope === "all" ? " selected" : "") + '>The whole valley</option></select></label>' +
       '</form>' +
-      '<div class="agent-list-head"><b>' + on + ' of ' + all.length + ' events on your flyer</b><span><button type="button" class="linklike" data-all="1">All</button> &middot; <button type="button" class="linklike" data-all="0">None</button></span></div>' +
+      '<div class="agent-list-head"><b>' + on + ' of ' + all.length + ' events picked</b><span><button type="button" class="linklike" data-all="1">All</button> &middot; <button type="button" class="linklike" data-all="0">None</button></span></div>' +
       (all.length ? '<div class="agent-list">' +
         list.dated.map(function (x) { return row(x, DOW[x.day.getDay()].slice(0, 3) + " " + MONTHS[x.day.getMonth()].slice(0, 3) + " " + x.day.getDate()); }).join("") +
         (list.weekly.length ? '<p class="agent-list-sub">Every week</p>' + list.weekly.map(function (x) { return row(x, x.e.weekly + "s"); }).join("") : "") + '</div>'
         : '<div class="empty">No events are listed for ' + MONTHS[state.m] + ' yet' + (state.scope === "farm" ? " in your cities. Try the whole valley." : ". More get added every week, so check back soon.") + '</div>') +
+      '<p class="agent-fit" aria-live="polite"></p>' +
       (state.scope === "farm" && all.length && all.length < 6 ? '<p class="acct-hint" style="margin-top:10px">Only a few events in your cities so far. Switch to the whole valley for a fuller flyer.</p>' : "") +
       '<div class="agent-go"><button type="button" class="btn" data-act="pdf"' + (on ? "" : " disabled") + '>Download my PDF &darr;</button><p class="form-status" role="status" aria-live="polite"></p></div>' +
       '</div></div>';
@@ -253,19 +253,42 @@
     app.querySelectorAll("[data-key]").forEach(function (cb) { cb.addEventListener("change", function () {
       state.off[cb.getAttribute("data-key")] = !cb.checked;
       var n = all.filter(function (x) { return !state.off[x.key]; }).length;
-      app.querySelector(".agent-list-head b").textContent = n + " of " + all.length + " events on your flyer";
+      app.querySelector(".agent-list-head b").textContent = n + " of " + all.length + " events picked";
       app.querySelector('[data-act="pdf"]').disabled = !n;
+      checkFit();
     }); });
     app.querySelectorAll("[data-all]").forEach(function (b) { b.addEventListener("click", function () { var v = b.getAttribute("data-all") === "1"; all.forEach(function (x) { state.off[x.key] = !v; }); render(); }); });
     app.querySelector('[data-act="edit"]').addEventListener("click", function () { var c = app.querySelector(".agent-me"); c.classList.remove("agent-me"); A.agentForm(c, render); });
+    function picked() { return { dated: list.dated.filter(function (x) { return !state.off[x.key]; }), weekly: list.weekly.filter(function (x) { return !state.off[x.key]; }) }; }
+    // The flyer is one page: show how many of the picked events fit, before they download. Events are cut in date
+    // order with the weekly box last, so this tells the agent to untick some to choose which ones make it.
+    var fitEl = app.querySelector(".agent-fit"), fitTimer, fitRun = 0;
+    function checkFit() {
+      clearTimeout(fitTimer);
+      fitTimer = setTimeout(function () {
+        var run = ++fitRun, pk = picked();
+        if (!pk.dated.length && !pk.weekly.length) { fitEl.textContent = ""; fitEl.className = "agent-fit"; return; }
+        buildPDF(agent, state.y, state.m, pk).then(function (r) {
+          if (run !== fitRun) return;
+          var over = r.total - r.shown;
+          fitEl.className = "agent-fit" + (over ? " over" : "");
+          fitEl.textContent = over
+            ? "The flyer is one page: " + r.shown + " of these " + r.total + " fit. The last " + over + " (by date, with the weekly list last) will be left off, and the flyer will point readers to the website for more. Untick " + over + " to choose which ones make it."
+            : "All " + r.total + " fit on your one-page flyer.";
+        }).catch(function () {});
+      }, 200);
+    }
+    checkFit();
     var go = app.querySelector('[data-act="pdf"]'), st = app.querySelector(".agent-go .form-status");
     go.addEventListener("click", function () {
-      var pick = { dated: list.dated.filter(function (x) { return !state.off[x.key]; }), weekly: list.weekly.filter(function (x) { return !state.off[x.key]; }) };
+      var pick = picked();
       go.disabled = true; st.textContent = "Making your PDF…";
       buildPDF(agent, state.y, state.m, pick).then(function (r) {
         r.doc.save(r.file);
-        st.textContent = "Downloaded: " + r.file + " (" + r.pages + " page" + (r.pages > 1 ? "s" : "") + "). Come back next month for a fresh one.";
-        ga("agent_flyer_download", { month: MONTHS[state.m] + " " + state.y, events: pick.dated.length + pick.weekly.length, pages: r.pages });
+        st.textContent = r.shown < r.total
+          ? "Downloaded: " + r.file + " (one page, " + r.shown + " of your " + r.total + " events; the flyer points readers to the website for the rest)."
+          : "Downloaded: " + r.file + " (one page, all " + r.total + " events). Come back next month for a fresh one.";
+        ga("agent_flyer_download", { month: MONTHS[state.m] + " " + state.y, events: r.total, shown: r.shown });
       }).catch(function (e) { console.warn(e); st.textContent = e.message || "Something went wrong making the PDF. Please try again."; })
         .then(function () { go.disabled = false; });
     });
