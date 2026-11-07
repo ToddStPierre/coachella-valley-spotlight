@@ -1529,3 +1529,10 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .form .agent-cities .acct-check { display: flex; gap: 8px; font-weight: 500; font-size: 15px; align-items: center; }
 .form .agent-cities .acct-check input { width: 18px; height: 18px; padding: 0; flex: none; }
 .agent-form .linklike { margin-left: 12px; }
+.agent-fit { margin: 10px 0 0; font-size: 15px; color: var(--palm); font-weight: 600; }
+.agent-fit:empty { display: none; }
+.agent-fit.over { color: var(--sun-deep); background: #fff4e8; border: 1px solid #f3cfa6; border-radius: 10px; padding: 10px 14px; }
+.acct-links { font-size: 15px; margin: 0 0 12px; }
+.acct-chg:not(:empty) { margin-bottom: 14px; }
+.acct-chg .form { grid-template-columns: 1fr; }
+.agent-card-btns { display: grid; gap: 10px; justify-items: start; }
