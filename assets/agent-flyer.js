@@ -1,8 +1,8 @@
 /* Real estate agent monthly events flyer (agents.html).
    A signed-in My Spotlight member with an agent profile (assets/auth.js, users/{uid}.agent) picks a month and
    the events they want, and downloads a US Letter PDF of valley events with their photo, contact info, logo and
-   a QR code to their website on a one-page flyer, plus a QR beside each event (to that event on our site) and one
-   in the bottom-left corner (to the Events page), both through the short e.html links. Built in the browser with jsPDF (assets/vendor, MIT), which loads
+   a QR code to their website on a one-page flyer, plus a QR beside each event (to that event on our site)
+   through the short e.html links. Built in the browser with jsPDF (assets/vendor, MIT), which loads
    on the first download only, like the QR library. Events: data/events.js + data/feed-events.js, the same lists
    the Events page uses. Weekly events go in an "Every week" box instead of being repeated. */
 (function () {
@@ -82,7 +82,7 @@
     function make(sizes, descLines, k, cut) {
       var doc = new window.jspdf.jsPDF({ unit: "pt", format: "letter" });
       var W = 612, H = 792, M = 36, GAP = 20, COLW = (W - 2 * M - GAP) / 2;
-      var FOOT_H = 112, FINE_H = 58, EQ = 42, EQ_GAP = 8, bodyBottom = H - M - FOOT_H - FINE_H - 12;
+      var FOOT_H = 112, FINE_H = 26, EQ = 42, EQ_GAP = 8, bodyBottom = H - M - FOOT_H - FINE_H - 12;
       var month = MONTHS[m] + " " + y, name = clean(agent.name);
       doc.setProperties({ title: "Coachella Valley events, " + month, author: name, subject: "Things to do in the Coachella Valley", creator: "Coachella Valley Spotlight" });
       var fill = function (c) { doc.setFillColor(c[0], c[1], c[2]); }, color = function (c) { doc.setTextColor(c[0], c[1], c[2]); }, stroke = function (c) { doc.setDrawColor(c[0], c[1], c[2]); };
@@ -146,17 +146,9 @@
         var more = [site, agent.dre ? "DRE# " + clean(agent.dre).replace(/^dre\s*#?\s*/i, "") : ""].filter(Boolean).join("   ");
         if (more) { yy += 13; doc.text(doc.splitTextToSize(more, tw)[0], x, yy); }
         if (agent.note) { doc.setFont("helvetica", "italic"); doc.setFontSize(8.5); color(C.ink); doc.splitTextToSize(clean(agent.note), tw).slice(0, top + FOOT_H - yy > 32 ? 2 : 1).forEach(function (l) { yy += 11; doc.text(l, x, yy); }); }
-        // Bottom-left corner: a QR to the site's events page (every event this month, kept up to date).
-        var sq = 46, sx = M + 4, sy = H - M - sq - 2, lx = sx + sq + 12;
-        if (window.qrcode) {
-          drawQR(SHORT + "all", sx, sy, sq, "M");
-          doc.setFont("helvetica", "bold"); doc.setFontSize(9); color(C.sunDeep); doc.text("Scan for every valley event", lx, sy + 14);
-          doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); color(C.ink2); doc.text("Updated daily at coachellavalleyspotlight.com", lx, sy + 25);
-          doc.text("Or scan the code beside any event for its details.", lx, sy + 35);
-        }
-        // Fine print, to the right of the corner QR and its text
+        // Fine print
         doc.setFont("helvetica", "normal"); doc.setFontSize(6.5); color(C.ink2);
-        doc.text(doc.splitTextToSize("Equal Housing Opportunity. Event listings courtesy of Coachella Valley Spotlight, coachellavalleyspotlight.com. Dates, times and details can change, so please check with the organizer before you go. If your property is currently listed for sale, this is not a solicitation.", W - M - (lx + 196)), lx + 196, H - M - FINE_H + 18);
+        doc.text(doc.splitTextToSize("Equal Housing Opportunity. Event listings courtesy of Coachella Valley Spotlight, coachellavalleyspotlight.com. Dates, times and details can change, so please check with the organizer before you go. If your property is currently listed for sale, this is not a solicitation.", W - 2 * M), M, H - M - FINE_H + 10);
       }
 
       // Flow: blocks laid down in two columns on one page. full: the page ran out of room.
@@ -172,8 +164,8 @@
       // Venue without its street address ("Palm Canyon Theatre, 538 N Palm Canyon Dr" -> "Palm Canyon Theatre").
       function venue(e) { var v = String(e.venue || "").replace(/,\s*\d.*$/, "").replace(/^\d+[^,]*$/, ""); return [v, v.indexOf(e.city || "~") > -1 ? "" : e.city].filter(Boolean).join(", "); }
       // compact: title and one line, no description (the "Every week" list).
-      // Dated events get a small QR on the right that opens that event on the site (weekly ones are covered by the
-      // corner QR, to keep the "Every week" box compact).
+      // Dated events get a small QR on the right that opens that event on the site. Weekly ones don't, to keep the
+      // "Every week" box compact.
       function eventBlock(e, sub, compact) {
         var qr = !compact && window.qrcode, TW = qr ? COLW - EQ - EQ_GAP : COLW;
         var t = doc.setFont("helvetica", "bold").setFontSize(10.5 * k) && doc.splitTextToSize(clean(e.title), TW);
