@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Coachella Valley Spotlight</title>
+<link rel="icon" href="assets/img/icon.svg" type="image/svg+xml">
+<!-- QR codes on the agents' events flyer point here: coachellavalleyspotlight.com/e?k=<key>.
+     k=all goes to the Events page. Any other key is a hash of an event's slug (made by evKey in assets/agent-flyer.js;
+     change both together). A hand-entered event opens its event/<slug>/ page. A venue-feed event (no page of its own)
+     opens the Events page searched for its title. A key that's no longer found (the event passed or left the feed)
+     opens the Events page. Every redirect adds utm_source=agent-flyer&utm_medium=qr so GA shows the scans. -->
+</head>
+<body>
+<p style="font:16px/1.5 system-ui,sans-serif;text-align:center;margin-top:40vh">Opening Coachella Valley Spotlight&hellip; <a href="events">Tap here</a> if nothing happens.</p>
+<script src="data/events.js"></script><script src="data/feed-events.js"></script>
+<script>
+(function () {
+  var k = (new URLSearchParams(location.search).get("k") || "").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 12);
+  function slug(e) { return (String(e.title).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").replace(/^(.{80}[^-]*).*$/, "$1")) + "-" + (e.weekly ? "weekly" : e.date); }
+  function key(e) { var s = slug(e), h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h.toString(36); }
+  var today = new Date(); today.setHours(0, 0, 0, 0);
+  function past(e) { var d = e.endDate || e.until || e.date; if (!d) return false; var p = d.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]) < today; }
+  var utm = "utm_source=agent-flyer&utm_medium=qr&utm_campaign=" + (k === "all" ? "site" : "event");
+  var to = "events?" + utm, D = window.CVS || {};
+  if (k && k !== "all") {
+    var all = (D.events || []).concat(D.feedEvents || []);
+    for (var i = 0; i < all.length; i++) {
+      var e = all[i];
+      if (!e || !e.title || e.sample || key(e) !== k) continue;
+      if (!past(e)) to = e.feed ? "events?q=" + encodeURIComponent(e.title) + "&" + utm : "event/" + slug(e) + "/?" + utm;
+      break;
+    }
+  }
+  location.replace(to);
+})();
+</script>
+</body>
+</html>

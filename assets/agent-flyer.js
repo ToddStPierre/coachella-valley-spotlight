@@ -1,7 +1,8 @@
 /* Real estate agent monthly events flyer (agents.html).
    A signed-in My Spotlight member with an agent profile (assets/auth.js, users/{uid}.agent) picks a month and
    the events they want, and downloads a US Letter PDF of valley events with their photo, contact info, logo and
-   a QR code to their website on a one-page flyer. Built in the browser with jsPDF (assets/vendor, MIT), which loads
+   a QR code to their website on a one-page flyer, plus a QR beside each event (to that event on our site) and one
+   in the bottom-left corner (to the Events page), both through the short e.html links. Built in the browser with jsPDF (assets/vendor, MIT), which loads
    on the first download only, like the QR library. Events: data/events.js + data/feed-events.js, the same lists
    the Events page uses. Weekly events go in an "Every week" box instead of being repeated. */
 (function () {
@@ -56,6 +57,15 @@
   var C = { ink: [34, 28, 24], ink2: [93, 80, 72], line: [228, 214, 195], sand: [245, 237, 225], sun: [217, 85, 43], sunDeep: [184, 64, 28], gold: [240, 163, 58], rose: [201, 102, 122], dusk: [91, 74, 122], palm: [46, 92, 79] };
   function shortDay(d) { return DOW[d.getDay()].slice(0, 3).toUpperCase() + "  " + MONTHS[d.getMonth()].slice(0, 3).toUpperCase() + " " + d.getDate(); }
   function imgType(u) { return /^data:image\/png/.test(u) ? "PNG" : "JPEG"; }
+  // Short QR links: coachellavalleyspotlight.com/e?k=<key>. e.html looks the key up in the same event lists and
+  // opens the event's page (or the Events page searched for it), tagged utm_source=agent-flyer. The key is a hash
+  // of the event's slug, so it's short enough to scan at 0.6 in. e.html has the same hash: change both together.
+  var SHORT = "https://coachellavalleyspotlight.com/e?k=";
+  function evKey(e) {
+    var s = (R.eventSlug ? R.eventSlug(e) : String(e.title)), h = 2166136261;
+    for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return h.toString(36);
+  }
   function imgSize(u) { return new Promise(function (res) { var i = new Image(); i.onload = function () { res({ w: i.naturalWidth, h: i.naturalHeight }); }; i.onerror = function () { res(null); }; i.src = u; }); }
 
   // agent: the profile; y, m: month; list: monthEvents() result already filtered to the chosen events.
@@ -72,10 +82,17 @@
     function make(sizes, descLines, k, cut) {
       var doc = new window.jspdf.jsPDF({ unit: "pt", format: "letter" });
       var W = 612, H = 792, M = 36, GAP = 20, COLW = (W - 2 * M - GAP) / 2;
-      var FOOT_H = 112, FINE_H = 26, bodyBottom = H - M - FOOT_H - FINE_H - 12;
+      var FOOT_H = 112, FINE_H = 58, EQ = 42, EQ_GAP = 8, bodyBottom = H - M - FOOT_H - FINE_H - 12;
       var month = MONTHS[m] + " " + y, name = clean(agent.name);
       doc.setProperties({ title: "Coachella Valley events, " + month, author: name, subject: "Things to do in the Coachella Valley", creator: "Coachella Valley Spotlight" });
       var fill = function (c) { doc.setFillColor(c[0], c[1], c[2]); }, color = function (c) { doc.setTextColor(c[0], c[1], c[2]); }, stroke = function (c) { doc.setDrawColor(c[0], c[1], c[2]); };
+      // A QR code drawn as vector squares (sharp at any print size). level: L for the small event codes, M otherwise.
+      function drawQR(text, x, y, size, level) {
+        var qr = window.qrcode(0, level || "M"); qr.addData(text); qr.make();
+        var n = qr.getModuleCount(), cell = size / n;
+        doc.setFillColor(255, 255, 255); doc.rect(x - 4, y - 4, size + 8, size + 8, "F"); fill(C.ink);
+        for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (qr.isDark(r, c)) doc.rect(x + c * cell, y + r * cell, cell + 0.15, cell + 0.15, "F");
+      }
 
       function header() {
         // Sunset stripes, the site's mark
@@ -106,10 +123,8 @@
         // QR to their website, then the logo, from the right edge
         var site = clean(agent.website);
         if (site && window.qrcode) {
-          var qr = window.qrcode(0, "M"); qr.addData("https://" + site.replace(/^https?:\/\//i, "")); qr.make();
-          var n = qr.getModuleCount(), q = 70, cell = q / n, qx = right - q, qy = top + (FOOT_H - q) / 2 - 5;
-          doc.setFillColor(255, 255, 255); doc.rect(qx - 4, qy - 4, q + 8, q + 8, "F"); fill(C.ink);
-          for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (qr.isDark(r, c)) doc.rect(qx + c * cell, qy + r * cell, cell + 0.15, cell + 0.15, "F");
+          var q = 70, qx = right - q, qy = top + (FOOT_H - q) / 2 - 5;
+          drawQR("https://" + site.replace(/^https?:\/\//i, ""), qx, qy, q, "M");
           doc.setFont("helvetica", "normal"); doc.setFontSize(6.5); color(C.ink2); doc.text("Scan for my website", qx + q / 2, qy + q + 11, { align: "center" });
           right = qx - 16;
         }
@@ -131,9 +146,17 @@
         var more = [site, agent.dre ? "DRE# " + clean(agent.dre).replace(/^dre\s*#?\s*/i, "") : ""].filter(Boolean).join("   ");
         if (more) { yy += 13; doc.text(doc.splitTextToSize(more, tw)[0], x, yy); }
         if (agent.note) { doc.setFont("helvetica", "italic"); doc.setFontSize(8.5); color(C.ink); doc.splitTextToSize(clean(agent.note), tw).slice(0, top + FOOT_H - yy > 32 ? 2 : 1).forEach(function (l) { yy += 11; doc.text(l, x, yy); }); }
-        // Fine print
+        // Bottom-left corner: a QR to the site's events page (every event this month, kept up to date).
+        var sq = 46, sx = M + 4, sy = H - M - sq - 2, lx = sx + sq + 12;
+        if (window.qrcode) {
+          drawQR(SHORT + "all", sx, sy, sq, "M");
+          doc.setFont("helvetica", "bold"); doc.setFontSize(9); color(C.sunDeep); doc.text("Scan for every valley event", lx, sy + 14);
+          doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); color(C.ink2); doc.text("Updated daily at coachellavalleyspotlight.com", lx, sy + 25);
+          doc.text("Or scan the code beside any event for its details.", lx, sy + 35);
+        }
+        // Fine print, to the right of the corner QR and its text
         doc.setFont("helvetica", "normal"); doc.setFontSize(6.5); color(C.ink2);
-        doc.text(doc.splitTextToSize("Equal Housing Opportunity. Event listings courtesy of Coachella Valley Spotlight, coachellavalleyspotlight.com. Dates, times and details can change, so please check with the organizer before you go. If your property is currently listed for sale, this is not a solicitation.", W - 2 * M), M, H - M - FINE_H + 10);
+        doc.text(doc.splitTextToSize("Equal Housing Opportunity. Event listings courtesy of Coachella Valley Spotlight, coachellavalleyspotlight.com. Dates, times and details can change, so please check with the organizer before you go. If your property is currently listed for sale, this is not a solicitation.", W - M - (lx + 196)), lx + 196, H - M - FINE_H + 18);
       }
 
       // Flow: blocks laid down in two columns on one page. full: the page ran out of room.
@@ -149,19 +172,24 @@
       // Venue without its street address ("Palm Canyon Theatre, 538 N Palm Canyon Dr" -> "Palm Canyon Theatre").
       function venue(e) { var v = String(e.venue || "").replace(/,\s*\d.*$/, "").replace(/^\d+[^,]*$/, ""); return [v, v.indexOf(e.city || "~") > -1 ? "" : e.city].filter(Boolean).join(", "); }
       // compact: title and one line, no description (the "Every week" list).
+      // Dated events get a small QR on the right that opens that event on the site (weekly ones are covered by the
+      // corner QR, to keep the "Every week" box compact).
       function eventBlock(e, sub, compact) {
-        var t = doc.setFont("helvetica", "bold").setFontSize(10.5 * k) && doc.splitTextToSize(clean(e.title), COLW);
+        var qr = !compact && window.qrcode, TW = qr ? COLW - EQ - EQ_GAP : COLW;
+        var t = doc.setFont("helvetica", "bold").setFontSize(10.5 * k) && doc.splitTextToSize(clean(e.title), TW);
         var meta = clean([sub, e.time, venue(e), e.price].filter(Boolean).join("  ·  "));
         doc.setFont("helvetica", "normal"); doc.setFontSize(8.5 * k);
-        var mm = doc.splitTextToSize(meta, COLW).slice(0, compact ? 1 : 2);
-        var full = e.description && !compact ? doc.splitTextToSize(clean(e.description), COLW) : [], dd = full.slice(0, descLines);
+        var mm = doc.splitTextToSize(meta, TW).slice(0, compact ? 1 : 2);
+        var full = e.description && !compact ? doc.splitTextToSize(clean(e.description), TW) : [], dd = full.slice(0, descLines);
         if (dd.length && full.length > dd.length) dd[dd.length - 1] = dd[dd.length - 1].replace(/\s*\S*$/, "") + "...";
-        return { h: (t.length * 12.5 + mm.length * 10.5 + dd.length * 10.5 + 9) * k, draw: function () {
-          var x = colX();
+        var textH = (t.length * 12.5 + mm.length * 10.5 + dd.length * 10.5 + 9) * k;
+        return { h: qr ? Math.max(textH, EQ + 12) : textH, draw: function () {
+          var x = colX(), y0 = yy;
+          if (qr) drawQR(SHORT + evKey(e), x + COLW - EQ, y0 + 3, EQ, "L");
           doc.setFont("helvetica", "bold"); doc.setFontSize(10.5 * k); color(C.ink); t.forEach(function (l) { yy += 12.5 * k; doc.text(l, x, yy - 3 * k); });
           doc.setFont("helvetica", "normal"); doc.setFontSize(8.5 * k); color(C.palm); mm.forEach(function (l) { yy += 10.5 * k; doc.text(l, x, yy - 2 * k); });
           color(C.ink2); dd.forEach(function (l) { yy += 10.5 * k; doc.text(l, x, yy - 2 * k); });
-          yy += 9 * k; shown++;
+          yy += 9 * k; if (qr) yy = Math.max(yy, y0 + EQ + 12); shown++;
         } };
       }
       function heading(label, c) {
@@ -200,7 +228,7 @@
       return { doc: doc, pages: 1, shown: shown, total: total, file: "valley-events-" + MONTHS[m].toLowerCase() + "-" + y + ".pdf" };
     }
   }
-  window.CVS_AGENT_FLYER = { monthEvents: monthEvents, buildPDF: buildPDF };
+  window.CVS_AGENT_FLYER = { monthEvents: monthEvents, buildPDF: buildPDF, evKey: evKey };
 
   /* ---------- page ---------- */
   if (!app) return;
