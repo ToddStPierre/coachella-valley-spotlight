@@ -1663,5 +1663,16 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
   .vc { grid-template-columns: 1fr; padding: var(--s3) 18px; border-radius: 20px; gap: var(--s3); }
   .vc-phone { transform: none; }
 }
+/* Compact version in the events page hero (data-compact) */
+.vc-compact { grid-template-columns: 1fr; gap: 0; padding: 26px 24px; border-radius: 20px; }
+.vc-compact::before { inset: auto -20% -70% 20%; }
+.vc-compact h2 { font-size: clamp(24px, 2.4vw, 30px); margin: 6px 0 10px; }
+.vc-compact p { font-size: 15.5px; }
+.vc-compact .vc-town { max-width: none; margin-top: 14px; }
+.vc-compact .vc-town select { font-size: 16px; padding: 10px 12px; }
+.vc-compact .vc-btns { max-width: none; gap: 8px; margin-top: 12px; }
+.vc-compact .vc-btn { padding: 11px 12px; font-size: 15px; gap: 8px; }
+.vc-compact .vc-note { font-size: 13px; }
+@media (max-width: 860px) { .vc-compact { padding: 22px 18px; } }
 @media (max-width: 420px) { .vc-btns { grid-template-columns: 1fr; } }
 @media (max-width: 640px) { .vc-toast { bottom: 76px; } }

@@ -55,18 +55,21 @@
 
   function draw(box) {
     var town = offered.indexOf(saved) > -1 ? saved : "";
+    var compact = box.hasAttribute("data-compact"); // small version in the events page hero: no phone preview, shorter copy
     box.classList.add("vc");
+    if (compact) box.classList.add("vc-compact");
     box.id = box.id || "valley-calendar";
     box.innerHTML =
       '<div class="vc-copy"><span class="eyebrow vc-eyebrow">New &middot; The Valley Calendar</span>' +
       '<h2>Put the valley in <span class="grad">your calendar.</span></h2>' +
-      '<p>Subscribe once and what&rsquo;s happening near you shows up in the calendar app you already use. New events appear on their own, and every Friday you get a heads-up with the weekend&rsquo;s list. Free, no account, no email.</p>' +
+      (compact ? '<p>Subscribe once and new events show up in the calendar app you already use, plus a Friday heads-up with the weekend&rsquo;s list. Free, no account.</p>'
+        : '<p>Subscribe once and what&rsquo;s happening near you shows up in the calendar app you already use. New events appear on their own, and every Friday you get a heads-up with the weekend&rsquo;s list. Free, no account, no email.</p>') +
       '<label class="vc-town"><span>Show me events in</span><select>' + '<option value="">The whole valley</option>' +
       offered.map(function (t) { return "<option" + (t === town ? " selected" : "") + ">" + esc(t) + "</option>"; }).join("") + "</select></label>" +
       '<div class="vc-btns"><a class="vc-btn" data-app="apple">' + ICON.apple + '<span>iPhone &amp; Mac</span></a><a class="vc-btn" data-app="google" target="_blank" rel="noopener">' + ICON.google + '<span>Google Calendar</span></a>' +
       '<a class="vc-btn" data-app="outlook" target="_blank" rel="noopener">' + ICON.outlook + '<span>Outlook</span></a><button type="button" class="vc-btn vc-copy-btn" data-app="copy">' + ICON.link + '<span>Copy link</span></button></div>' +
       '<p class="vc-note" role="status"><span class="vc-count"></span> Unsubscribe any time from your calendar app.</p></div>' +
-      '<div class="vc-visual"></div>';
+      (compact ? "" : '<div class="vc-visual"></div>');
     var sel = box.querySelector("select"), note = box.querySelector(".vc-note"), cnt = box.querySelector(".vc-count");
     function update() {
       var t = sel.value, L = links(t), n = count(offered.indexOf(t) > -1 ? t : "");
@@ -74,7 +77,7 @@
       box.querySelector('[data-app="google"]').href = L.google;
       box.querySelector('[data-app="outlook"]').href = L.outlook;
       cnt.textContent = n + " upcoming events" + (t ? " in " + t : " across the valley") + ", plus a weekend heads-up every Friday.";
-      box.querySelector(".vc-visual").innerHTML = preview(t);
+      var vis = box.querySelector(".vc-visual"); if (vis) vis.innerHTML = preview(t);
     }
     sel.addEventListener("change", function () { update(); ga("cal_town", { city: sel.value || "valley" }); });
     box.addEventListener("click", function (e) {
