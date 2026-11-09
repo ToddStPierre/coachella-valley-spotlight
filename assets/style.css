@@ -1623,3 +1623,45 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .rv-back { margin: 20px 0 0; }
 .rv-back a { color: var(--gold); font-weight: 600; }
 .rv-note .form { margin-top: 16px; }
+
+/* The Valley Calendar: subscribe box (assets/valley-cal.js) on the home and events pages */
+.vc-section { padding: var(--s3) 0 var(--s4); }
+.vc-home { padding-top: 0; }
+.vc { position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .9fr); gap: var(--s4); align-items: center; background: var(--ink); color: #f5ede1; border-radius: 24px; padding: var(--s4) var(--s4); scroll-margin-top: 90px; }
+.vc::before { content: ""; position: absolute; inset: auto -10% -55% 35%; height: 120%; background: radial-gradient(closest-side, rgba(240,163,58,.35), rgba(217,85,43,.18) 55%, transparent 75%); pointer-events: none; }
+.vc > * { position: relative; }
+.vc h2 { color: #fff; font-size: clamp(30px, 4vw, 44px); line-height: 1.05; margin: 8px 0 12px; }
+.vc .grad { background: linear-gradient(100deg, var(--gold), var(--sun) 50%, var(--rose)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.vc p { color: #d9cdbd; max-width: 560px; }
+.vc-eyebrow { color: var(--gold); }
+.vc-town { display: grid; gap: 6px; margin-top: 18px; max-width: 360px; font-size: 14px; color: #d9cdbd; }
+.vc-town select { font: 600 17px var(--body); padding: 12px 14px; border-radius: 12px; border: 1.5px solid #4a3f38; background: #2d2520; color: #fff; }
+.vc-btns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; max-width: 520px; }
+.vc-btn { display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-radius: 14px; background: #fffaf3; color: var(--ink) !important; font: 600 16px var(--body); text-decoration: none; border: 0; cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; }
+.vc-btn svg { width: 20px; height: 20px; flex: none; }
+.vc-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px -12px rgba(240,163,58,.8); }
+.vc-btn[data-app="apple"] { background: linear-gradient(180deg, #f0a33a, #d9552b); color: #fff !important; }
+.vc-copy-btn { background: transparent; color: #f5ede1 !important; box-shadow: inset 0 0 0 1.5px #4a3f38; }
+.vc .vc-note { font-size: 14px; margin-top: 12px; color: #bfb2a2; }
+.vc-note b { color: #fff; }
+.vc-phone { width: min(300px, 100%); margin: 0 auto; background: #fffaf3; color: var(--ink); border-radius: 30px; padding: 14px 14px 18px; box-shadow: 0 30px 60px -25px rgba(0,0,0,.8), inset 0 0 0 6px #3a302a; transform: rotate(2deg); }
+.vc-phone-top { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px 10px; font: 700 18px var(--display); }
+.vc-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--sun); box-shadow: 0 0 0 4px rgba(217,85,43,.2); }
+.vc-phone ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.vc-ev { display: grid; grid-template-columns: 42px 1fr; gap: 10px; align-items: start; padding: 10px; border-radius: 12px; background: #fff; border-left: 4px solid var(--palm); }
+.vc-day { font: 500 11px var(--mono); letter-spacing: .06em; color: var(--ink-2); text-align: center; line-height: 1.2; }
+.vc-day em { font: 700 20px var(--display); font-style: normal; color: var(--ink); }
+.vc-ev b { display: block; font-size: 14px; line-height: 1.25; }
+.vc-ev i { display: block; font-style: normal; font-size: 12.5px; color: var(--ink-2); margin-top: 2px; }
+.vc-ev.vc-fri { border-left-color: var(--sun); background: #fff4e6; }
+.vc-toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 90; display: flex; align-items: center; gap: 12px; max-width: calc(100% - 32px); padding: 12px 12px 12px 18px; border-radius: 16px; background: var(--ink); color: #f5ede1; box-shadow: 0 18px 40px -16px rgba(0,0,0,.6); font-size: 15px; animation: vcIn .25s ease; transition: opacity .3s, transform .3s; }
+.vc-toast a { flex: none; padding: 8px 14px; border-radius: 999px; background: var(--gold); color: var(--ink); font-weight: 700; text-decoration: none; }
+.vc-toast button { flex: none; background: none; border: 0; color: #bfb2a2; font-size: 22px; cursor: pointer; padding: 0 4px; }
+.vc-toast-out { opacity: 0; transform: translate(-50%, 10px); }
+@keyframes vcIn { from { opacity: 0; transform: translate(-50%, 12px); } }
+@media (max-width: 860px) {
+  .vc { grid-template-columns: 1fr; padding: var(--s3) 18px; border-radius: 20px; gap: var(--s3); }
+  .vc-phone { transform: none; }
+}
+@media (max-width: 420px) { .vc-btns { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .vc-toast { bottom: 76px; } }

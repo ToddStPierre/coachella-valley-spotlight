@@ -816,6 +816,8 @@
     offerInput.addEventListener("input", render);
   })();
 
+  // Shared with assets/valley-cal.js (the "Valley Calendar" subscribe box).
+  window.CVS_EVENTS = events; window.CVS_EVENT_SLUG = eventSlug;
   // "Apple / Outlook" calendar links: build the .ics file on click.
   document.addEventListener("click", function (ev) {
     var a = ev.target.closest && ev.target.closest("[data-ics]"); if (!a) return;

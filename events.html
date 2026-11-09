@@ -38,7 +38,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=20261109vc">
 </head>
 <body>
 <header class="site-header"><a class="skip-link" href="#main">Skip to main content</a><div class="stripe"></div><nav class="nav wrap" aria-label="Main">
@@ -54,6 +54,7 @@
 
 <section class="page-hero"><div class="wrap city-hero"><div><span class="eyebrow"><span class="stripe-mini"></span>Things to do</span><h1>Coachella Valley <span class="grad">Events Calendar.</span></h1><p>There are <span data-count="events"></span> upcoming events on the Coachella Valley calendar, from Palm Springs to Coachella, sorted by date: concerts, festivals, Firebirds hockey, farmers markets, street fairs and community events. Past events drop off on their own, so everything here is still coming up.</p>
 <div class="chips"><a class="chip" href="this-weekend/">This weekend</a><a class="chip chip-feature" href="holidays" data-until="2027-01-02">&#127876; Holiday guide</a><a class="chip" href="farmers-markets">Farmers markets</a><a class="chip" href="golf/">Golf courses</a><a class="chip" href="local/hiking-trails/">Hiking trails</a></div></div><figure class="city-photo"><img src="assets/img/activities/events.jpg" alt="VillageFest on Palm Canyon Drive, Palm Springs" width="800" height="450"><figcaption>Photo: <a href="https://commons.wikimedia.org/wiki/File:Village_Fest-1.jpg" target="_blank" rel="noopener">Visitor7</a>, CC BY-SA 3.0 via Wikimedia Commons</figcaption></figure></div></section>
+<section class="vc-section"><div class="wrap"><div data-cal-sub id="valley-calendar"></div></div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
 <div class="filters"><label class="sr-only" for="f-q">Search</label><input id="f-q" type="search" placeholder="Search">
 <label class="sr-only" for="f-city">City</label><select id="f-city"><option value="">All cities</option></select><label class="sr-only" for="f-cat">Categories</label><select id="f-cat"><option value="">All categories</option></select><label class="sr-only" for="f-when">When</label><select id="f-when"><option value="">Any date</option><option value="today">Today</option><option value="weekend">This weekend</option><option value="week">Next 7 days</option><option value="month">This month</option></select></div>
@@ -78,6 +79,6 @@
 <nav class="footer-towns" aria-label="Towns"><h4>Towns</h4><ul><li><a href="city/bermuda-dunes/">Bermuda Dunes</a></li><li><a href="city/cathedral-city/">Cathedral City</a></li><li><a href="city/coachella/">Coachella</a></li><li><a href="city/desert-hot-springs/">Desert Hot Springs</a></li><li><a href="city/indian-wells/">Indian Wells</a></li><li><a href="city/indio/">Indio</a></li><li><a href="city/la-quinta/">La Quinta</a></li><li><a href="city/palm-desert/">Palm Desert</a></li><li><a href="city/palm-springs/">Palm Springs</a></li><li><a href="city/rancho-mirage/">Rancho Mirage</a></li><li><a href="city/thousand-palms/">Thousand Palms</a></li></ul></nav>
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight, a brand of MoreViews Pro LLC. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
-<script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js"></script>
+<script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js"></script><script src="assets/valley-cal.js?v=20261109b"></script>
 </body>
 </html>
