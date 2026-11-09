@@ -141,7 +141,7 @@
     next2.disabled = !route;
   }
 
-  function go(n) {
+  function go(n, first) {
     step = n;
     steps.forEach(function (s) { s.hidden = +s.getAttribute("data-step") !== n; });
     dots.forEach(function (d, i) { d.classList.toggle("on", i < n); });
@@ -153,7 +153,7 @@
       $("#qh-pay").textContent = "Pay " + PRICE + " and lock it in";
     }
     var f = steps[n - 1].querySelector("input:not([type=hidden]), button.qh-route.on, button");
-    box.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!first) box.scrollIntoView({ behavior: "smooth", block: "start" });
     if (f && n > 1) setTimeout(function () { try { f.focus({ preventScroll: true }); } catch (e) {} }, 250);
   }
   next1.addEventListener("click", function () { go(2); });
@@ -208,5 +208,5 @@
     loadRoute(p.route);
   }
 
-  go(1);
+  go(1, true);
 })();

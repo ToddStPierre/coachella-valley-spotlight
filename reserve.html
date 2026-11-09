@@ -39,7 +39,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=20261109q">
+<link rel="stylesheet" href="assets/style.css?v=20261109r">
 </head>
 <body>
 <header class="site-header"><a class="skip-link" href="#main">Skip to main content</a><div class="stripe"></div><nav class="nav wrap" aria-label="Main">
@@ -57,7 +57,8 @@
 <div class="final">
 <span class="eyebrow" style="color:var(--gold)">Hold your spot</span>
 <h2>Be the One Business Your Neighbors See for <span class="grad">Your Category.</span></h2>
-<p style="max-width:640px">Three quick steps and you&rsquo;re on the card. No payment needed to hold. We design your ad for you.</p>
+<p style="max-width:640px" id="rv-intro">Three quick steps and you&rsquo;re on the card. No payment needed to hold. We design your ad for you.</p>
+<div class="rv-view" data-view="quick">
 <div class="qh qh-loading" id="qh">
 <div class="qh-progress"><span class="qh-when-wrap"><b id="qh-title">Get on the next card</b> &middot; <span id="qh-when"></span></span><span class="qh-dots" aria-hidden="true"><i></i><i></i><i></i></span><span id="qh-count" class="qh-count">Step 1 of 3</span></div>
 <p class="qh-load" id="qh-load">Checking open spots&hellip;</p>
@@ -91,8 +92,11 @@
 <div class="qh-nav"><button type="button" class="qh-link" data-back>&larr; Back</button></div>
 </form>
 <div class="qh-done" id="qh-done" hidden role="status"></div>
-<p class="qh-more"><a href="#picker">Want a bigger ad or a specific spot? Choose it on the card &darr;</a></p>
+<div class="qh-more"><a href="#picker">Want a bigger ad or a specific spot? <b>Choose it on the card &rarr;</b></a><a href="#not-sure">Questions first, or a different area? <b>Send us a note &rarr;</b></a></div>
 </div>
+</div>
+<div class="rv-view" data-view="picker" hidden>
+<p class="rv-back"><a href="#quick">&larr; Back to the quick 3-step hold</a></p>
 <div class="picker" id="picker">
 <div class="picker-head">Choose your exact spot or a bigger ad</div>
 <div class="picker-tabs" role="tablist">
@@ -128,8 +132,11 @@
 </div>
 <noscript><p class="picker-status">Turn on JavaScript to see open spots, or call (760) 422-5475.</p></noscript>
 </div>
-<h3 id="not-sure" style="color:#fff;margin-top:40px">Not sure yet, or want a different area?</h3>
-<p style="max-width:640px">Send a note and we will call you to talk it through.</p>
+</div>
+<div class="rv-view rv-note" data-view="note" hidden>
+<p class="rv-back"><a href="#quick">&larr; Back to the quick 3-step hold</a></p>
+<h3 id="not-sure" style="color:#fff;margin-top:24px">Not sure yet, or want a different area?</h3>
+<p style="max-width:640px">Send a note and we will call you to talk it through. Or call <a href="tel:+17604225475" style="color:var(--gold)">(760) 422-5475</a>.</p>
 <form class="form" action="https://formspree.io/f/myezyype" method="POST" data-ajax data-thanks="Got it. We will call you within 1 business day to confirm your spot.">
 <input type="hidden" name="_subject" value="Coachella Valley Spotlight: postcard spot request">
 <input type="hidden" name="source" value="Coachella Valley Spotlight / reserve">
@@ -144,6 +151,7 @@
 <div class="full"><button class="btn" type="submit">Hold my spot</button></div>
 <p class="form-status" role="status"></p>
 </form>
+</div>
 </div></div></section>
 </main>
 
@@ -167,7 +175,28 @@
 <script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js"></script>
 <script src="data/mailings.js"></script>
 <script src="assets/picker.js?v=20261109a"></script>
-<script src="assets/quick-hold.js?v=20261109a"></script>
+<script src="assets/quick-hold.js?v=20261109b"></script>
+<script>
+/* One view at a time: quick hold (default), the full spot picker (#picker, or ?size=2/4/8, or ?paid=1), or the note form (#not-sure). */
+(function () {
+  var views = document.querySelectorAll(".rv-view");
+  function pickView() {
+    var h = location.hash.slice(1);
+    if (h === "picker" || h === "not-sure" || h === "quick") return h === "not-sure" ? "note" : h;
+    if (/[?&]paid=1\b/.test(location.search) || /[?&]size=[248]\b/.test(location.search)) return "picker";
+    return "quick";
+  }
+  function show(first) {
+    var v = pickView();
+    views.forEach(function (el) { el.hidden = el.getAttribute("data-view") !== v; });
+    var intro = document.getElementById("rv-intro");
+    if (intro) intro.textContent = { quick: "Three quick steps and you\u2019re on the card. No payment needed to hold. We design your ad for you.", picker: "Pick your size, tap an open spot, then pay online to lock it in, or hold it and we\u2019ll invoice you. No payment needed to hold.", note: "Have a question, or want a route we don\u2019t mail yet? Tell us and we\u2019ll call you." }[v];
+    if (!first) { var top = document.querySelector(".reserve-page .final"); if (top) top.scrollIntoView({ block: "start" }); }
+  }
+  window.addEventListener("hashchange", function () { show(false); });
+  show(true);
+})();
+</script>
 <script>
 (function () {
   var a = document.getElementById("reserve-change"), m = location.search.match(/[?&]route=([a-z-]+)/);

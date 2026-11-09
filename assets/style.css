@@ -1615,3 +1615,11 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
   .qh-when-wrap { flex-basis: 100%; }
 }
 .qh-done:focus { outline: none; }
+/* Reserve page: one view at a time (quick hold / spot picker / note form) */
+.qh-more { display: grid; gap: 10px; }
+.qh-more a { text-decoration: none; color: var(--ink-2) !important; font-size: 15.5px; }
+.qh-more a b { color: var(--palm); font-weight: 600; }
+.qh-more a:hover b { text-decoration: underline; }
+.rv-back { margin: 20px 0 0; }
+.rv-back a { color: var(--gold); font-weight: 600; }
+.rv-note .form { margin-top: 16px; }
