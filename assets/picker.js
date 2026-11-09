@@ -131,7 +131,7 @@
   }
   var wantSize = (location.search.match(/[?&]size=([1248])\b/) || [])[1];
   if (wantSize) root.querySelectorAll("[data-size]").forEach(function (b) { if (b.getAttribute("data-size") === wantSize) b.click(); });
-  var want = (location.search.match(/[?&]route=([a-z-]+)/) || [])[1];
+  var want = (location.search.match(/[?&]route=([a-z-]+)/) || [])[1]; if (want === "sun-city") want = "sun-city-palm-desert";
   tabs.forEach(function (t) { if (want && t.getAttribute("data-route") === want) t.click(); });
   if (!want || !mailing(want)) load(route);
 })();

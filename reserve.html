@@ -39,7 +39,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=20261102b">
+<link rel="stylesheet" href="assets/style.css?v=20261109q">
 </head>
 <body>
 <header class="site-header"><a class="skip-link" href="#main">Skip to main content</a><div class="stripe"></div><nav class="nav wrap" aria-label="Main">
@@ -57,10 +57,44 @@
 <div class="final">
 <span class="eyebrow" style="color:var(--gold)">Hold your spot</span>
 <h2>Be the One Business Your Neighbors See for <span class="grad">Your Category.</span></h2>
-<p style="max-width:640px">Pick your size, tap an open spot, then pay online to lock it in, or hold it and we&rsquo;ll invoice you. No payment needed to hold a spot.</p>
-<p class="reserve-change"><a href="coverage-map" id="reserve-change">&larr; Change route on the coverage map</a></p>
+<p style="max-width:640px">Three quick steps and you&rsquo;re on the card. No payment needed to hold. We design your ad for you.</p>
+<div class="qh qh-loading" id="qh">
+<div class="qh-progress"><span class="qh-when-wrap"><b id="qh-title">Get on the next card</b> &middot; <span id="qh-when"></span></span><span class="qh-dots" aria-hidden="true"><i></i><i></i><i></i></span><span id="qh-count" class="qh-count">Step 1 of 3</span></div>
+<p class="qh-load" id="qh-load">Checking open spots&hellip;</p>
+<form class="qh-step" data-step="1" id="qh-step1" autocomplete="off">
+<h3>What&rsquo;s your business?</h3>
+<div class="qh-field"><label class="sr-only" for="qh-biz">Business name</label><input id="qh-biz" name="business" placeholder="Start typing your business name" autocomplete="organization" required>
+<ul class="qh-sugg" id="qh-sugg" hidden></ul></div>
+<div class="qh-cat" id="qh-cat-wrap"><p class="qh-cat-picked-line">Category: <b id="qh-cat-picked"></b> <button type="button" class="qh-link" id="qh-cat-change">change</button></p>
+<label class="qh-cat-label">Your category<select id="qh-cat"><option value="">Pick your category&hellip;</option></select></label></div>
+<div class="qh-avail" id="qh-avail" aria-live="polite"></div>
+<p class="qh-fine">One business per category on each card, so no competitor shares it with you.</p>
+<button type="submit" class="btn qh-next" id="qh-next1" disabled>Next &rarr;</button>
+</form>
+<div class="qh-step" data-step="2" hidden>
+<h3>Which homes should get your ad?</h3>
+<div class="qh-routes" id="qh-routes"></div>
+<p class="qh-fine"><a href="coverage-map" id="reserve-change">See both routes on the coverage map</a></p>
+<div class="qh-nav"><button type="button" class="qh-link" data-back>&larr; Back</button><button type="button" class="btn qh-next" id="qh-next2" disabled>Next &rarr;</button></div>
+</div>
+<form class="qh-step" data-step="3" id="qh-form" hidden>
+<h3>Where should we send your confirmation?</h3>
+<p class="qh-summary" id="qh-summary"></p>
+<div class="qh-fields">
+<label>Your name<input name="name" required autocomplete="name"></label>
+<label>Email<input name="email" type="email" required autocomplete="email"></label>
+<label>Phone (optional)<input name="phone" type="tel" autocomplete="tel"></label>
+</div>
+<div class="qh-buttons"><button type="submit" class="btn" id="qh-pay">Pay $300 and lock it in</button><button type="submit" class="btn btn-ghost" id="qh-hold">Hold my spot free, invoice me</button></div>
+<p class="qh-fine">Design, printing, postage and QR tracking included. Holding is free; the invoice comes after you approve your ad.</p>
+<p class="form-status" id="qh-msg" role="status"></p>
+<div class="qh-nav"><button type="button" class="qh-link" data-back>&larr; Back</button></div>
+</form>
+<div class="qh-done" id="qh-done" hidden role="status"></div>
+<p class="qh-more"><a href="#picker">Want a bigger ad or a specific spot? Choose it on the card &darr;</a></p>
+</div>
 <div class="picker" id="picker">
-<div class="picker-head">Select the postcard campaign below</div>
+<div class="picker-head">Choose your exact spot or a bigger ad</div>
 <div class="picker-tabs" role="tablist">
 <button class="picker-tab active" data-route="el-paseo" type="button" role="tab" aria-selected="true">El Paseo</button>
 <button class="picker-tab" data-route="sun-city-palm-desert" type="button" role="tab" aria-selected="false">Sun City Palm Desert</button>
@@ -94,7 +128,7 @@
 </div>
 <noscript><p class="picker-status">Turn on JavaScript to see open spots, or call (760) 422-5475.</p></noscript>
 </div>
-<h3 style="color:#fff;margin-top:40px">Not sure yet, or want a different area?</h3>
+<h3 id="not-sure" style="color:#fff;margin-top:40px">Not sure yet, or want a different area?</h3>
 <p style="max-width:640px">Send a note and we will call you to talk it through.</p>
 <form class="form" action="https://formspree.io/f/myezyype" method="POST" data-ajax data-thanks="Got it. We will call you within 1 business day to confirm your spot.">
 <input type="hidden" name="_subject" value="Coachella Valley Spotlight: postcard spot request">
@@ -132,11 +166,12 @@
 </div></footer>
 <script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js"></script>
 <script src="data/mailings.js"></script>
-<script src="assets/picker.js?v=20261102a"></script>
+<script src="assets/picker.js?v=20261109a"></script>
+<script src="assets/quick-hold.js?v=20261109a"></script>
 <script>
 (function () {
   var a = document.getElementById("reserve-change"), m = location.search.match(/[?&]route=([a-z-]+)/);
-  if (a && m) a.href = "coverage-map?route=" + m[1];
+  if (a && m) a.href = "coverage-map?route=" + (m[1] === "sun-city" ? "sun-city-palm-desert" : m[1]);
 })();
 </script>
 </body>
