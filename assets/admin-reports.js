@@ -26,7 +26,11 @@
     var rows = {};
     owners.forEach(function (o) { rows[o.slug] = { slug: o.slug, who: o.name, email: o.email }; });
     dir.forEach(function (b) { if (b.slug && !b.sample && (b.premium || b.postcard || b.featured) && !rows[b.slug]) rows[b.slug] = { slug: b.slug, who: "", email: "" }; });
-    var list = Object.keys(rows).map(function (k) { var x = rows[k]; x.b = info[k] || { name: k }; x.s = by[k]; return x; }).filter(function (x) { return x.s; })
+    var list = Object.keys(rows).map(function (k) { var x = rows[k]; x.b = info[k] || { name: k }; x.s = by[k]; return x; }).filter(function (x) { return x.s; });
+    // Only businesses with some activity in the report month get a report (Todd, 2026-11-09). A report of all zeros helps no one.
+    function active(x) { var m = x.s.lastMonth || {}; return Object.keys(m).some(function (k) { return m[k] > 0; }); }
+    var quiet = list.filter(function (x) { return !active(x); });
+    list = list.filter(active)
       .sort(function (a, z) { return (sent[a.slug] === ym) - (sent[z.slug] === ym) || a.b.name.localeCompare(z.b.name); });
 
     function draft(x) {
@@ -47,7 +51,8 @@
     function draw() {
       var done = list.filter(function (x) { return sent[x.slug] === ym; }).length;
       box.innerHTML = '<h2 class="month-head"><span class="stripe-mini"></span>Monthly reports: ' + monthName(ym) + ' (' + done + ' of ' + list.length + ' sent)</h2>' +
-        '<p class="risk" style="margin-bottom:16px">Owners and paying businesses get their numbers every month. Email report opens a ready Gmail draft from ' + FROM + '. Postcard and Premium listings without an owner account have no email on file, so fill in the To line.</p>' +
+        '<p class="risk" style="margin-bottom:16px">Owners and paying businesses get their numbers every month. Email report opens a ready Gmail draft from ' + FROM + '. Postcard and Premium listings without an owner account have no email on file, so fill in the To line.' +
+        (quiet.length ? ' Only listings with activity in ' + monthName(ym) + ' are shown; ' + quiet.length + ' had none (' + quiet.map(function (x) { return esc(x.b.name); }).join(", ") + ').' : "") + '</p>' +
         '<div class="table-scroll"><table class="stats-table"><thead><tr><th>Business</th><th>' + monthName(ym) + '</th><th>Send to</th><th></th></tr></thead><tbody>' +
         list.map(function (x) {
           var m = x.s.lastMonth, d = draft(x), isSent = sent[x.slug] === ym;
