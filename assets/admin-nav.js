@@ -13,11 +13,11 @@
   function num(sel, re) { var el = document.querySelector(sel); if (!el) return 0; var m = re ? (el.textContent.match(re) || [])[1] : el.textContent; return +m || 0; }
   var SECTIONS = [
     ["today", "Today", ["cockpit-admin", "visitors-admin"], function () { return num("#ck-due-todo b"); }],
+    ["setup", "Mailing & money", ["mailings-admin", "money-admin", "admin-tools"], null],
     ["reports", "Reports", ["reports-admin"], function () { return document.querySelectorAll("#reports-admin a.btn[data-sent]:not(.btn-ghost)").length; }],
     ["inbox", "Inbox", ["submissions-admin"], function () { return num("#submissions-admin", /\((\d+) new\)/); }],
     ["listings", "Listings", ["st-out", "st-risk"], null],
-    ["people", "Owners & people", ["owners-admin", "own-msg", "signups-admin"], function () { return document.querySelectorAll("#owners-admin [data-claim]").length; }],
-    ["setup", "Mailing & money", ["mailings-admin", "money-admin", "admin-tools"], null]
+    ["people", "Owners & people", ["owners-admin", "own-msg", "signups-admin"], function () { return document.querySelectorAll("#owners-admin [data-claim]").length; }]
   ];
   var risk = wrap.querySelector("p.risk:last-of-type"); if (risk && !risk.id) risk.id = "st-risk";
 
