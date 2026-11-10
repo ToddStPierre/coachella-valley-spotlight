@@ -19,6 +19,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css?v=20261109adm2">
+<link rel="stylesheet" href="assets/admin-shell.css?v=20261109hq">
 </head>
 <body data-no-popup>
 <header class="site-header"><a class="skip-link" href="#main">Skip to main content</a><div class="stripe"></div><nav class="nav wrap" aria-label="Main">
@@ -72,7 +73,7 @@
       var cities = all.map(function (b) { return b.city; }).filter(function (c, i, a) { return c && a.indexOf(c) === i; }).sort();
       var PERIODS = [["thisMonth", "This month"], ["lastMonth", "Last month"], ["last30", "Last 30 days"], ["allTime", "All time"]];
       var st = { period: "thisMonth", sort: "profile", q: "", city: "", filter: "active", shown: 25 };
-      out.innerHTML = '<h2 class="month-head"><span class="stripe-mini"></span>Listings</h2><p class="risk" style="margin-bottom:16px">Every real business in the directory. Copy a business&rsquo;s private link to send them their numbers.</p><div class="adm-tiles" id="adm-tiles"></div>' +
+      out.innerHTML = '<div class="adm-tiles" id="adm-tiles"></div>' +
         '<div class="filters adm-controls">' +
         '<label class="sr-only" for="adm-q">Search</label><input id="adm-q" type="search" placeholder="Search businesses">' +
         '<label class="sr-only" for="adm-city">City</label><select id="adm-city"><option value="">All cities</option>' + cities.map(function (c) { return "<option>" + c + "</option>"; }).join("") + '</select>' +
@@ -114,12 +115,12 @@
         $("adm-chips").innerHTML = FILTERS.map(function (f) { return '<button type="button" class="chip' + (st.filter === f[0] ? " active" : "") + '" data-f="' + f[0] + '">' + f[1] + " (" + all.filter(function (b) { var o = st.filter; st.filter = f[0]; var ok = pass(b); st.filter = o; return ok; }).length + ")</button>"; }).join("");
         var label = PERIODS.filter(function (p) { return p[0] === st.period; })[0][1];
         $("adm-count").textContent = list.length + " of " + all.length + " listings · " + label + (st.period === "thisMonth" ? " (change vs. last month at the same point)" : "");
-        $("adm-head").innerHTML = "<tr><th>Business</th>" + LABELS.map(function (l) { return "<th>" + tip(l) + "</th>"; }).join("") + "<th>Links</th></tr>";
+        $("adm-head").innerHTML = "<tr><th>Business</th>" + LABELS.map(function (l) { return "<th>" + tip(l) + "</th>"; }).join("") + "<th></th></tr>";
         $("adm-body").innerHTML = list.slice(0, st.shown).map(function (b) {
           var link = base + "?b=" + b.slug + "&key=" + b.key;
           var tags = (b.postcard ? '<span class="adm-tag">Postcard</span>' : b.premium ? '<span class="adm-tag">Premium</span>' : "") + (b.claimed ? '<span class="adm-tag adm-tag-c">Claimed</span>' : "");
           return "<tr><td><strong>" + b.name + "</strong>" + tags + '<br><span class="adm-city">' + b.city + "</span></td>" + LABELS.map(function (l) { return "<td>" + (b[st.period][l[0]] || 0) + trend(b, l[0]) + "</td>"; }).join("") +
-            '<td><a href="' + link + '" target="_blank" rel="noopener">Open</a> &middot; <a href="#" data-copy="' + link + '">Copy link</a> &middot; <a href="#" data-qr="' + b.slug + '" data-qr-name="' + String(b.name).replace(/"/g, "&quot;") + '">QR code</a></td></tr>';
+            '<td><span class="hq-rowact"><button type="button" class="hq-edit" data-edit="' + b.slug + '">Edit</button><a href="' + link + '" target="_blank" rel="noopener" title="Their private Spotlight Report">Report</a><a href="#" data-copy="' + link + '" title="Copy their private report link">Link</a><a href="#" data-qr="' + b.slug + '" data-qr-name="' + String(b.name).replace(/"/g, "&quot;") + '">QR</a></span></td></tr>';
         }).join("") || '<tr><td colspan="' + (LABELS.length + 2) + '">Nothing matches.</td></tr>';
         $("adm-more-wrap").innerHTML = list.length > st.shown ? '<button type="button" class="btn btn-ghost" id="adm-more">Show ' + Math.min(25, list.length - st.shown) + " more (" + (list.length - st.shown) + " left)</button>" : "";
       }
@@ -133,6 +134,14 @@
         if (e.target.id === "adm-more") { st.shown += 25; draw(); }
       });
       draw();
+      // Spotlight HQ listing editor: refresh names, tags and new listings after a save (assets/admin-listing-edit.js).
+      window.HQ_LISTINGS_CHANGED = function () {
+        var now = {}; ((window.CVS && window.CVS.directory) || []).forEach(function (x) { if (!x.sample && x.slug) now[x.slug] = x; });
+        all = all.filter(function (b) { return now[b.slug]; });
+        Object.keys(now).forEach(function (s) { if (!all.some(function (b) { return b.slug === s; })) { var z = {}; LABELS.forEach(function (l) { z[l[0]] = 0; }); all.push({ slug: s, key: "", thisMonth: z, lastMonth: z, last30: z, allTime: z }); } });
+        all.forEach(function (b) { var x = now[b.slug]; b.name = x.name; b.city = x.city || ""; b.premium = !!(x.premium || x.featured); b.postcard = !!x.postcard; b.claimed = !!x.claimed; b.pub = !!x.public; });
+        draw();
+      };
     }).catch(function () { fail("Could not load the numbers. Try again in a minute."); });
     return;
   }
@@ -185,6 +194,6 @@
 <nav class="footer-towns" aria-label="Towns"><h4>Towns</h4><ul><li><a href="city/bermuda-dunes/">Bermuda Dunes</a></li><li><a href="city/cathedral-city/">Cathedral City</a></li><li><a href="city/coachella/">Coachella</a></li><li><a href="city/desert-hot-springs/">Desert Hot Springs</a></li><li><a href="city/indian-wells/">Indian Wells</a></li><li><a href="city/indio/">Indio</a></li><li><a href="city/la-quinta/">La Quinta</a></li><li><a href="city/palm-desert/">Palm Desert</a></li><li><a href="city/palm-springs/">Palm Springs</a></li><li><a href="city/rancho-mirage/">Rancho Mirage</a></li><li><a href="city/thousand-palms/">Thousand Palms</a></li></ul></nav>
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight, a brand of MoreViews Pro LLC. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
-<script src="data/directory.js"></script><script src="assets/app.js"></script><script src="assets/admin-owners.js?v=20261103b"></script><script src="data/mailings.js"></script><script src="assets/admin-mailings.js?v=20261103a"></script><script src="assets/admin-money.js?v=20261106b"></script><script src="assets/admin-signups.js?v=20261106a"></script><script src="assets/admin-backup.js?v=20261103a"></script><script src="assets/admin-submissions.js?v=20261103a"></script><script src="data/deals.js"></script><script src="assets/admin-cockpit.js?v=20261109a"></script><script src="assets/admin-reports.js?v=20261109a"></script><script src="assets/admin-nav.js?v=20261109b"></script><script src="assets/admin-qr.js?v=20261102a"></script><script src="assets/stats-report.js?v=20261109a"></script>
+<script src="data/directory.js"></script><script src="assets/app.js"></script><script src="assets/admin-owners.js?v=20261103b"></script><script src="data/mailings.js"></script><script src="assets/admin-mailings.js?v=20261103a"></script><script src="assets/admin-money.js?v=20261106b"></script><script src="assets/admin-signups.js?v=20261106a"></script><script src="assets/admin-backup.js?v=20261103a"></script><script src="assets/admin-submissions.js?v=20261103a"></script><script src="data/deals.js"></script><script src="assets/admin-cockpit.js?v=20261109a"></script><script src="assets/admin-reports.js?v=20261109a"></script><script src="assets/admin-hq.js?v=20261109hq"></script><script src="assets/admin-board.js?v=20261109hq"></script><script src="assets/admin-overview.js?v=20261109hq"></script><script src="assets/admin-listing-edit.js?v=20261109hq"></script><script src="assets/admin-nav.js?v=20261109hq"></script><script src="assets/admin-qr.js?v=20261102a"></script><script src="assets/stats-report.js?v=20261109a"></script>
 </body>
 </html>
