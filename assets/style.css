@@ -1676,3 +1676,38 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 @media (max-width: 860px) { .vc-compact { padding: 22px 18px; } }
 @media (max-width: 420px) { .vc-btns { grid-template-columns: 1fr; } }
 @media (max-width: 640px) { .vc-toast { bottom: 76px; } }
+
+/* Admin sidebar layout (stats.html admin mode, 2026-11-09): one section at a time, sidebar on the left. */
+.is-admin .site-footer { display: none; }
+.is-admin .page-hero { padding: 24px 0 64px; }
+.is-admin .page-hero > .wrap { width: min(1600px, 100% - 32px); }
+.is-admin .page-hero .eyebrow, .is-admin #st-sub { display: none; }
+.adm-shell { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 32px; align-items: start; }
+.adm-main { min-width: 0; }
+.adm-main > #st-title { font-size: clamp(30px, 3vw, 40px); margin: 0 0 20px; }
+.adm-off { display: none !important; }
+.adm-side { position: sticky; top: 96px; display: grid; gap: 4px; padding: 12px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.adm-side-head { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); padding: 4px 12px 8px; }
+.adm-side a { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-radius: 10px; color: var(--ink); text-decoration: none; font-weight: 600; font-size: 15px; }
+.adm-side a:hover { background: var(--sand); }
+.adm-side a.active { background: var(--ink); color: #fff; }
+.adm-side .adm-side-ext { margin-top: 8px; border-top: 1px solid var(--line); border-radius: 0 0 10px 10px; padding-top: 14px; font-weight: 500; color: var(--ink-2); }
+.adm-badge { font-style: normal; min-width: 22px; padding: 1px 7px; border-radius: 99px; background: var(--sun-deep); color: #fff; font-size: 12px; font-weight: 700; text-align: center; }
+.adm-side a.active .adm-badge { background: var(--gold); color: var(--ink); }
+.adm-main > [id] + [id] { margin-top: 32px; }
+.adm-main #admin-tools { margin-bottom: 0 !important; }
+@media (max-width: 900px) {
+  .adm-shell { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .adm-side { top: 64px; z-index: 15; display: flex; overflow-x: auto; scrollbar-width: none; padding: 6px; border-radius: 99px; }
+  .adm-side::-webkit-scrollbar { display: none; }
+  .adm-side-head { display: none; }
+  .adm-side a { flex: none; border-radius: 99px; padding: 8px 14px; }
+  .adm-side .adm-side-ext { margin: 0; border: 0; border-radius: 99px; padding-top: 8px; }
+}
+/* Cockpit additions: headline, break-even/pace lines, ranked call list, offer tags, fix items */
+.ck-headline { font-size: 18px; line-height: 1.5; color: var(--ink); max-width: 900px; margin: 0 0 16px; }
+.ck-be, .ck-pace { margin-top: 4px; }
+.ck-rank { display: inline-grid; place-items: center; width: 24px; height: 24px; margin-right: 8px; border-radius: 99px; background: var(--ink); color: #fff; font-size: 13px; font-weight: 700; vertical-align: 2px; }
+.ck-offer { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 99px; background: #fde8bf; color: #7a4a00; font-size: 12px; font-weight: 600; vertical-align: middle; }
+.ck-offer-p { background: var(--palm-soft); color: var(--palm); }
+.ck-todo .ck-fix { color: var(--sun-deep); }

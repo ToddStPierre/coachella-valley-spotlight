@@ -58,7 +58,8 @@
     j(API + "/admin/submissions?key=" + encodeURIComponent(admin)),
     j(API + "/admin/owners?key=" + encodeURIComponent(admin)),
     j(API + "/stats/all?key=" + encodeURIComponent(admin)),
-    j(API + "/admin/pitches?key=" + encodeURIComponent(admin))
+    j(API + "/admin/pitches?key=" + encodeURIComponent(admin)),
+    j(API + "/admin/campaigns?key=" + encodeURIComponent(admin))
   ]).then(function (r) {
     dir = (window.CVS && window.CVS.directory) || dir;
     var spots = r[0], subs = r[1], owners = r[2], stats = r[3];
@@ -70,6 +71,13 @@
     function isOpen(x) { return x && CLOSED.indexOf(x.status) < 0; }
     function isDue(x) { return isOpen(x) && x.follow_up && x.follow_up <= today(); }
 
+    // Campaign money per card ("<route>:<mail date>"), in cents, for the break-even line.
+    var money = {};
+    ((r[5] && r[5].lines) || []).forEach(function (l) { var t = money[l.campaign] = money[l.campaign] || { inc: 0, exp: 0 }; if (l.kind === "income") t.inc += l.amount || 0; else t.exp += l.amount || 0; });
+    function usd(c) { return "$" + Math.round(Math.abs(c) / 100).toLocaleString(); }
+    var SPOT = 30000; // $300 a spot, in cents
+    var race = []; // one summary per card, for the headline
+
     // 1) Card progress
     var open = {}; // route -> list of open categories
     var cardHtml = cards.map(function (m, i) {
@@ -79,11 +87,16 @@
       var need = Math.max(0, (m.minSold || 0) - sold), total = d.positions.length, left = days(m.deadline);
       var taken = d.positions.filter(function (p) { return p.category && st(p) !== "open"; }).map(function (p) { return p.category; });
       open[m.route] = (d.categories || []).filter(function (c) { return taken.indexOf(c) < 0; });
+      var t = money[m.route + ":" + m.mail], gap = t ? t.exp - t.inc : 0, be = gap > 0 ? Math.ceil(gap / SPOT) : 0, openN = total - sold - pend;
+      race.push({ m: m, need: need, left: left, be: be, gap: gap, has: !!t, open: openN });
+      var pace = need && left > 0 ? (need > left ? "<b>" + (Math.round(need / left * 10) / 10) + " sales a day</b> to make it" : "<b>1 sale every " + (Math.round(left / need * 10) / 10) + " days</b> to make it") : "";
+      var beLine = !t ? "" : gap > 0 ? "Break-even: <b>" + be + " more sold</b> (" + usd(gap) + " to cover costs)" : "&#10003; Costs covered, " + usd(-gap) + " profit so far" + (openN ? ". Every open spot is profit." : "");
       var mark = m.minSold ? '<i class="ck-min" style="left:' + (m.minSold / total * 100) + '%" title="Needed to mail"></i>' : "";
       return '<div class="ck-card' + (need ? "" : " ck-ok") + '"><div class="ck-card-top"><b>' + esc(m.name) + '</b><span>' + (left < 0 ? "Booking closed" : left === 0 ? "Last day to book" : left + " " + pl(left, "day", "days") + " to book") + '</span></div>' +
         '<div class="ck-meter" role="img" aria-label="' + sold + ' sold, ' + pend + ' pending, ' + total + ' spots"><i class="ck-sold" style="width:' + (sold / total * 100) + '%"></i><i class="ck-pend" style="width:' + (pend / total * 100) + '%"></i>' + mark + '</div>' +
         '<p class="ck-line"><b>' + sold + '</b> sold &middot; <b>' + pend + '</b> pending &middot; ' + (total - sold - pend) + ' open of ' + total + '</p>' +
         '<p class="ck-need">' + (need ? "Needs <b>" + need + " more sold</b> to mail on " + nice(m.mail) + (pend ? " (" + pend + " pending would get it to " + (sold + pend) + ")" : "") : "&#10003; Minimum met. Mails " + nice(m.mail)) + '</p>' +
+        (beLine ? '<p class="ck-need ck-be">' + beLine + '</p>' : "") + (pace ? '<p class="ck-need ck-pace">' + pace + '</p>' : "") +
         '<details class="ck-open"><summary>' + open[m.route].length + ' categories still open</summary><p>' + open[m.route].map(esc).join(" &middot; ") + '</p></details></div>';
     }).join("");
 
@@ -101,6 +114,13 @@
       if (d.expires && !d.sample) { var l = days(d.expires); if (l >= 0 && l <= 7) todo.push('<span>Deal <b>' + esc(d.offer) + '</b> (' + esc(d.business) + ') ends ' + nice(d.expires) + '</span>'); }
     });
 
+    // The one-sentence state of the race, above the cards.
+    var headline = race.filter(function (x) { return x.left >= 0; }).map(function (x) {
+      var nm = "<b>" + esc(x.m.name) + "</b>";
+      if (x.need) return nm + " needs " + x.need + " more sold in " + x.left + " " + pl(x.left, "day", "days") + " to mail" + (x.be ? " (" + x.be + " to break even)" : "") + ".";
+      return nm + " has hit its minimum" + (x.be ? "; " + x.be + " more " + pl(x.be, "sale covers", "sales cover") + " its costs." : x.has && x.open ? "; its " + x.open + " open " + pl(x.open, "spot is", "spots are") + " profit." : ".");
+    }).join(" ");
+
     // 3) Who to pitch
     var by = {}; (stats && stats.businesses || []).forEach(function (s) { by[s.slug] = s; });
     var info = {}; dir.forEach(function (b) { if (b.slug && !b.sample) info[b.slug] = b; });
@@ -112,16 +132,33 @@
       .filter(function (x) { return (x.routes.length && (x.pv || x.seen >= 5)) || rec[x.b.slug]; });
     // Anyone with a pitch record stays on the list, even after their traffic drops or their category fills.
     Object.keys(rec).forEach(function (slug) { if (info[slug] && !leads.some(function (x) { return x.b.slug === slug; })) leads.push(lead(info[slug])); });
+    // Hot right now: free listings people are actively looking at (2+ profile visits or any call/website tap in 30 days).
+    function isHot(x) { var rr = rec[x.b.slug]; return !x.b.premium && !x.b.featured && (x.pv >= 2 || x.acts > 0) && (!rr || isOpen(rr)); }
+    dir.forEach(function (b) {
+      if (!b.slug || b.sample || b.public || b.postcard || b.premium || b.featured || !by[b.slug] || leads.some(function (x) { return x.b.slug === b.slug; })) return;
+      var x = lead(b); if (isHot(x)) leads.push(x);
+    });
+    // Call list ranking: hottest status first, then a category open on a card that still needs sales, near the routes, traffic, due.
+    var needy = race.filter(function (x) { return x.need && x.left >= 0; }).map(function (x) { return x.m.route; });
+    var RANK = { "Spot Held": 5, "Interested": 4, "Waiting on reply": 2, "Contacted": 1, "New": 1 };
+    function score(x) {
+      var rr = rec[x.b.slug] || {};
+      return (RANK[rr.status] || 0) * 10 + (x.routes.some(function (m) { return needy.indexOf(m.route) > -1; }) ? 6 : x.routes.length ? 2 : 0) +
+        (NEAR.indexOf(x.b.city) > -1 ? 3 : 0) + Math.min(x.pv + x.acts * 2, 6) + (isDue(rr) ? 4 : 0);
+    }
+    function onCall(x) { var rr = rec[x.b.slug]; return isOpen(rr) && (isDue(rr) || rr.status === "Interested" || rr.status === "Spot Held"); }
     leads.sort(function (a, z) { return (NEAR.indexOf(z.b.city) > -1) - (NEAR.indexOf(a.b.city) > -1) || (z.pv * 10 + z.acts * 20 + z.seen) - (a.pv * 10 + a.acts * 20 + a.seen); });
 
     var FILTERS = [
+      ["call", "Call list", onCall],
+      ["hot", "Hot right now", isHot],
       ["new", "To pitch", function (x) { return !rec[x.b.slug] && x.routes.length; }],
       ["due", "Follow-ups due", function (x) { return isDue(rec[x.b.slug]); }],
       ["open", "In progress", function (x) { return isOpen(rec[x.b.slug]); }],
       ["closed", "Closed", function (x) { return rec[x.b.slug] && !isOpen(rec[x.b.slug]); }],
       ["all", "All", function () { return true; }]
     ];
-    var st = { filter: "new", shown: 8, openRow: "", channel: "" };
+    var st = { filter: leads.some(onCall) ? "call" : "new", shown: 10, openRow: "", channel: "" };
 
     function draft(x) {
       var m = x.routes[0]; if (!m || !x.s.key) return null;
@@ -157,13 +194,15 @@
         (r.log && r.log.length ? '<ol class="ck-hist">' + r.log.map(function (l) { return '<li><b>' + esc(chanLabel(l.channel)) + '</b> ' + when(l.created_at) + (l.status ? ' &middot; ' + esc(l.status) : "") + (l.note ? '<br>' + esc(l.note) : "") + ' <button type="button" class="ck-del" data-del="' + l.id + '" aria-label="Delete this entry">&times;</button></li>'; }).join("") + '</ol>' : "") +
         '</form>';
     }
-    function leadRow(x) {
-      var d = draft(x), r = rec[x.b.slug], last = r && r.log[0];
-      return '<div class="ck-lead" data-row="' + esc(x.b.slug) + '"><div class="ck-lead-main"><b>' + esc(x.b.name) + '</b><span class="ck-sub">' + esc(x.b.service || x.b.category) + " &middot; " + esc(x.b.city || "") + (x.b.claimed ? " &middot; claimed" : "") + (x.b.premium ? " &middot; Premium" : "") + (x.b.postcard ? " &middot; on the postcard" : "") + '</span>' +
+    function ago(iso) { var n = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000); return n < 1 ? "today" : n === 1 ? "yesterday" : n + " days ago"; }
+    function leadRow(x, i) {
+      var d = draft(x), r = rec[x.b.slug], last = r && r.log[0], ranked = st.filter === "call" || st.filter === "hot";
+      var offer = st.filter === "hot" ? (x.routes.length ? '<span class="ck-offer">Pitch the postcard</span>' : '<span class="ck-offer ck-offer-p">Pitch Premium</span>') : "";
+      return '<div class="ck-lead" data-row="' + esc(x.b.slug) + '"><div class="ck-lead-main"><b>' + (ranked ? '<span class="ck-rank">' + (i + 1) + '</span>' : "") + esc(x.b.name) + '</b>' + offer + '<span class="ck-sub">' + esc(x.b.service || x.b.category) + " &middot; " + esc(x.b.city || "") + (x.b.claimed ? " &middot; claimed" : "") + (x.b.premium ? " &middot; Premium" : "") + (x.b.postcard ? " &middot; on the postcard" : "") + '</span>' +
         '<span class="ck-nums"><b>' + x.pv + '</b> profile ' + pl(x.pv, "visit", "visits") + ' &middot; <b>' + x.seen + '</b> seen' + (x.acts ? ' &middot; <b>' + x.acts + '</b> reached out' : "") + ' <em>(30 days)</em></span>' +
         '<span class="ck-sub">' + (x.routes.length ? esc(x.cat) + ' open on ' + x.routes.map(function (m) { return esc(m.name); }).join(" and ") : x.cat ? esc(x.cat) + ' is taken on the cards' : 'No card category') + '</span>' +
         (r ? '<span class="ck-status">' + statusPill(r) + '</span>' : "") +
-        (last ? '<span class="ck-last">Last: ' + esc(chanLabel(last.channel)) + ' ' + when(last.created_at) + (last.note ? ': ' + esc(last.note.length > 90 ? last.note.slice(0, 90) + "…" : last.note) : "") + '</span>' : "") + '</div>' +
+        (last ? '<span class="ck-last">Last: ' + esc(chanLabel(last.channel)) + ' ' + when(last.created_at) + ' (' + ago(last.created_at) + ')' + (last.note ? ': ' + esc(last.note.length > 90 ? last.note.slice(0, 90) + "…" : last.note) : "") + '</span>' : "") + '</div>' +
         '<div class="ck-lead-cta">' + (d ? '<a class="btn' + (r ? " btn-ghost" : "") + '" href="' + esc(d.gmail) + '" target="_blank" rel="noopener" data-pitch="' + esc(x.b.slug) + '">Email in Gmail</a>' : "") +
         (x.b.phone ? '<a class="btn btn-ghost" href="tel:' + esc(x.b.phone.replace(/[^\d+]/g, "")) + '" data-tel="' + esc(x.b.slug) + '">' + esc(x.b.phone) + '</a>' : "") +
         '<button type="button" class="btn btn-ghost" data-open="' + esc(x.b.slug) + '">' + (r ? "Update" : "Log contact") + '</button>' +
@@ -172,25 +211,34 @@
     }
     function list() {
       var f = FILTERS.filter(function (k) { return k[0] === st.filter; })[0][2], out = leads.filter(f);
-      if (st.filter !== "new") out.sort(function (a, z) { var fa = (rec[a.b.slug] || {}).follow_up || "9999", fz = (rec[z.b.slug] || {}).follow_up || "9999"; return fa < fz ? -1 : fa > fz ? 1 : 0; });
+      if (st.filter === "call" || st.filter === "hot") out.sort(function (a, z) { return score(z) - score(a) || (z.pv + z.acts * 2) - (a.pv + a.acts * 2); });
+      else if (st.filter !== "new") out.sort(function (a, z) { var fa = (rec[a.b.slug] || {}).follow_up || "9999", fz = (rec[z.b.slug] || {}).follow_up || "9999"; return fa < fz ? -1 : fa > fz ? 1 : 0; });
       return out;
     }
     function drawLeads() {
       var l = list(), dt = document.getElementById("ck-due-todo");
       if (dt) { dt.innerHTML = dueTodo(); dt.parentNode.hidden = !dt.innerHTML; var none = box.querySelector(".ck-none"); if (none) none.hidden = !!box.querySelector(".ck-todo li:not([hidden])"); }
       document.getElementById("ck-chips").innerHTML = FILTERS.map(function (k) { return '<button type="button" class="chip' + (st.filter === k[0] ? " active" : "") + '" data-filter="' + k[0] + '">' + k[1] + " (" + leads.filter(k[2]).length + ")</button>"; }).join("");
-      document.getElementById("ck-leads").innerHTML = (l.slice(0, st.shown).map(leadRow).join("") || '<p class="ck-sub" style="padding:14px 0">' + (st.filter === "due" ? "No follow-ups due. Nice." : "Nothing here.") + '</p>') +
-        (l.length > st.shown ? '<p><button type="button" class="btn btn-ghost" data-more>Show ' + Math.min(8, l.length - st.shown) + ' more (' + (l.length - st.shown) + ' left)</button></p>' : "");
+      document.getElementById("ck-leads").innerHTML = (l.slice(0, st.shown).map(function (x, i) { return leadRow(x, i); }).join("") || '<p class="ck-sub" style="padding:14px 0">' + (st.filter === "due" || st.filter === "call" ? "No follow-ups due. Nice." : "Nothing here.") + '</p>') +
+        (l.length > st.shown ? '<p><button type="button" class="btn btn-ghost" data-more>Show ' + Math.min(10, l.length - st.shown) + ' more (' + (l.length - st.shown) + ' left)</button></p>' : "");
     }
     function openLog(slug, channel) { st.openRow = slug; st.channel = channel || ""; drawLeads(); var f = box.querySelector('[data-log="' + slug + '"]'); if (f) { f.scrollIntoView({ block: "nearest" }); } }
 
     function dueTodo() {
       var due = leads.filter(function (x) { return isDue(rec[x.b.slug]); });
-      return due.length ? '<a href="#cockpit-admin" data-filter="due"><b>' + due.length + '</b> follow-' + pl(due.length, "up", "ups") + ' due: ' + due.slice(0, 4).map(function (x) { return esc(x.b.name); }).join(", ") + (due.length > 4 ? " and " + (due.length - 4) + " more" : "") + '</a>' : "";
+      var calls = leads.filter(onCall);
+      return due.length ? '<a href="#cockpit-admin" data-filter="call"><b>' + due.length + '</b> follow-' + pl(due.length, "up", "ups") + ' due.' + (calls.length > 10 ? ' Start with the <b>top 10</b> on the Call list &rarr;' : ' Open the Call list &rarr;') + '</a>' : "";
     }
     todo.unshift('<span id="ck-due-todo"></span>');
+    var hot = leads.filter(isHot).length;
+    if (hot) todo.splice(1, 0, '<a href="#cockpit-admin" data-filter="hot"><b>' + hot + '</b> free ' + pl(hot, "listing is", "listings are") + ' getting real interest right now &rarr;</a>');
+    // Fix these: paying listings with no email anywhere, so their monthly report can't be emailed.
+    var ownerMail = {}; ((owners && owners.owners) || []).forEach(function (o) { if (!o.revoked && o.email) ownerMail[o.slug] = 1; });
+    var noMail = dir.filter(function (b) { return b.slug && !b.sample && (b.postcard || b.premium || b.featured) && !ownerMail[b.slug] && !(contacts[b.slug] || {}).email; });
+    if (noMail.length) todo.push('<a href="#reports-admin" class="ck-fix"><b>Fix:</b> ' + noMail.length + ' paying ' + pl(noMail.length, "listing has", "listings have") + ' no email on file (' + noMail.slice(0, 4).map(function (b) { return esc(b.name); }).join(", ") + (noMail.length > 4 ? " and " + (noMail.length - 4) + " more" : "") + '), so ' + pl(noMail.length, "its", "their") + ' monthly report can&rsquo;t be emailed.</a>');
 
     box.innerHTML = '<h2 class="month-head"><span class="stripe-mini"></span>Sales cockpit</h2>' +
+      (headline ? '<p class="ck-headline">' + headline + '</p>' : "") +
       (cards.length ? '<div class="ck-cards">' + cardHtml + '</div>' : '<div class="empty">No upcoming cards. Add the next dates under Mailing dates.</div>') +
       '<div class="ck-grid"><div class="ck-panel"><h3>Do today</h3>' + '<ul class="ck-todo">' + todo.map(function (t) { return "<li>" + t + "</li>"; }).join("") + '</ul><p class="ck-sub ck-none">Nothing waiting. Go pitch.</p>'  + '</div>' +
       '<div class="ck-panel ck-pitch" id="ck-pitch"><h3>Who to pitch</h3>' +
@@ -200,7 +248,7 @@
 
     box.addEventListener("click", function (e) {
       var t = e.target;
-      var fl = t.closest("[data-filter]"); if (fl) { e.preventDefault(); st.filter = fl.dataset.filter; st.shown = 8; st.openRow = ""; drawLeads(); if (fl.closest(".ck-todo")) document.getElementById("ck-pitch").scrollIntoView({ behavior: "smooth" }); return; }
+      var fl = t.closest("[data-filter]"); if (fl) { e.preventDefault(); st.filter = fl.dataset.filter; st.shown = 10; st.openRow = ""; drawLeads(); if (fl.closest(".ck-todo")) document.getElementById("ck-pitch").scrollIntoView({ behavior: "smooth" }); return; }
       var p = t.closest("[data-pitch]"); if (p) { var slug = p.dataset.pitch; setTimeout(function () { openLog(slug, "Email"); }, 300); return; }
       var tel = t.closest("[data-tel]"); if (tel) { var ts = tel.dataset.tel; setTimeout(function () { openLog(ts, "Call"); }, 300); return; }
       var c = t.closest("[data-copy-pitch]");
@@ -227,7 +275,7 @@
         }).catch(function () { alert("Could not delete. Try again."); });
         return;
       }
-      if (t.closest("[data-more]")) { st.shown += 8; drawLeads(); }
+      if (t.closest("[data-more]")) { st.shown += 10; drawLeads(); }
     });
     box.addEventListener("submit", function (e) {
       var f = e.target.closest("[data-log]"); if (!f) return;

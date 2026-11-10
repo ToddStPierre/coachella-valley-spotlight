@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=20261102bk2">
+<link rel="stylesheet" href="assets/style.css?v=20261109adm">
 </head>
 <body data-no-popup>
 <header class="site-header"><a class="skip-link" href="#main">Skip to main content</a><div class="stripe"></div><nav class="nav wrap" aria-label="Main">
@@ -93,11 +93,18 @@
         if (f === "prospects") return !b.premium && !b.postcard && !b.pub && sum(b) > 0;
         return true;
       }
+      // This month so far vs. last month scaled to the same number of days, so day 9 isn't compared with a whole month.
+      var pace = (function () {
+        var t = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Los_Angeles" }).format(new Date()).split("-");
+        return +t[2] / new Date(+t[0], +t[1] - 1, 0).getDate();
+      })();
       function trend(b, k) {
         if (st.period !== "thisMonth") return "";
-        var a = b.thisMonth[k] || 0, p = b.lastMonth[k] || 0;
-        if (!p) return a ? ' <span class="adm-up">new</span>' : "";
+        var a = b.thisMonth[k] || 0, p = (b.lastMonth[k] || 0) * pace;
+        if (a < 5 && p < 5) return ""; // too small to mean anything
+        if (p < 1) return ' <span class="adm-up">new</span>';
         var pct = Math.round((a - p) / p * 100);
+        if (Math.abs(pct) < 10) return "";
         return pct ? ' <span class="' + (pct > 0 ? "adm-up" : "adm-down") + '">' + (pct > 0 ? "+" : "") + pct + "%</span>" : "";
       }
       function draw() {
@@ -106,7 +113,7 @@
         $("adm-tiles").innerHTML = tiles(tot);
         $("adm-chips").innerHTML = FILTERS.map(function (f) { return '<button type="button" class="chip' + (st.filter === f[0] ? " active" : "") + '" data-f="' + f[0] + '">' + f[1] + " (" + all.filter(function (b) { var o = st.filter; st.filter = f[0]; var ok = pass(b); st.filter = o; return ok; }).length + ")</button>"; }).join("");
         var label = PERIODS.filter(function (p) { return p[0] === st.period; })[0][1];
-        $("adm-count").textContent = list.length + " of " + all.length + " listings · " + label + (st.period === "thisMonth" ? " (change vs. last month)" : "");
+        $("adm-count").textContent = list.length + " of " + all.length + " listings · " + label + (st.period === "thisMonth" ? " (change vs. last month at the same point)" : "");
         $("adm-head").innerHTML = "<tr><th>Business</th>" + LABELS.map(function (l) { return "<th>" + tip(l) + "</th>"; }).join("") + "<th>Links</th></tr>";
         $("adm-body").innerHTML = list.slice(0, st.shown).map(function (b) {
           var link = base + "?b=" + b.slug + "&key=" + b.key;
@@ -178,6 +185,6 @@
 <nav class="footer-towns" aria-label="Towns"><h4>Towns</h4><ul><li><a href="city/bermuda-dunes/">Bermuda Dunes</a></li><li><a href="city/cathedral-city/">Cathedral City</a></li><li><a href="city/coachella/">Coachella</a></li><li><a href="city/desert-hot-springs/">Desert Hot Springs</a></li><li><a href="city/indian-wells/">Indian Wells</a></li><li><a href="city/indio/">Indio</a></li><li><a href="city/la-quinta/">La Quinta</a></li><li><a href="city/palm-desert/">Palm Desert</a></li><li><a href="city/palm-springs/">Palm Springs</a></li><li><a href="city/rancho-mirage/">Rancho Mirage</a></li><li><a href="city/thousand-palms/">Thousand Palms</a></li></ul></nav>
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight, a brand of MoreViews Pro LLC. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
-<script src="data/directory.js"></script><script src="assets/app.js"></script><script src="assets/admin-owners.js?v=20261103b"></script><script src="data/mailings.js"></script><script src="assets/admin-mailings.js?v=20261103a"></script><script src="assets/admin-money.js?v=20261106b"></script><script src="assets/admin-signups.js?v=20261106a"></script><script src="assets/admin-backup.js?v=20261103a"></script><script src="assets/admin-submissions.js?v=20261103a"></script><script src="data/deals.js"></script><script src="assets/admin-cockpit.js?v=20261103f"></script><script src="assets/admin-reports.js?v=20261103a"></script><script src="assets/admin-nav.js?v=20261106a"></script><script src="assets/admin-qr.js?v=20261102a"></script><script src="assets/stats-report.js?v=20261102qr"></script>
+<script src="data/directory.js"></script><script src="assets/app.js"></script><script src="assets/admin-owners.js?v=20261103b"></script><script src="data/mailings.js"></script><script src="assets/admin-mailings.js?v=20261103a"></script><script src="assets/admin-money.js?v=20261106b"></script><script src="assets/admin-signups.js?v=20261106a"></script><script src="assets/admin-backup.js?v=20261103a"></script><script src="assets/admin-submissions.js?v=20261103a"></script><script src="data/deals.js"></script><script src="assets/admin-cockpit.js?v=20261109a"></script><script src="assets/admin-reports.js?v=20261103a"></script><script src="assets/admin-nav.js?v=20261109a"></script><script src="assets/admin-qr.js?v=20261102a"></script><script src="assets/stats-report.js?v=20261102qr"></script>
 </body>
 </html>
