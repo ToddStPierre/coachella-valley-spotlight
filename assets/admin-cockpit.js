@@ -23,7 +23,7 @@
     "Pool service": "Pool Service", "Pool builders": "Pool Service", "Landscaping": "Landscaping", "Tree care": "Landscaping",
     "Carpet cleaning": "House Cleaning", "Window cleaning": "House Cleaning", "Flooring": "Remodeling", "Roofing": "Roofing", "Insulation": "Insulation",
     "Golf cars": "Golf Cart Sales & Service", "Golf shops": "Golf Shop & Club Fitting", "Auto repair": "Auto Repair",
-    "Dentists": "Dental", "Orthodontists": "Dental", "Chiropractors": "Chiropractic", "Med spas": "Med Spa", "Dermatology": "Med Spa",
+    "Dentists": "Dental", "Orthodontists": "Dental", "Chiropractors": "Chiropractic", "Med spas": "Med Spa", "Dermatology": "Med Spa", "Weight loss": "Weight Loss",
     "Nail salons": "Salon/Spa", "Hair salons and barbers": "Salon/Spa", "Massage and day spas": "Salon/Spa",
     "Gyms": "Fitness/Gym", "CrossFit gyms": "Fitness/Gym", "Personal training": "Fitness/Gym", "Boxing and martial arts": "Fitness/Gym", "Yoga and pilates": "Fitness/Gym",
     "Veterinarians": "Veterinary/Pet Care", "Pet stores": "Veterinary/Pet Care", "Pet sitting": "Veterinary/Pet Care",

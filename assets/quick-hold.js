@@ -24,7 +24,7 @@
     "gyms": "Fitness/Gym", "crossfit gyms": "Fitness/Gym", "personal training": "Fitness/Gym", "boxing and martial arts": "Fitness/Gym", "yoga and pilates": "Fitness/Gym",
     "chiropractors": "Chiropractic", "dentists": "Dental", "orthodontists": "Dental",
     "hair salons and barbers": "Salon/Spa", "nail salons": "Salon/Spa", "lashes and brows": "Salon/Spa", "massage and day spas": "Salon/Spa", "facials and skin care": "Salon/Spa",
-    "med spas": "Med Spa", "dermatology": "Med Spa", "weight loss": "Med Spa",
+    "med spas": "Med Spa", "dermatology": "Med Spa", "weight loss": "Weight Loss",
     "blinds and shutters": "Window Coverings", "cleaning services": "House Cleaning", "electrical": "Electrical", "garage doors": "Garage Doors",
     "handyman": "Handyman Services", "heating and air conditioning": "HVAC", "insulation": "Insulation", "landscaping": "Landscaping", "tree care": "Landscaping",
     "painting": "Painting", "pest control": "Pest Control", "plumbing": "Plumbing", "pool service": "Pool Service", "pool builders": "Pool Service",
