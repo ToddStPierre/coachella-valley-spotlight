@@ -33,7 +33,7 @@
     var rate = p.impression ? Math.round((p.profile || 0) / p.impression * 1000) / 10 : 0;
     return '<div class="rp-funnel">' +
       row("rp-seen", "Saw your listing", p.impression, "In the directory, search results, town pages and the home page.") +
-      row("rp-open", "Opened your profile", p.profile, p.impression && p.profile ? rate + "% of the times you were seen" : "") +
+      row("rp-open", "Opened your profile", p.profile, p.impression && p.profile && rate <= 100 ? rate + "% of the times you were seen" : p.profile > (p.impression || 0) ? "Includes people who came straight to your page from Google or a shared link." : "") +
       row("rp-act", "Called or visited your website", acts, n(p.call) + " " + pl(p.call, "call", "calls") + " tapped &middot; " + n(p.website) + " website " + pl(p.website, "visit", "visits")) +
       '</div>' +
       // Postcard advertisers (or anyone with scans or claims): the QR code and deal numbers.
