@@ -39,6 +39,65 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css?v=20261102b">
+<style>
+/* Coverage map redesign 2026-11-11 (page-only styles) */
+.cm-hero h1 { margin-bottom: 10px; }
+.cm-hero .cm-lede { max-width: 640px; color: var(--ink-2); font-size: 18px; margin: 0; }
+.cm-live-h { display: flex; align-items: center; gap: 10px; margin: 28px 0 12px; font-family: var(--mono); font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--palm); }
+.cm-live-h::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #2fa36b; box-shadow: 0 0 0 4px rgba(47,163,107,.18); }
+.cm-live { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.cm-lc { background: var(--paper); border: 1px solid var(--line); border-radius: 20px; padding: 20px 22px; box-shadow: var(--shadow); display: grid; gap: 10px; }
+.cm-lc-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.cm-lc h2 { margin: 0; font-size: 24px; }
+.cm-ok { display: inline-block; vertical-align: middle; margin-left: 8px; padding: 3px 10px; border-radius: 999px; background: var(--palm-soft); color: var(--palm); font: 600 12.5px var(--body); }
+.cm-lc-homes { font-size: 14.5px; color: var(--ink-2); }
+.cm-lc-left { font-family: var(--display); font-size: 30px; font-weight: 700; line-height: 1; color: var(--palm); }
+.cm-lc-left small { font-family: var(--body); font-size: 14px; font-weight: 500; color: var(--ink-2); margin-left: 6px; }
+.cm-bar { height: 8px; border-radius: 99px; background: #efe5d6; overflow: hidden; }
+.cm-bar i { display: block; height: 100%; width: var(--p, 0%); background: linear-gradient(90deg, #2e5c4f, #3f8a6f); border-radius: 99px; transition: width .6s ease; }
+.cm-lc-meta { margin: 0; font-size: 14.5px; color: var(--ink-2); }
+.cm-lc-meta b { color: var(--sun-deep); }
+.cm-lc-act { display: flex; gap: 10px 18px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
+.cm-lc[data-state="almost"] .cm-lc-left { color: #9a5a12; }
+.cm-lc[data-state="almost"] .cm-bar i { background: linear-gradient(90deg, #c9852a, #e0a24a); }
+.cm-lc[data-state="full"] .cm-lc-left, .cm-lc[data-state="closed"] .cm-lc-left { color: var(--ink-2); }
+.cm-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(300px, 1fr); gap: 24px; align-items: start; }
+.cm-grid > * { min-width: 0; }
+.cm-side { position: sticky; top: 96px; }
+.cm-side .cov-panel { margin-top: 0; scroll-margin-top: 90px; }
+/* live zones bigger and bolder, waitlist cities small and quiet */
+.cov-zone[data-live] { border-width: 3px; }
+.cov-zone[data-live] .cov-zone-lab { font-size: 13.5px; padding: 3px 10px; box-shadow: 0 2px 8px rgba(34,28,24,.22); }
+.cov-zone-lab b { color: var(--palm); font-weight: 700; margin-left: 4px; }
+.cov-zone[data-state="soon"] { opacity: .85; border-width: 2px; }
+.cov-zone[data-state="soon"] .cov-zone-lab { font-size: 11.5px; font-weight: 500; padding: 1px 7px; background: rgba(255,250,243,.88); box-shadow: none; color: #4a3d63; }
+.cov-zone[data-state="soon"].is-on, .cov-zone[data-state="soon"]:hover { opacity: 1; }
+.cm-chips { margin-top: 16px; display: grid; gap: 10px; }
+.cm-chiprow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.cm-chiprow > span { font-family: var(--mono); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); width: 112px; flex: none; }
+.cm-chip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); font: 500 14px var(--body); color: var(--ink); cursor: pointer; }
+.cm-chip:hover { border-color: var(--ink-2); }
+.cm-chip.is-on { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.cm-chip .cov-dot { width: 9px; height: 9px; }
+.cm-chip[data-state="soon"] .cov-dot { background: transparent; border: 1.5px dashed #5b4a7a; }
+.cm-chip[data-state="almost"] .cov-dot { background: #c9852a; }
+.cm-chip[data-state="full"] .cov-dot, .cm-chip[data-state="closed"] .cov-dot { background: #8a7d74; }
+.cm-chip em { font-style: normal; color: var(--ink-2); font-size: 13px; }
+.cm-fine { margin: 18px 0 0; color: var(--ink-2); font-size: 15px; max-width: 760px; }
+.cm-wl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 32px; align-items: start; }
+.cm-wl h2 { font-size: 30px; margin: 0 0 10px; }
+.cm-wl-pitch p { color: var(--ink-2); margin: 0 0 14px; }
+.cm-wl-pitch ul { margin: 0 0 18px; padding: 0; list-style: none; display: grid; gap: 10px; }
+.cm-wl-pitch li { display: flex; gap: 10px; }
+.cm-wl-pitch li::before { content: "\2713"; color: var(--palm); font-weight: 700; }
+.cm-wl-cities { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14.5px; }
+.cm-wl .waitlist { margin-top: 0; }
+@media (max-width: 900px) {
+  .cm-live, .cm-grid, .cm-wl { grid-template-columns: minmax(0, 1fr); }
+  .cm-side { position: static; }
+  .cm-chiprow > span { width: 100%; }
+}
+</style>
 </head>
 <body>
 <header class="site-header"><a class="skip-link" href="#main">Skip to main content</a><div class="stripe"></div><nav class="nav wrap" aria-label="Main">
@@ -51,15 +110,15 @@
 <a class="btn btn-nav" href="advertise">Advertise</a>
 </nav></header>
 <main id="main" tabindex="-1">
-<section class="page-hero"><div class="wrap">
+<section class="page-hero cm-hero" style="padding-bottom:var(--s3)"><div class="wrap">
 <nav class="crumbs" aria-label="Breadcrumb"><a href="advertise">Advertise</a> &rsaquo; <span>Coverage map</span></nav>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>Postcard coverage map</span>
 <h1>See Exactly Where <span class="grad">Your Ad Lands.</span></h1>
-<p>Every postcard route on one map. Tap a route to see how many homes it reaches, its ZIP code, when it tentatively mails and how many spots are still open, live from our booking board. One business per category on every card.</p>
+<p class="cm-lede">About 5,000 homes per card, one business per category. Two cards are booking now. Every other city in the valley is next.</p>
 </div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
-<div class="cov-grid">
-<div class="cov-left">
+<div class="cm-grid">
+<div>
 <div class="vmap cov-map" id="cov-map">
 <svg viewBox="0 0 1000 520" preserveAspectRatio="none" aria-hidden="true" focusable="false">
 <defs>
@@ -87,21 +146,28 @@
 <div class="cov-zones" id="cov-zones"></div>
 </div>
 <ul class="cov-legend" aria-label="Map key"><li><span class="cov-key open"></span>Spots open</li><li><span class="cov-key almost"></span>Almost full</li><li><span class="cov-key full"></span>Full</li><li><span class="cov-key soon"></span>Join waitlist</li></ul>
+<div class="cm-chips" role="group" aria-label="Choose a route"><div class="cm-chiprow" id="cm-chips-live"><span>Booking now</span></div><div class="cm-chiprow" id="cm-chips-soon"><span>Join waitlist</span></div></div>
+<p class="cm-fine">Spot counts update live as businesses book. A card mails once at least 8 of its 16 spots are sold. If it has fewer by its artwork deadline, it moves to the next date, and your spot and payment carry over, or we refund you. Every date is on the <a href="mailing-calendar">mailing calendar</a>.</p>
 </div>
-<div class="cov-side">
-<p class="cov-pick-h">Pick a route</p>
-<div class="cov-list" id="cov-list" role="group" aria-label="Choose a route"></div>
-<div class="cov-panel" id="cov-panel" aria-live="polite"></div>
+<aside class="cm-side"><div class="cov-panel" id="cov-panel" aria-live="polite"></div></aside>
 </div>
-</div>
-<h2 class="cov-h2">Upcoming cards</h2>
-<div class="cov-cards" id="cov-cards"></div>
-<p style="margin-top:24px;color:var(--ink-2)">Spot counts update live as businesses book. A card mails once at least 8 of its 16 spots are sold. If it has fewer by its artwork deadline, it moves to the next date, and your spot and payment carry over, or we refund you. Dates and deadlines for every card are on the <a href="mailing-calendar">mailing calendar</a>. Want a route in your part of the valley? <a href="contact">Tell us where</a>.</p>
 </div></section>
-<section id="waitlist" style="padding-bottom:var(--s5)"><div class="wrap">
-<h2 class="cov-h2" style="margin-top:0">Join the waitlist for your city</h2>
-<div class="card waitlist" style="max-width:720px"><span class="meta">Join waitlist</span><h3>Palm Springs to Coachella</h3><p class="wl-zip">8 cities &middot; about 5,000 homes each</p><p>We&rsquo;re lining up a card for every city in the valley: Palm Springs, Cathedral City, Rancho Mirage, Indian Wells, La Quinta, Indio, Coachella and Desert Hot Springs. Join the waitlist for your city and you&rsquo;ll hear first, so you can claim your spot and your category before we open it to everyone. Tap a city on the map to see who its card would reach.</p><form class="form signup-form" data-signup="waitlist" novalidate><label class="full">City<select id="wl-city" name="city" required><option value="">Pick a city</option></select></label><label>Business name<input name="business" required></label><label>Your name<input name="name" autocomplete="name"></label><label>Email<input name="email" type="email" autocomplete="email" required></label><label>Phone<input name="phone" type="tel" autocomplete="tel"></label><label class="full">Your business type<input name="category" placeholder="Plumbing, dentist, pizza..."></label><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><div class="full"><button class="btn" id="wl-btn" type="submit">Join the waitlist</button></div><p class="form-status" role="status"></p></form></div>
-<p style="margin-top:16px;color:var(--ink-2)">Somewhere else in the valley? <a href="contact">Tell us where</a> and we will put it on the list.</p>
+<section id="booking" style="padding-bottom:var(--s5)"><div class="wrap">
+<div class="cm-live-h" style="margin-top:0">Booking now</div>
+<div class="cm-live" id="cm-live"></div>
+</div></section>
+<section id="waitlist" style="padding-bottom:var(--s5);scroll-margin-top:90px"><div class="wrap">
+<div class="cm-wl">
+<div class="cm-wl-pitch">
+<span class="eyebrow"><span class="stripe-mini"></span>Next cards</span>
+<h2>Get first pick in your city.</h2>
+<p>We&rsquo;re lining up a card for every city in the valley. Join the waitlist and you hear first, before spots and categories open to everyone.</p>
+<ul><li>First pick of your spot and your category</li><li>About 5,000 homes in each city, with a report showing who they are</li><li>Free to join, no commitment</li></ul>
+<div class="cm-wl-cities" id="cm-wl-cities"></div>
+<p style="margin-top:16px;font-size:15px">Somewhere else in the valley? <a href="contact">Tell us where</a>.</p>
+</div>
+<div class="card waitlist"><span class="meta">Join waitlist</span><form class="form signup-form" data-signup="waitlist" novalidate><label class="full">City<select id="wl-city" name="city" required><option value="">Pick a city</option></select></label><label>Business name<input name="business" required></label><label>Your name<input name="name" autocomplete="name"></label><label>Email<input name="email" type="email" autocomplete="email" required></label><label>Phone<input name="phone" type="tel" autocomplete="tel"></label><label class="full">Your business type<input name="category" placeholder="Plumbing, dentist, pizza..."></label><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><div class="full"><button class="btn" id="wl-btn" type="submit">Join the waitlist</button></div><p class="form-status" role="status"></p></form></div>
+</div>
 </div></section>
 </main>
 
@@ -123,13 +189,13 @@
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight, a brand of MoreViews Pro LLC. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
 <script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js"></script>
-<script src="data/mailings.js"></script>
+<script src="data/mailings.js?v=20261111a"></script>
 <script>
 (function () {
   var API = "https://local-spotlight-reservations.toddstpierre.workers.dev";
   var M = window.CVS_MAILINGS || [];
   /* Routes on the map. Live routes get their dates and homes from data/mailings.js and their spots from the booking Worker.
-     x/y = center of the zone on the map (percent), w/h = its size. A planned route needs no mailing entry. */
+     x/y = center of the zone on the map (percent), w/h = its size. A planned route (soon: true) needs no mailing entry. */
   var ZONES = [
     { id: "el-paseo", name: "El Paseo", town: "Palm Desert", zip: "92260", x: 46.5, y: 78, w: 11, h: 15, area: "mailing-area-el-paseo", blurb: "The streets around El Paseo, Palm Desert's shopping and dining strip, south of Highway 111." },
     { id: "sun-city-palm-desert", name: "Sun City Palm Desert", town: "Palm Desert", zip: "92211", x: 58, y: 42, w: 10, h: 14, area: "mailing-area-sun-city", blurb: "The 55-plus golf community north of I-10, where homeowners stay put and buy local." },
@@ -143,18 +209,26 @@
     { id: "desert-hot-springs", name: "Desert Hot Springs", town: "Desert Hot Springs", zip: "92240 &middot; 92241", homes: "4,977", x: 22, y: 15, w: 11, h: 14, soon: true, area: "mailing-area-desert-hot-springs", blurb: "Five carrier routes across Desert Hot Springs. Join the waitlist to get first pick of categories." }
   ];
   var TOWNS = [["Thousand Palms", 41, 40]];
-  var mapEl = document.getElementById("cov-map"), zonesEl = document.getElementById("cov-zones"), listEl = document.getElementById("cov-list"), panel = document.getElementById("cov-panel"), cardsEl = document.getElementById("cov-cards");
+  var zonesEl = document.getElementById("cov-zones"), panel = document.getElementById("cov-panel"), liveEl = document.getElementById("cm-live");
   var SIZE = (location.search.match(/[?&]size=([1248])\b/) || [])[1];
   function reserveUrl(id) { return "reserve?route=" + encodeURIComponent(id) + (SIZE ? "&size=" + SIZE : ""); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function ymd(s) { var p = s.split("-"); return new Date(+p[0], p[1] - 1, +p[2]); }
   function nice(s) { return ymd(s).toLocaleDateString("en-US", { weekday: "short", month: "long", day: "numeric" }); }
   function left(s) { var t = new Date(); t.setHours(0, 0, 0, 0); return Math.round((ymd(s) - t) / 864e5); }
-  ZONES.forEach(function (z) { z.mail = M.filter(function (m) { return m.route === z.id; })[0]; if (!z.soon && !z.mail) z.soon = true; z.state = z.soon ? "soon" : "loading"; });
+  function daysTxt(d) { return d === 0 ? "today" : d + (d === 1 ? " day" : " days") + " left"; }
+  ZONES.forEach(function (z) {
+    z.mail = M.filter(function (m) { return m.route === z.id; })[0]; if (!z.soon && !z.mail) z.soon = true; z.state = z.soon ? "soon" : "loading";
+    if (z.soon) { z.w = Math.round(z.w * 0.62 * 10) / 10; z.h = Math.round(z.h * 0.62 * 10) / 10; } else { z.w = z.w * 1.15; z.h = z.h * 1.15; }
+  });
+  var LIVE = ZONES.filter(function (z) { return !z.soon; }), SOON = ZONES.filter(function (z) { return z.soon; });
 
   zonesEl.innerHTML = TOWNS.map(function (t) { return '<span class="cov-town" style="--x:' + t[1] + '%;--y:' + t[2] + '%">' + esc(t[0]) + '</span>'; }).join("") +
-    ZONES.map(function (z) { return '<button type="button" class="cov-zone" data-z="' + z.id + '" style="--x:' + z.x + '%;--y:' + z.y + '%;--w:' + z.w + '%;--h:' + z.h + '%" aria-label="' + esc(z.name) + '"><span class="cov-zone-lab">' + esc(z.name) + '</span></button>'; }).join("");
-  listEl.innerHTML = ZONES.map(function (z) { return '<button type="button" class="cov-item" data-z="' + z.id + '"><span class="cov-dot"></span><span class="cov-item-name">' + esc(z.name) + '</span><span class="cov-item-st" data-st></span></button>'; }).join("");
+    ZONES.map(function (z) { return '<button type="button" class="cov-zone" data-z="' + z.id + '"' + (z.soon ? "" : " data-live") + ' style="--x:' + z.x + '%;--y:' + z.y + '%;--w:' + z.w + '%;--h:' + z.h + '%" aria-label="' + esc(z.name) + '"><span class="cov-zone-lab">' + esc(z.name) + '<b data-ct></b></span></button>'; }).join("");
+  function chip(z) { return '<button type="button" class="cm-chip" data-z="' + z.id + '"><span class="cov-dot"></span>' + esc(z.name) + (z.soon ? "" : ' <em data-st></em>') + '</button>'; }
+  document.getElementById("cm-chips-live").insertAdjacentHTML("beforeend", LIVE.map(chip).join(""));
+  document.getElementById("cm-chips-soon").insertAdjacentHTML("beforeend", SOON.map(chip).join(""));
+  document.getElementById("cm-wl-cities").innerHTML = SOON.map(function (z) { return z.area ? '<a href="' + z.area + '">' + esc(z.name) + '</a>' : esc(z.name); }).join("");
 
   function label(z) {
     if (z.state === "soon") return "Join waitlist";
@@ -164,48 +238,55 @@
     if (z.open == null) return "Open";
     return z.open + (z.open === 1 ? " spot left" : " spots left");
   }
+  function st(z) { return z.state === "loading" ? "open" : z.state; }
+  function liveCard(z) {
+    var m = z.mail, d = left(m.deadline), pct = z.total ? Math.round(z.taken / z.total * 100) : 0;
+    var big = z.state === "loading" ? "&hellip;" : z.open == null ? "Open" : z.open;
+    return '<article class="cm-lc" data-state="' + st(z) + '"><div class="cm-lc-top"><h2>' + esc(z.name) + (z.sold != null && m.minSold && z.sold >= m.minSold ? ' <span class="cm-ok">Confirmed to mail</span>' : "") + '</h2><span class="cm-lc-homes">' + esc(m.homes) + " &middot; " + esc(z.town) + '</span></div>' +
+      '<div class="cm-lc-left">' + big + (z.open != null ? "<small>of " + z.total + " spots open</small>" : "") + "</div>" +
+      '<div class="cm-bar" aria-hidden="true"><i style="--p:' + pct + '%"></i></div>' +
+      '<p class="cm-lc-meta">Mails ' + esc(nice(m.mail)) + " &middot; artwork due " + esc(nice(m.deadline)) + (d >= 0 ? " &middot; <b>" + daysTxt(d) + "</b>" : "") + "</p>" +
+      '<div class="cm-lc-act">' + (z.state === "closed" || z.state === "full" ? '<a class="btn btn-ghost" href="mailing-calendar">See the next date</a>' : '<a class="btn" href="' + reserveUrl(z.id) + '">Reserve in ' + esc(z.name) + "</a>") +
+      (z.area ? '<a class="cov-more" href="' + z.area + '">Who it reaches &rarr;</a>' : "") + "</div></article>";
+  }
   function paint() {
     ZONES.forEach(function (z) {
       [].forEach.call(document.querySelectorAll('[data-z="' + z.id + '"]'), function (el) {
-        el.setAttribute("data-state", z.state === "loading" ? "open" : z.state);
-        var st = el.querySelector("[data-st]"); if (st) st.textContent = label(z);
+        el.setAttribute("data-state", st(z));
+        var s = el.querySelector("[data-st]"); if (s) s.textContent = z.open != null ? z.open + " left" : "";
+        var c = el.querySelector("[data-ct]"); if (c) c.textContent = !z.soon && z.open != null ? z.open + " left" : "";
       });
     });
-    cardsEl.innerHTML = ZONES.map(function (z) {
-      var m = z.mail;
-      return '<article class="cov-card" data-state="' + (z.state === "loading" ? "open" : z.state) + '"><span class="cov-badge">' + esc(label(z)) + '</span><h3>' + esc(z.name) + '</h3>' +
-        '<p class="cov-card-meta">' + (m ? "Tentatively mails " + esc(nice(m.mail)) + " &middot; " + esc(m.homes) : (z.homes ? z.homes + " homes &middot; " : "Zip " + z.zip + " &middot; ") + "date to be set") + '</p>' +
-        (z.sold != null ? '<p class="cov-card-fill"><b>' + z.taken + '/' + z.total + '</b> spots filled</p>' : "") +
-        '<a class="cov-card-link" href="' + (z.soon ? "#waitlist" : reserveUrl(z.id)) + '"' + (z.soon ? ' data-wl="' + z.name + '"' : "") + '>' + (z.soon ? "Join the waitlist" : z.state === "full" ? "See other routes" : "Reserve a spot") + ' &rarr;</a></article>';
-    }).join("");
+    liveEl.innerHTML = LIVE.map(liveCard).join("");
     if (cur) show(cur, true);
   }
   var cur = null;
   function show(id, quiet) {
     var z = ZONES.filter(function (x) { return x.id === id; })[0]; if (!z) return; cur = id;
-    [].forEach.call(document.querySelectorAll("[data-z]"), function (el) { el.classList.toggle("is-on", el.getAttribute("data-z") === id); el.setAttribute("aria-pressed", el.getAttribute("data-z") === id ? "true" : "false"); });
+    [].forEach.call(document.querySelectorAll("button[data-z]"), function (el) { el.classList.toggle("is-on", el.getAttribute("data-z") === id); el.setAttribute("aria-pressed", el.getAttribute("data-z") === id ? "true" : "false"); });
     var m = z.mail, rows = [];
     rows.push(["Homes per mailing", m ? esc(m.homes.replace(/ homes$/, "")) : z.homes ? z.homes + ' <span class="cov-muted">(planned)</span>' : "Being mapped now"]);
     rows.push([/&middot;/.test(z.zip) ? "ZIP codes" : "ZIP code", z.zip + " &middot; " + esc(z.town)]);
     if (m) {
       var d = left(m.deadline);
-      rows.push(["Tentative mail date", esc(nice(m.mail))]);
-      rows.push(["Tentative artwork date", esc(nice(m.deadline)) + (d >= 0 ? ' <span class="cov-muted">(' + (d === 0 ? "today" : d + (d === 1 ? " day" : " days") + " left") + ")</span>" : "")]);
-      rows.push(["Spots", z.state === "loading" ? "Checking&hellip;" : z.sold == null ? "Call (760) 422-5475" : "<b>" + z.open + " of " + z.total + "</b> open" + (m.minSold ? ' <span class="cov-muted">&middot; ' + Math.min(z.sold, m.minSold) + " of " + m.minSold + " sold to confirm</span>" : "")]);
+      rows.push(["Mails", esc(nice(m.mail)) + ' <span class="cov-muted">(tentative)</span>']);
+      rows.push(["Artwork due", esc(nice(m.deadline)) + (d >= 0 ? ' <span class="cov-muted">(' + daysTxt(d) + ")</span>" : "")]);
+      rows.push(["Spots", z.state === "loading" ? "Checking&hellip;" : z.sold == null ? "Call (760) 422-5475" : "<b>" + z.open + " of " + z.total + "</b> open" + (m.minSold ? ' <span class="cov-muted">&middot; ' + (z.sold >= m.minSold ? "confirmed to mail" : z.sold + " of " + m.minSold + " sold to confirm") + "</span>" : "")]);
       rows.push(["Ads from", "$300 per mailing <span class=\"cov-muted\">with design, printing, postage and QR code tracking</span>"]);
     } else {
-      rows.push(["Tentative mail date", "Not set yet"]);
+      rows.push(["Mail date", "Not set yet"]);
     }
     var cta = z.soon ? '<a class="btn" href="#waitlist" data-wl="' + esc(z.name) + '">Join the ' + esc(z.name) + ' waitlist</a>'
       : z.state === "closed" || z.state === "full" ? '<a class="btn btn-ghost" href="mailing-calendar">See the mailing calendar</a>'
       : '<a class="btn" href="' + reserveUrl(z.id) + '">Reserve in ' + esc(z.name) + '</a>';
-    panel.innerHTML = '<span class="cov-badge" data-state="' + (z.state === "loading" ? "open" : z.state) + '">' + esc(label(z)) + '</span><h2>' + esc(z.name) + '</h2><p class="cov-blurb">' + esc(z.blurb) + '</p>' +
+    panel.innerHTML = '<span class="cov-badge" data-state="' + st(z) + '">' + esc(label(z)) + '</span><h2>' + esc(z.name) + '</h2><p class="cov-blurb">' + esc(z.blurb) + '</p>' +
       '<dl class="cov-facts">' + rows.map(function (r) { return "<dt>" + r[0] + "</dt><dd>" + r[1] + "</dd>"; }).join("") + "</dl>" +
       '<div class="cov-actions">' + cta + (z.area ? '<a class="cov-more" href="' + z.area + '">Who this route reaches &rarr;</a>' : "") + "</div>" +
-      '<p class="cov-foot">Availability updates live &middot; one business per category</p>';
+      '<p class="cov-foot">' + (z.soon ? "Waitlist businesses get first pick of spots and categories" : "Availability updates live &middot; one business per category") + "</p>";
     if (!quiet) {
       try { history.replaceState(null, "", "?route=" + id + (SIZE ? "&size=" + SIZE : "")); } catch (e) {}
       if (!window.CVS_NOTRACK && window.gtag) window.gtag("event", "coverage_route", { route: id });
+      if (window.matchMedia("(max-width: 900px)").matches) panel.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
   document.addEventListener("click", function (e) {
@@ -214,15 +295,14 @@
   });
   /* One waitlist form for every planned city. Links into #waitlist preselect the city. */
   var wlSel = document.getElementById("wl-city");
-  if (wlSel) wlSel.innerHTML = '<option value="">Pick a city</option>' + ZONES.filter(function (z) { return z.soon; }).map(function (z) { return "<option>" + esc(z.name) + "</option>"; }).join("");
+  if (wlSel) wlSel.innerHTML = '<option value="">Pick a city</option>' + SOON.map(function (z) { return "<option>" + esc(z.name) + "</option>"; }).join("");
   function pickCity(n) { if (!wlSel) return; wlSel.value = n; var b = document.getElementById("wl-btn"); if (b) b.textContent = n ? "Join the " + n + " waitlist" : "Join the waitlist"; }
   if (wlSel) wlSel.addEventListener("change", function () { pickCity(wlSel.value); });
   var want = (location.search.match(/[?&]route=([a-z-]+)/) || [])[1];
   show(ZONES.some(function (z) { return z.id === want; }) ? want : ZONES[0].id, true);
-  var wz = ZONES.filter(function (z) { return z.id === want && z.soon; })[0]; if (wz) pickCity(wz.name);
+  var wz = SOON.filter(function (z) { return z.id === want; })[0]; if (wz) pickCity(wz.name);
   paint();
-  ZONES.forEach(function (z) {
-    if (z.soon) return;
+  LIVE.forEach(function (z) {
     fetch(API + "/api/spots?route=" + encodeURIComponent(z.id)).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
       var s = function (p) { return (p.status || "").toLowerCase(); };
       z.total = d.positions.length;
