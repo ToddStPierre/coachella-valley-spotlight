@@ -248,7 +248,7 @@
 
     box.addEventListener("click", function (e) {
       var t = e.target;
-      var fl = t.closest("[data-filter]"); if (fl) { e.preventDefault(); st.filter = fl.dataset.filter; st.shown = 10; st.openRow = ""; drawLeads(); if (fl.closest(".ck-todo")) {
+      var fl = t.closest("[data-filter]"); if (fl) { e.preventDefault(); var inTodo = !!fl.closest(".ck-todo"); st.filter = fl.dataset.filter; st.shown = 10; st.openRow = ""; drawLeads(); if (inTodo) {
         // "Who to pitch" is hidden on Overview, so open the Who to call section first, then scroll to the filtered list.
         var go = function () { var pk = document.getElementById("ck-pitch"); if (pk) { pk.scrollIntoView({ block: "start" }); window.scrollBy(0, -76); } };
         if (document.body.dataset.sec && document.body.dataset.sec !== "sales") { location.hash = "sales"; setTimeout(go, 80); } else go();
