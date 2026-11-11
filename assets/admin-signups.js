@@ -70,7 +70,7 @@
       '</tbody></table></div>' +
       '<p class="risk" style="margin-top:12px">"(defaults)" means they haven&rsquo;t opened their email preferences yet, so they have the sign-up choices (all three on). Last seen updates when a member visits signed in.</p>' +
 
-      '<h2 class="month-head" style="margin-top:40px"><span class="stripe-mini"></span>La Quinta and Indio waitlist</h2>' +
+      '<h2 class="month-head" style="margin-top:40px"><span class="stripe-mini"></span>Route waitlist (by city)</h2>' +
       '<div class="table-scroll"><table class="stats-table"><thead><tr><th>Business</th><th>Contact</th><th>Route</th><th>Type</th><th>Joined</th></tr></thead><tbody>' +
       (wait.map(function (s) { return '<tr><td><strong>' + esc(s.business) + '</strong></td><td>' + esc(s.name) + '<br><a href="mailto:' + esc(s.email) + '">' + esc(s.email) + '</a><br>' + esc(s.phone) + '</td><td>' + esc(s.city) + '</td><td>' + esc(s.category) + '</td><td>' + esc(s.created_at.slice(0, 10)) + '</td></tr>'; }).join("") || '<tr><td colspan="5">No one on the waitlist yet.</td></tr>') +
       '</tbody></table></div>' + (wait.length ? '<p style="margin-top:12px"><button class="btn btn-ghost" data-dl="waitlist">Download waitlist (CSV)</button></p>' : "");

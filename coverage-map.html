@@ -25,7 +25,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script type="text/javascript">(function(i,m,p,a,c,t){c.ire_o=p;c[p]=c[p]||function(){(c[p].a=c[p].a||[]).push(arguments)};t=a.createElement(m);var z=a.getElementsByTagName(m)[0];t.async=1;t.src=i;z.parentNode.insertBefore(t,z)})('https://utt.impactcdn.com/P-A8063333-b369-4de8-a2dd-14aeee36646f1.js','script','impactStat',document,window);impactStat('transformLinks');impactStat('trackImpression');</script>
 <title>Postcard Coverage Map | Coachella Valley Spotlight</title>
-<meta name="description" content="See every Coachella Valley Spotlight postcard route on a map: homes per mailing, ZIP codes, tentative mail dates and live spot availability for El Paseo, Sun City Palm Desert and the routes coming next.">
+<meta name="description" content="See every Coachella Valley Spotlight postcard route on a map: homes per mailing, ZIP codes, tentative mail dates and live spot availability for El Paseo, Sun City Palm Desert and the planned cards for every other city in the valley.">
 <meta property="og:title" content="Postcard Coverage Map | Coachella Valley Spotlight">
 <meta property="og:description" content="Every postcard route on one map, with homes, ZIP codes, tentative mail dates and live spot availability.">
 <meta property="og:image" content="https://coachellavalleyspotlight.com/assets/img/share-card.png">
@@ -99,8 +99,8 @@
 <p style="margin-top:24px;color:var(--ink-2)">Spot counts update live as businesses book. A card mails once at least 8 of its 16 spots are sold. If it has fewer by its artwork deadline, it moves to the next date, and your spot and payment carry over, or we refund you. Dates and deadlines for every card are on the <a href="mailing-calendar">mailing calendar</a>. Want a route in your part of the valley? <a href="contact">Tell us where</a>.</p>
 </div></section>
 <section id="waitlist" style="padding-bottom:var(--s5)"><div class="wrap">
-<h2 class="cov-h2" style="margin-top:0">Join the waitlist for the next routes</h2>
-<div class="grid-2 waitlist-grid"><div class="card waitlist"><span class="meta">Join waitlist</span><h3>La Quinta</h3><p class="wl-zip">Zip 92253</p><p>We&rsquo;re lining up a card for La Quinta homes. Join the waitlist and you&rsquo;ll hear first, so you can claim your spot and your category before we open it to everyone.</p><form class="form signup-form" data-signup="waitlist" novalidate><input type="hidden" name="city" value="La Quinta"><label>Business name<input name="business" required></label><label>Your name<input name="name" autocomplete="name"></label><label>Email<input name="email" type="email" autocomplete="email" required></label><label>Phone<input name="phone" type="tel" autocomplete="tel"></label><label class="full">Your business type<input name="category" placeholder="Plumbing, dentist, pizza..."></label><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><div class="full"><button class="btn" type="submit">Join the La Quinta waitlist</button></div><p class="form-status" role="status"></p></form></div><div class="card waitlist"><span class="meta">Join waitlist</span><h3>Indio</h3><p class="wl-zip">Zip 92201</p><p>We&rsquo;re lining up a card for Indio homes. Join the waitlist and you&rsquo;ll hear first, so you can claim your spot and your category before we open it to everyone.</p><form class="form signup-form" data-signup="waitlist" novalidate><input type="hidden" name="city" value="Indio"><label>Business name<input name="business" required></label><label>Your name<input name="name" autocomplete="name"></label><label>Email<input name="email" type="email" autocomplete="email" required></label><label>Phone<input name="phone" type="tel" autocomplete="tel"></label><label class="full">Your business type<input name="category" placeholder="Plumbing, dentist, pizza..."></label><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><div class="full"><button class="btn" type="submit">Join the Indio waitlist</button></div><p class="form-status" role="status"></p></form></div></div>
+<h2 class="cov-h2" style="margin-top:0">Join the waitlist for your city</h2>
+<div class="card waitlist" style="max-width:720px"><span class="meta">Join waitlist</span><h3>Palm Springs to Coachella</h3><p class="wl-zip">8 cities &middot; about 5,000 homes each</p><p>We&rsquo;re lining up a card for every city in the valley: Palm Springs, Cathedral City, Rancho Mirage, Indian Wells, La Quinta, Indio, Coachella and Desert Hot Springs. Join the waitlist for your city and you&rsquo;ll hear first, so you can claim your spot and your category before we open it to everyone. Tap a city on the map to see who its card would reach.</p><form class="form signup-form" data-signup="waitlist" novalidate><label class="full">City<select id="wl-city" name="city" required><option value="">Pick a city</option></select></label><label>Business name<input name="business" required></label><label>Your name<input name="name" autocomplete="name"></label><label>Email<input name="email" type="email" autocomplete="email" required></label><label>Phone<input name="phone" type="tel" autocomplete="tel"></label><label class="full">Your business type<input name="category" placeholder="Plumbing, dentist, pizza..."></label><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><div class="full"><button class="btn" id="wl-btn" type="submit">Join the waitlist</button></div><p class="form-status" role="status"></p></form></div>
 <p style="margin-top:16px;color:var(--ink-2)">Somewhere else in the valley? <a href="contact">Tell us where</a> and we will put it on the list.</p>
 </div></section>
 </main>
@@ -133,10 +133,16 @@
   var ZONES = [
     { id: "el-paseo", name: "El Paseo", town: "Palm Desert", zip: "92260", x: 46.5, y: 78, w: 11, h: 15, area: "mailing-area-el-paseo", blurb: "The streets around El Paseo, Palm Desert's shopping and dining strip, south of Highway 111." },
     { id: "sun-city-palm-desert", name: "Sun City Palm Desert", town: "Palm Desert", zip: "92211", x: 58, y: 42, w: 10, h: 14, area: "mailing-area-sun-city", blurb: "The 55-plus golf community north of I-10, where homeowners stay put and buy local." },
-    { id: "la-quinta", name: "La Quinta", town: "La Quinta", zip: "92253", x: 61, y: 87, w: 10, h: 13, soon: true, blurb: "We're lining up a card for La Quinta homes. Join the waitlist to get first pick of categories." },
-    { id: "indio", name: "Indio", town: "Indio", zip: "92201", x: 80, y: 79, w: 10, h: 14, soon: true, blurb: "We're lining up a card for Indio homes. Join the waitlist to get first pick of categories." }
+    { id: "palm-springs", name: "Palm Springs", town: "Palm Springs", zip: "92262 &middot; 92264", homes: "4,979", x: 12, y: 45, w: 10, h: 14, soon: true, area: "mailing-area-palm-springs", blurb: "Seven carrier routes across Palm Springs' north end, east of downtown and the south end of town. Join the waitlist to get first pick of categories." },
+    { id: "cathedral-city", name: "Cathedral City", town: "Cathedral City", zip: "92234", homes: "4,993", x: 25, y: 53, w: 9, h: 12, soon: true, area: "mailing-area-cathedral-city", blurb: "Six carrier routes in Cathedral City's newer family neighborhoods. Join the waitlist to get first pick of categories." },
+    { id: "rancho-mirage", name: "Rancho Mirage", town: "Rancho Mirage", zip: "92270", homes: "4,976", x: 35, y: 67, w: 9, h: 12, soon: true, area: "mailing-area-rancho-mirage", blurb: "Eight carrier routes in Rancho Mirage's established, higher-income neighborhoods. Join the waitlist to get first pick of categories." },
+    { id: "indian-wells", name: "Indian Wells", town: "Indian Wells", zip: "92210", homes: "4,461", x: 56, y: 63, w: 8, h: 10, soon: true, area: "mailing-area-indian-wells", blurb: "Every home in Indian Wells, all seven carrier routes. Join the waitlist to get first pick of categories." },
+    { id: "la-quinta", name: "La Quinta", town: "La Quinta", zip: "92253", homes: "4,995", x: 61, y: 87, w: 10, h: 13, soon: true, area: "mailing-area-la-quinta", blurb: "Six carrier routes in La Quinta's golf communities and higher-income streets. Join the waitlist to get first pick of categories." },
+    { id: "indio", name: "Indio", town: "Indio", zip: "92201 &middot; 92203", homes: "4,994", x: 79, y: 74, w: 10, h: 14, soon: true, area: "mailing-area-indio", blurb: "Seven carrier routes in north Indio near Bermuda Dunes and the newer neighborhoods south of Avenue 48. Join the waitlist to get first pick of categories." },
+    { id: "coachella", name: "Coachella", town: "Coachella", zip: "92236", homes: "4,998", x: 91, y: 89, w: 9, h: 12, soon: true, area: "mailing-area-coachella", blurb: "Six carrier routes covering Coachella's family neighborhoods. Join the waitlist to get first pick of categories." },
+    { id: "desert-hot-springs", name: "Desert Hot Springs", town: "Desert Hot Springs", zip: "92240 &middot; 92241", homes: "4,977", x: 22, y: 15, w: 11, h: 14, soon: true, area: "mailing-area-desert-hot-springs", blurb: "Five carrier routes across Desert Hot Springs. Join the waitlist to get first pick of categories." }
   ];
-  var TOWNS = [["Palm Springs", 11.4, 44.6], ["Cathedral City", 28.1, 57.9], ["Rancho Mirage", 31, 64], ["Thousand Palms", 41, 40], ["Desert Hot Springs", 20.5, 10.2], ["Coachella", 90, 92]];
+  var TOWNS = [["Thousand Palms", 41, 40]];
   var mapEl = document.getElementById("cov-map"), zonesEl = document.getElementById("cov-zones"), listEl = document.getElementById("cov-list"), panel = document.getElementById("cov-panel"), cardsEl = document.getElementById("cov-cards");
   var SIZE = (location.search.match(/[?&]size=([1248])\b/) || [])[1];
   function reserveUrl(id) { return "reserve?route=" + encodeURIComponent(id) + (SIZE ? "&size=" + SIZE : ""); }
@@ -168,9 +174,9 @@
     cardsEl.innerHTML = ZONES.map(function (z) {
       var m = z.mail;
       return '<article class="cov-card" data-state="' + (z.state === "loading" ? "open" : z.state) + '"><span class="cov-badge">' + esc(label(z)) + '</span><h3>' + esc(z.name) + '</h3>' +
-        '<p class="cov-card-meta">' + (m ? "Tentatively mails " + esc(nice(m.mail)) + " &middot; " + esc(m.homes) : "Zip " + z.zip + " &middot; date to be set") + '</p>' +
+        '<p class="cov-card-meta">' + (m ? "Tentatively mails " + esc(nice(m.mail)) + " &middot; " + esc(m.homes) : (z.homes ? z.homes + " homes &middot; " : "Zip " + z.zip + " &middot; ") + "date to be set") + '</p>' +
         (z.sold != null ? '<p class="cov-card-fill"><b>' + z.taken + '/' + z.total + '</b> spots filled</p>' : "") +
-        '<a class="cov-card-link" href="' + (z.soon ? "#waitlist" : reserveUrl(z.id)) + '">' + (z.soon ? "Join the waitlist" : z.state === "full" ? "See other routes" : "Reserve a spot") + ' &rarr;</a></article>';
+        '<a class="cov-card-link" href="' + (z.soon ? "#waitlist" : reserveUrl(z.id)) + '"' + (z.soon ? ' data-wl="' + z.name + '"' : "") + '>' + (z.soon ? "Join the waitlist" : z.state === "full" ? "See other routes" : "Reserve a spot") + ' &rarr;</a></article>';
     }).join("");
     if (cur) show(cur, true);
   }
@@ -179,8 +185,8 @@
     var z = ZONES.filter(function (x) { return x.id === id; })[0]; if (!z) return; cur = id;
     [].forEach.call(document.querySelectorAll("[data-z]"), function (el) { el.classList.toggle("is-on", el.getAttribute("data-z") === id); el.setAttribute("aria-pressed", el.getAttribute("data-z") === id ? "true" : "false"); });
     var m = z.mail, rows = [];
-    rows.push(["Homes per mailing", m ? esc(m.homes.replace(/ homes$/, "")) : "Being mapped now"]);
-    rows.push(["ZIP code", z.zip + " &middot; " + esc(z.town)]);
+    rows.push(["Homes per mailing", m ? esc(m.homes.replace(/ homes$/, "")) : z.homes ? z.homes + ' <span class="cov-muted">(planned)</span>' : "Being mapped now"]);
+    rows.push([/&middot;/.test(z.zip) ? "ZIP codes" : "ZIP code", z.zip + " &middot; " + esc(z.town)]);
     if (m) {
       var d = left(m.deadline);
       rows.push(["Tentative mail date", esc(nice(m.mail))]);
@@ -190,7 +196,7 @@
     } else {
       rows.push(["Tentative mail date", "Not set yet"]);
     }
-    var cta = z.soon ? '<a class="btn" href="#waitlist">Join the ' + esc(z.name) + ' waitlist</a>'
+    var cta = z.soon ? '<a class="btn" href="#waitlist" data-wl="' + esc(z.name) + '">Join the ' + esc(z.name) + ' waitlist</a>'
       : z.state === "closed" || z.state === "full" ? '<a class="btn btn-ghost" href="mailing-calendar">See the mailing calendar</a>'
       : '<a class="btn" href="' + reserveUrl(z.id) + '">Reserve in ' + esc(z.name) + '</a>';
     panel.innerHTML = '<span class="cov-badge" data-state="' + (z.state === "loading" ? "open" : z.state) + '">' + esc(label(z)) + '</span><h2>' + esc(z.name) + '</h2><p class="cov-blurb">' + esc(z.blurb) + '</p>' +
@@ -202,9 +208,18 @@
       if (!window.CVS_NOTRACK && window.gtag) window.gtag("event", "coverage_route", { route: id });
     }
   }
-  document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest("button[data-z]"); if (b) show(b.getAttribute("data-z")); });
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("button[data-z]"); if (b) show(b.getAttribute("data-z"));
+    var w = e.target.closest && e.target.closest("[data-wl]"); if (w) pickCity(w.getAttribute("data-wl"));
+  });
+  /* One waitlist form for every planned city. Links into #waitlist preselect the city. */
+  var wlSel = document.getElementById("wl-city");
+  if (wlSel) wlSel.innerHTML = '<option value="">Pick a city</option>' + ZONES.filter(function (z) { return z.soon; }).map(function (z) { return "<option>" + esc(z.name) + "</option>"; }).join("");
+  function pickCity(n) { if (!wlSel) return; wlSel.value = n; var b = document.getElementById("wl-btn"); if (b) b.textContent = n ? "Join the " + n + " waitlist" : "Join the waitlist"; }
+  if (wlSel) wlSel.addEventListener("change", function () { pickCity(wlSel.value); });
   var want = (location.search.match(/[?&]route=([a-z-]+)/) || [])[1];
   show(ZONES.some(function (z) { return z.id === want; }) ? want : ZONES[0].id, true);
+  var wz = ZONES.filter(function (z) { return z.id === want && z.soon; })[0]; if (wz) pickCity(wz.name);
   paint();
   ZONES.forEach(function (z) {
     if (z.soon) return;

@@ -712,7 +712,7 @@
   // Formspree drops emails sent from the tracker's servers, so the browser sends the tracker's email notice.
   function mailTodd(n) { if (!n) return; var fd = new FormData(); Object.keys(n).forEach(function (k) { if (n[k] != null) fd.append(k, String(n[k])); }); fetch("https://formspree.io/f/myezyype", { method: "POST", headers: { Accept: "application/json" }, body: fd }).catch(function () {}); }
 
-  // Email signups (footer, the exit popup) and the La Quinta / Indio route waitlist: saved by the tracker.
+  // Email signups (footer, the exit popup) and the city route waitlist: saved by the tracker.
   // Delegated on document (not queried once at load) so forms injected later, like the popup, are covered too.
   var SIGNUP_THANKS = { news: "You're on the list. Thanks, neighbor!", waitlist: "You're on the waitlist. We'll reach out before the first card for your city goes out." };
   document.addEventListener("submit", function (ev) {
@@ -722,6 +722,7 @@
     var kind = f.getAttribute("data-signup"), status = f.querySelector(".form-status"), btn = f.querySelector("button[type=submit]");
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email.value.trim())) { status.textContent = "Please add a valid email."; f.email.focus(); return; }
     if (f.business && !f.business.value.trim()) { status.textContent = "Please add your business name."; f.business.focus(); return; }
+    if (kind === "waitlist" && f.city && f.city.tagName === "SELECT" && !f.city.value) { status.textContent = "Please pick your city."; f.city.focus(); return; }
     var body = { kind: kind, page: location.pathname };
     Array.prototype.forEach.call(f.elements, function (el) { if (el.name) body[el.name] = el.value; });
     btn.disabled = true; status.textContent = "Sending...";
