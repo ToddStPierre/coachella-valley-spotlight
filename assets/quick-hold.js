@@ -12,8 +12,8 @@
   var PRICE = "$300", SIZE = "1 spot", DIMS = "2.7″ x 2.6″";
   var MAIL = window.CVS_MAILINGS || [];
   var ROUTES = [
-    { id: "el-paseo", name: "El Paseo", area: "Palm Desert 92260", homes: "4,972 homes" },
-    { id: "sun-city-palm-desert", name: "Sun City Palm Desert", area: "Sun City, 92211", homes: "4,826 homes" }
+    { id: "el-paseo", name: "El Paseo", area: "Palm Desert 92260", homes: "4,968 homes" },
+    { id: "sun-city-palm-desert", name: "Sun City Palm Desert", area: "Sun City, 92211", homes: "4,829 homes" }
   ];
   ROUTES.forEach(function (r) { var m = mailing(r.id); if (m) { r.homes = m.homes || r.homes; r.area = m.area || r.area; } });
   var D = ((window.CVS && window.CVS.directory) || []).filter(function (b) { return !b.public; });
