@@ -339,7 +339,7 @@ p { margin: 0 0 var(--s2); }
 .advertisers { padding: var(--s4) 0 var(--s5); }
 .advertisers h2 { margin-bottom: 6px; }
 .advertisers-strip { overflow: hidden; margin-top: var(--s3); -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
-.advertisers-track { display: flex; gap: 20px; width: max-content; animation: advertisers-scroll 40s linear infinite; }
+.advertisers-track { display: flex; gap: 20px; width: max-content; animation: advertisers-scroll 70s linear infinite; }
 .advertisers-strip:hover .advertisers-track, .advertisers-strip:focus-within .advertisers-track { animation-play-state: paused; }
 .advertiser-card { flex: none; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 10px; box-shadow: var(--shadow); }
 .advertiser-card img { display: block; height: 170px; width: auto; border-radius: 8px; }
