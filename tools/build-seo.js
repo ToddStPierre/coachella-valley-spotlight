@@ -383,7 +383,7 @@ for (const file of ["index.html", "directory.html", "deals.html", "events.html",
 const golfCtx = { window: {} };
 if (fs.existsSync(path.join(root, "data", "golf.js"))) require("vm").runInNewContext(fs.readFileSync(path.join(root, "data", "golf.js"), "utf8"), golfCtx);
 const golfPaths = ((golfCtx.window.CVS || {}).golf || []).map(c => `golf/${c.slug}/`);
-const urls = ["", "directory", "deals", "events", "agents", "halloween", "welcome", "farmers-markets", "holidays", "golf/", "advertise", "submit", "story", "contact", "mailing-area-el-paseo", "mailing-area-sun-city", "mailing-calendar", "coverage-map", "for-business", "pricing", "legal"]
+const urls = ["", "directory", "deals", "events", "agents", "halloween", "welcome", "farmers-markets", "holidays", "golf/", "advertise", "submit", "story", "contact", "mailing-area-el-paseo", "mailing-area-sun-city", "mailing-area-palm-springs", "mailing-area-cathedral-city", "mailing-area-rancho-mirage", "mailing-area-indian-wells", "mailing-area-la-quinta", "mailing-area-indio", "mailing-area-coachella", "mailing-area-desert-hot-springs", "mailing-calendar", "coverage-map", "for-business", "pricing", "legal"]
   .concat(cityPaths, weekendPaths, list.map(b => `business/${b.slug}/`), eventPaths, landing.filter(p => p.index).map(p => p.path), golfPaths);
 // Pages whose content changes day to day as events come and go. Only these get <lastmod>, so it stays a signal Google can trust.
 const FRESH = new Set(["", "events", "holidays"].concat(weekendPaths, cityPaths));
