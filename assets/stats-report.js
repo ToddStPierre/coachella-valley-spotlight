@@ -137,7 +137,7 @@
 
     var sp = out.querySelector("[data-rp-spots]");
     if (sp) {
-      var routes = (window.CVS_MAILINGS || []).map(function (m) { return [m.route, m.name]; }), got = [], left = routes.length;
+      var routes = (window.CVS_MAILINGS || []).filter(function (m, i, all) { return all.findIndex(function (x) { return x.route === m.route; }) === i; }).map(function (m) { return [m.route, m.name]; }), got = [], left = routes.length;
       routes.forEach(function (r) {
         fetch(SPOTS + "/api/spots?route=" + r[0]).then(function (x) { if (!x.ok) throw 0; return x.json(); }).then(function (j) {
           var open = j.positions.filter(function (q) { return (q.status || "").toLowerCase() === "open"; }).length;

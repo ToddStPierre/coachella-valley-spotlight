@@ -114,7 +114,7 @@
 <nav class="crumbs" aria-label="Breadcrumb"><a href="advertise">Advertise</a> &rsaquo; <span>Coverage map</span></nav>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>Postcard coverage map</span>
 <h1>See Exactly Where <span class="grad">Your Ad Lands.</span></h1>
-<p class="cm-lede">About 5,000 homes per card, one business per category. Two cards are booking now. Every other city in the valley is next.</p>
+<p class="cm-lede">About 5,000 homes per card, one business per category. Ten cards are booking now, from Desert Hot Springs to Coachella.</p>
 </div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
 <div class="cm-grid">
@@ -145,7 +145,7 @@
 </svg>
 <div class="cov-zones" id="cov-zones"></div>
 </div>
-<ul class="cov-legend" aria-label="Map key"><li><span class="cov-key open"></span>Spots open</li><li><span class="cov-key almost"></span>Almost full</li><li><span class="cov-key full"></span>Full</li><li><span class="cov-key soon"></span>Join waitlist</li></ul>
+<ul class="cov-legend" aria-label="Map key"><li><span class="cov-key open"></span>Spots open</li><li><span class="cov-key almost"></span>Almost full</li><li><span class="cov-key full"></span>Full</li><li id="cov-key-soon"><span class="cov-key soon"></span>Join waitlist</li></ul>
 <div class="cm-chips" role="group" aria-label="Choose a route"><div class="cm-chiprow" id="cm-chips-live"><span>Booking now</span></div><div class="cm-chiprow" id="cm-chips-soon"><span>Join waitlist</span></div></div>
 <p class="cm-fine">Spot counts update live as businesses book. A card mails once at least 8 of its 16 spots are sold. If it has fewer by its artwork deadline, it moves to the next date, and your spot and payment carry over, or we refund you. Every date is on the <a href="mailing-calendar">mailing calendar</a>.</p>
 </div>
@@ -189,36 +189,38 @@
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight, a brand of MoreViews Pro LLC. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
 <script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js"></script>
-<script src="data/mailings.js?v=20261111a"></script>
+<script src="data/mailings.js?v=20261111mm"></script>
 <script>
 (function () {
   var API = "https://local-spotlight-reservations.toddstpierre.workers.dev";
   var M = window.CVS_MAILINGS || [];
   /* Routes on the map. Live routes get their dates and homes from data/mailings.js and their spots from the booking Worker.
-     x/y = center of the zone on the map (percent), w/h = its size. A planned route (soon: true) needs no mailing entry. */
+     x/y = center of the zone on the map (percent), w/h = its size. A planned route (soon: true) needs no mailing entry. All 10 were opened for booking 2026-11-11. */
   var ZONES = [
     { id: "el-paseo", name: "El Paseo", town: "Palm Desert", zip: "92260", x: 46.5, y: 78, w: 11, h: 15, area: "mailing-area-el-paseo", blurb: "The streets around El Paseo, Palm Desert's shopping and dining strip, south of Highway 111." },
     { id: "sun-city-palm-desert", name: "Sun City Palm Desert", town: "Palm Desert", zip: "92211", x: 58, y: 42, w: 10, h: 14, area: "mailing-area-sun-city", blurb: "The 55-plus golf community north of I-10, where homeowners stay put and buy local." },
-    { id: "palm-springs", name: "Palm Springs", town: "Palm Springs", zip: "92262 &middot; 92264", homes: "4,979", x: 12, y: 45, w: 10, h: 14, soon: true, area: "mailing-area-palm-springs", blurb: "Seven carrier routes across Palm Springs' north end, east of downtown and the south end of town. Join the waitlist to get first pick of categories." },
-    { id: "cathedral-city", name: "Cathedral City", town: "Cathedral City", zip: "92234", homes: "4,993", x: 25, y: 53, w: 9, h: 12, soon: true, area: "mailing-area-cathedral-city", blurb: "Six carrier routes in Cathedral City's family neighborhoods. Join the waitlist to get first pick of categories." },
-    { id: "rancho-mirage", name: "Rancho Mirage", town: "Rancho Mirage", zip: "92270", homes: "4,976", x: 35, y: 67, w: 9, h: 12, soon: true, area: "mailing-area-rancho-mirage", blurb: "Eight carrier routes in Rancho Mirage's established, higher-income neighborhoods. Join the waitlist to get first pick of categories." },
-    { id: "indian-wells", name: "Indian Wells", town: "Indian Wells", zip: "92210", homes: "4,461", x: 56, y: 63, w: 8, h: 10, soon: true, area: "mailing-area-indian-wells", blurb: "Every home in Indian Wells, all seven carrier routes. Join the waitlist to get first pick of categories." },
-    { id: "la-quinta", name: "La Quinta", town: "La Quinta", zip: "92253", homes: "4,995", x: 61, y: 87, w: 10, h: 13, soon: true, area: "mailing-area-la-quinta", blurb: "Six carrier routes in La Quinta's golf communities and higher-income streets. Join the waitlist to get first pick of categories." },
-    { id: "indio", name: "Indio", town: "Indio", zip: "92201 &middot; 92203", homes: "4,994", x: 79, y: 74, w: 10, h: 14, soon: true, area: "mailing-area-indio", blurb: "Seven carrier routes in north Indio near Bermuda Dunes and the newer neighborhoods south of Avenue 48. Join the waitlist to get first pick of categories." },
-    { id: "coachella", name: "Coachella", town: "Coachella", zip: "92236", homes: "4,998", x: 91, y: 89, w: 9, h: 12, soon: true, area: "mailing-area-coachella", blurb: "Six carrier routes covering Coachella's family neighborhoods. Join the waitlist to get first pick of categories." },
-    { id: "desert-hot-springs", name: "Desert Hot Springs", town: "Desert Hot Springs", zip: "92240 &middot; 92241", homes: "4,977", x: 22, y: 15, w: 11, h: 14, soon: true, area: "mailing-area-desert-hot-springs", blurb: "Five carrier routes across Desert Hot Springs. Join the waitlist to get first pick of categories." }
+    { id: "palm-springs", name: "Palm Springs", town: "Palm Springs", zip: "92262 &middot; 92264", homes: "4,979", x: 12, y: 45, w: 10, h: 14, area: "mailing-area-palm-springs", blurb: "Seven carrier routes across Palm Springs' north end, east of downtown and the south end of town. Join the waitlist to get first pick of categories." },
+    { id: "cathedral-city", name: "Cathedral City", town: "Cathedral City", zip: "92234", homes: "4,993", x: 25, y: 53, w: 9, h: 12, area: "mailing-area-cathedral-city", blurb: "Six carrier routes in Cathedral City's family neighborhoods. Join the waitlist to get first pick of categories." },
+    { id: "rancho-mirage", name: "Rancho Mirage", town: "Rancho Mirage", zip: "92270", homes: "4,976", x: 35, y: 67, w: 9, h: 12, area: "mailing-area-rancho-mirage", blurb: "Eight carrier routes in Rancho Mirage's established, higher-income neighborhoods. Join the waitlist to get first pick of categories." },
+    { id: "indian-wells", name: "Indian Wells", town: "Indian Wells", zip: "92210", homes: "4,461", x: 56, y: 63, w: 8, h: 10, area: "mailing-area-indian-wells", blurb: "Every home in Indian Wells, all seven carrier routes. Join the waitlist to get first pick of categories." },
+    { id: "la-quinta", name: "La Quinta", town: "La Quinta", zip: "92253", homes: "4,995", x: 61, y: 87, w: 10, h: 13, area: "mailing-area-la-quinta", blurb: "Six carrier routes in La Quinta's golf communities and higher-income streets. Join the waitlist to get first pick of categories." },
+    { id: "indio", name: "Indio", town: "Indio", zip: "92201 &middot; 92203", homes: "4,994", x: 79, y: 74, w: 10, h: 14, area: "mailing-area-indio", blurb: "Seven carrier routes in north Indio near Bermuda Dunes and the newer neighborhoods south of Avenue 48. Join the waitlist to get first pick of categories." },
+    { id: "coachella", name: "Coachella", town: "Coachella", zip: "92236", homes: "4,998", x: 91, y: 89, w: 9, h: 12, area: "mailing-area-coachella", blurb: "Six carrier routes covering Coachella's family neighborhoods. Join the waitlist to get first pick of categories." },
+    { id: "desert-hot-springs", name: "Desert Hot Springs", town: "Desert Hot Springs", zip: "92240 &middot; 92241", homes: "4,977", x: 22, y: 15, w: 11, h: 14, area: "mailing-area-desert-hot-springs", blurb: "Five carrier routes across Desert Hot Springs. Join the waitlist to get first pick of categories." }
   ];
   var TOWNS = [["Thousand Palms", 41, 40]];
   var zonesEl = document.getElementById("cov-zones"), panel = document.getElementById("cov-panel"), liveEl = document.getElementById("cm-live");
   var SIZE = (location.search.match(/[?&]size=([1248])\b/) || [])[1];
-  function reserveUrl(id) { return "reserve?route=" + encodeURIComponent(id) + (SIZE ? "&size=" + SIZE : ""); }
+  function reserveUrl(id) { var z = ZONES.filter(function (x) { return x.id === id; })[0]; return "reserve?route=" + encodeURIComponent(id) + (z && z.mail ? "&mail=" + z.mail.mail : "") + (SIZE ? "&size=" + SIZE : ""); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function ymd(s) { var p = s.split("-"); return new Date(+p[0], p[1] - 1, +p[2]); }
   function nice(s) { return ymd(s).toLocaleDateString("en-US", { weekday: "short", month: "long", day: "numeric" }); }
   function left(s) { var t = new Date(); t.setHours(0, 0, 0, 0); return Math.round((ymd(s) - t) / 864e5); }
   function daysTxt(d) { return d === 0 ? "today" : d + (d === 1 ? " day" : " days") + " left"; }
   ZONES.forEach(function (z) {
-    z.mail = M.filter(function (m) { return m.route === z.id; })[0]; if (!z.soon && !z.mail) z.soon = true; z.state = z.soon ? "soon" : "loading";
+    // The card shown for a route: the next one still open for booking, else the next one that hasn't mailed.
+    var own = M.filter(function (m) { return m.route === z.id; }).sort(function (a, b) { return a.mail < b.mail ? -1 : 1; });
+    z.mail = own.filter(function (m) { return left(m.deadline) >= 0; })[0] || own.filter(function (m) { return left(m.mail) >= 0; })[0] || own[0]; if (!z.soon && !z.mail) z.soon = true; z.state = z.soon ? "soon" : "loading";
     if (z.soon) { z.w = Math.round(z.w * 0.62 * 10) / 10; z.h = Math.round(z.h * 0.62 * 10) / 10; } else { z.w = z.w * 1.15; z.h = z.h * 1.15; }
   });
   var LIVE = ZONES.filter(function (z) { return !z.soon; }), SOON = ZONES.filter(function (z) { return z.soon; });
@@ -228,6 +230,8 @@
   function chip(z) { return '<button type="button" class="cm-chip" data-z="' + z.id + '"><span class="cov-dot"></span>' + esc(z.name) + (z.soon ? "" : ' <em data-st></em>') + '</button>'; }
   document.getElementById("cm-chips-live").insertAdjacentHTML("beforeend", LIVE.map(chip).join(""));
   document.getElementById("cm-chips-soon").insertAdjacentHTML("beforeend", SOON.map(chip).join(""));
+  // Every planned city is booking now (2026-11-11): hide the empty waitlist row and form until a new city is planned.
+  if (!SOON.length) ["cm-chips-soon", "waitlist", "cov-key-soon"].forEach(function (id) { var el = document.getElementById(id); if (el) { el.hidden = true; el.style.display = "none"; } });
   document.getElementById("cm-wl-cities").innerHTML = SOON.map(function (z) { return z.area ? '<a href="' + z.area + '">' + esc(z.name) + '</a>' : esc(z.name); }).join("");
 
   function label(z) {
@@ -303,7 +307,7 @@
   var wz = SOON.filter(function (z) { return z.id === want; })[0]; if (wz) pickCity(wz.name);
   paint();
   LIVE.forEach(function (z) {
-    fetch(API + "/api/spots?route=" + encodeURIComponent(z.id)).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
+    fetch(API + "/api/spots?route=" + encodeURIComponent(z.id) + (z.mail ? "&mail=" + z.mail.mail : "")).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
       var s = function (p) { return (p.status || "").toLowerCase(); };
       z.total = d.positions.length;
       z.sold = d.positions.filter(function (p) { return s(p) === "sold"; }).length;

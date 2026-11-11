@@ -49,12 +49,14 @@
   if (anchor.id === "admin-tools") anchor.after(box); else anchor.before(box);
   box.innerHTML = '<div class="empty">Loading the sales cockpit&hellip;</div>';
 
-  var cards = (window.CVS_MAILINGS || []).filter(function (m) { return days(m.mail) >= 0; });
+  // The next card on each route (the one sales are urgent for). Later cards show on the Postcard board.
+  var cards = (window.CVS_MAILINGS || []).filter(function (m) { return days(m.mail) >= 0; }).sort(function (a, b) { return a.mail < b.mail ? -1 : 1; })
+    .filter(function (m, i, all) { return all.findIndex(function (x) { return x.route === m.route; }) === i; });
   var dir = (window.CVS && window.CVS.directory) || [];
 
   function j(url) { return fetch(url).then(function (r) { return r.json(); }).catch(function () { return null; }); }
   Promise.all([
-    Promise.all(cards.map(function (m) { return j(SPOTS + "/api/spots?route=" + m.route); })),
+    Promise.all(cards.map(function (m) { return j(SPOTS + "/api/spots?route=" + m.route + "&mail=" + m.mail); })),
     j(API + "/admin/submissions?key=" + encodeURIComponent(admin)),
     j(API + "/admin/owners?key=" + encodeURIComponent(admin)),
     j(API + "/stats/all?key=" + encodeURIComponent(admin)),

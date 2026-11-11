@@ -1,9 +1,17 @@
-/* Postcard spot picker: live availability from the reservations Worker. */
+/* Postcard spot picker: live availability from the reservations Worker.
+   Several cards per route can be open at once (2026-11-11). The date chips pick which card; ?mail=YYYY-MM-DD preselects one. */
 (function () {
   var API = "https://local-spotlight-reservations.toddstpierre.workers.dev";
   var NOTIFY = "https://formspree.io/f/myezyype";
   var LABELS = { "el-paseo": "El Paseo", "sun-city-palm-desert": "Sun City Palm Desert" };
   var root = document.getElementById("picker"); if (!root) return;
+  // Route tabs come from the calendar (10 routes since 2026-11-11), so a new route needs no HTML change.
+  (function () {
+    var seen = [], tabRow = root.querySelector(".picker-tabs");
+    (window.CVS_MAILINGS || []).forEach(function (m) { if (seen.indexOf(m.route) < 0) { seen.push(m.route); LABELS[m.route] = m.name || LABELS[m.route] || m.route; } });
+    if (!tabRow || !seen.length) return;
+    tabRow.innerHTML = seen.map(function (r, i) { return '<button class="picker-tab' + (i ? "" : " active") + '" data-route="' + r + '" type="button" role="tab" aria-selected="' + (i ? "false" : "true") + '">' + String(LABELS[r]).replace(/</g, "&lt;") + "</button>"; }).join("");
+  })();
   var tabs = root.querySelectorAll(".picker-tab"), statusEl = document.getElementById("picker-status"), countEl = document.getElementById("picker-count");
   var front = document.getElementById("picker-front"), back = document.getElementById("picker-back");
   var shell = document.getElementById("picker-form-shell"), title = document.getElementById("picker-form-title");
@@ -26,28 +34,49 @@
     return null;
   }
   function mark(list) { root.querySelectorAll(".spot").forEach(function (el) { el.classList.toggle("picked", !!list && list.indexOf(+el.getAttribute("data-pos")) > -1); }); }
-  var dateEl = root.querySelector(".picker-date"), MAIL = window.CVS_MAILINGS || [];
-  function mailing(r) { for (var i = 0; i < MAIL.length; i++) if (MAIL[i].route === r) return MAIL[i]; return null; }
+  var dateEl = root.querySelector(".picker-date"), MAIL = window.CVS_MAILINGS || [], mail = null;
+  var wantMail = (location.search.match(/[?&]mail=(\d{4}-\d{2}-\d{2})/) || [])[1];
   function ymd(s) { var p = s.split("-"); return new Date(+p[0], p[1] - 1, +p[2]); }
   function nice(s) { return ymd(s).toLocaleDateString("en-US", { weekday: "short", month: "long", day: "numeric" }); }
+  function short(s) { return ymd(s).toLocaleDateString("en-US", { month: "short", day: "numeric" }); }
   function daysLeft(s) { var t = new Date(); t.setHours(0, 0, 0, 0); return Math.round((ymd(s) - t) / 864e5); }
+  // Cards on a route that haven't mailed yet, soonest first. Bookable ones have an artwork date today or later.
+  function cards(r) { return MAIL.filter(function (m) { return m.route === r && daysLeft(m.mail) >= 0; }).sort(function (a, b) { return a.mail < b.mail ? -1 : 1; }); }
+  function bookable(r) { return cards(r).filter(function (m) { return daysLeft(m.deadline) >= 0; }); }
+  function mailing(r) {
+    var c = cards(r), b = bookable(r);
+    for (var i = 0; i < c.length; i++) if (c[i].mail === mail) return c[i];
+    return b[0] || c[0] || null;
+  }
+  // Date chips under the route tabs: one per card that hasn't mailed.
+  var chips = root.querySelector(".picker-mails");
+  if (!chips) { chips = document.createElement("div"); chips.className = "picker-mails"; chips.setAttribute("role", "group"); chips.setAttribute("aria-label", "Which mailing"); var tabRow = root.querySelector(".picker-tabs"); if (tabRow) tabRow.after(chips); }
+  function drawChips(r) {
+    var c = cards(r), cur = mailing(r); mail = cur ? cur.mail : null;
+    chips.hidden = c.length < 2;
+    chips.innerHTML = c.map(function (m) {
+      var shut = daysLeft(m.deadline) < 0;
+      return '<button type="button" class="picker-mail' + (m.mail === mail ? " on" : "") + '" data-mail="' + m.mail + '" aria-pressed="' + (m.mail === mail) + '"' + (shut ? ' title="Booking for this card is closed"' : "") + "><b>" + short(m.mail) + "</b><span>" + (shut ? "closed" : "artwork " + short(m.deadline)) + "</span></button>";
+    }).join("");
+    chips.querySelectorAll("[data-mail]").forEach(function (b) { b.addEventListener("click", function () { mail = b.getAttribute("data-mail"); load(r); }); });
+  }
   function closed(r) { var m = mailing(r); return !!(m && daysLeft(m.deadline) < 0); }
   function showDate(r) {
     var m = mailing(r); if (!dateEl) return;
     if (!m) { dateEl.textContent = "Mailing date coming soon"; return; }
     var d = daysLeft(m.deadline);
     dateEl.innerHTML = "Tentative Mail Date: " + nice(m.mail) + " &middot; Tentative Artwork Date: " + nice(m.deadline) +
-      (d < 0 ? '<span class="picker-left">Booking for this card is closed. The next date is coming soon.</span>' : '<span class="picker-left">' + (d === 0 ? "Last day to book" : d + (d === 1 ? " day" : " days") + " left to book") + (m.minSold ? " &middot; This card mails once " + m.minSold + " spots are sold" : "") + '</span>');
+      (d < 0 ? '<span class="picker-left">Booking for this card is closed. ' + (bookable(r).length ? "Pick a later date above." : "The next date is coming soon.") + '</span>' : '<span class="picker-left">' + (d === 0 ? "Last day to book" : d + (d === 1 ? " day" : " days") + " left to book") + (m.minSold ? " &middot; This card mails once " + m.minSold + " spots are sold" : "") + '</span>');
   }
 
   function state(s) { s = (s || "").toLowerCase(); return s === "open" ? "open" : s === "pending" ? "pending" : "sold"; }
   function word(k) { return k === "open" ? "Open" : k === "pending" ? "Pending" : "Sold"; }
 
   function load(r, keepForm) {
-    showDate(r);
+    drawChips(r); showDate(r);
     statusEl.textContent = "Loading spots…"; countEl.textContent = "Loading availability…";
     front.innerHTML = ""; back.innerHTML = ""; openNow = {}; if (!keepForm) { shell.hidden = true; pending = null; }
-    fetch(API + "/api/spots?route=" + encodeURIComponent(r)).then(function (res) { if (!res.ok) throw 0; return res.json(); }).then(function (d) {
+    fetch(API + "/api/spots?route=" + encodeURIComponent(r) + (mail ? "&mail=" + mail : "")).then(function (res) { if (!res.ok) throw 0; return res.json(); }).then(function (d) {
       d.positions.forEach(function (p) {
         var k = state(p.status), el = document.createElement(k === "open" ? "button" : "div");
         el.className = "spot " + k; el.setAttribute("data-pos", p.position); openNow[p.position] = k === "open";
@@ -60,7 +89,7 @@
       var taken = d.categories.filter(function (c) { return d.takenCategories.indexOf(c) === -1; });
       cat.innerHTML = '<option value="" disabled selected>Select your category…</option>' + taken.map(function (c) { return '<option>' + c.replace(/</g, "&lt;") + '</option>'; }).join("") + (taken.length ? "" : '<option value="" disabled>No categories left on this route</option>');
       var n = d.positions.filter(function (p) { return state(p.status) !== "open"; }).length;
-      countEl.innerHTML = '<b>' + n + ' of ' + d.positions.length + '</b> spots taken on ' + LABELS[r];
+      countEl.innerHTML = '<b>' + n + ' of ' + d.positions.length + '</b> spots taken on ' + LABELS[r] + (mail ? ", " + short(mail) + " card" : "");
       statusEl.textContent = LABELS[r] + ": tap an open spot to place your " + SIZES[size].name + " ad.";
     }).catch(function () {
       statusEl.textContent = "Couldn’t load live spot availability right now. Refresh to try again, or call (760) 422-5475.";
@@ -71,9 +100,9 @@
   function open(r, pos) {
     var list = blockFor(pos, size), S = SIZES[size];
     if (!list) { mark(null); shell.hidden = true; pending = null; statusEl.textContent = "There's no open " + S.name + " block that includes Spot " + pos + ". Tap another spot or pick a smaller size."; return; }
-    pending = { route: r, position: list[0], positions: list };
+    pending = { route: r, mail: mail, position: list[0], positions: list };
     mark(list);
-    title.textContent = "Hold " + (list.length === 1 ? "Spot " + list[0] : "Spots " + list.join(", ")) + " on " + LABELS[r] + " (" + S.label + ", " + money(S.price) + ")";
+    title.textContent = "Hold " + (list.length === 1 ? "Spot " + list[0] : "Spots " + list.join(", ")) + " on " + LABELS[r] + (mail ? ", " + short(mail) + " card" : "") + " (" + S.label + ", " + money(S.price) + ")";
     if (payBtn) { payBtn.hidden = !PAY_LINKS[size]; payBtn.textContent = "Pay " + money(S.price) + " now and lock it in"; }
     msg.textContent = ""; shell.hidden = false;
     shell.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -92,7 +121,7 @@
     t.addEventListener("click", function () {
       tabs.forEach(function (x) { x.classList.remove("active"); x.setAttribute("aria-selected", "false"); });
       t.classList.add("active"); t.setAttribute("aria-selected", "true");
-      route = t.getAttribute("data-route"); load(route);
+      route = t.getAttribute("data-route"); mail = null; load(route);
     });
   });
 
@@ -100,18 +129,18 @@
     e.preventDefault(); if (!pending) return;
     var payNow = !!(e.submitter && e.submitter.hasAttribute("data-pay")) && !!PAY_LINKS[pending.positions.length];
     var btn = e.submitter || form.querySelector('button[type="submit"]'); btn.disabled = true; msg.textContent = payNow ? "Holding your spot, then taking you to secure checkout…" : "Holding your spot…";
-    var p = { route: pending.route, position: pending.position, positions: pending.positions, size: SIZES[pending.positions.length].label, price: money(SIZES[pending.positions.length].price), category: form.category.value, name: form.name.value, business: form.business.value, email: form.email.value, phone: form.phone.value, notes: form.notes.value + (window.CVS_REF && window.CVS_REF() ? " [Referred by: " + window.CVS_REF() + "]" : "") };
+    var p = { route: pending.route, mail: pending.mail, position: pending.position, positions: pending.positions, size: SIZES[pending.positions.length].label, price: money(SIZES[pending.positions.length].price), category: form.category.value, name: form.name.value, business: form.business.value, email: form.email.value, phone: form.phone.value, notes: form.notes.value + (window.CVS_REF && window.CVS_REF() ? " [Referred by: " + window.CVS_REF() + "]" : "") };
     fetch(API + "/api/reserve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p) })
       .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, d: d }; }); })
       .then(function (r) {
         if (!r.ok) { msg.textContent = r.d.error || "That spot just got taken. Pick another one."; btn.disabled = false; load(route, true); return; }
         fetch(NOTIFY, { method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, body: JSON.stringify({
-          _subject: "Coachella Valley Spotlight: " + p.business + (payNow ? " is paying online for " : " wants ") + (p.positions.length === 1 ? "Spot " + p.position : p.size + " (Spots " + p.positions.join(", ") + ")") + " (" + p.category + ") on " + LABELS[p.route],
-          name: p.name, business: p.business, email: p.email, phone: p.phone, notes: p.notes, referred_by: (window.CVS_REF && window.CVS_REF()) || "", route: LABELS[p.route], spot: p.positions.join(", "), size: p.size, price: p.price + " per mailing", category: p.category,
+          _subject: "Coachella Valley Spotlight: " + p.business + (payNow ? " is paying online for " : " wants ") + (p.positions.length === 1 ? "Spot " + p.position : p.size + " (Spots " + p.positions.join(", ") + ")") + " (" + p.category + ") on " + LABELS[p.route] + (p.mail ? " (" + short(p.mail) + " card)" : ""),
+          name: p.name, business: p.business, email: p.email, phone: p.phone, notes: p.notes, referred_by: (window.CVS_REF && window.CVS_REF()) || "", route: LABELS[p.route], mailing: p.mail || "", spot: p.positions.join(", "), size: p.size, price: p.price + " per mailing", category: p.category,
           source: "coachellavalleyspotlight.com / advertise spot picker" }) }).catch(function () {});
-        if (window.CVS_GA) window.CVS_GA(payNow ? "spot_pay_now" : "spot_hold", { route: p.route, spots: p.positions.length, category: p.category, ref: (window.CVS_REF && window.CVS_REF()) || "" });
+        if (window.CVS_GA) window.CVS_GA(payNow ? "spot_pay_now" : "spot_hold", { route: p.route, mail: p.mail || "", spots: p.positions.length, category: p.category, ref: (window.CVS_REF && window.CVS_REF()) || "" });
         if (payNow) {
-          var ref = pending.route + "__" + pending.positions.join("-"), go = PAY_LINKS[pending.positions.length] + (PAY_LINKS[pending.positions.length].indexOf("?") > -1 ? "&" : "?") + "client_reference_id=" + encodeURIComponent(ref);
+          var ref = pending.route + "__" + (pending.mail ? pending.mail + "__" : "") + pending.positions.join("-"), go = PAY_LINKS[pending.positions.length] + (PAY_LINKS[pending.positions.length].indexOf("?") > -1 ? "&" : "?") + "client_reference_id=" + encodeURIComponent(ref);
           msg.textContent = "Spot held. Taking you to secure checkout…";
           setTimeout(function () { location.href = go; }, 600);
           return;
@@ -133,5 +162,6 @@
   if (wantSize) root.querySelectorAll("[data-size]").forEach(function (b) { if (b.getAttribute("data-size") === wantSize) b.click(); });
   var want = (location.search.match(/[?&]route=([a-z-]+)/) || [])[1]; if (want === "sun-city") want = "sun-city-palm-desert";
   tabs.forEach(function (t) { if (want && t.getAttribute("data-route") === want) t.click(); });
-  if (!want || !mailing(want)) load(route);
+  if (wantMail && cards(route).some(function (m) { return m.mail === wantMail; })) { mail = wantMail; load(route); }
+  else if (!want || !mailing(want)) load(route);
 })();

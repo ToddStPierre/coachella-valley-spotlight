@@ -82,7 +82,7 @@
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight, a brand of MoreViews Pro LLC. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
 <script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js"></script>
-<script src="data/mailings.js"></script>
+<script src="data/mailings.js?v=20261111mm"></script>
 <script>
 (function () {
   var API = "https://local-spotlight-reservations.toddstpierre.workers.dev", grid = document.getElementById("mc-grid"), M = window.CVS_MAILINGS || [];
@@ -90,19 +90,19 @@
   function nice(s) { return ymd(s).toLocaleDateString("en-US", { weekday: "short", month: "long", day: "numeric", year: "numeric" }); }
   function left(s) { var t = new Date(); t.setHours(0, 0, 0, 0); return Math.round((ymd(s) - t) / 864e5); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-  var cards = M.slice().sort(function (a, b) { return ymd(a.mail) - ymd(b.mail); });
+  var cards = M.filter(function (m) { return left(m.mail) >= 0; }).sort(function (a, b) { return ymd(a.mail) - ymd(b.mail); });
   if (!cards.length) { grid.innerHTML = "<p>New mailing dates are coming soon. Call (760) 422-5475 to get on the next card.</p>"; return; }
   grid.innerHTML = cards.map(function (m, i) {
-    var d = left(m.deadline);
-    return '<article class="mc-card" id="mc-' + i + '"><span class="mc-status" data-status>' + (d < 0 ? "Closed for booking" : "Open") + '</span>' +
+    var d = left(m.deadline), head = i === 0 || cards[i - 1].mail !== m.mail ? '<h2 class="mc-group" style="grid-column:1/-1;margin:' + (i ? "28px" : "0") + ' 0 0;font-size:22px">Mails ' + nice(m.mail) + "</h2>" : "";
+    return head + '<article class="mc-card" id="mc-' + i + '"><span class="mc-status" data-status>' + (d < 0 ? "Closed for booking" : "Open") + '</span>' +
       '<h2>' + esc(m.name) + '</h2><p class="mc-area">' + esc(m.area) + ' &middot; ' + esc(m.homes) + '</p>' +
       '<dl class="mc-dates"><dt>Tentative Mail Date</dt><dd>' + nice(m.mail) + '</dd><dt>Tentative Artwork Date</dt><dd>' + nice(m.deadline) + (d >= 0 ? ' <span style="font-weight:400;color:var(--ink-2)">(' + (d === 0 ? "today" : d + (d === 1 ? " day" : " days") + " left") + ')</span>' : "") + '</dd></dl>' +
       '<p class="mc-fill" data-fill>Checking open spots&hellip;</p><div class="mc-bar"><span data-bar></span></div>' +
-      (d < 0 ? "" : '<a class="btn" href="reserve?route=' + encodeURIComponent(m.route) + '">Hold a spot on this card</a>') + '</article>';
+      (d < 0 ? "" : '<a class="btn" href="reserve?route=' + encodeURIComponent(m.route) + '&mail=' + m.mail + '">Hold a spot on this card</a>') + '</article>';
   }).join("");
   cards.forEach(function (m, i) {
     var el = document.getElementById("mc-" + i), closed = left(m.deadline) < 0;
-    fetch(API + "/api/spots?route=" + encodeURIComponent(m.route)).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
+    fetch(API + "/api/spots?route=" + encodeURIComponent(m.route) + "&mail=" + m.mail).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
       var total = d.positions.length, st8 = function (p) { return (p.status || "").toLowerCase(); };
       var sold = d.positions.filter(function (p) { return st8(p) === "sold"; }).length, held = d.positions.filter(function (p) { return st8(p) === "pending"; }).length, open = total - sold - held, min = m.minSold || 0;
       el.querySelector("[data-fill]").innerHTML = (min ? "<b>" + Math.min(sold, min) + " of " + min + "</b> spots sold to confirm this mailing<br>" : "") + "<span style='color:var(--ink-2);font-size:15px'>" + sold + " sold &middot; " + held + " on hold &middot; " + open + " open of " + total + "</span>";

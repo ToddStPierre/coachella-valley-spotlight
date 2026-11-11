@@ -8,6 +8,8 @@
   var D = (window.CVS && window.CVS.directory) || [], RENDER = window.CVS_RENDER || {}, ROOT = RENDER.root || "";
   var API = "https://local-spotlight-reservations.toddstpierre.workers.dev";
   var ROUTES = [["el-paseo", "El Paseo"], ["sun-city-palm-desert", "Sun City Palm Desert"]];
+  // Every route on the calendar (10 since 2026-11-11), once each.
+  (window.CVS_MAILINGS || []).forEach(function (m) { if (!ROUTES.some(function (r) { return r[0] === m.route; })) ROUTES.push([m.route, m.name || m.route]); });
   var biz = D.filter(function (b) { return !b.public; });
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }

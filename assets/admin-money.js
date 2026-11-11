@@ -3,7 +3,7 @@
 (function () {
   var API = "https://cvs-tracker.toddstpierre.workers.dev";
   var admin = (new URLSearchParams(location.search).get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })()); if (!admin || window.CVS_IS_REPORT) return;
-  var ROUTES = { "el-paseo": "El Paseo", "sun-city-palm-desert": "Sun City Palm Desert" };
+  var ROUTES = { "el-paseo": "El Paseo", "sun-city-palm-desert": "Sun City Palm Desert", "palm-springs": "Palm Springs", "cathedral-city": "Cathedral City", "rancho-mirage": "Rancho Mirage", "indian-wells": "Indian Wells", "la-quinta": "La Quinta", "indio": "Indio", "coachella": "Coachella", "desert-hot-springs": "Desert Hot Springs" };
   (window.CVS_MAILINGS || []).forEach(function (m) { if (m.route && m.name) ROUTES[m.route] = m.name; });
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function money(c) { var n = (c || 0) / 100, s = Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); return (n < 0 ? "-$" : "$") + s; }

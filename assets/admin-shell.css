@@ -409,3 +409,6 @@ body.is-admin #st-out td, body.is-admin #st-out th { padding-left: 12px; padding
 body.is-admin #st-out td:first-child { min-width: 200px; }
 @media (max-width: 600px) { .bd-spot .st { display: none; } .bd-spot .n { font-size: 9.5px; letter-spacing: .02em; } .bd-spot .biz { font-size: 12px; } }
 body.is-admin .month-head:not(:first-child) { margin-top: 28px; }
+
+/* Postcard board date tabs (2026-11-11: several cards per route). */
+body.is-admin .bd-mails { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 16px; }

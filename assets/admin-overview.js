@@ -6,7 +6,9 @@
   var esc = HQ.esc, ic = HQ.icons;
   var box = document.createElement("div"); box.id = "ov-admin";
   document.getElementById("st-out").before(box);
-  var mailings = window.CVS_MAILINGS || [];
+  // "This mailing": the next card on each route. (Several cards per route can be on the calendar since 2026-11-11.)
+  var mailings = (window.CVS_MAILINGS || []).filter(function (m) { var t = new Date(); t.setHours(0, 0, 0, 0); return new Date(m.mail + "T12:00:00") >= t; })
+    .sort(function (a, b) { return a.mail < b.mail ? -1 : 1; }).filter(function (m, i, all) { return all.findIndex(function (x) { return x.route === m.route; }) === i; });
   var st = { lines: null, vis: null, board: null };
 
   function j(u) { return fetch(u).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }); }

@@ -76,7 +76,7 @@
     key: admin,
     TRACKER: "https://cvs-tracker.toddstpierre.workers.dev",
     SPOTS: "https://local-spotlight-reservations.toddstpierre.workers.dev",
-    ROUTES: { "el-paseo": "El Paseo", "sun-city-palm-desert": "Sun City Palm Desert" },
+    ROUTES: { "el-paseo": "El Paseo", "sun-city-palm-desert": "Sun City Palm Desert", "palm-springs": "Palm Springs", "cathedral-city": "Cathedral City", "rancho-mirage": "Rancho Mirage", "indian-wells": "Indian Wells", "la-quinta": "La Quinta", "indio": "Indio", "coachella": "Coachella", "desert-hot-springs": "Desert Hot Springs" },
     icons: ICONS, esc: esc, money: money, toast: toast, drawer: drawer, post: post,
     dir: function () { return ((window.CVS && window.CVS.directory) || []).filter(function (b) { return !b.sample && b.slug; }); },
     go: function (sec) { location.hash = sec; }
