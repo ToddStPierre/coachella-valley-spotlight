@@ -106,7 +106,7 @@
     var claims = owners && owners.claims ? owners.claims.length : 0;
     if (claims) todo.push('<a href="#owners-admin"><b>' + claims + '</b> claim ' + pl(claims, "request", "requests") + ' to approve (call first)</a>');
     if (newSubs) todo.push('<a href="#submissions-admin"><b>' + newSubs + '</b> new form ' + pl(newSubs, "submission", "submissions") + '</a>');
-    cards.forEach(function (m) { var l = days(m.deadline); if (l >= 0 && l <= 7) todo.push("<span><b>" + esc(m.name) + "</b> booking closes " + (l ? "in " + l + " " + pl(l, "day", "days") : "today") + "</span>"); });
+    cards.forEach(function (m) { var l = days(m.deadline); if (l >= 0 && l <= 7) todo.push('<a href="#board"><b>' + esc(m.name) + "</b> booking closes " + (l ? "in " + l + " " + pl(l, "day", "days") : "today") + ". See the postcard board &rarr;</a>"); });
     dir.forEach(function (b) {
       if (b.offer && b.offer.expires) { var l = days(b.offer.expires); if (l >= 0 && l <= 14) todo.push('<span><b>' + esc(b.name) + '</b> offer ends ' + nice(b.offer.expires) + ' (' + l + ' ' + pl(l, "day", "days") + '). Ask for a new one.</span>'); }
     });
@@ -248,7 +248,11 @@
 
     box.addEventListener("click", function (e) {
       var t = e.target;
-      var fl = t.closest("[data-filter]"); if (fl) { e.preventDefault(); st.filter = fl.dataset.filter; st.shown = 10; st.openRow = ""; drawLeads(); if (fl.closest(".ck-todo")) document.getElementById("ck-pitch").scrollIntoView({ behavior: "smooth" }); return; }
+      var fl = t.closest("[data-filter]"); if (fl) { e.preventDefault(); st.filter = fl.dataset.filter; st.shown = 10; st.openRow = ""; drawLeads(); if (fl.closest(".ck-todo")) {
+        // "Who to pitch" is hidden on Overview, so open the Who to call section first, then scroll to the filtered list.
+        var go = function () { var pk = document.getElementById("ck-pitch"); if (pk) { pk.scrollIntoView({ block: "start" }); window.scrollBy(0, -76); } };
+        if (document.body.dataset.sec && document.body.dataset.sec !== "sales") { location.hash = "sales"; setTimeout(go, 80); } else go();
+      } return; }
       var p = t.closest("[data-pitch]"); if (p) { var slug = p.dataset.pitch; setTimeout(function () { openLog(slug, "Email"); }, 300); return; }
       var tel = t.closest("[data-tel]"); if (tel) { var ts = tel.dataset.tel; setTimeout(function () { openLog(ts, "Call"); }, 300); return; }
       var c = t.closest("[data-copy-pitch]");

@@ -192,6 +192,9 @@ body.is-admin .ck-meter { height: 10px; background: var(--hq-line-2); }
 body.is-admin .ck-min { background: var(--hq-ink); top: -4px; bottom: -4px; }
 body.is-admin .ck-line, body.is-admin .ck-need, body.is-admin .ck-open { color: var(--hq-ink-2); font-size: 14px; }
 body.is-admin .ck-line b, body.is-admin .ck-need b, body.is-admin .ck-open summary { color: var(--hq-ink); }
+/* style.css has ".page-hero .ck-card p.ck-line" (light text for the old dark cards), which outranks the rules above. Admin cards are white, so force dark text. */
+body.is-admin .page-hero .ck-card p.ck-line, body.is-admin .page-hero .ck-card p.ck-need, body.is-admin .page-hero .ck-card .ck-open p { color: var(--hq-ink-2); }
+body.is-admin .page-hero .ck-card p.ck-line b, body.is-admin .page-hero .ck-card p.ck-need b { color: var(--hq-ink); }
 body.is-admin .ck-panel { background: #fff; border: 1px solid var(--hq-line); box-shadow: var(--hq-shadow); padding: 20px 22px; }
 body.is-admin .ck-panel h3 { font-family: var(--body); font-size: 15px; font-weight: 650; margin: 0 0 12px; }
 body.is-admin .ck-todo li { background: #fbf9f6; border: 1px solid var(--hq-line-2); font-size: 14px; border-radius: 10px; }
