@@ -24,6 +24,8 @@ jobs:
         with:
           node-version: 20
       - run: node tools/build-profiles.js
+      - run: node tools/geocode.js   # map pins for listings added since data/geo.js was last committed
+        continue-on-error: true
       - run: node tools/build-headlines.js
         continue-on-error: true
       - run: node tools/build-feed-events.js
