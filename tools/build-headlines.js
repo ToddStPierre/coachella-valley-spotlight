@@ -29,6 +29,9 @@ const FEEDS = [
 // local and regional newsrooms are kept from it. A story whose link can't be resolved is dropped, never shown.
 const GN_SOURCES = /^(The Desert Sun|Desert Sun|KESQ|NBC Palm Springs|KMIR|Palm Springs Life|The Palm Springs Post|Coachella Valley Independent|CV Independent|Coachella Valley Weekly|Patch|KTLA|Los Angeles Times|The Press-Enterprise|Press-Enterprise|Riverside County)\b/i;
 const GN = /news\.google\.com/;
+// Pages that are promotion, not reporting: Palm Springs Life's visitor guide ("Book your stay at…") and its
+// "Vision" economic-development section. Checked on the publisher's URL, so it works for feed and Google News items.
+const SKIP_URLS = /palmspringslife\.com\/(the-guide|vision)\/|\/press-release\//i;
 // Sources that are listings, robots or tourist listicles, not local news.
 const SKIP_SOURCES = /^(NFHS Network|Yahoo|MSN|AOL|Realtor\.com|Zillow|Redfin|Homes\.com|Trulia|Tripadvisor|Travel \+ Leisure|Fodor's|Thrillist|Eventbrite|MaxPreps)\b/i;
 const SKIP_TITLES = /magnitude|earthquake struck|live (& |and )?on demand|best places to|things to do in|weekend getaway|visitor['’]?s guide|,\s*(FL|Fla\.?|Florida)\b/i;
@@ -75,7 +78,7 @@ async function readFeed(feed) {
     let title = decode(tag(item, "title")), source = feed.source;
     if (!source) { source = decode(tag(item, "source")); if (source && title.endsWith(" - " + source)) title = title.slice(0, -(source.length + 3)); }
     if (!title || !/^https:\/\//.test(url) || (feed.skip && feed.skip.test(url))) continue;
-    if (GN.test(url) && !GN_SOURCES.test(source || "")) continue;
+    if ((GN.test(url) && !GN_SOURCES.test(source || "")) || SKIP_URLS.test(url)) continue;
     const when = new Date(decode(tag(item, "pubDate")));
     if (isNaN(when)) continue;
     // WordPress feeds end with "The post X appeared first on <outlet>", and outlet names hold city names.
@@ -105,7 +108,7 @@ async function live() {
   // Newsroom feeds before Google News, so a story carried by both keeps the direct link.
   for (const h of [...fresh.filter(h => !GN.test(h.url)), ...fresh.filter(h => GN.test(h.url)), ...old]) {
     const w = words(h.title);
-    if (h.date < cutoff || seen.has(h.url) || GRIM.test(h.title) || SKIP_TITLES.test(h.title) || SKIP_SOURCES.test(h.source) || (GN.test(h.url) && !GN_SOURCES.test(h.source)) || kept.some(k => same(k, w))) continue;
+    if (h.date < cutoff || seen.has(h.url) || GRIM.test(h.title) || SKIP_TITLES.test(h.title) || SKIP_SOURCES.test(h.source) || SKIP_URLS.test(h.url) || (GN.test(h.url) && !GN_SOURCES.test(h.source)) || kept.some(k => same(k, w))) continue;
     seen.add(h.url); kept.push(w); list.push(h);
   }
   list.sort((a, b) => b.time.localeCompare(a.time));
@@ -117,7 +120,7 @@ async function live() {
     if (keep.length >= MAX) break;
     if (GN.test(h.url)) {
       try { h.url = await resolveGN(h.url); resolved++; } catch (e) { dropped++; continue; }
-      if (links.has(h.url) || /\/press-release\//.test(h.url)) { dropped++; continue; }
+      if (links.has(h.url) || SKIP_URLS.test(h.url)) { dropped++; continue; }
       links.add(h.url);
     }
     keep.push(h);
