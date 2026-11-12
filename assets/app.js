@@ -353,6 +353,17 @@
   });
   paintClaimed();
 
+  // Curated directory filters for links like directory?find=breakfast (the home page "now" button).
+  // Precise, unlike a word search: "breakfast" as a word also hits a club's "Prayer Breakfast".
+  var FIND = {
+    breakfast: { label: "Coffee &amp; breakfast spots", test: function (x) {
+      if (x.public) return false;
+      if (/^(Cafes and delis|Bakeries)$/.test(x.service || "")) return true;
+      return (x.category === "Restaurants") && /\b(breakfast|brunch|coffee|espresso|bagels?|pancakes?|waffles?|diner)\b/i.test([x.name, x.service, x.blurb].join(" "));
+    } }
+  };
+  window.CVS_FIND = FIND;
+
   // Full list pages with filters: <div data-browse="events"></div>
   var browse = document.querySelector("[data-browse]");
   if (browse) {
@@ -373,10 +384,11 @@
     if (cat && params.get("category")) cat.value = params.get("category");
     if (city && params.get("city")) city.value = params.get("city");
     if (when && params.get("when")) when.value = params.get("when");
+    var finder = key === "directory" ? FIND[params.get("find")] : null;
     function draw() {
       var term = q ? q.value.trim().toLowerCase() : "", w = when ? windowFor(when.value) : null;
       var items = all.filter(function (x) {
-        return (!term || text(x).indexOf(term) > -1) && (!city || !city.value || x.city === city.value) && (!cat || !cat.value || x.category === cat.value || (cat.value === "Happy hours" && x.happyHour)) && inWindow(x, w);
+        return (!term || text(x).indexOf(term) > -1) && (!city || !city.value || x.city === city.value) && (!cat || !cat.value || x.category === cat.value || (cat.value === "Happy hours" && x.happyHour)) && inWindow(x, w) && (!finder || finder.test(x));
       });
       if (!items.length) { browse.innerHTML = '<div class="empty">No matches. Try a different city or search word.</div>'; return; }
       if (key === "events") {
@@ -392,6 +404,12 @@
       } else if (key === "directory") {
         // With "All categories": postcard advertisers get their own Featured section on top,
         // then everyone else grouped by category, A to Z (each group keeps the usual order).
+        // Arrived looking for something specific (curated find or a search word): one plain list,
+        // advertisers and Premium still first by the usual sort, but no sponsor band or category headers.
+        if (finder || (q && q.value.trim())) {
+          browse.innerHTML = '<div class="grid">' + items.map(R.directory).join("") + '</div>';
+          return;
+        }
         var allCats = !cat || !cat.value;
         var feat = allCats ? items.filter(function (b) { return b.postcard; }) : [];
         var groups = {}, names = [];

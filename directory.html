@@ -118,16 +118,17 @@
   }
   function sync() {
     var term = fQ ? fQ.value.trim().toLowerCase() : "", city = fCity ? fCity.value : "", cat = fCat.value;
-    var hits = matches(term, city, cat);
+    var finder = window.CVS_FIND && window.CVS_FIND[new URLSearchParams(location.search).get("find")];
+    var hits = matches(term, city, cat).filter(function (x) { return !finder || finder.test(x); });
     // quote card
     if (card) {
       var pros = hits.filter(function (x) { return PROS.indexOf(x.category) > -1; }).length;
-      card.hidden = cat ? PROS.indexOf(cat) < 0 : (term || city ? pros * 2 < hits.length || !hits.length : false);
+      card.hidden = finder ? true : cat ? PROS.indexOf(cat) < 0 : (term || city ? pros * 2 < hits.length || !hits.length : false);
       if (qfCat && cat && [].some.call(qfCat.options, function (o) { return o.value === cat; })) qfCat.value = cat;
     }
     // heading
-    if (!term && !city && !cat) { h1.innerHTML = h1Orig; intro.hidden = false; sub.hidden = true; hero.classList.remove("is-filtered"); return; }
-    var what = NICE[term] || (cat && term ? esc(cat) + " matching &ldquo;" + esc(term) + "&rdquo;" : cat ? esc(cat) : term ? "&ldquo;" + esc(term) + "&rdquo;" : "Local businesses");
+    if (!term && !city && !cat && !finder) { h1.innerHTML = h1Orig; intro.hidden = false; sub.hidden = true; hero.classList.remove("is-filtered"); return; }
+    var what = (finder && finder.label) || NICE[term] || (cat && term ? esc(cat) + " matching &ldquo;" + esc(term) + "&rdquo;" : cat ? esc(cat) : term ? "&ldquo;" + esc(term) + "&rdquo;" : "Local businesses");
     h1.innerHTML = what + ' <span class="grad">in ' + esc(city || "the valley") + '</span>';
     sub.innerHTML = '<b>' + hits.length + (hits.length === 1 ? ' place' : ' places') + '</b>' + (hits.length ? ', local favorites first. Tap one for the phone, hours and directions.' : '. Try another town or word.') + ' <a href="directory" id="dir-all">See the whole directory &rarr;</a>';
     intro.hidden = true; sub.hidden = false; hero.classList.add("is-filtered");

@@ -1878,3 +1878,5 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .dir-sub a { font-weight: 600; white-space: nowrap; }
 .page-hero.is-filtered .city-hero { grid-template-columns: 1fr; }
 .page-hero.is-filtered .chips, .page-hero.is-filtered [data-cal-sub] { display: none; }
+/* filtered arrivals: the "tap the heart" account tip waits for the unfiltered pages */
+.page-hero.is-filtered ~ section .acct-bar { display: none; }

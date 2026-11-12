@@ -141,9 +141,9 @@
     function withCity(url, list) { return inTown(list).length >= 3 ? url + (url.indexOf("?") > -1 ? "&" : "?") + "city=" + encodeURIComponent(my) : url; }
     var today = evs.filter(function (e) { return e.dates ? e.dates.indexOf(d) > -1 : e.date <= d && (e.endDate || e.date) >= d; });
     var hh = dir.filter(function (x) { return x.happyHour; }), rest = dir.filter(function (x) { return x.category === "Restaurants"; });
-    var bfast = dir.filter(function (x) { return /breakfast|brunch|coffee|cafe/i.test((x.service || "") + " " + (x.blurb || "") + " " + (x.name || "")); });
+    var F = window.CVS_FIND && window.CVS_FIND.breakfast, bfast = F ? dir.filter(F.test) : [];
     var hhMine = inTown(hh).length >= 2, restMine = inTown(rest).length >= 3, evMine = inTown(today).length >= 3;
-    if (hour >= 5 && hour < 11 && bfast.length >= 3) o = { k: "morning", i: "&#9749;", t: "Good morning. Coffee &amp; breakfast spots" + (my && inTown(bfast).length >= 3 ? " in " + my : " near you"), u: withCity("directory?q=breakfast", bfast) };
+    if (hour >= 5 && hour < 11 && bfast.length >= 3) o = { k: "morning", i: "&#9749;", t: "Good morning. Coffee &amp; breakfast spots" + (my && inTown(bfast).length >= 3 ? " in " + my : " near you"), u: withCity("directory?find=breakfast", bfast) };
     else if (hour >= 11 && hour < 15 && rest.length) o = { k: "lunch", i: "&#127790;", t: "Lunch time. " + (restMine ? inTown(rest).length + " restaurants in " + my : rest.length + " local restaurants"), u: withCity("directory?category=Restaurants", rest) };
     else if (hour >= 15 && hour < 19 && hh.length) o = { k: "happy-hour", i: "&#127865;", t: "It&rsquo;s happy hour. " + (hhMine ? inTown(hh).length + " spots in " + my : hh.length + " spots pouring now"), u: withCity("directory?category=Happy%20hours", hh) };
     else if (hour >= 15 && hour < 23 && today.length) o = { k: "tonight", i: "&#10024;", t: "Tonight: " + (evMine ? inTown(today).length + " things happening in " + my : today.length + " things happening in the valley"), u: withCity("events?when=today", today) };
