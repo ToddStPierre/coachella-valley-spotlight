@@ -1761,3 +1761,23 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 /* The card dropdown grew with 32 cards; keep it inside the screen on phones. */
 #pr-card { max-width: 100%; width: 100%; min-width: 0; text-overflow: ellipsis; }
 #pr-card, #pr-note { box-sizing: border-box; }
+/* Home "Get matched" teaser: who gets the visitor's details */
+.quote-teaser .quote-privacy { display: block; margin-top: 6px; font-size: 14px; color: var(--ink-2); max-width: 620px; }
+/* Paid placement label on postcard advertisers' cards */
+.card .tag-sponsor { background: #fde8bf; color: #7a4a00; }
+/* About page */
+.about-wrap { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--s4); align-items: start; max-width: 1080px; }
+.about-photo { margin: 0; position: sticky; top: 96px; }
+.about-photo img { width: 100%; height: auto; border-radius: var(--radius); display: block; }
+.about-photo figcaption { font-size: 14px; color: var(--ink-2); margin-top: 8px; }
+.about-copy h2 { margin-top: 0; }
+.about-copy h3 { margin: var(--s3) 0 6px; }
+.about-copy p { font-size: 17px; line-height: 1.6; }
+.about-facts { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.about-facts li { background: var(--palm-soft); border-radius: var(--radius); padding: 14px; font-size: 15px; }
+.about-facts b { display: block; font-family: var(--display, inherit); font-size: 26px; color: var(--palm); }
+@media (max-width: 760px) { .about-wrap { grid-template-columns: 1fr; } .about-photo { position: static; } .about-facts { grid-template-columns: 1fr; } }
+.hero-byline { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 var(--s2); font-size: 15px; color: var(--ink-2); text-decoration: none; }
+.hero-byline img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex: none; }
+.hero-byline b { color: var(--palm); font-weight: 600; white-space: nowrap; }
+.hero-byline:hover b { text-decoration: underline; }

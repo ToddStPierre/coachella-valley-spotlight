@@ -27,7 +27,7 @@
     var body =
       '<fieldset class="hq-fs"><legend>Advertising</legend><div class="hq-toggles">' +
         toggle("premium", "Premium listing", "Gold border, sits above Basic, shows about, hours, offer and photos. Turn on after they pay.", b.premium || b.featured) +
-        toggle("postcard", "On the postcard", "Shows the “On the Spotlight postcard” tag and gives them stats and a QR code.", b.postcard) +
+        toggle("postcard", "On the postcard", "Shows the “Sponsor · On the Spotlight postcard” tag and gives them stats and a QR code.", b.postcard) +
       "</div>" +
       '<div class="hq-row" id="le-adsize"' + (b.postcard ? "" : " hidden") + ">" + field("Ad size on the card", "adSize", String(b.adSize || 1), { options: ["1", "2", "4", "8"], hint: "Spots their ad takes up." }) + "</div></fieldset>" +
       '<fieldset class="hq-fs"><legend>Basics</legend>' +

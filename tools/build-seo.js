@@ -337,7 +337,7 @@ function byCategory(items) {
   const head = (i, label, n) => `<h2 class="month-head" id="${i}"><span class="stripe-mini"></span>${esc(label)} <span class="cat-count">${n}</span></h2>`;
   const jumps = (feat.length ? [`<a href="#cat-featured">Featured (${feat.length})</a>`] : []).concat(names.map(c => `<a href="#${id(c)}">${esc(c)} (${groups[c].length})</a>`));
   return (jumps.length > 1 ? `<p class="cat-jump">${jumps.join("")}</p>` : "") +
-    (feat.length ? `<section class="featured-band">${head("cat-featured", "Featured Listings", feat.length)}<p class="featured-note">Local businesses on the current Spotlight postcard.</p><div class="grid">${cards("directory", feat)}</div></section>` : "") +
+    (feat.length ? `<section class="featured-band">${head("cat-featured", "Featured sponsors", feat.length)}<p class="featured-note">These local businesses pay to advertise on the current Spotlight postcard. Everyone else below is listed free.</p><div class="grid">${cards("directory", feat)}</div></section>` : "") +
     names.map((c, i) => `${head(id(c), c, groups[c].length)}<div class="grid">${cards("directory", groups[c])}</div>${listBand(i, names.length)}`).join("");
 }
 /* Directory page "Browse by city and category": one collapsible row per city and per broad category, so the page
@@ -357,7 +357,7 @@ const orphanSvc = landing.filter(o => o.kind === "category" && o.field === "serv
 const browseLinks = landing.length ? `<div class="browse-links"><h2 class="month-head"><span class="stripe-mini"></span>Browse by city and category</h2><div class="browse-cols"><div><h3>By city</h3>${byCityRows}</div><div><h3>By category</h3>${byCatRows}${orphanSvc.length ? browseRow("More", orphanSvc.length, orphanSvc.map(o => pill(o, o.category)).join("")) : ""}</div></div></div>` : "";
 /* Reads an opening tag's attributes into { name: value } (bare attributes get ""). */
 const attrsOf = str => { const a = {}; str.replace(/([\w-]+)(?:="([^"]*)")?/g, (m, k, v) => { a[k] = v === undefined ? "" : v; }); return a; };
-for (const file of ["index.html", "directory.html", "deals.html", "events.html", "news.html", "halloween.html", "welcome.html", "farmers-markets.html", "holidays.html"]) {
+for (const file of ["index.html", "directory.html", "deals.html", "events.html", "news.html", "halloween.html", "welcome.html", "farmers-markets.html", "holidays.html", "for-business.html", "about.html"]) {
   const p = path.join(root, file);
   let html = fs.readFileSync(p, "utf8");
   // Any empty data-list / data-browse block (or one holding only the "Turn on JavaScript" placeholder) gets its cards.
@@ -373,7 +373,8 @@ for (const file of ["index.html", "directory.html", "deals.html", "events.html",
     if (!items.length) return open + empty;
     return open + (key === "events" ? eventsByMonth(items) : key === "directory" ? byCategory(items) : `<div class="${key === "news" ? "grid-2" : "grid"}">${cards(key, items)}</div>`);
   });
-  html = html.replace(/<span data-count="(\w+)"><\/span>/g, (m, k) => `<span data-count="${k}">${(C[k] || []).filter(x => !x.sample).length}</span>`);
+  // Fills every count span, even one holding an old number, so a page can never show a stale count.
+  html = html.replace(/<span data-count="(\w+)">[^<]*<\/span>/g, (m, k) => `<span data-count="${k}">${(k === "businesses" ? C.directory.filter(x => !x.public) : C[k] || []).filter(x => !x.sample).length}</span>`);
   html = html.replace("<!--browse-links-->", browseLinks);
   fs.writeFileSync(p, html);
   console.log("prerendered " + file);
@@ -383,7 +384,7 @@ for (const file of ["index.html", "directory.html", "deals.html", "events.html",
 const golfCtx = { window: {} };
 if (fs.existsSync(path.join(root, "data", "golf.js"))) require("vm").runInNewContext(fs.readFileSync(path.join(root, "data", "golf.js"), "utf8"), golfCtx);
 const golfPaths = ((golfCtx.window.CVS || {}).golf || []).map(c => `golf/${c.slug}/`);
-const urls = ["", "directory", "deals", "events", "agents", "halloween", "welcome", "farmers-markets", "holidays", "golf/", "advertise", "submit", "story", "contact", "mailing-area-el-paseo", "mailing-area-sun-city", "mailing-area-palm-springs", "mailing-area-cathedral-city", "mailing-area-rancho-mirage", "mailing-area-indian-wells", "mailing-area-la-quinta", "mailing-area-indio", "mailing-area-coachella", "mailing-area-desert-hot-springs", "mailing-calendar", "coverage-map", "for-business", "pricing", "legal"]
+const urls = ["", "directory", "deals", "events", "agents", "halloween", "welcome", "farmers-markets", "holidays", "golf/", "advertise", "submit", "story", "contact", "about", "mailing-area-el-paseo", "mailing-area-sun-city", "mailing-area-palm-springs", "mailing-area-cathedral-city", "mailing-area-rancho-mirage", "mailing-area-indian-wells", "mailing-area-la-quinta", "mailing-area-indio", "mailing-area-coachella", "mailing-area-desert-hot-springs", "mailing-calendar", "coverage-map", "for-business", "pricing", "legal"]
   .concat(cityPaths, weekendPaths, list.map(b => `business/${b.slug}/`), eventPaths, landing.filter(p => p.index).map(p => p.path), golfPaths);
 // Pages whose content changes day to day as events come and go. Only these get <lastmod>, so it stays a signal Google can trust.
 const FRESH = new Set(["", "events", "holidays"].concat(weekendPaths, cityPaths));

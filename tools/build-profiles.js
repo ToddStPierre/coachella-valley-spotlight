@@ -71,7 +71,7 @@ ${header}
 <div class="pf-head">
 <h1>${esc(b.name)}</h1>
 ${b.claimed && owner ? '<span class="verified verified-lg">&#10003; Verified by owner</span>' : ""}
-${b.postcard || prem ? '<span class="pf-badge">' + (b.postcard ? "On the Spotlight postcard" : "Premium listing") + '</span>' : ""}
+${b.postcard || prem ? '<span class="pf-badge">' + (b.postcard ? "Sponsor &middot; On the Spotlight postcard" : "Premium listing") + '</span>' : ""}
 <p class="pf-lede">${esc(b.blurb)}</p>
 <div class="cta-row">
 ${tel ? `<a class="btn" href="tel:${tel}" data-track="call">Call ${esc(b.phone)}</a>` : ""}

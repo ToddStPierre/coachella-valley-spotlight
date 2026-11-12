@@ -186,7 +186,7 @@
       var prem = b.premium || b.featured, off = prem && liveOffer(b.offer);
       return '<article class="card' + (prem ? ' featured' : '') + '"' + (slug ? ' data-biz="' + slug + '"' : '') + '>' + sample(b) + (slug ? favBtn("biz:" + slug, b.name) : '') + cardArt(b, prem) + '<span class="meta">' + esc(b.service || b.category) + ' &middot; ' + esc(b.city) + '</span>' +
         '<h3>' + name + '</h3>' + (b.claimed && !b.public ? '<span class="verified" title="The owner has claimed this listing and keeps it up to date">&#10003; Verified by owner</span>' : '') + '<p>' + esc(b.blurb) + '</p>' + (b.courts && b.size ? '<p class="hh"><b>Courts:</b> ' + esc(b.size) + '</p>' : '') + (b.trail && b.trail.summary ? '<p class="hh"><b>Trail:</b> ' + esc(b.trail.summary) + '</p>' : '') + featPills(b.features) + (b.happyHour ? '<p class="hh"><b>Happy hour:</b> ' + esc(b.happyHour) + '</p>' : '') +
-        (b.postcard ? '<span class="tag">On the Spotlight postcard</span>' : prem ? '<span class="tag">Premium listing</span>' : '') +
+        (b.postcard ? '<span class="tag tag-sponsor" title="This business pays to advertise on the Spotlight postcard">Sponsor &middot; On the Spotlight postcard</span>' : prem ? '<span class="tag">Premium listing</span>' : '') +
         (off ? '<div class="offer-box"><b>' + esc(off.title) + '</b>' + (off.details ? '<span>' + esc(off.details) + '</span>' : '') + '</div>' : '') +
         (slug ? '<a class="card-link" href="' + ROOT + 'business/' + slug + '/">View profile &rarr;</a>' : '') + '</article>';
     }
@@ -195,14 +195,16 @@
   var SETS = { events: events, deals: deals, news: news, directory: directory };
   var TYPE = { events: "event", deals: "deal", news: "news", directory: "directory" };
 
-  // data-mix="valley" (home page): postcard advertisers first, then one business from each of the other towns,
-  // biggest first, each one a different everyday trade where the town has it, so the home page reads valley-wide.
+  // data-mix="valley" (home page): up to MIX_SPONSORS postcard advertisers first (labeled Sponsor, a different few each
+  // day), then free listings: one business from each town, biggest first, each a different everyday trade where the town
+  // has it, so the home page reads valley-wide and isn't all paid placements.
+  var MIX_SPONSORS = 3;
   var MIX_SERVICES = ["Mexican restaurants", "Pool service", "Plumbing", "Dentists", "Gyms", "Electrical", "Heating and air conditioning", "American restaurants", "Landscaping"];
   function valleyMix(items, limit) {
-    var out = items.filter(function (b) { return b.postcard; }), used = {}, usedSvc = {}, counts = {};
-    out.forEach(function (b) { used[b.city] = 1; });
+    var ads = items.filter(function (b) { return b.postcard; }), start = ads.length ? Math.floor(today / 864e5) % ads.length : 0;
+    var out = ads.slice(start).concat(ads.slice(0, start)).slice(0, MIX_SPONSORS), usedSvc = {}, counts = {};
     items.forEach(function (b) { if (!b.public && !b.postcard) counts[b.city] = (counts[b.city] || 0) + 1; });
-    Object.keys(counts).filter(function (c) { return !used[c]; }).sort(function (a, b) { return counts[b] - counts[a] || a.localeCompare(b); }).forEach(function (c) {
+    Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a] || a.localeCompare(b); }).forEach(function (c) {
       if (out.length >= limit) return;
       var here = items.filter(function (b) { return b.city === c && !b.public && !b.postcard; }), pick = null;
       for (var i = 0; i < MIX_SERVICES.length && !pick; i++) {
@@ -339,7 +341,8 @@
   function text(item) { return Object.keys(item).map(function (k) { return typeof item[k] === "string" ? item[k] : ""; }).join(" ").toLowerCase(); }
 
   // Live counts: <span data-count="directory"></span> (pre-filled by tools/build-seo.js too).
-  document.querySelectorAll("[data-count]").forEach(function (el) { var s = SETS[el.getAttribute("data-count")]; if (s) el.textContent = s.filter(function (x) { return !x.sample; }).length; });
+  // data-count="businesses" leaves out public places (parks, libraries, trails), so "N local businesses" is true.
+  document.querySelectorAll("[data-count]").forEach(function (el) { var k = el.getAttribute("data-count"), s = k === "businesses" ? directory.filter(function (x) { return !x.public; }) : SETS[k]; if (s) el.textContent = s.filter(function (x) { return !x.sample; }).length; });
 
   document.querySelectorAll("[data-list]").forEach(function (el) {
     var key = el.getAttribute("data-list"), items = pickList(key, function (n) { return el.getAttribute(n); });
@@ -401,7 +404,7 @@
         var head = function (id, label, n) { return '<h2 class="month-head" id="' + id + '"><span class="stripe-mini"></span>' + esc(label) + ' <span class="cat-count">' + n + '</span></h2>'; };
         var jumps = (feat.length ? ['<a href="#cat-featured">Featured (' + feat.length + ')</a>'] : []).concat(names.map(function (c) { return '<a href="#' + anchor(c) + '">' + esc(c) + ' (' + groups[c].length + ')</a>'; }));
         browse.innerHTML = (jumps.length > 1 ? '<p class="cat-jump">' + jumps.join("") + '</p>' : '') +
-          (feat.length ? '<section class="featured-band">' + head("cat-featured", "Featured Listings", feat.length) + '<p class="featured-note">Local businesses on the current Spotlight postcard.</p><div class="grid">' + feat.map(R.directory).join("") + '</div></section>' : '') +
+          (feat.length ? '<section class="featured-band">' + head("cat-featured", "Featured sponsors", feat.length) + '<p class="featured-note">These local businesses pay to advertise on the current Spotlight postcard. Everyone else below is listed free.</p><div class="grid">' + feat.map(R.directory).join("") + '</div></section>' : '') +
           names.map(function (c, i) { return head(anchor(c), c, groups[c].length) + '<div class="grid">' + groups[c].map(R.directory).join("") + '</div>' + listBand(i, names.length); }).join("");
       } else {
         browse.innerHTML = '<div class="' + (key === "news" ? "grid-2" : "grid") + '">' + items.map(R[TYPE[key]]).join("") + "</div>";
@@ -585,7 +588,7 @@
       var slug = slugOf(b), d = document.createElement("div");
       d.className = "hp-slide hp-ad"; d.setAttribute("role", "group"); d.setAttribute("aria-roledescription", "slide"); d.setAttribute("aria-label", b.name);
       d.setAttribute("data-biz", slug); d.setAttribute("data-noimp", ""); d.hidden = true;
-      d.innerHTML = '<span class="eyebrow"><span class="stripe-mini"></span>On the Spotlight postcard</span>' +
+      d.innerHTML = '<span class="eyebrow"><span class="stripe-mini"></span>Sponsored &middot; On the Spotlight postcard</span>' +
         '<a class="hp-ad-img" href="' + ROOT + 'business/' + slug + '/"><img src="' + ROOT + esc(b.image) + '" alt="' + esc(b.imageAlt || b.name + " ad") + '" loading="lazy"></a>' +
         '<a class="more" href="' + ROOT + 'business/' + slug + '/">' + esc(b.name) + ' &rarr;</a>';
       panel.appendChild(d);
