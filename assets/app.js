@@ -360,6 +360,18 @@
       if (x.public) return false;
       if (/^(Cafes and delis|Bakeries)$/.test(x.service || "")) return true;
       return (x.category === "Restaurants") && /\b(breakfast|brunch|coffee|espresso|bagels?|pancakes?|waffles?|diner)\b/i.test([x.name, x.service, x.blurb].join(" "));
+    } },
+    // Lunch: restaurants, cafes and delis, minus the places that clearly don't do lunch (steakhouses, bars,
+    // dessert bakeries, "dinner nightly", or posted hours that never open before 3 PM).
+    lunch: { label: "Lunch spots", test: function (x) {
+      if (x.public) return false;
+      var t = [x.name, x.service, x.blurb].join(" ");
+      if (x.service === "Bakeries") return /\b(deli|sandwich(es)?|lunch)\b/i.test(t);
+      if (x.category !== "Restaurants" || /^(Steakhouses|Bars and nightclubs)$/.test(x.service || "")) return false;
+      if (/steak ?house|dinner nightly|dinner only|nightly from/i.test(t + " " + (x.hours || ""))) return false;
+      if (/\bdinners?\b/i.test(t) && !/\b(lunch|breakfast|brunch|all day|sandwich(es)?|tacos?|burgers?)\b/i.test(t)) return false;
+      if (x.hours && !/\b(1[01]|[5-9])(:\d\d)? ?AM\b|\b12(:\d\d)? ?PM\b/i.test(x.hours)) return false;
+      return true;
     } }
   };
   window.CVS_FIND = FIND;
@@ -406,7 +418,7 @@
         // then everyone else grouped by category, A to Z (each group keeps the usual order).
         // Arrived looking for something specific (curated find or a search word): one plain list,
         // advertisers and Premium still first by the usual sort, but no sponsor band or category headers.
-        if (finder || (q && q.value.trim())) {
+        if (finder || (q && q.value.trim()) || (cat && cat.value)) {
           browse.innerHTML = '<div class="grid">' + items.map(R.directory).join("") + '</div>';
           return;
         }
