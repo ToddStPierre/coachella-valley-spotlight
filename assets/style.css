@@ -1940,3 +1940,12 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
   .has-tabbar .dm-fab { bottom: calc(74px + env(safe-area-inset-bottom)); }
   .dm-open .maplibregl-ctrl-top-right { top: 56px; }
 }
+
+/* Home hero headline: "Support Local", big and stacked, "Local" in the sunset gradient with a gold underline that draws in (2026-11-12). */
+.hero-grid h1.hero-title { font-size: clamp(64px, 9.5vw, 128px); font-weight: 700; line-height: .92; letter-spacing: -.035em; margin: 0 0 22px; }
+.hero-title .ht-a, .hero-title .ht-b { display: block; }
+.hero-title .ht-b { position: relative; width: max-content; padding: 0 .04em .1em 0; }
+.hero-title .ht-b::after { content: ""; position: absolute; left: .02em; right: .06em; bottom: -.02em; height: .11em; border-radius: 999px; background: linear-gradient(90deg, var(--gold), var(--sun) 60%, var(--rose)); transform: rotate(-1.6deg) scaleX(1); transform-origin: left center; animation: ht-draw .9s cubic-bezier(.2, .8, .2, 1) .25s both; }
+@keyframes ht-draw { from { transform: rotate(-1.6deg) scaleX(0); } to { transform: rotate(-1.6deg) scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .hero-title .ht-b::after { animation: none; } }
+.hero.living:is([data-phase="night"], [data-phase="dusk"], [data-phase="dawn"]) .hero-title .ht-b::after { background: linear-gradient(90deg, var(--gold), #ff8a6a 60%, #f2a6c0); }
