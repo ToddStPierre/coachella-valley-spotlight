@@ -1863,3 +1863,5 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
   .tb-r, .hn-dot { animation: none; }
   .hero.living, .sky-sun, .sky-stars, .sky-ridges path { transition: none; }
 }
+/* byline sits at the bottom of the hero, under the chips (2026-11-12) */
+.hero.living .hero-byline { margin: var(--s3) 0 0; }
