@@ -39,7 +39,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=20261109vc">
+<link rel="stylesheet" href="assets/style.css?v=20261112sky">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://coachellavalleyspotlight.com/#org","name":"Coachella Valley Spotlight","url":"https://coachellavalleyspotlight.com/","telephone":"+1-760-422-5475","areaServed":{"@type":"Place","name":"Coachella Valley, California"},"description":"A local guide to the Coachella Valley: a free business directory, events calendar and local deals, plus the Spotlight shared postcard mailed to Palm Desert homes."},{"@type":"WebSite","@id":"https://coachellavalleyspotlight.com/#website","name":"Coachella Valley Spotlight","url":"https://coachellavalleyspotlight.com/","publisher":{"@id":"https://coachellavalleyspotlight.com/#org"}}]}</script>
 </head>
 <body>
@@ -54,11 +54,13 @@
 </nav></header>
 <main id="main" tabindex="-1">
 
-<section class="hero"><div class="wrap hero-grid"><div class="hero-inner">
+<section class="hero living" data-phase="day"><div class="wrap hero-grid"><div class="hero-inner">
 <span class="eyebrow"><span class="stripe-mini"></span>The valley&rsquo;s local guide</span>
+<p class="hero-now" id="hero-now" hidden></p>
 <h1>Your First Stop for Anything Local in <span class="grad">the Valley.</span></h1>
 <p class="lede">Things to do this weekend, deals from local shops, and the businesses your neighbors actually call, all in one place.</p>
 <a class="hero-byline" href="about"><img src="assets/img/todd-avatar.jpg" alt="" width="40" height="40"><span>Run by Todd St. Pierre, a Palm Desert neighbor. <b>Who&rsquo;s behind Spotlight&nbsp;&rarr;</b></span></a>
+<a class="now-cta" id="now-cta" href="this-weekend/" hidden></a>
 <form class="search" id="home-search" role="search" action="directory">
 <label class="sr-only" for="hq">Search</label>
 <input id="hq" name="q" type="search" placeholder="Try &ldquo;tacos&rdquo;, &ldquo;pool service&rdquo; or &ldquo;Indio&rdquo;">
@@ -88,10 +90,17 @@
 <a class="more" href="this-weekend/">See all weekend events &rarr;</a></div>
 </div>
 </div>
-</div><svg class="mountains" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
-<path d="M0 120 L0 78 L120 40 L210 70 L330 18 L450 66 L560 36 L650 58 L780 10 L900 62 L1010 30 L1110 56 L1200 34 L1200 120 Z" fill="#c9667a" opacity=".35"/>
-<path d="M0 120 L0 96 L160 64 L260 88 L400 52 L520 90 L640 66 L760 92 L880 58 L1000 86 L1100 70 L1200 84 L1200 120 Z" fill="#5b4a7a" opacity=".55"/>
-<path d="M0 120 L0 108 L200 92 L380 108 L560 94 L760 110 L940 96 L1200 106 L1200 120 Z" fill="#221c18"/></svg></section>
+</div>
+<div class="sky" aria-hidden="true"><div class="sky-stars"></div><div class="sky-sun"></div>
+<svg class="sky-ridges" viewBox="0 0 1440 260" preserveAspectRatio="xMidYMax slice">
+<defs><symbol id="sky-palm" viewBox="0 0 60 120"><path d="M30 120 C32 92 27 62 31 30" fill="none" stroke="#221c18" stroke-width="3.2" stroke-linecap="round"/><g fill="#221c18"><path d="M31 30 C21 20 9 21 1 31 C11 25 21 27 31 32Z"/><path d="M31 30 C41 20 53 21 59 31 C50 25 40 27 31 32Z"/><path d="M31 30 C25 16 15 9 5 10 C15 14 23 20 30 31Z"/><path d="M31 30 C37 16 47 9 57 10 C47 14 39 20 32 31Z"/><path d="M31 30 C29 18 31 6 36 0 C34 10 33 20 32 31Z"/><path d="M31 30 C22 33 14 42 12 52 C18 43 25 37 31 32Z"/><path d="M31 30 C40 33 48 42 50 52 C44 43 37 37 31 32Z"/></g></symbol></defs>
+<path class="r-far" d="M0 260 L0 120 L90 70 L170 40 L230 22 L290 48 L360 62 L430 96 L520 110 L600 100 L700 124 L820 112 L940 128 L1040 104 L1130 86 L1210 98 L1300 80 L1380 92 L1440 84 L1440 260 Z"/>
+<path class="r-mid" d="M0 260 L0 168 L120 150 L220 162 L340 146 L460 160 L600 150 L720 164 L860 138 L980 118 L1080 130 L1180 108 L1280 126 L1380 112 L1440 120 L1440 260 Z"/>
+<g class="sky-turbines"><g class="tb" transform="translate(330 112) scale(1)"><path d="M0 0 V34" stroke-width="1.6"/><g class="tb-r"><path d="M0 0 L0 -15 M0 0 L13 7.5 M0 0 L-13 7.5" stroke-width="1.8" stroke-linecap="round"/></g></g><g class="tb" transform="translate(362 118) scale(0.9)"><path d="M0 0 V34" stroke-width="1.6"/><g class="tb-r"><path d="M0 0 L0 -15 M0 0 L13 7.5 M0 0 L-13 7.5" stroke-width="1.8" stroke-linecap="round"/></g></g><g class="tb" transform="translate(392 122) scale(0.85)"><path d="M0 0 V34" stroke-width="1.6"/><g class="tb-r"><path d="M0 0 L0 -15 M0 0 L13 7.5 M0 0 L-13 7.5" stroke-width="1.8" stroke-linecap="round"/></g></g><g class="tb" transform="translate(424 126) scale(0.8)"><path d="M0 0 V34" stroke-width="1.6"/><g class="tb-r"><path d="M0 0 L0 -15 M0 0 L13 7.5 M0 0 L-13 7.5" stroke-width="1.8" stroke-linecap="round"/></g></g><g class="tb" transform="translate(452 130) scale(0.75)"><path d="M0 0 V34" stroke-width="1.6"/><g class="tb-r"><path d="M0 0 L0 -15 M0 0 L13 7.5 M0 0 L-13 7.5" stroke-width="1.8" stroke-linecap="round"/></g></g><g class="tb" transform="translate(1240 84) scale(0.7)"><path d="M0 0 V34" stroke-width="1.6"/><g class="tb-r"><path d="M0 0 L0 -15 M0 0 L13 7.5 M0 0 L-13 7.5" stroke-width="1.8" stroke-linecap="round"/></g></g><g class="tb" transform="translate(1266 88) scale(0.65)"><path d="M0 0 V34" stroke-width="1.6"/><g class="tb-r"><path d="M0 0 L0 -15 M0 0 L13 7.5 M0 0 L-13 7.5" stroke-width="1.8" stroke-linecap="round"/></g></g></g>
+<path class="r-near" d="M0 260 L0 206 L160 194 L320 210 L480 198 L640 214 L800 200 L960 212 L1120 196 L1280 208 L1440 198 L1440 260 Z"/>
+<use href="#sky-palm" x="170" y="150" width="46" height="92"/><use href="#sky-palm" x="205" y="172" width="38" height="76"/><use href="#sky-palm" x="1040" y="128" width="52" height="104"/><use href="#sky-palm" x="1080" y="160" width="40" height="80"/><use href="#sky-palm" x="1112" y="116" width="58" height="116"/><use href="#sky-palm" x="1330" y="152" width="44" height="88"/>
+<path d="M0 260 L0 236 L240 228 L520 240 L800 230 L1100 242 L1440 232 L1440 260 Z" fill="#221c18"/>
+</svg></div></section>
 
 <div class="wrap"><section id="search-results" class="section" hidden></section></div>
 
@@ -247,7 +256,7 @@
   });
 })();
 </script>
-<script src="assets/app.js"></script><script src="assets/valley-cal.js?v=20261109b"></script><script src="assets/owner-lookup.js?v=20261111mm"></script><script src="assets/plan-night.js?v=20261102b"></script>
+<script src="assets/app.js"></script><script src="assets/valley-cal.js?v=20261109b"></script><script src="assets/owner-lookup.js?v=20261111mm"></script><script src="assets/plan-night.js?v=20261102b"></script><script src="assets/valley-sky.js?v=20261112a"></script>
 <script>
 // Valley map ("Town by town" section): tap a town pin to see its businesses, upcoming events, deals and top categories.
 // Runs after app.js so it can reuse CVS_RENDER (upcoming events with weekly dates filled in, the sorted directory).
