@@ -38,7 +38,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=20261112dir">
 </head>
 <body>
 <header class="site-header"><a class="skip-link" href="#main">Skip to main content</a><div class="stripe"></div><nav class="nav wrap" aria-label="Main">
@@ -52,7 +52,7 @@
 </nav></header>
 <main id="main" tabindex="-1">
 
-<section class="page-hero"><div class="wrap"><span class="eyebrow"><span class="stripe-mini"></span>Local directory</span><h1>The Valley&rsquo;s Local Pros, <span class="grad">Sorted.</span></h1><p>Find a plumber, a pool guy or a great taco in a couple of taps. Businesses on the Spotlight postcard are featured at the top, and premium listings come first in each category.</p></div></section>
+<section class="page-hero" id="dir-hero"><div class="wrap"><span class="eyebrow"><span class="stripe-mini"></span>Local directory</span><h1 id="dir-h1">The Valley&rsquo;s Local Pros, <span class="grad">Sorted.</span></h1><p>Find a plumber, a pool guy or a great taco in a couple of taps. Businesses on the Spotlight postcard are featured at the top, and premium listings come first in each category.</p><p class="dir-sub" id="dir-sub" hidden></p></div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
 <div class="filters"><label class="sr-only" for="f-q">Search</label><input id="f-q" type="search" placeholder="Search">
 <label class="sr-only" for="f-city">City</label><select id="f-city"><option value="">All cities</option></select><label class="sr-only" for="f-cat">Categories</label><select id="f-cat"><option value="">All categories</option></select></div>
@@ -96,21 +96,46 @@
 </div></footer>
 <script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js"></script>
 <script>
-// Get 3 Quotes: only makes sense for "hire a pro" categories, so it stays hidden until the visitor's
-// filter says they're in one (or they haven't filtered at all) — a restaurant or activity search never
-// sees a quote pitch. Also prefills its own category from the directory filter so a visitor who taps
-// "Home services" on the homepage, or picks a category in the filter bar, lands with it already matching.
+// Filtered arrivals (from the home page "now" button, chips, search): the heading names what the visitor
+// asked for ("Coffee & breakfast spots in Palm Desert · 12 places") instead of the generic directory intro.
+// Get 3 Quotes: only shows when the visitor is looking for a hire-a-pro business (a pro category, or a search
+// whose matches are mostly pros, or no filter at all). A breakfast or happy hour search never sees it.
 (function () {
-  var card = document.getElementById("quote"), qfCat = document.getElementById("qf-cat"), fCat = document.getElementById("f-cat");
-  if (!card || !fCat) return;
-  var NOT_A_PRO_SEARCH = ["Restaurants", "Fitness", "Recreation", "Outdoors", "Attractions", "Community", "Shopping", "Happy hours"];
+  var card = document.getElementById("quote"), qfCat = document.getElementById("qf-cat");
+  var fQ = document.getElementById("f-q"), fCity = document.getElementById("f-city"), fCat = document.getElementById("f-cat");
+  var hero = document.getElementById("dir-hero"), h1 = document.getElementById("dir-h1"), sub = document.getElementById("dir-sub");
+  if (!fCat || !hero) return;
+  var intro = hero.querySelector("p:not(.dir-sub)"), h1Orig = h1.innerHTML;
+  var PROS = ["Home services", "Automotive", "Legal", "Professional services", "Health and beauty", "Pets"];
+  var NICE = { breakfast: "Coffee &amp; breakfast spots", brunch: "Brunch spots", coffee: "Coffee spots", tacos: "Tacos", pizza: "Pizza", sushi: "Sushi" };
+  var dir = (window.CVS && window.CVS.directory) || [];
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function text(x) { return Object.keys(x).map(function (k) { return typeof x[k] === "string" ? x[k] : ""; }).join(" ").toLowerCase(); }
+  function matches(term, city, cat) {
+    return dir.filter(function (x) {
+      return (!term || text(x).indexOf(term) > -1) && (!city || x.city === city) && (!cat || x.category === cat || (cat === "Happy hours" && x.happyHour));
+    });
+  }
   function sync() {
-    var v = fCat.value;
-    card.hidden = NOT_A_PRO_SEARCH.indexOf(v) > -1;
-    if (qfCat && v && [].some.call(qfCat.options, function (o) { return o.value === v; })) qfCat.value = v;
+    var term = fQ ? fQ.value.trim().toLowerCase() : "", city = fCity ? fCity.value : "", cat = fCat.value;
+    var hits = matches(term, city, cat);
+    // quote card
+    if (card) {
+      var pros = hits.filter(function (x) { return PROS.indexOf(x.category) > -1; }).length;
+      card.hidden = cat ? PROS.indexOf(cat) < 0 : (term || city ? pros * 2 < hits.length || !hits.length : false);
+      if (qfCat && cat && [].some.call(qfCat.options, function (o) { return o.value === cat; })) qfCat.value = cat;
+    }
+    // heading
+    if (!term && !city && !cat) { h1.innerHTML = h1Orig; intro.hidden = false; sub.hidden = true; hero.classList.remove("is-filtered"); return; }
+    var what = NICE[term] || (cat && term ? esc(cat) + " matching &ldquo;" + esc(term) + "&rdquo;" : cat ? esc(cat) : term ? "&ldquo;" + esc(term) + "&rdquo;" : "Local businesses");
+    h1.innerHTML = what + ' <span class="grad">in ' + esc(city || "the valley") + '</span>';
+    sub.innerHTML = '<b>' + hits.length + (hits.length === 1 ? ' place' : ' places') + '</b>' + (hits.length ? ', local favorites first. Tap one for the phone, hours and directions.' : '. Try another town or word.') + ' <a href="directory" id="dir-all">See the whole directory &rarr;</a>';
+    intro.hidden = true; sub.hidden = false; hero.classList.add("is-filtered");
   }
   sync();
+  [fQ, fCity, fCat].forEach(function (el) { if (el) el.addEventListener("input", sync); });
   fCat.addEventListener("change", sync);
+  if (fCity) fCity.addEventListener("change", sync);
 })();
 </script>
 </body>

@@ -38,7 +38,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=20261109vd">
+<link rel="stylesheet" href="assets/style.css?v=20261112dir">
 </head>
 <body>
 <header class="site-header"><a class="skip-link" href="#main">Skip to main content</a><div class="stripe"></div><nav class="nav wrap" aria-label="Main">
@@ -52,7 +52,7 @@
 </nav></header>
 <main id="main" tabindex="-1">
 
-<section class="page-hero"><div class="wrap city-hero"><div><span class="eyebrow"><span class="stripe-mini"></span>Things to do</span><h1>Coachella Valley <span class="grad">Events Calendar.</span></h1><p>There are <span data-count="events"></span> upcoming events on the Coachella Valley calendar, from Palm Springs to Coachella, sorted by date: concerts, festivals, Firebirds hockey, farmers markets, street fairs and community events. Past events drop off on their own, so everything here is still coming up.</p>
+<section class="page-hero" id="ev-hero"><div class="wrap city-hero"><div><span class="eyebrow"><span class="stripe-mini"></span>Things to do</span><h1 id="ev-h1">Coachella Valley <span class="grad">Events Calendar.</span></h1><p>There are <span data-count="events"></span> upcoming events on the Coachella Valley calendar, from Palm Springs to Coachella, sorted by date: concerts, festivals, Firebirds hockey, farmers markets, street fairs and community events. Past events drop off on their own, so everything here is still coming up.</p><p class="dir-sub" id="ev-sub" hidden></p>
 <div class="chips"><a class="chip" href="this-weekend/">This weekend</a><a class="chip chip-feature" href="holidays" data-until="2027-01-02">&#127876; Holiday guide</a><a class="chip" href="farmers-markets">Farmers markets</a><a class="chip" href="golf/">Golf courses</a><a class="chip" href="local/hiking-trails/">Hiking trails</a></div></div><div data-cal-sub data-compact id="valley-calendar"></div></div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
 <div class="filters"><label class="sr-only" for="f-q">Search</label><input id="f-q" type="search" placeholder="Search">
@@ -79,5 +79,31 @@
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight, a brand of MoreViews Pro LLC. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
 <script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js"></script><script src="assets/valley-cal.js?v=20261109c"></script>
+<script>
+// Filtered arrivals (the home page "Tonight" button, links with ?when= / ?city=): the heading says what the
+// visitor asked for ("Tonight in the valley · 5 events") and the intro, chips and calendar box step aside,
+// so the events are the first thing they see. With no filter, the page is unchanged.
+(function () {
+  var hero = document.getElementById("ev-hero"), h1 = document.getElementById("ev-h1"), sub = document.getElementById("ev-sub");
+  var fQ = document.getElementById("f-q"), fCity = document.getElementById("f-city"), fCat = document.getElementById("f-cat"), fWhen = document.getElementById("f-when");
+  var browse = document.querySelector('[data-browse="events"]');
+  if (!hero || !h1 || !browse) return;
+  var intro = hero.querySelector("p:not(.dir-sub)"), h1Orig = h1.innerHTML;
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function sync() {
+    var term = fQ ? fQ.value.trim() : "", city = fCity ? fCity.value : "", cat = fCat ? fCat.value : "", when = fWhen ? fWhen.value : "";
+    if (!term && !city && !cat && !when) { h1.innerHTML = h1Orig; intro.hidden = false; sub.hidden = true; hero.classList.remove("is-filtered"); return; }
+    var late = new Date().getHours() >= 16;
+    var w = { today: late ? "Tonight" : "Today", weekend: "This weekend", week: "The next 7 days", month: "This month" }[when] || "Coming up";
+    var what = cat ? esc(cat) + " &middot; " + w.toLowerCase() : term ? "&ldquo;" + esc(term) + "&rdquo; &middot; " + w.toLowerCase() : w;
+    h1.innerHTML = what + ' <span class="grad">in ' + esc(city || "the valley") + '</span>';
+    var n = browse.querySelectorAll("article.event").length;
+    sub.innerHTML = '<b>' + n + (n === 1 ? ' event' : ' events') + '</b>' + (n ? ', soonest first. Tap one for times, tickets and directions.' : '. Try another day or town.') + ' <a href="events">See the full calendar &rarr;</a>';
+    intro.hidden = true; sub.hidden = false; hero.classList.add("is-filtered");
+  }
+  sync();
+  [fQ, fCity, fCat, fWhen].forEach(function (el) { if (el) { el.addEventListener("input", function () { setTimeout(sync, 0); }); el.addEventListener("change", function () { setTimeout(sync, 0); }); } });
+})();
+</script>
 </body>
 </html>

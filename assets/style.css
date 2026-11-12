@@ -1870,3 +1870,11 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .hero.living .hero-now { min-height: 33px; }
 .hero.living .hero-now:empty { visibility: hidden; }
 .hero.living .lede { max-width: 720px; }
+/* Directory heading when the visitor arrives with a filter (2026-11-12) */
+.page-hero.is-filtered { padding-bottom: var(--s2); }
+.page-hero.is-filtered h1 { font-size: clamp(32px, 4.6vw, 52px); }
+.dir-sub { font-size: 18px; }
+.dir-sub[hidden] { display: none; }
+.dir-sub a { font-weight: 600; white-space: nowrap; }
+.page-hero.is-filtered .city-hero { grid-template-columns: 1fr; }
+.page-hero.is-filtered .chips, .page-hero.is-filtered [data-cal-sub] { display: none; }
