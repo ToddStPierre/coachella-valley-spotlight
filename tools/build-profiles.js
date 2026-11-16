@@ -6,6 +6,8 @@ const { schemaType, root, SITE, loadData, esc, slugOf, ldjson, landingPages, she
 const DATA = loadData(), list = (DATA.directory || []).filter(b => !b.sample), deals = DATA.deals || [];
 const { head, headRest, header, footer } = shell();
 const landing = landingPages(list);
+// Map pins (data/geo.js, from tools/geocode.js): slug -> [lat, lng, address hash]. Used for the profile's geo schema.
+const GEO = (() => { const g = path.join(root, "data", "geo.js"), ctx = { window: {} }; if (fs.existsSync(g)) require("vm").runInNewContext(fs.readFileSync(g, "utf8"), ctx); return ctx.window.CVS_GEO || {}; })();
 const nice = d => { const [y, m, dd] = d.split("-").map(Number); return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m - 1] + " " + dd + ", " + y; };
 const outbound = u => { try { const x = new URL(u); x.searchParams.set("utm_source", "coachellavalleyspotlight"); x.searchParams.set("utm_medium", "profile"); return x.toString(); } catch { return u; } };
 
@@ -55,6 +57,13 @@ for (const b of list) {
   const trailRows = [["Distance", TR.length], ["Climb", TR.climb], ["Difficulty", TR.difficulty], ["Time", TR.time], ["The route", TR.route], ["Dogs", TR.dogs], ["Fee", TR.fee], ["Hours", TR.hours], ["Permit", TR.permit], ["Parking", TR.parking], ["At the trailhead", TR.facilities], ["Shade", TR.shade], ["Best time to go", TR.season], ["Guided hikes", TR.guided], ["Closures", TR.closures], ["Before you go", TR.rules], ["Good to know", TR.note], ["Questions", TR.contact]].filter(r => r[1]);
   const showHours = (prem || b.public) && b.hours;
   const owner = !b.public;
+  // More structured data for search engines and AI assistants. Only things the page itself shows:
+  // the pin (only when we have a street address), social links, hours (when shown) and the map link.
+  const pin = GEO[slug];
+  if (pin && b.address) schema.geo = { "@type": "GeoCoordinates", latitude: pin[0], longitude: pin[1] };
+  if (social.length) schema.sameAs = social.map(k => b.social[k]);
+  if (showHours) schema.openingHours = b.hours;
+  schema.hasMap = "https://www.google.com/maps/search/?api=1&query=" + mapPlace;
   const html = `${head}${metaTags({ title: `${b.name} | ${kind} in ${b.city}, CA`, description: desc, url, image: prem && b.image })}<base href="../../">
 ${headRest}${ldjson(schema)}${ldjson(breadcrumbs(trail))}
 </head>

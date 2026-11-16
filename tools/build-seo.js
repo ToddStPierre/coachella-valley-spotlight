@@ -355,6 +355,18 @@ const byCatRows = tops.map(t => {
 }).join("");
 const orphanSvc = landing.filter(o => o.kind === "category" && o.field === "service" && !tops.some(t => t.category === topCat(o)));
 const browseLinks = landing.length ? `<div class="browse-links"><h2 class="month-head"><span class="stripe-mini"></span>Browse by city and category</h2><div class="browse-cols"><div><h3>By city</h3>${byCityRows}</div><div><h3>By category</h3>${byCatRows}${orphanSvc.length ? browseRow("More", orphanSvc.length, orphanSvc.map(o => pill(o, o.category)).join("")) : ""}</div></div></div>` : "";
+/* Structured data for the /events calendar: the next 60 events as Event items, so search engines and AI
+   assistants can read what's on without running the page's JavaScript. Injected into events.html below. */
+const eventListSchema = (() => {
+  const up = C.events.slice().sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)).slice(0, 60);
+  if (!up.length) return "";
+  return ldjson({ "@context": "https://schema.org", "@type": "ItemList", name: "Upcoming events in the Coachella Valley", numberOfItems: up.length,
+    itemListElement: up.map((e, i) => ({ "@type": "ListItem", position: i + 1, item: {
+      "@type": "Event", name: e.title, startDate: isoStart(e), endDate: e.endDate || undefined,
+      url: e.feed ? (e.url || undefined) : `${SITE}/event/${C.eventSlug(e)}/`,
+      eventStatus: "https://schema.org/EventScheduled", eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+      location: { "@type": "Place", name: e.venue || e.city, address: { "@type": "PostalAddress", addressLocality: e.city, addressRegion: "CA", addressCountry: "US" } } } })) });
+})();
 /* Reads an opening tag's attributes into { name: value } (bare attributes get ""). */
 const attrsOf = str => { const a = {}; str.replace(/([\w-]+)(?:="([^"]*)")?/g, (m, k, v) => { a[k] = v === undefined ? "" : v; }); return a; };
 for (const file of ["index.html", "directory.html", "deals.html", "events.html", "news.html", "halloween.html", "welcome.html", "farmers-markets.html", "holidays.html", "for-business.html", "about.html"]) {
@@ -376,6 +388,7 @@ for (const file of ["index.html", "directory.html", "deals.html", "events.html",
   // Fills every count span, even one holding an old number, so a page can never show a stale count.
   html = html.replace(/<span data-count="(\w+)">[^<]*<\/span>/g, (m, k) => `<span data-count="${k}">${(k === "businesses" ? C.directory.filter(x => !x.public) : C[k] || []).filter(x => !x.sample).length}</span>`);
   html = html.replace("<!--browse-links-->", browseLinks);
+  if (file === "events.html" && eventListSchema && !html.includes('"@type":"ItemList","name":"Upcoming events')) html = html.replace("</head>", eventListSchema + "\n</head>");
   fs.writeFileSync(p, html);
   console.log("prerendered " + file);
 }
@@ -394,3 +407,36 @@ ${urls.map(u => `  <url><loc>${esc(SITE + "/" + u)}</loc>${FRESH.has(u) ? `<last
 </urlset>
 `);
 console.log(`sitemap.xml: ${urls.length} pages`);
+
+/* 3. llms.txt: a plain-text guide to the site for AI assistants (llmstxt.org format). Rebuilt on every deploy so
+   the counts stay true. Generated, so it's gitignored like sitemap.xml. */
+{
+  const L = (u, label, note) => `- [${label}](${SITE}/${u})${note ? ": " + note : ""}`;
+  const biz = list.filter(b => !b.public), places = list.filter(b => b.public), golfCount = ((golfCtx.window.CVS || {}).golf || []).length;
+  const cityLinks = landing.filter(p => p.kind === "city" && p.index).sort((a, b) => b.items.length - a.items.length).map(p => L(p.path, `${p.city} businesses`, `${p.items.length} listed`));
+  const catLinks = landing.filter(p => p.kind === "category" && p.index).sort((a, b) => b.items.length - a.items.length).slice(0, 25).map(p => L(p.path, p.category, `${p.items.length} listed valley-wide`));
+  const weekend = weekendPaths.map(u => L(u, u === "this-weekend/" ? "This weekend in the Coachella Valley" : "This weekend in " + u.split("/")[1].replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase())));
+  const txt = `# Coachella Valley Spotlight
+
+> A free local guide for people who live in the Coachella Valley, California (Palm Springs, Cathedral City, Rancho Mirage, Palm Desert, Indian Wells, La Quinta, Indio, Coachella, Desert Hot Springs, Thousand Palms and Bermuda Dunes). It lists local events, deals and ${biz.length} independent local businesses with real phone numbers, plus ${places.length} public places such as parks, trails and golf courses. Run by Todd St. Pierre in Palm Desert. Updated ${BUILT_DAY}.
+
+Every listed business has its own page with structured data (schema.org). The events calendar and weekend pages are rebuilt daily. Business details come from each business's own ad or website, or its public listings, and owners can claim their listing and correct it.
+
+## Things to do
+${[L("this-weekend/", "This weekend", "everything happening Friday to Sunday, by day and by town, refreshed daily"), L("events", "Events calendar", `${C.events.length} upcoming events`), L("deals", "Local deals", "current offers from local businesses"), L("golf/", "Golf courses", `${golfCount} golf clubs across the valley`), L("farmers-markets", "Farmers markets", "markets across the valley, with days and times"), L("holidays", "Holiday events"), L("welcome", "New to the valley", "a starter guide for new residents")].concat(weekend.slice(1)).join("\n")}
+
+## Local businesses
+${[L("directory", "Business directory", `${biz.length} independent local businesses`)].concat(cityLinks, catLinks).join("\n")}
+
+## For business owners
+${[L("advertise", "Advertise", "the shared Spotlight postcard and Premium listings"), L("pricing", "Postcard pricing", "ads from $300 per mailing"), L("coverage-map", "Postcard coverage map", "El Paseo and Sun City Palm Desert routes"), L("for-business", "Find and claim your listing"), L("submit", "Add a free listing or submit an event")].join("\n")}
+
+## About
+${[L("about", "Who runs Spotlight"), L("contact", "Contact and corrections"), L("legal", "Privacy and terms")].join("\n")}
+
+## Optional
+${L("sitemap.xml", "Sitemap", `all ${urls.length} pages`)}
+`;
+  fs.writeFileSync(path.join(root, "llms.txt"), txt);
+  console.log(`llms.txt: ${txt.length} chars`);
+}
