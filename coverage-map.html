@@ -114,7 +114,7 @@
 <nav class="crumbs" aria-label="Breadcrumb"><a href="advertise">Advertise</a> &rsaquo; <span>Coverage map</span></nav>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>Postcard coverage map</span>
 <h1>See Exactly Where <span class="grad">Your Ad Lands.</span></h1>
-<p class="cm-lede">About 5,000 homes per card, one business per category. Ten cards are booking now, from Desert Hot Springs to Coachella.</p>
+<p class="cm-lede">About 5,000 homes per card, one business per category. Two Palm Desert cards are booking now: El Paseo and Sun City.</p>
 </div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
 <div class="cm-grid">
@@ -189,7 +189,7 @@
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight, a brand of MoreViews Pro LLC. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
 <script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js"></script>
-<script src="data/mailings.js?v=20261111mm"></script>
+<script src="data/mailings.js?v=20261111mm"></script><script src="data/hidden-routes.js?v=20261116h"></script>
 <script>
 (function () {
   var API = "https://local-spotlight-reservations.toddstpierre.workers.dev";
@@ -208,6 +208,8 @@
     { id: "coachella", name: "Coachella", town: "Coachella", zip: "92236", homes: "4,998", x: 91, y: 89, w: 9, h: 12, area: "mailing-area-coachella", blurb: "Six carrier routes covering Coachella's family neighborhoods. Join the waitlist to get first pick of categories." },
     { id: "desert-hot-springs", name: "Desert Hot Springs", town: "Desert Hot Springs", zip: "92240 &middot; 92241", homes: "4,977", x: 22, y: 15, w: 11, h: 14, area: "mailing-area-desert-hot-springs", blurb: "Five carrier routes across Desert Hot Springs. Join the waitlist to get first pick of categories." }
   ];
+  // Routes hidden from the public site (data/hidden-routes.js) come off the map entirely, not as waitlist zones.
+  ZONES = ZONES.filter(function (z) { return (window.CVS_HIDDEN_ROUTES || []).indexOf(z.id) < 0; });
   var TOWNS = [["Thousand Palms", 41, 40]];
   var zonesEl = document.getElementById("cov-zones"), panel = document.getElementById("cov-panel"), liveEl = document.getElementById("cm-live");
   var SIZE = (location.search.match(/[?&]size=([1248])\b/) || [])[1];
