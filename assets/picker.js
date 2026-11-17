@@ -23,6 +23,25 @@
   // Each link's "after payment" setting redirects to advertise?paid=1#reserve, which forwards to reserve?paid=1 (or point it at /reserve?paid=1 directly)
   var PAY_LINKS = { 1: "https://pay.coachellavalleyspotlight.com/b/aFaaEX6E01cW1Mkg6S9MY0B", 2: "https://pay.coachellavalleyspotlight.com/b/4gM00jaUg3l462AdYK9MY0C", 4: "https://pay.coachellavalleyspotlight.com/b/bJebJ15zW3l4bmU8Eq9MY0D", 8: "https://pay.coachellavalleyspotlight.com/b/eVq4gz0fCdZIbmUcUG9MY0E" };
   var payBtn = root.querySelector("[data-pay]");
+  // 9 x 12 cards (Jan 21, 2027 on): 19 fixed spots in four sizes, from data/formats.js. Each ad is one spot.
+  var F9 = (window.CVS_FORMATS || {})["9x12"], FMT = window.CVS_FMT || {}, PAY9 = FMT.PAY_9x12 || {};
+  var fmt = "11x6", size9 = "medium", sizesBox = root.querySelector(".picker-sizes"), sizesOld = sizesBox ? sizesBox.innerHTML : "";
+  var dimsEl = root.querySelector(".picker-dims"), dimsOld = dimsEl ? dimsEl.innerHTML : "";
+  function S9(k) { return F9.sizes[k]; }
+  function drawSizes() {
+    if (!sizesBox) return;
+    if (fmt !== "9x12") { if (sizesBox.getAttribute("data-fmt") === "9x12") { sizesBox.innerHTML = sizesOld; bindSizes(); } sizesBox.removeAttribute("data-fmt"); if (dimsEl) dimsEl.innerHTML = dimsOld; return; }
+    sizesBox.setAttribute("data-fmt", "9x12");
+    sizesBox.innerHTML = F9.sizeOrder.map(function (k) { var z = S9(k); return '<button type="button" data-size9="' + k + '" aria-pressed="' + (k === size9) + '"><b>' + z.label + " &middot; " + money(z.price) + "</b><span>" + z.dims + " &middot; " + z.perHome + "/home</span></button>"; }).join("");
+    sizesBox.querySelectorAll("[data-size9]").forEach(function (b) { b.addEventListener("click", function () { pick9(b.getAttribute("data-size9")); }); });
+    if (dimsEl) dimsEl.textContent = "This card is the bigger 9 x 12 size. Pick a size, then tap one of its open spots (they light up).";
+  }
+  function pick9(k) {
+    size9 = k; shell.hidden = true; pending = null; mark(null);
+    if (sizesBox) sizesBox.querySelectorAll("[data-size9]").forEach(function (x) { x.setAttribute("aria-pressed", x.getAttribute("data-size9") === k ? "true" : "false"); });
+    root.querySelectorAll(".spot9").forEach(function (el) { el.classList.toggle("dim", el.getAttribute("data-size") !== k); });
+    statusEl.textContent = LABELS[route] + ": tap an open " + S9(k).label + " spot to hold it (" + money(S9(k).price) + ").";
+  }
   function money(n) { return "$" + n.toLocaleString("en-US"); }
   function blockFor(pos, n) {
     var base = pos <= 8 ? 0 : 8, i = (pos - 1) % 8, c = i % 4, r = Math.floor(i / 4), tries = [];
@@ -66,7 +85,7 @@
     if (!m) { dateEl.textContent = "Mailing date coming soon"; return; }
     var d = daysLeft(m.deadline);
     dateEl.innerHTML = "Tentative Mail Date: " + nice(m.mail) + " &middot; Tentative Artwork Date: " + nice(m.deadline) +
-      (d < 0 ? '<span class="picker-left">Booking for this card is closed. ' + (bookable(r).length ? "Pick a later date above." : "The next date is coming soon.") + '</span>' : '<span class="picker-left">' + (d === 0 ? "Last day to book" : d + (d === 1 ? " day" : " days") + " left to book") + (m.minSold ? " &middot; This card mails once " + m.minSold + " spots are sold" : "") + '</span>');
+      (d < 0 ? '<span class="picker-left">Booking for this card is closed. ' + (bookable(r).length ? "Pick a later date above." : "The next date is coming soon.") + '</span>' : '<span class="picker-left">' + (d === 0 ? "Last day to book" : d + (d === 1 ? " day" : " days") + " left to book") + (m.format === "9x12" ? " &middot; This card mails once " + money(m.minDollars || 2500) + " of ads are sold" : m.minSold ? " &middot; This card mails once " + m.minSold + " spots are sold" : "") + '</span>');
   }
 
   function state(s) { s = (s || "").toLowerCase(); return s === "open" ? "open" : s === "pending" ? "pending" : "sold"; }
@@ -77,6 +96,10 @@
     statusEl.textContent = "Loading spots…"; countEl.textContent = "Loading availability…";
     front.innerHTML = ""; back.innerHTML = ""; openNow = {}; if (!keepForm) { shell.hidden = true; pending = null; }
     fetch(API + "/api/spots?route=" + encodeURIComponent(r) + (mail ? "&mail=" + mail : "")).then(function (res) { if (!res.ok) throw 0; return res.json(); }).then(function (d) {
+      fmt = d.format === "9x12" && F9 ? "9x12" : "11x6";
+      front.classList.toggle("picker-9x12", fmt === "9x12"); back.classList.toggle("picker-9x12", fmt === "9x12");
+      drawSizes();
+      if (fmt === "9x12") { draw9(r, d); return; }
       d.positions.forEach(function (p) {
         var k = state(p.status), el = document.createElement(k === "open" ? "button" : "div");
         el.className = "spot " + k; el.setAttribute("data-pos", p.position); openNow[p.position] = k === "open";
@@ -97,10 +120,45 @@
     });
   }
 
+  function fillCats(d) {
+    var left = d.categories.filter(function (c) { return d.takenCategories.indexOf(c) === -1; });
+    cat.innerHTML = '<option value="" disabled selected>Select your category…</option>' + left.map(function (c) { return '<option>' + c.replace(/</g, "&lt;") + '</option>'; }).join("") + (left.length ? "" : '<option value="" disabled>No categories left on this route</option>');
+  }
+  // Draw the 9 x 12 card: the masthead and postal block on the front, then each spot where it sits on the printed card.
+  function draw9(r, d) {
+    var head = document.createElement("div"); head.className = "spot9-head"; head.innerHTML = "<b>Coachella Valley Spotlight</b><span>Postal block</span>"; head.setAttribute("aria-hidden", "true");
+    front.appendChild(head);
+    var byPos = {}; d.positions.forEach(function (p) { byPos[p.position] = p; });
+    F9.map.forEach(function (s) {
+      var p = byPos[s.pos] || { position: s.pos, status: "open" }, k = state(p.status), z = S9(s.size);
+      var el = document.createElement(k === "open" ? "button" : "div");
+      el.className = "spot spot9 sz-" + s.size + " " + k + (s.size === size9 ? "" : " dim"); el.setAttribute("data-pos", s.pos); el.setAttribute("data-size", s.size);
+      el.style.gridColumn = s.col + " / span " + s.colSpan; el.style.gridRow = (s.row + 1) + " / span " + s.rowSpan;
+      openNow[s.pos] = k === "open";
+      el.innerHTML = '<span class="spot-n">' + z.label + " &middot; Spot " + s.pos + '</span><span class="spot-cat">' + (p.category ? p.category.replace(/</g, "&lt;") : (k === "open" ? money(z.price) : "")) + '</span><span class="spot-state">' + word(k) + '</span>';
+      el.setAttribute("aria-label", z.label + " spot " + s.pos + ", " + money(z.price) + (p.category ? ", " + p.category : "") + ", " + word(k));
+      if (k === "open" && closed(r)) { el.disabled = true; el.title = "Booking for this card is closed"; }
+      else if (k === "open") { el.type = "button"; el.addEventListener("click", function () { if (s.size !== size9) pick9(s.size); open9(r, s.pos); }); }
+      (s.side === "front" ? front : back).appendChild(el);
+    });
+    fillCats(d);
+    var sold = d.soldDollars || 0, min = d.minDollars || F9.minDollars, n = d.positions.filter(function (p) { return state(p.status) !== "open"; }).length;
+    countEl.innerHTML = "<b>" + money(sold) + " of " + money(min) + "</b> sold" + (sold >= min ? " &middot; confirmed to mail" : "") + " &middot; " + n + " of " + F9.spots + " spots taken on " + LABELS[r] + (mail ? ", " + short(mail) + " card" : "");
+    pick9(size9);
+  }
+  function open9(r, pos) {
+    var k = FMT.spotSize("9x12", pos), z = S9(k);
+    pending = { route: r, mail: mail, position: pos, positions: [pos], fmt: "9x12", sizeKey: k, label: z.label, price: z.price, link: PAY9[k] || "" };
+    mark([pos]);
+    title.textContent = "Hold Spot " + pos + " on " + LABELS[r] + (mail ? ", " + short(mail) + " card" : "") + " (" + z.label + ", " + money(z.price) + ")";
+    if (payBtn) { payBtn.hidden = !pending.link; payBtn.textContent = "Pay " + money(z.price) + " now and lock it in"; }
+    msg.textContent = ""; shell.hidden = false;
+    shell.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
   function open(r, pos) {
     var list = blockFor(pos, size), S = SIZES[size];
     if (!list) { mark(null); shell.hidden = true; pending = null; statusEl.textContent = "There's no open " + S.name + " block that includes Spot " + pos + ". Tap another spot or pick a smaller size."; return; }
-    pending = { route: r, mail: mail, position: list[0], positions: list };
+    pending = { route: r, mail: mail, position: list[0], positions: list, fmt: "11x6", label: S.label, price: S.price, link: PAY_LINKS[size] || "" };
     mark(list);
     title.textContent = "Hold " + (list.length === 1 ? "Spot " + list[0] : "Spots " + list.join(", ")) + " on " + LABELS[r] + (mail ? ", " + short(mail) + " card" : "") + " (" + S.label + ", " + money(S.price) + ")";
     if (payBtn) { payBtn.hidden = !PAY_LINKS[size]; payBtn.textContent = "Pay " + money(S.price) + " now and lock it in"; }
@@ -109,14 +167,18 @@
   }
 
   document.getElementById("picker-cancel").addEventListener("click", function () { shell.hidden = true; pending = null; mark(null); });
-  root.querySelectorAll("[data-size]").forEach(function (b) {
-    b.addEventListener("click", function () {
-      size = +b.getAttribute("data-size");
-      root.querySelectorAll("[data-size]").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
-      shell.hidden = true; pending = null; mark(null);
-      statusEl.textContent = LABELS[route] + ": tap an open spot to place your " + SIZES[size].name + " ad.";
+  function bindSizes() {
+    root.querySelectorAll("button[data-size]").forEach(function (b) {
+      b.setAttribute("aria-pressed", +b.getAttribute("data-size") === size ? "true" : "false");
+      b.addEventListener("click", function () {
+        size = +b.getAttribute("data-size");
+        root.querySelectorAll("button[data-size]").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+        shell.hidden = true; pending = null; mark(null);
+        statusEl.textContent = LABELS[route] + ": tap an open spot to place your " + SIZES[size].name + " ad.";
+      });
     });
-  });
+  }
+  bindSizes();
   tabs.forEach(function (t) {
     t.addEventListener("click", function () {
       tabs.forEach(function (x) { x.classList.remove("active"); x.setAttribute("aria-selected", "false"); });
@@ -127,9 +189,9 @@
 
   form.addEventListener("submit", function (e) {
     e.preventDefault(); if (!pending) return;
-    var payNow = !!(e.submitter && e.submitter.hasAttribute("data-pay")) && !!PAY_LINKS[pending.positions.length];
+    var payNow = !!(e.submitter && e.submitter.hasAttribute("data-pay")) && !!pending.link;
     var btn = e.submitter || form.querySelector('button[type="submit"]'); btn.disabled = true; msg.textContent = payNow ? "Holding your spot, then taking you to secure checkout…" : "Holding your spot…";
-    var p = { route: pending.route, mail: pending.mail, position: pending.position, positions: pending.positions, size: SIZES[pending.positions.length].label, price: money(SIZES[pending.positions.length].price), category: form.category.value, name: form.name.value, business: form.business.value, email: form.email.value, phone: form.phone.value, notes: form.notes.value + (window.CVS_REF && window.CVS_REF() ? " [Referred by: " + window.CVS_REF() + "]" : "") };
+    var p = { route: pending.route, mail: pending.mail, position: pending.position, positions: pending.positions, size: pending.label, price: money(pending.price), category: form.category.value, name: form.name.value, business: form.business.value, email: form.email.value, phone: form.phone.value, notes: form.notes.value + (window.CVS_REF && window.CVS_REF() ? " [Referred by: " + window.CVS_REF() + "]" : "") };
     fetch(API + "/api/reserve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p) })
       .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, d: d }; }); })
       .then(function (r) {
@@ -140,7 +202,7 @@
           source: "coachellavalleyspotlight.com / advertise spot picker" }) }).catch(function () {});
         if (window.CVS_GA) window.CVS_GA(payNow ? "spot_pay_now" : "spot_hold", { route: p.route, mail: p.mail || "", spots: p.positions.length, category: p.category, ref: (window.CVS_REF && window.CVS_REF()) || "" });
         if (payNow) {
-          var ref = pending.route + "__" + (pending.mail ? pending.mail + "__" : "") + pending.positions.join("-"), go = PAY_LINKS[pending.positions.length] + (PAY_LINKS[pending.positions.length].indexOf("?") > -1 ? "&" : "?") + "client_reference_id=" + encodeURIComponent(ref);
+          var ref = pending.route + "__" + (pending.mail ? pending.mail + "__" : "") + pending.positions.join("-"), go = pending.link + (pending.link.indexOf("?") > -1 ? "&" : "?") + "client_reference_id=" + encodeURIComponent(ref);
           msg.textContent = "Spot held. Taking you to secure checkout…";
           setTimeout(function () { location.href = go; }, 600);
           return;
@@ -159,7 +221,8 @@
     root.insertBefore(note, root.firstChild);
   }
   var wantSize = (location.search.match(/[?&]size=([1248])\b/) || [])[1];
-  if (wantSize) root.querySelectorAll("[data-size]").forEach(function (b) { if (b.getAttribute("data-size") === wantSize) b.click(); });
+  if (wantSize) root.querySelectorAll("button[data-size]").forEach(function (b) { if (b.getAttribute("data-size") === wantSize) b.click(); });
+  var wantSize9 = (location.search.match(/[?&]size=(large|medium|small|mini)\b/) || [])[1]; if (wantSize9) size9 = wantSize9;
   var want = (location.search.match(/[?&]route=([a-z-]+)/) || [])[1]; if (want === "sun-city") want = "sun-city-palm-desert";
   tabs.forEach(function (t) { if (want && t.getAttribute("data-route") === want) t.click(); });
   if (wantMail && cards(route).some(function (m) { return m.mail === wantMail; })) { mail = wantMail; load(route); }
