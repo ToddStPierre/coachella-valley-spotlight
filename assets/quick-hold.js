@@ -220,7 +220,8 @@
       html += '<label class="qh-pass"><input type="checkbox" id="qh-pass-on"' + (passOn ? " checked" : "") + '><span><b>Season Pass: ' + of.pass + ' for 3 mailings</b> (save ' + of.save + '). The same spot and your category locked on ' +
         pc.map(function (m) { return shortDate(m.mail); }).join(", ") + ".</span></label>";
       // A second card for the same 3 dates: any other route where the category and a spot are open on all three.
-      var others = passOn ? ROUTES.filter(function (r) { return r.id !== route && sameDates(r.id) && passSpot(r.id, mail, cat); }) : [];
+      // The two-card Season Pass is switched off (2026-11-17, Todd: too confusing). To bring it back, restore the filter below.
+      var others = []; // passOn ? ROUTES.filter(function (r) { return r.id !== route && sameDates(r.id) && passSpot(r.id, mail, cat); }) : [];
       if (route2 && others.every(function (r) { return r.id !== route2; })) route2 = null;
       if (others.length) html += '<div class="qh-pass2"><p><b>Add a second card</b> for ' + of.pass2 + ' total (both cards, all 3 mailings):</p>' +
         others.map(function (r) { return '<label><input type="checkbox" name="qh-r2" value="' + r.id + '"' + (route2 === r.id ? " checked" : "") + "><span>" + esc(r.name) + " · " + esc(r.homes) + "</span></label>"; }).join("") + "</div>";
