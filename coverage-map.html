@@ -38,7 +38,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=20261102b">
+<link rel="stylesheet" href="assets/style.css?v=20261117f">
 <style>
 /* Coverage map redesign 2026-11-11 (page-only styles) */
 .cm-hero h1 { margin-bottom: 10px; }
@@ -147,7 +147,7 @@
 </div>
 <ul class="cov-legend" aria-label="Map key"><li><span class="cov-key open"></span>Spots open</li><li><span class="cov-key almost"></span>Almost full</li><li><span class="cov-key full"></span>Full</li><li id="cov-key-soon"><span class="cov-key soon"></span>Join waitlist</li></ul>
 <div class="cm-chips" role="group" aria-label="Choose a route"><div class="cm-chiprow" id="cm-chips-live"><span>Booking now</span></div><div class="cm-chiprow" id="cm-chips-soon"><span>Join waitlist</span></div></div>
-<p class="cm-fine">Spot counts update live as businesses book. A card mails once at least 8 of its 16 spots are sold. If it has fewer by its artwork deadline, it moves to the next date, and your spot and payment carry over, or we refund you. Every date is on the <a href="mailing-calendar">mailing calendar</a>.</p>
+<p class="cm-fine">Spot counts update live as businesses book. From January on, a 9 x 12 card mails once at least $2,500 of its ads are sold. If it falls short by its artwork deadline, it moves to the next date, and your spot and payment carry over, or we refund you. Every date is on the <a href="mailing-calendar">mailing calendar</a>.</p>
 </div>
 <aside class="cm-side"><div class="cov-panel" id="cov-panel" aria-live="polite"></div></aside>
 </div>
@@ -248,7 +248,7 @@
   function liveCard(z) {
     var m = z.mail, d = left(m.deadline), pct = z.total ? Math.round(z.taken / z.total * 100) : 0;
     var big = z.state === "loading" ? "&hellip;" : z.open == null ? "Open" : z.open;
-    return '<article class="cm-lc" data-state="' + st(z) + '"><div class="cm-lc-top"><h2>' + esc(z.name) + (z.sold != null && m.minSold && z.sold >= m.minSold ? ' <span class="cm-ok">Confirmed to mail</span>' : "") + '</h2><span class="cm-lc-homes">' + esc(m.homes) + " &middot; " + esc(z.town) + '</span></div>' +
+    return '<article class="cm-lc" data-state="' + st(z) + '"><div class="cm-lc-top"><h2>' + esc(z.name) + (z.sold != null && z.ok ? ' <span class="cm-ok">Confirmed to mail</span>' : "") + '</h2><span class="cm-lc-homes">' + esc(m.homes) + " &middot; " + esc(z.town) + '</span></div>' +
       '<div class="cm-lc-left">' + big + (z.open != null ? "<small>of " + z.total + " spots open</small>" : "") + "</div>" +
       '<div class="cm-bar" aria-hidden="true"><i style="--p:' + pct + '%"></i></div>' +
       '<p class="cm-lc-meta">Mails ' + esc(nice(m.mail)) + " &middot; artwork due " + esc(nice(m.deadline)) + (d >= 0 ? " &middot; <b>" + daysTxt(d) + "</b>" : "") + "</p>" +
@@ -277,8 +277,8 @@
       var d = left(m.deadline);
       rows.push(["Mails", esc(nice(m.mail)) + ' <span class="cov-muted">(tentative)</span>']);
       rows.push(["Artwork due", esc(nice(m.deadline)) + (d >= 0 ? ' <span class="cov-muted">(' + daysTxt(d) + ")</span>" : "")]);
-      rows.push(["Spots", z.state === "loading" ? "Checking&hellip;" : z.sold == null ? "Call (760) 422-5475" : "<b>" + z.open + " of " + z.total + "</b> open" + (m.minSold ? ' <span class="cov-muted">&middot; ' + (z.sold >= m.minSold ? "confirmed to mail" : z.sold + " of " + m.minSold + " sold to confirm") + "</span>" : "")]);
-      rows.push(["Ads from", "$300 per mailing <span class=\"cov-muted\">with design, printing, postage and QR code tracking</span>"]);
+      rows.push(["Spots", z.state === "loading" ? "Checking&hellip;" : z.sold == null ? "Call (760) 422-5475" : "<b>" + z.open + " of " + z.total + "</b> open" + (z.nine ? ' <span class="cov-muted">&middot; ' + (z.ok ? "confirmed to mail" : "$" + z.soldD.toLocaleString("en-US") + " of $" + z.minD.toLocaleString("en-US") + " sold to confirm") + "</span>" : m.minSold ? ' <span class="cov-muted">&middot; ' + (z.sold >= m.minSold ? "confirmed to mail" : z.sold + " of " + m.minSold + " sold to confirm") + "</span>" : "")]);
+      rows.push(["Ads from", (m.format === "9x12" ? "$100 per mailing <span class=\"cov-muted\">on the 9 x 12 card (Mini to Large, $100 to $500)" : "$300 per mailing <span class=\"cov-muted\">") + " with design, printing, postage and QR code tracking</span>"]);
     } else {
       rows.push(["Mail date", "Not set yet"]);
     }
@@ -315,6 +315,9 @@
       z.sold = d.positions.filter(function (p) { return s(p) === "sold"; }).length;
       z.taken = d.positions.filter(function (p) { return s(p) === "sold" || s(p) === "pending"; }).length;
       z.open = z.total - z.taken;
+      // 9 x 12 cards confirm by dollars sold; 11 x 6 cards by spots sold.
+      z.nine = d.format === "9x12"; z.soldD = d.soldDollars || 0; z.minD = d.minDollars || z.mail.minDollars || 2500;
+      z.ok = window.CVS_FMT ? window.CVS_FMT.isConfirmed(z.nine ? { format: "9x12", minDollars: z.minD } : z.mail, d.positions) : !!(z.mail.minSold && z.sold >= z.mail.minSold);
       z.state = left(z.mail.deadline) < 0 ? "closed" : z.open === 0 ? "full" : z.open <= 4 ? "almost" : "open";
       paint();
     }).catch(function () { z.state = "open"; z.sold = null; paint(); });
