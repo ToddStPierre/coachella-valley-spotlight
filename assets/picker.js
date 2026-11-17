@@ -16,7 +16,7 @@
   var front = document.getElementById("picker-front"), back = document.getElementById("picker-back");
   var shell = document.getElementById("picker-form-shell"), title = document.getElementById("picker-form-title");
   var form = document.getElementById("picker-form"), cat = document.getElementById("pf-category"), msg = document.getElementById("picker-msg");
-  var route = "el-paseo", pending = null, size = 1, openNow = {};
+  var route = "el-paseo", pending = null, size = 1, openNow = {}, loadSeq = 0;
   // Ad sizes: blocks of spots on one side of the card (4 across, 2 down).
   var SIZES = { 1: { name: "1-spot", label: "1 spot", dims: "2.7\u2033 x 2.6\u2033", price: 300 }, 2: { name: "2-spot", label: "2 spots", dims: "5.4\u2033 x 2.6\u2033", price: 550 }, 4: { name: "4-spot", label: "4 spots", dims: "5.4\u2033 x 5.2\u2033", price: 1000 }, 8: { name: "full-side", label: "Full side", dims: "all 8 spots on one side", price: 2000 } };
   // Stripe Payment Links, one per ad size. Leave a size "" to hide its Pay button (hold-only).
@@ -95,7 +95,10 @@
     drawChips(r); showDate(r);
     statusEl.textContent = "Loading spots…"; countEl.textContent = "Loading availability…";
     front.innerHTML = ""; back.innerHTML = ""; openNow = {}; if (!keepForm) { shell.hidden = true; pending = null; }
+    // Only the newest request draws (a link with ?route= and ?mail= starts two loads at once).
+    var my = ++loadSeq;
     fetch(API + "/api/spots?route=" + encodeURIComponent(r) + (mail ? "&mail=" + mail : "")).then(function (res) { if (!res.ok) throw 0; return res.json(); }).then(function (d) {
+      if (my !== loadSeq) return;
       fmt = d.format === "9x12" && F9 ? "9x12" : "11x6";
       front.classList.toggle("picker-9x12", fmt === "9x12"); back.classList.toggle("picker-9x12", fmt === "9x12");
       drawSizes();
@@ -115,6 +118,7 @@
       countEl.innerHTML = '<b>' + n + ' of ' + d.positions.length + '</b> spots taken on ' + LABELS[r] + (mail ? ", " + short(mail) + " card" : "");
       statusEl.textContent = LABELS[r] + ": tap an open spot to place your " + SIZES[size].name + " ad.";
     }).catch(function () {
+      if (my !== loadSeq) return;
       statusEl.textContent = "Couldn’t load live spot availability right now. Refresh to try again, or call (760) 422-5475.";
       countEl.textContent = "";
     });
