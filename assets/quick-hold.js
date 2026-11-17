@@ -17,6 +17,18 @@
   var PAY_PASS2 = "https://pay.coachellavalleyspotlight.com/b/8x29ATbYk4p80IgaMy9MY0J";  // 1 spot, 2 cards, 3 mailings: $1,650
   var PRICE = "$300", PASS_PRICE = "$825", PASS2_PRICE = "$1,650", PASS_N = 3, SIZE = "1 spot", DIMS = "2.7″ x 2.6″";
   var MAIL = window.CVS_MAILINGS || [];
+  // 9 x 12 cards (Jan 21, 2027 on, data/formats.js): four sizes, each ad is one spot. Medium is preselected.
+  var F9 = (window.CVS_FORMATS || {})["9x12"], FX = window.CVS_FMT || {}, PAY9 = FX.PAY_9x12 || {}, PASS9 = FX.PASS_9x12 || {}, size9 = "medium";
+  var wantSize9 = (location.search.match(/[?&]size=(large|medium|small|mini)\b/) || [])[1]; if (wantSize9) size9 = wantSize9;
+  function money(n) { return "$" + Number(n).toLocaleString("en-US"); }
+  function fmtOfMail(id, ml) { var m = MAIL.filter(function (x) { return x.route === id && x.mail === ml; })[0]; return FX.fmtOf ? FX.fmtOf(m) : "11x6"; }
+  // What's being bought on (route, card): label, size, price, pass price and pay links.
+  function offer(id, ml) {
+    if (fmtOfMail(id, ml) === "9x12" && F9) { var z = F9.sizes[size9]; return { nine: true, label: z.label, dims: z.dims, price: money(z.price), pass: money(z.pass), pass2: money(z.pass * 2), save: money(z.price * 3 - z.pass), pay: PAY9[size9] || "", payPass: PASS9[size9] || "", payPass2: size9 === "medium" ? PAY_PASS2 : "" }; }
+    return { nine: false, label: SIZE, dims: DIMS, price: PRICE, pass: PASS_PRICE, pass2: PASS2_PRICE, save: "$75", pay: PAY_1, payPass: PAY_PASS, payPass2: PAY_PASS2 };
+  }
+  // Open spots a hold can use on a card: on 9x12 only the chosen size.
+  function usable(id, ml) { var d = cardData(id, ml); if (!d) return []; return d.fmt === "9x12" ? d.open.filter(function (p) { return d.size[p] === size9; }) : d.open; }
   // Every route on the calendar, in calendar order (El Paseo and Sun City first, then the cities opened 2026-11-11).
   // town: the city a directory listing has to match for its route to be preselected.
   var ROUTES = [];
@@ -80,7 +92,8 @@
   // Live spots for every bookable card on both routes. data[route][mail] = { open: [spots], cats, taken }.
   function loadCard(id, ml) {
     return fetch(API + "/api/spots?route=" + id + "&mail=" + ml).then(function (x) { if (!x.ok) throw 0; return x.json(); }).then(function (d) {
-      (data[id] = data[id] || {})[ml] = { open: d.positions.filter(function (p) { return (p.status || "").toLowerCase() === "open"; }).map(function (p) { return p.position; }), cats: d.categories, taken: d.takenCategories || [] };
+      var sz = {}; d.positions.forEach(function (p) { if (p.size) sz[p.position] = p.size; });
+      (data[id] = data[id] || {})[ml] = { open: d.positions.filter(function (p) { return (p.status || "").toLowerCase() === "open"; }).map(function (p) { return p.position; }), cats: d.categories, taken: d.takenCategories || [], fmt: d.format === "9x12" ? "9x12" : "11x6", size: sz };
     });
   }
   var jobs = [];
@@ -99,11 +112,12 @@
   // The cards on a route where this category can still go, soonest first.
   function okCards(id, cat) { return cards(id).filter(function (m) { return openOn(id, m.mail, cat); }); }
   function openFor(id, cat) { return okCards(id, cat).length > 0; }
-  // A Season Pass starting at card ml: that card and the next PASS_N - 1, all open for the category, with one spot open on all.
-  function passCards(id, ml) { var c = cards(id), i = c.map(function (m) { return m.mail; }).indexOf(ml); return i < 0 || i + PASS_N > c.length ? null : c.slice(i, i + PASS_N); }
+  // A Season Pass starting at card ml: that card and the next PASS_N - 1 of the SAME format (never mixing 11 x 6 and 9 x 12),
+  // all open for the category, with one spot (of the chosen size, on 9x12) open on all.
+  function passCards(id, ml) { var f = fmtOfMail(id, ml), c = cards(id).filter(function (m) { return fmtOfMail(id, m.mail) === f; }), i = c.map(function (m) { return m.mail; }).indexOf(ml); return i < 0 || i + PASS_N > c.length ? null : c.slice(i, i + PASS_N); }
   function passSpot(id, ml, cat) {
     var pc = passCards(id, ml); if (!pc || !pc.every(function (m) { return openOn(id, m.mail, cat); })) return null;
-    var first = cardData(id, pc[0].mail).open;
+    var first = usable(id, pc[0].mail);
     for (var i = 0; i < first.length; i++) if (pc.every(function (m) { return cardData(id, m.mail).open.indexOf(first[i]) > -1; })) return first[i];
     return null;
   }
@@ -186,25 +200,35 @@
     if (!route) { mailsEl.innerHTML = ""; return; }
     var ok = okCards(route, cat);
     if (!mail || !openOn(route, mail, cat)) mail = (wantMail && openOn(route, wantMail, cat) ? wantMail : (ok[0] || {}).mail) || null;
+    if (mail && fmtOfMail(route, mail) === "9x12" && !usable(route, mail).length) { var dz = cardData(route, mail); size9 = F9.sizeOrder.filter(function (k) { return dz && dz.open.some(function (p) { return dz.size[p] === k; }); })[0] || size9; }
     var c = cards(route);
     var html = c.length > 1 ? '<p class="qh-mails-h">Which card?</p><div class="qh-mail-row">' + c.map(function (m) {
       var on = openOn(route, m.mail, cat), d = cardData(route, m.mail);
       var note = on ? d.open.length + (d.open.length === 1 ? " spot" : " spots") + " left" : d && d.taken.indexOf(cat) > -1 ? "taken" : "full";
       return '<button type="button" class="qh-mail' + (m.mail === mail ? " on" : "") + '" data-m="' + m.mail + '"' + (on ? "" : " disabled") + ' aria-pressed="' + (m.mail === mail) + '"><b>' + shortDate(m.mail) + "</b><span>" + esc(note) + "</span></button>";
     }).join("") + "</div>" : "";
+    var of = mail ? offer(route, mail) : offer(route, null);
+    if (mail && of.nine) {
+      var dd = cardData(route, mail);
+      html += '<p class="qh-mails-h">Ad size <span style="font-weight:400">(this card is the bigger 9 x 12)</span></p><div class="qh-mail-row qh-size-row">' + F9.sizeOrder.map(function (k) {
+        var z = F9.sizes[k], left = dd ? dd.open.filter(function (p) { return dd.size[p] === k; }).length : 0;
+        return '<button type="button" class="qh-mail' + (k === size9 ? " on" : "") + '" data-size9="' + k + '"' + (left ? "" : " disabled") + ' aria-pressed="' + (k === size9) + '"><b>' + z.label + " " + money(z.price) + "</b><span>" + z.dims + " · " + (left ? left + " left" : "full") + "</span></button>";
+      }).join("") + "</div>";
+    }
     var ps = mail && passSpot(route, mail, cat), pc = mail && passCards(route, mail);
     if (ps) {
-      html += '<label class="qh-pass"><input type="checkbox" id="qh-pass-on"' + (passOn ? " checked" : "") + '><span><b>Season Pass: ' + PASS_PRICE + ' for 3 mailings</b> (save $75). The same spot and your category locked on ' +
+      html += '<label class="qh-pass"><input type="checkbox" id="qh-pass-on"' + (passOn ? " checked" : "") + '><span><b>Season Pass: ' + of.pass + ' for 3 mailings</b> (save ' + of.save + '). The same spot and your category locked on ' +
         pc.map(function (m) { return shortDate(m.mail); }).join(", ") + ".</span></label>";
       // A second card for the same 3 dates: any other route where the category and a spot are open on all three.
       var others = passOn ? ROUTES.filter(function (r) { return r.id !== route && sameDates(r.id) && passSpot(r.id, mail, cat); }) : [];
       if (route2 && others.every(function (r) { return r.id !== route2; })) route2 = null;
-      if (others.length) html += '<div class="qh-pass2"><p><b>Add a second card</b> for ' + PASS2_PRICE + ' total (both cards, all 3 mailings):</p>' +
+      if (others.length) html += '<div class="qh-pass2"><p><b>Add a second card</b> for ' + of.pass2 + ' total (both cards, all 3 mailings):</p>' +
         others.map(function (r) { return '<label><input type="checkbox" name="qh-r2" value="' + r.id + '"' + (route2 === r.id ? " checked" : "") + "><span>" + esc(r.name) + " · " + esc(r.homes) + "</span></label>"; }).join("") + "</div>";
     } else { passOn = false; route2 = null; }
     if (!passOn) route2 = null;
     mailsEl.innerHTML = html;
-    mailsEl.querySelectorAll(".qh-mail").forEach(function (b) { b.addEventListener("click", function () { mail = b.getAttribute("data-m"); drawRoutes(); }); });
+    mailsEl.querySelectorAll(".qh-mail[data-m]").forEach(function (b) { b.addEventListener("click", function () { mail = b.getAttribute("data-m"); drawRoutes(); }); });
+    mailsEl.querySelectorAll("[data-size9]").forEach(function (b) { b.addEventListener("click", function () { size9 = b.getAttribute("data-size9"); ga("quick_hold_size", { size: size9 }); drawRoutes(); }); });
     var cb = mailsEl.querySelector("#qh-pass-on"); if (cb) cb.addEventListener("change", function () { passOn = cb.checked; ga("season_pass_toggle", { on: passOn, route: route }); drawMails(); });
     // Only one extra card ("1 spot 2 cards"): ticking one unticks the others.
     mailsEl.querySelectorAll("[name=qh-r2]").forEach(function (x) { x.addEventListener("change", function () { route2 = x.checked ? x.value : null; ga("season_pass_2card", { on: !!route2, route: route, route2: route2 || "" }); drawMails(); }); });
@@ -212,10 +236,10 @@
   // The second route's pass uses the same 3 dates, so both cards share one checkout.
   function sameDates(id) { var a = passCards(route, mail), b = passCards(id, mail); return !!(a && b) && a.every(function (m, i) { return b[i].mail === m.mail; }); }
   function chosen() {
-    var cat = catSel.value, pc = passOn && passCards(route, mail), ps = pc && passSpot(route, mail, cat);
-    if (!ps) return { pass: false, mails: [mail], price: PRICE, pos: null, extra: null };
+    var cat = catSel.value, pc = passOn && passCards(route, mail), ps = pc && passSpot(route, mail, cat), of = offer(route, mail);
+    if (!ps) return { pass: false, mails: [mail], price: of.price, pos: null, extra: null, of: of, link: of.pay };
     var mails = pc.map(function (m) { return m.mail; }), ps2 = route2 && sameDates(route2) && passSpot(route2, mail, cat);
-    return { pass: true, mails: mails, price: ps2 ? PASS2_PRICE : PASS_PRICE, pos: ps, extra: ps2 ? { route: route2, pos: ps2 } : null };
+    return { pass: true, mails: mails, price: ps2 ? of.pass2 : of.pass, pos: ps, extra: ps2 ? { route: route2, pos: ps2 } : null, of: of, link: ps2 ? of.payPass2 : of.payPass };
   }
 
   function go(n, first) {
@@ -227,8 +251,8 @@
     if (n === 3) {
       var r = route0(route), c = chosen();
       summary.innerHTML = "<b>" + esc(bizIn.value.trim()) + "</b> · " + esc(catSel.value) + "<br>" + esc(r.name) + (c.extra ? " + " + esc(route0(c.extra.route).name) : ", " + esc(r.homes)) + " · " +
-        (c.pass ? "Season Pass: " + c.mails.map(shortDate).join(", ") + " mailings" : shortDate(mail) + " card") + " · " + SIZE + " (" + DIMS + ") · " + c.price;
-      var payBtn = $("#qh-pay"), canPay = c.extra ? !!PAY_PASS2 : c.pass ? !!PAY_PASS : !!PAY_1;
+        (c.pass ? "Season Pass: " + c.mails.map(shortDate).join(", ") + " mailings" : shortDate(mail) + " card") + " · " + c.of.label + " (" + c.of.dims + ") · " + c.price;
+      var payBtn = $("#qh-pay"), canPay = !!c.link;
       payBtn.hidden = !canPay; payBtn.textContent = "Pay " + c.price + " and lock it in";
       $("#qh-hold").textContent = c.pass ? "Hold my Season Pass free, invoice me" : "Hold my spot free, invoice me";
     }
@@ -248,13 +272,13 @@
     btns.forEach(function (b) { b.disabled = true; });
     msg.textContent = payNow ? "Holding your spot, then taking you to secure checkout…" : "Holding your spot…";
     var ref = (window.CVS_REF && window.CVS_REF()) || "";
-    var base = { route: route, size: SIZE, category: catSel.value, name: form.name.value.trim(), business: bizIn.value.trim(), email: form.email.value.trim(), phone: form.phone.value.trim() };
+    var base = { route: route, size: offer(route, mail).label, category: catSel.value, name: form.name.value.trim(), business: bizIn.value.trim(), email: form.email.value.trim(), phone: form.phone.value.trim() };
     function attempt(tries) {
-      var c = chosen(), pos = c.pass ? c.pos : (cardData(route, mail) || { open: [] }).open[0];
+      var c = chosen(), pos = c.pass ? c.pos : usable(route, mail)[0];
       if (!pos) { fail("That card just filled up. Call (760) 422-5475 and we’ll find you a spot."); return; }
-      var p = Object.assign({}, base, { position: pos, positions: [pos], price: c.price, pass: c.pass, mails: c.mails, mail: c.mails[0], extra: c.extra,
+      var p = Object.assign({}, base, { position: pos, positions: [pos], price: c.price, link: c.link, passPrice: c.of.pass, pass: c.pass, mails: c.mails, mail: c.mails[0], extra: c.extra,
         notes: (c.pass ? "Quick hold, SEASON PASS " + (c.extra ? "2 cards (" + route + " + " + c.extra.route + ") " : "") + c.mails.join(" + ") + " (" + c.price + ")" : "Quick hold") + (listing ? " (directory listing: " + (listing.slug || listing.name) + ")" : "") + (ref ? " [Referred by: " + ref + "]" : "") });
-      var body = Object.assign({}, p); delete body.extra; if (!c.pass) delete body.mails;
+      var body = Object.assign({}, p); delete body.extra; delete body.link; delete body.passPrice; if (!c.pass) delete body.mails;
       fetch(API + "/api/reserve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
         .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, status: res.status, d: d }; }); })
         .then(function (r) {
@@ -265,15 +289,15 @@
               .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, d: d }; }); })
               .then(function (r2) {
                 if (r2.ok) return held(p, payNow);
-                p.extra = null; p.price = PASS_PRICE;
+                p.extra = null; p.price = p.passPrice; p.link = c.of.payPass;
                 held(p, false);
-                msg.textContent = ""; done.insertAdjacentHTML("afterbegin", '<p class="qh-warn"><b>Heads up:</b> ' + esc(route0(c.extra.route).name) + " just filled for " + esc(catSel.value) + ", so we held your Season Pass on " + esc(route0(route).name) + " only (" + PASS_PRICE + "). We’ll email you about the other card.</p>");
+                msg.textContent = ""; done.insertAdjacentHTML("afterbegin", '<p class="qh-warn"><b>Heads up:</b> ' + esc(route0(c.extra.route).name) + " just filled for " + esc(catSel.value) + ", so we held your Season Pass on " + esc(route0(route).name) + " only (" + esc(p.passPrice) + "). We’ll email you about the other card.</p>");
               });
           }
           if (r.ok) return held(p, payNow);
           if (r.status === 409 && tries > 0) return Promise.all(c.mails.map(function (ml) { return loadCard(route, ml); })).then(function () {
             if (!c.pass) cardData(route, mail).open = cardData(route, mail).open.filter(function (x) { return x !== pos; });
-            if (!openOn(route, mail, catSel.value) || (c.pass && !passSpot(route, mail, catSel.value))) return fail((r.d && r.d.error) || "That just got taken. Go back and pick another card.");
+            if (!openOn(route, mail, catSel.value) || (!c.pass && !usable(route, mail).length) || (c.pass && !passSpot(route, mail, catSel.value))) return fail((r.d && r.d.error) || "That just got taken. Go back and pick another card.");
             attempt(tries - 1);
           });
           fail((r.d && r.d.error) || "Something went wrong. Please try again, or call (760) 422-5475.");
@@ -286,7 +310,7 @@
 
   // Stripe client_reference_id (letters, digits, - and _ only). Two cards: two segments joined by "__AND__".
   function payUrl(p) {
-    var link = p.extra ? PAY_PASS2 : p.pass ? PAY_PASS : PAY_1; if (!link) return "";
+    var link = p.link; if (!link) return "";
     var ref = p.route + "__" + p.mails.join("_") + "__" + p.position;
     if (p.extra) ref += "__AND__" + p.extra.route + "__" + p.mails.join("_") + "__" + p.extra.pos;
     return link + "?client_reference_id=" + encodeURIComponent(ref);
@@ -309,7 +333,7 @@
     done.innerHTML = '<p class="qh-check" aria-hidden="true">✓</p><h3>' + (p.extra ? "Your Season Pass on both cards is held." : "Spot " + p.position + " on " + esc(r.name) + (p.pass ? " is yours for all 3 mailings." : " is yours.")) + "</h3>" +
       (p.extra ? "<p>" + esc(where) + ".</p>" : "") +
       "<p>We’re holding it" + (p.pass ? " on the " + esc(when) + ". Your category is locked on all three" : m ? " until " + shortDate(m.deadline) + ", the artwork date" : "") + ". No payment yet.</p>" +
-      '<ol><li><b>Today:</b> we email ' + esc(p.email) + " to confirm.</li><li><b>Within a day:</b> send us your logo and offer. We design the ad.</li><li><b>You approve it</b>, pay the invoice" + (p.pass ? " (" + PASS_PRICE + ")" : "") + ", and it mails " + (p.pass ? "on each date" : m ? shortDate(m.mail) : "") + ".</li></ol>" +
+      '<ol><li><b>Today:</b> we email ' + esc(p.email) + " to confirm.</li><li><b>Within a day:</b> send us your logo and offer. We design the ad.</li><li><b>You approve it</b>, pay the invoice" + (p.pass ? " (" + esc(p.price) + ")" : "") + ", and it mails " + (p.pass ? "on each date" : m ? shortDate(m.mail) : "") + ".</li></ol>" +
       (pay ? '<p><a class="btn" href="' + pay + '">Pay ' + esc(p.price) + " now instead</a></p>" : "");
     done.hidden = false; done.setAttribute("tabindex", "-1"); done.focus();
     p.mails.forEach(function (ml) { loadCard(p.route, ml); if (p.extra) loadCard(p.extra.route, ml); });
