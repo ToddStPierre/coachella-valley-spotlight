@@ -40,7 +40,7 @@
   };
   // Stripe Payment Links per 9x12 size. "" = hold-and-invoice only. Each link redirects to /reserve?paid=1.
   var PAY_9x12 = {
-    large: "",
+    large: "https://pay.coachellavalleyspotlight.com/b/00wdR9e6scVE4YwdYK9MY0N",
     medium: "https://pay.coachellavalleyspotlight.com/b/4gM3cvgeAcVE0Igg6S9MY0M",
     small: "https://pay.coachellavalleyspotlight.com/b/9B6eVdbYk9JsaiQg6S9MY0L",
     mini: "https://pay.coachellavalleyspotlight.com/b/9B6fZhe6s1cWez63k69MY0K"
