@@ -33,13 +33,21 @@
     var profit = inc - exp;
 
     // Spots
-    var sold = 0, min = 0, split = "", routes = st.board && st.board.routes;
+    // 9 x 12 cards (Jan 21, 2027 on) count dollars sold against minDollars; 11 x 6 cards count spots against minSold.
+    var sold = 0, min = 0, mixed = false, split = "", routes = st.board && st.board.routes, bcards = (st.board && st.board.cards) || [], FX = window.CVS_FMT;
+    function listFor(m) { var c = bcards.filter(function (x) { return x.route === m.route && x.mail === m.mail; })[0]; return c ? c.spots : routes && routes[m.route]; }
+    function prog(m) {
+      var list = listFor(m), nine = FX && FX.fmtOf(m) === "9x12";
+      if (!list) return { s: 0, ratio: 0, txt: "–", nine: nine };
+      var s = list.filter(function (r) { return r.status === "Sold"; }).length;
+      if (nine) { var d = FX.soldDollars("9x12", list), md = m.minDollars || 2500; return { s: s, ratio: d / md, txt: "$" + d.toLocaleString("en-US") + "/$" + md.toLocaleString("en-US"), nine: true }; }
+      return { s: s, ratio: s / (m.minSold || 8), txt: s + "/" + (m.minSold || 8), nine: false };
+    }
     mailings.forEach(function (m, i) {
-      var list = routes && routes[m.route]; min += m.minSold || 8;
-      var s = list ? list.filter(function (r) { return r.status === "Sold"; }).length : 0; sold += s;
-      split += '<span title="' + esc(m.name) + ": " + s + ' sold" style="width:' + (100 / Math.max(1, mailings.length)) * Math.min(1, s / (m.minSold || 8)) + "%;background:" + (i ? "var(--hq-gold)" : "var(--hq-green)") + '"></span>';
+      var pr = prog(m); sold += pr.s; if (pr.nine) mixed = true; else min += m.minSold || 8;
+      split += '<span title="' + esc(m.name) + ": " + esc(pr.txt) + ' sold" style="width:' + (100 / Math.max(1, mailings.length)) * Math.min(1, pr.ratio) + "%;background:" + (i ? "var(--hq-gold)" : "var(--hq-green)") + '"></span>';
     });
-    var cardsLine = mailings.map(function (m) { var list = routes && routes[m.route]; return esc(m.name.replace(" Palm Desert", "")) + " " + (list ? list.filter(function (r) { return r.status === "Sold"; }).length : "–") + "/" + (m.minSold || 8); }).join(" · ");
+    var cardsLine = mailings.map(function (m) { return esc(m.name.replace(" Palm Desert", "")) + " " + esc(prog(m).txt); }).join(" · ");
 
     var h = new Date().getHours(), hi = h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
     var greet = document.querySelector(".hq-head h1"); if (greet && document.body.dataset.sec === "overview") greet.textContent = hi + ", Todd";
@@ -52,7 +60,7 @@
       kpi({ dark: true, icon: ic.money, label: "Postcard income · this mailing", href: "#mailings",
         value: st.lines ? HQ.money(inc) : "—",
         sub: st.lines ? "Costs " + HQ.money(exp) + " · " + (profit >= 0 ? '<span class="pos">+' + HQ.money(profit) + " profit</span>" : '<span class="neg">' + HQ.money(profit) + " to break even</span>") + (missing ? " · " + missing + " amount" + (missing > 1 ? "s" : "") + " missing" : "") : "Loading…" }) +
-      kpi({ icon: ic.card, label: "Spots sold", href: "#board", value: routes ? sold + '<span style="font-size:18px;color:var(--hq-ink-3)"> / ' + min + "</span>" : "—", sub: routes ? cardsLine : "Loading…", extra: '<div class="ov-split">' + split + "</div>" }) +
+      kpi({ icon: ic.card, label: "Spots sold", href: "#board", value: routes ? sold + (mixed ? "" : '<span style="font-size:18px;color:var(--hq-ink-3)"> / ' + min + "</span>") : "—", sub: routes ? cardsLine : "Loading…", extra: '<div class="ov-split">' + split + "</div>" }) +
       kpi({ icon: ic.list, label: "Directory listings", href: "#listings", value: (dir.length - places).toLocaleString(), sub: premium + " Premium · " + postcard + " on the postcard · " + claimed + " claimed" + (places ? " · plus " + places + " public places" : "") }) +
       kpi({ icon: ic.eye, label: "Visitors today", value: st.vis ? (st.vis.today || 0).toLocaleString() : "—", sub: st.vis ? (st.vis.month || 0).toLocaleString() + " visits this month" : "Loading…" }) +
       "</div>" +

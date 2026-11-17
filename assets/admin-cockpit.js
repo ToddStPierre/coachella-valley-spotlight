@@ -87,17 +87,24 @@
       var st = function (p) { return (p.status || "").toLowerCase(); };
       var sold = d.positions.filter(function (p) { return st(p) === "sold"; }).length, pend = d.positions.filter(function (p) { return st(p) === "pending"; }).length;
       var need = Math.max(0, (m.minSold || 0) - sold), total = d.positions.length, left = days(m.deadline);
+      // 9 x 12 card: confirmed by dollars sold (list price) against minDollars, out of $5,300 for a full card. usd() takes cents.
+      var nine = d.format === "9x12", soldD = nine ? (d.soldDollars || 0) : 0, minD = nine ? (d.minDollars || m.minDollars || 2500) : 0, needD = Math.max(0, minD - soldD);
+      var pendD = nine ? d.positions.filter(function (p) { return st(p) === "pending"; }).reduce(function (n, p) { return n + ((window.CVS_FMT && window.CVS_FMT.spotPrice("9x12", p.position)) || 0); }, 0) : 0;
+      if (nine) need = needD ? Math.ceil(needD * 100 / SPOT) : 0;
       var taken = d.positions.filter(function (p) { return p.category && st(p) !== "open"; }).map(function (p) { return p.category; });
       open[m.route] = (d.categories || []).filter(function (c) { return taken.indexOf(c) < 0; });
       var t = money[m.route + ":" + m.mail], gap = t ? t.exp - t.inc : 0, be = gap > 0 ? Math.ceil(gap / SPOT) : 0, openN = total - sold - pend;
       race.push({ m: m, need: need, left: left, be: be, gap: gap, has: !!t, open: openN });
       var pace = need && left > 0 ? (need > left ? "<b>" + (Math.round(need / left * 10) / 10) + " sales a day</b> to make it" : "<b>1 sale every " + (Math.round(left / need * 10) / 10) + " days</b> to make it") : "";
       var beLine = !t ? "" : gap > 0 ? "Break-even: <b>" + be + " more sold</b> (" + usd(gap) + " to cover costs)" : "&#10003; Costs covered, " + usd(-gap) + " profit so far" + (openN ? ". Every open spot is profit." : "");
-      var mark = m.minSold ? '<i class="ck-min" style="left:' + (m.minSold / total * 100) + '%" title="Needed to mail"></i>' : "";
+      var mark = nine ? '<i class="ck-min" style="left:' + (minD / 5300 * 100) + '%" title="Needed to mail"></i>' : m.minSold ? '<i class="ck-min" style="left:' + (m.minSold / total * 100) + '%" title="Needed to mail"></i>' : "";
+      if (nine) pace = needD && left > 0 ? "<b>" + usd(Math.ceil(needD / left) * 100) + " a day</b> in sales to make it" : "";
       return '<div class="ck-card' + (need ? "" : " ck-ok") + '"><div class="ck-card-top"><b>' + esc(m.name) + '</b><span>' + (left < 0 ? "Booking closed" : left === 0 ? "Last day to book" : left + " " + pl(left, "day", "days") + " to book") + '</span></div>' +
-        '<div class="ck-meter" role="img" aria-label="' + sold + ' sold, ' + pend + ' pending, ' + total + ' spots"><i class="ck-sold" style="width:' + (sold / total * 100) + '%"></i><i class="ck-pend" style="width:' + (pend / total * 100) + '%"></i>' + mark + '</div>' +
+        '<div class="ck-meter" role="img" aria-label="' + sold + ' sold, ' + pend + ' pending, ' + total + ' spots"><i class="ck-sold" style="width:' + (nine ? soldD / 5300 * 100 : sold / total * 100) + '%"></i><i class="ck-pend" style="width:' + (nine ? pendD / 5300 * 100 : pend / total * 100) + '%"></i>' + mark + '</div>' +
         '<p class="ck-line"><b>' + sold + '</b> sold &middot; <b>' + pend + '</b> pending &middot; ' + (total - sold - pend) + ' open of ' + total + '</p>' +
-        '<p class="ck-need">' + (need ? "Needs <b>" + need + " more sold</b> to mail on " + nice(m.mail) + (pend ? " (" + pend + " pending would get it to " + (sold + pend) + ")" : "") : "&#10003; Minimum met. Mails " + nice(m.mail)) + '</p>' +
+        (nine ? '<p class="ck-line"><b>' + usd(soldD * 100) + '</b> of ' + usd(minD * 100) + ' sold (9 x 12 card)</p>' : "") +
+        '<p class="ck-need">' + (nine ? (needD ? "Needs <b>" + usd(needD * 100) + " more sold</b> to mail on " + nice(m.mail) + (pendD ? " (" + usd(pendD * 100) + " pending)" : "") : "&#10003; Minimum met. Mails " + nice(m.mail))
+          : need ? "Needs <b>" + need + " more sold</b> to mail on " + nice(m.mail) + (pend ? " (" + pend + " pending would get it to " + (sold + pend) + ")" : "") : "&#10003; Minimum met. Mails " + nice(m.mail)) + '</p>' +
         (beLine ? '<p class="ck-need ck-be">' + beLine + '</p>' : "") + (pace ? '<p class="ck-need ck-pace">' + pace + '</p>' : "") +
         '<details class="ck-open"><summary>' + open[m.route].length + ' categories still open</summary><p>' + open[m.route].map(esc).join(" &middot; ") + '</p></details></div>';
     }).join("");

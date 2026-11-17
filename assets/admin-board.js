@@ -12,6 +12,10 @@
   document.getElementById("st-out").before(box);
 
   var PRICES = { 1: 30000, 2: 55000, 4: 100000, 8: 200000 };
+  // 9 x 12 cards (Jan 21, 2027 on): 19 fixed spots in four sizes, confirmed by dollars sold (data/formats.js).
+  var F9 = (window.CVS_FORMATS || {})["9x12"], FX = window.CVS_FMT || {};
+  function fmtOfCard(c, m) { return (c && c.format) === "9x12" || (m && m.format === "9x12") ? "9x12" : "11x6"; }
+  function listPrice(fmt, positions) { return fmt === "9x12" ? (FX.spotPrice("9x12", positions[0]) || 0) * 100 : PRICES[positions.length]; }
   var SIZE_NAME = { 1: "1 spot", 2: "2 spots, side by side", 4: "4 spots (2×2 block)", 8: "Full side (8 spots)" };
   var st = { routes: null, cards: [], view: null, cats: [], live: false, sel: null };
   var mailings = window.CVS_MAILINGS || [];
@@ -38,8 +42,8 @@
         st.routes = {}; st.cards = []; st.live = false;
         res.forEach(function (x) {
           st.cats = x[1].categories || st.cats;
-          var spots = (x[1].positions || []).map(function (p) { return { position: p.position, status: p.status || "open", category: p.category }; });
-          st.cards.push({ route: x[0].route, mail: x[1].mail || x[0].mail, deadline: x[0].deadline, spots: spots });
+          var spots = (x[1].positions || []).map(function (p) { return { position: p.position, status: p.status || "open", category: p.category, size: p.size }; });
+          st.cards.push({ route: x[0].route, mail: x[1].mail || x[0].mail, deadline: x[0].deadline, format: x[1].format, minDollars: x[1].minDollars, soldDollars: x[1].soldDollars, spots: spots });
           if (!st.routes[x[0].route]) st.routes[x[0].route] = spots;
         });
       });
@@ -65,14 +69,27 @@
   }
   function tileHtml(route, mail, t) {
     var r = t.r, cls = isSold(r) ? "sold" : isPend(r) ? "pending" : "open";
-    var label = t.block.length > 1 ? "Spots " + t.block[0] + "–" + t.block[t.block.length - 1] : "Spot " + r.position;
+    var label = t.size ? t.size + " · Spot " + r.position : t.block.length > 1 ? "Spots " + t.block[0] + "–" + t.block[t.block.length - 1] : "Spot " + r.position;
     var biz = cls === "open" ? "Open" : (r.business || (st.live ? "(no name)" : r.category || "Taken"));
     return '<button type="button" class="bd-spot ' + cls + (st.sel === route + ":" + mail + ":" + t.block[0] ? " sel" : "") + '" style="grid-column:' + (t.col + 1) + " / span " + t.cols + ";grid-row:" + (t.row + 1) + " / span " + t.rows + '" data-route="' + route + '" data-mail="' + mail + '" data-pos="' + t.block[0] + '">' +
       '<span class="n">' + label + '</span><i class="st"></i><span class="biz">' + esc(biz) + "</span>" + (cls !== "open" && r.category ? '<span class="cat">' + esc(r.category) + "</span>" : '<span class="cat">' + (cls === "open" ? "Click to hold" : "") + "</span>") + "</button>";
   }
+  // The 9 x 12 card: each spot where it sits on the printed card (3 across; rows are half a Medium tall).
+  function sides9(route, mail, list) {
+    var byPos = {}; list.forEach(function (r) { byPos[r.position] = r; });
+    return ["front", "back"].map(function (side) {
+      var head = side === "front" ? '<div class="bd-spot" style="grid-column:1 / span 3;grid-row:1;background:var(--hq-ink, #1f2a2a);color:#fff;cursor:default"><span class="n">Masthead + postal block</span></div>' : "";
+      return '<div class="bd-side"><div class="bd-side-label"><span>' + (side === "front" ? "Front" : "Back") + "</span><span>Spots " + (side === "front" ? "1–7" : "8–19") + '</span></div><div class="bd-grid" style="grid-template-columns:repeat(3,1fr);grid-auto-rows:minmax(44px,auto)">' + head +
+        F9.map.filter(function (s) { return s.side === side; }).map(function (s) {
+          var r = byPos[s.pos] || { position: s.pos, status: "open" };
+          var t = { r: r, block: [s.pos], col: s.col - 1, row: s.row, cols: s.colSpan, rows: s.rowSpan, size: F9.sizes[s.size].label };
+          return tileHtml(route, mail, t);
+        }).join("") + "</div></div>";
+    }).join("");
+  }
   function draw() {
     var html = '<div class="bd-tools"><div class="bd-legend"><span><i style="background:var(--hq-green)"></i>Sold (paid)</span><span><i style="background:var(--hq-gold)"></i>Held, waiting on payment</span><span><i style="background:#ddd2c3"></i>Open</span></div>' +
-      '<span class="bd-note">Prices: 1 spot $300 · 2 spots $550 · 2×2 block $1,000 · full side $2,000</span></div>' +
+      '<span class="bd-note">' + (st.cards.some(function (c) { return c.mail === st.view && fmtOfCard(c) === "9x12"; }) ? "9 x 12 prices: Large $500 · Medium $300 · Small $150 · Mini $100 · mails at $2,500 sold" : "Prices: 1 spot $300 · 2 spots $550 · 2×2 block $1,000 · full side $2,000") + "</span></div>" +
       (st.live ? "" : '<div class="bd-warn"><b>Read-only for now.</b> Names and spot editing turn on once the reservations Worker update is deployed. Until then this shows what the public board shows.</div>');
     var ds = dates();
     if (ds.length > 1) html += '<div class="bd-mails" role="tablist" aria-label="Which mailing">' + ds.map(function (d) {
@@ -80,16 +97,19 @@
       return '<button type="button" role="tab" class="hq-btn ' + (d === st.view ? "" : "ghost ") + 'sm" data-view="' + d + '" aria-selected="' + (d === st.view) + '">Mails ' + fmtDay(d) + ' <span style="opacity:.75">· ' + sold + " sold</span></button>";
     }).join("") + "</div>";
     html += '<div class="bd-wrap">' + st.cards.filter(function (c) { return c.mail === st.view; }).map(function (c) {
-      var route = c.route, list = c.spots, m = mailingOf(route, c.mail);
+      var route = c.route, list = c.spots, m = mailingOf(route, c.mail), fmt = fmtOfCard(c, m);
       var sold = list.filter(isSold).length, pend = list.filter(isPend).length, open = list.length - sold - pend;
+      var soldD = fmt === "9x12" ? FX.soldDollars("9x12", list) : 0, minD = c.minDollars || m.minDollars || 2500;
       var income = list.reduce(function (n, r) { return n + (isSold(r) && r.paid && r.paid.amount ? r.paid.amount : 0); }, 0);
       var left = daysTo(m.deadline);
       return '<section class="bd-route"><div class="bd-head"><div><h2>' + esc(m.name) + "</h2><p>" + esc(m.homes || "") + (m.mail ? " · mails " + fmtDay(m.mail) : "") + (m.deadline ? " · artwork due " + fmtDay(m.deadline) + (left != null && left >= 0 ? " (" + left + (left === 1 ? " day" : " days") + ")" : " (closed)") : "") + "</p></div>" +
-        '<div class="bd-stats"><div><b>' + sold + '<span style="font-size:14px;color:var(--hq-ink-3);text-transform:none;letter-spacing:0"> / ' + (m.minSold || 8) + "</span></b><span>Sold</span></div><div><b>" + pend + "</b><span>Held</span></div><div><b>" + open + "</b><span>Open</span></div>" +
+        '<div class="bd-stats">' + (fmt === "9x12"
+          ? '<div><b>' + HQ.money(soldD * 100) + '<span style="font-size:14px;color:var(--hq-ink-3);text-transform:none;letter-spacing:0"> / ' + HQ.money(minD * 100) + "</span></b><span>" + (soldD >= minD ? "Sold · confirmed" : "Sold · " + HQ.money((minD - soldD) * 100) + " to go") + "</span></div>"
+          : '<div><b>' + sold + '<span style="font-size:14px;color:var(--hq-ink-3);text-transform:none;letter-spacing:0"> / ' + (m.minSold || 8) + "</span></b><span>Sold</span></div>") + "<div><b>" + pend + "</b><span>Held</span></div><div><b>" + open + "</b><span>Open</span></div>" +
         (st.live ? "<div><b>" + HQ.money(income) + "</b><span>Paid on board</span></div>" : "") + "</div></div>" +
-        '<div class="bd-sides">' + [0, 1].map(function (side) {
+        '<div class="bd-sides">' + (fmt === "9x12" ? sides9(route, c.mail, list) : [0, 1].map(function (side) {
           return '<div class="bd-side"><div class="bd-side-label"><span>' + (side ? "Back" : "Front") + "</span><span>Spots " + (side ? "9–16" : "1–8") + '</span></div><div class="bd-grid">' + tiles(list, side).map(function (t) { return tileHtml(route, c.mail, t); }).join("") + "</div></div>";
-        }).join("") + "</div></section>";
+        }).join("")) + "</div></section>";
     }).join("") + "</div>";
     box.innerHTML = html;
     if (window.HQ_BOARD_CHANGED) window.HQ_BOARD_CHANGED(st);
@@ -122,12 +142,12 @@
   }
 
   function openSpot(route, mail, pos) {
-    var list = listOf(route, mail), r = list[pos - 1] || { position: pos, status: "open" }, m = mailingOf(route, mail);
+    var list = listOf(route, mail), r = list[pos - 1] || { position: pos, status: "open" }, m = mailingOf(route, mail), fmt = fmtOfCard(cardOf(route, mail), m);
     var block = (r.status !== "open" && Array.isArray(r.block) && r.block.length > 1) ? r.block.slice().sort(function (a, b) { return a - b; }) : [pos];
     var open = r.status === "open", cls = isSold(r) ? "sold" : isPend(r) ? "pending" : "open";
     st.sel = route + ":" + mail + ":" + block[0]; draw();
-    var label = block.length > 1 ? "Spots " + block.join(", ") : "Spot " + pos;
-    var shapes = open ? shapesFor(route, mail, pos) : [block];
+    var label = (fmt === "9x12" ? F9.sizes[FX.spotSize("9x12", pos)].label + " · " : "") + (block.length > 1 ? "Spots " + block.join(", ") : "Spot " + pos);
+    var shapes = open && fmt !== "9x12" ? shapesFor(route, mail, pos) : [block];
     var paidAmt = r.paid && r.paid.amount != null ? (r.paid.amount / 100) : "";
     var body = "";
     if (!open) {
@@ -148,9 +168,10 @@
       '<label class="hq-f">Category<select name="category">' + catOptions(route, mail, r.category, block) + "</select><small>One business per category on each card.</small></label>" +
       '<div class="hq-row"><label class="hq-f">Contact name<input name="name" value="' + esc(r.name || "") + '"></label><label class="hq-f">Phone<input name="phone" type="tel" value="' + esc(r.phone || "") + '"></label></div>' +
       '<label class="hq-f">Email<input name="email" type="email" value="' + esc(r.email || "") + '"></label>' +
-      '<label class="hq-f">Amount paid ($)<input name="amount" inputmode="decimal" value="' + esc(paidAmt) + '" placeholder="' + (PRICES[block.length] / 100) + '"><small>Only saved when the spot is Sold. Use what they really paid (e.g. 250 for the intro rate).</small></label>' +
+      '<label class="hq-f">Amount paid ($)<input name="amount" inputmode="decimal" value="' + esc(paidAmt) + '" placeholder="' + (listPrice(fmt, block) / 100) + '"><small>Only saved when the spot is Sold. Use what they really paid (e.g. 250 for the intro rate).</small></label>' +
       '<label class="hq-f">Note<textarea name="note" rows="2" placeholder="Artwork status, how they paid, anything to remember">' + esc(r.note || "") + "</textarea></label></fieldset>";
-    var later = st.cards.filter(function (c) { return c.route === route && c.mail !== mail; }).map(function (c) { return c.mail; }).sort();
+    // Moves only go to a card of the same format (11 x 6 and 9 x 12 spots don't line up).
+    var later = st.cards.filter(function (c) { return c.route === route && c.mail !== mail && fmtOfCard(c, mailingOf(route, c.mail)) === fmt; }).map(function (c) { return c.mail; }).sort();
     if (!open && later.length) body += '<fieldset class="hq-fs"><legend>Move to another card</legend><div class="hq-row"><label class="hq-f">Card<select name="moveto">' +
       later.map(function (d) { return '<option value="' + d + '">Mails ' + fmtDay(d) + "</option>"; }).join("") + '</select><small>Same spot number and category on that card. The old record is kept as a backup.</small></label>' +
       '<div class="hq-f" style="align-self:end"><button type="button" class="hq-btn ghost" data-op="move">Move it</button></div></div></fieldset>';
@@ -191,7 +212,7 @@
           var f = {}; ["business", "category", "name", "phone", "email", "amount", "note"].forEach(function (k) { f[k] = d.querySelector("[name=" + k + "]").value.trim(); });
           if (op !== "release" && !f.business) { msg.className = "hq-msg err"; msg.textContent = "Add the business name."; return; }
           if (op !== "release" && !f.category) { msg.className = "hq-msg err"; msg.textContent = "Pick a category."; return; }
-          if (op === "sold" && f.amount === "") f.amount = String(PRICES[positions.length] / 100);
+          if (op === "sold" && f.amount === "") f.amount = String(listPrice(fmt, positions) / 100);
           [].forEach.call(d.querySelectorAll(".hq-dr-foot button"), function (x) { x.disabled = true; });
           msg.className = "hq-msg"; msg.textContent = "Saving…";
           HQ.post(HQ.SPOTS, "/api/admin/spot", { route: route, mail: mail, positions: positions, op: op, fields: op === "release" ? {} : f }).then(function () {
