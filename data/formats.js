@@ -46,7 +46,7 @@
     mini: "https://pay.coachellavalleyspotlight.com/b/9B6fZhe6s1cWez63k69MY0K"
   };
   // Season Pass (3 mailings, 1 card) links per size. The Medium pass is the existing $825 link.
-  var PASS_9x12 = { large: "", medium: "https://pay.coachellavalleyspotlight.com/b/5kQdR98M8cVE4Yw8Eq9MY0I", small: "", mini: "" };
+  var PASS_9x12 = { large: "https://pay.coachellavalleyspotlight.com/b/4gMfZhe6s5tcez63k69MY0O", medium: "https://pay.coachellavalleyspotlight.com/b/5kQdR98M8cVE4Yw8Eq9MY0I", small: "https://pay.coachellavalleyspotlight.com/b/8x24gzgeAbRAaiQ5se9MY0P", mini: "https://pay.coachellavalleyspotlight.com/b/6oUdR9d2o4p88aI3k69MY0Q" };
 
   function st(p) { return String((p && p.status) || "open").toLowerCase(); }
   function fmtOf(m) { return m && m.format === "9x12" ? "9x12" : "11x6"; }
