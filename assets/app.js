@@ -509,17 +509,20 @@
 
   // Mobile app-style tab bar: a persistent bottom nav (Home / Events / Deals / Directory) on
   // every page on a phone, so the four things people actually come back for are always one thumb-tap
-  // away instead of buried behind the hamburger menu. Site-wide, not per-page — this is how the whole
-  // site should feel on a phone. Skipped on business profiles, which already dock Call/Directions there.
+  // away instead of buried behind the hamburger menu. Skipped on business profiles, which already dock
+  // Call/Directions there, and on the home page (2026-11-17), where the Valley Stories row does the same job.
+  // Dark bar with line icons (restyled 2026-11-17; the old version used emoji).
   (function () {
     if (document.body.classList.contains("has-sticky-cta")) return;
     var p = location.pathname;
+    if (document.getElementById("valley-stories")) return;
     function on(re) { return re.test(p); }
+    var svg = function (d) { return '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + d + "</svg>"; };
     var tabs = [
-      { href: "", label: "Home", icon: "🏠", active: p === "/" || p === "/index.html" },
-      { href: "events", label: "Events", icon: "🎉", active: on(/\/(events|event|this-weekend)(\/|\.html|$)/) },
-      { href: "deals", label: "Deals", icon: "🏷️", active: on(/\/deals(\/|\.html|$)/) },
-      { href: "directory", label: "Directory", icon: "📒", active: on(/\/(directory|business)(\/|\.html|$)/) }
+      { href: "", label: "Home", icon: svg('<path d="M3.5 10.5 12 4l8.5 6.5"/><path d="M5.5 9v10.5h4.5v-6h4v6h4.5V9"/>'), active: p === "/" || p === "/index.html" },
+      { href: "events", label: "Events", icon: svg('<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle cx="12" cy="15" r="1.6" fill="currentColor" stroke="none"/>'), active: on(/\/(events|event|this-weekend)(\/|\.html|$)/) },
+      { href: "deals", label: "Deals", icon: svg('<path d="M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1.4 1.4 0 0 1 0 2l-6.7 6.7a1.4 1.4 0 0 1-2 0z"/><circle cx="8" cy="8" r="1.5"/>'), active: on(/\/deals(\/|\.html|$)/) },
+      { href: "directory", label: "Directory", icon: svg('<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>'), active: on(/\/(directory|business)(\/|\.html|$)/) }
     ];
     var bar = document.createElement("nav");
     bar.className = "tab-bar";
