@@ -528,7 +528,7 @@
     bar.className = "tab-bar";
     bar.setAttribute("aria-label", "Quick navigation");
     bar.innerHTML = tabs.map(function (t) {
-      return '<a href="' + ROOT + t.href + '" class="tab' + (t.active ? " is-active" : "") + '"' + (t.active ? ' aria-current="page"' : "") +
+      return '<a href="' + ((ROOT + t.href) || "./") + '" class="tab' + (t.active ? " is-active" : "") + '"' + (t.active ? ' aria-current="page"' : "") +
         '><span class="tab-icon" aria-hidden="true">' + t.icon + '</span><span class="tab-label">' + t.label + "</span></a>";
     }).join("");
     document.body.appendChild(bar);

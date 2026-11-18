@@ -125,7 +125,7 @@ ${related.length ? `<section class="pf-related"><div class="wrap"><h2 class="mon
 <div class="wrap"><div class="biz-band"><p><strong>Own a local business?</strong><br>List it free, or go Premium for photos, hours, offers and monthly stats.</p><a class="btn" href="advertise#plans">See listing plans</a></div></div>
 </main>
 ${footer}
-<script src="assets/app.js"></script>
+<script src="assets/app.js?v=20261117tc"></script>
 </body>
 </html>
 `;
