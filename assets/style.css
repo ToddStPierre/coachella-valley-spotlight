@@ -1961,3 +1961,82 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 .spot.spot9.dim { opacity: .45; }
 .spot.spot9.dim.open:hover, .spot.spot9.dim.open:focus-visible { opacity: .8; }
 @media (max-width: 640px) { .picker-grid.picker-9x12 { grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 6px; } .spot.spot9 { padding: 6px; font-size: 12px; } .spot.spot9 .spot-state { display: none; } .spot.spot9 .spot-n { font-size: 10px; letter-spacing: 0; } .spot.spot9 .spot-cat { font-size: 13px; } }
+
+/* ===== Valley Stories (2026-11-17): story bubbles at the top of the home hero + full-screen viewer (assets/valley-stories.js) ===== */
+.vs-row { margin: 0 0 var(--s2); }
+.vs-bubbles { list-style: none; margin: 0; padding: 4px 2px 6px; display: flex; gap: 14px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.vs-bubbles::-webkit-scrollbar { display: none; }
+.vs-bubble { all: unset; cursor: pointer; display: grid; justify-items: center; gap: 6px; width: 76px; color: inherit; -webkit-tap-highlight-color: transparent; }
+.vs-bubble:focus-visible .vs-ring { outline: 3px solid var(--gold); outline-offset: 3px; }
+.vs-ring { display: block; width: 68px; height: 68px; border-radius: 50%; padding: 3px; background: conic-gradient(from 200deg, var(--gold), var(--sun), var(--rose), var(--dusk), var(--gold)); transition: transform .2s ease; }
+.vs-bubble:hover .vs-ring { transform: scale(1.06); }
+.vs-bubble.seen .vs-ring { background: rgba(120, 104, 92, .45); }
+.vs-thumb { position: relative; display: block; width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--paper); background: var(--ink) center / cover no-repeat; }
+.vs-emoji { position: absolute; right: -6px; bottom: -6px; width: 26px; height: 26px; border-radius: 50%; background: var(--paper); display: grid; place-items: center; font-size: 14px; line-height: 1; color: var(--sun); box-shadow: 0 2px 6px rgba(0,0,0,.18); }
+.vs-label { font-size: 12.5px; font-weight: 600; line-height: 1.15; text-align: center; white-space: nowrap; }
+.vs-label small { display: inline-block; min-width: 16px; padding: 0 4px; border-radius: 99px; background: var(--sun); color: #fff; font-size: 10px; line-height: 16px; vertical-align: 1px; }
+.vs-bubble.seen .vs-label small { background: rgba(120, 104, 92, .6); }
+@media (min-width: 960px) { .vs-bubbles { gap: 18px; } }
+
+html.vs-lock, html.vs-lock body { overflow: hidden; }
+.vs-viewer { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; opacity: 0; transition: opacity .2s ease; }
+.vs-viewer.vs-in { opacity: 1; }
+.vs-viewer[hidden] { display: none; }
+.vs-backdrop { position: absolute; inset: 0; background: rgba(18, 14, 12, .88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.vs-stage { position: relative; width: 100vw; height: 100dvh; overflow: hidden; background: #111; color: #fff; touch-action: none; user-select: none; -webkit-user-select: none; }
+@media (min-width: 700px) {
+  .vs-stage { width: min(430px, calc((100dvh - 48px) * 9 / 16)); height: min(calc(100dvh - 48px), 764px); border-radius: 22px; box-shadow: 0 30px 80px -20px rgba(0,0,0,.7); }
+}
+.vs-bars { position: absolute; z-index: 5; top: 10px; left: 10px; right: 10px; display: flex; gap: 4px; }
+.vs-bars span { flex: 1; height: 3px; border-radius: 3px; background: rgba(255,255,255,.32); overflow: hidden; }
+.vs-bars i { display: block; height: 100%; background: #fff; transform-origin: left; transform: scaleX(0); }
+.vs-top { position: absolute; z-index: 6; top: 20px; left: 12px; right: 8px; display: flex; align-items: center; gap: 4px; }
+.vs-who { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.vs-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--paper); color: var(--sun); display: grid; place-items: center; font-size: 16px; }
+.vs-name { font-size: 15px; }
+.vs-count { opacity: .75; font-family: var(--mono); font-size: 11px; }
+.vs-btn { all: unset; cursor: pointer; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; font-size: 15px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
+.vs-btn:hover, .vs-btn:focus-visible { background: rgba(255,255,255,.16); }
+.vs-slide { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.vs-card { position: absolute; inset: 0; transition: opacity .25s ease, transform .25s ease; }
+.vs-card.vs-enter { opacity: .2; transform: scale(1.02); }
+.vs-bg { position: absolute; inset: 0; background: #2b211c center / cover no-repeat; animation: vs-zoom 9s ease-out both; }
+.vs-bg-blur { filter: blur(28px) brightness(.55) saturate(1.2); transform: scale(1.2); animation: none; }
+@keyframes vs-zoom { from { transform: scale(1.12); } to { transform: scale(1); } }
+.vs-shade { position: absolute; inset: 0; }
+.tone-sun .vs-shade { background: linear-gradient(180deg, rgba(20,12,8,.55) 0%, rgba(217,85,43,.35) 40%, rgba(25,14,10,.92) 78%); }
+.tone-dusk .vs-shade { background: linear-gradient(180deg, rgba(15,10,35,.6) 0%, rgba(91,74,122,.45) 40%, rgba(15,10,30,.94) 78%); }
+.tone-rose .vs-shade { background: linear-gradient(180deg, rgba(30,10,20,.55) 0%, rgba(201,102,122,.4) 40%, rgba(28,12,20,.93) 78%); }
+.tone-palm .vs-shade { background: linear-gradient(180deg, rgba(8,22,18,.55) 0%, rgba(46,92,79,.45) 40%, rgba(8,22,18,.93) 78%); }
+.tone-gold .vs-shade { background: linear-gradient(180deg, rgba(30,20,6,.5) 0%, rgba(240,163,58,.35) 40%, rgba(30,18,8,.93) 78%); }
+.vs-art { position: absolute; z-index: 1; top: 74px; left: 50%; transform: translateX(-50%) rotate(-2deg); width: 72%; max-height: 34%; object-fit: contain; border-radius: 10px; box-shadow: 0 16px 40px rgba(0,0,0,.45); background: #fff; }
+.vs-body { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; padding: 24px 22px calc(26px + env(safe-area-inset-bottom)); display: grid; gap: 10px; pointer-events: none; }
+.vs-kicker { text-shadow: 0 1px 6px rgba(0,0,0,.6); font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
+.vs-chip { justify-self: start; padding: 6px 12px; border-radius: 99px; background: rgba(255,255,255,.95); color: var(--ink); font-weight: 700; font-size: 15px; }
+.vs-h { margin: 0; font-family: var(--display); font-weight: 600; font-size: clamp(30px, 8.4vw, 38px); line-height: 1.05; letter-spacing: -.01em; color: #fff; text-wrap: balance; }
+.vs-h-sm { font-size: clamp(24px, 6.6vw, 29px); }
+.vs-sub { margin: 0; font-weight: 600; opacity: .92; text-shadow: 0 1px 6px rgba(0,0,0,.5); }
+.vs-desc { margin: 0; font-size: 15px; line-height: 1.45; opacity: .85; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.vs-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; pointer-events: auto; }
+.vs-cta { flex: 1 1 auto; text-align: center; padding: 13px 16px; border-radius: 12px; font-weight: 700; font-size: 15px; text-decoration: none; color: #fff; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.35); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.vs-cta.primary { background: var(--sun); border-color: var(--sun); box-shadow: 0 8px 20px -8px rgba(217,85,43,.8); }
+.vs-cta:hover, .vs-cta:focus-visible { filter: brightness(1.08); outline: 2px solid #fff; outline-offset: 2px; }
+.vs-adcard .vs-body { top: 66px; align-content: end; }
+.vs-ad { width: 100%; max-height: 52vh; object-fit: contain; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,.55); background: #fff; margin: 4px 0 8px; }
+@media (min-width: 700px) { .vs-ad { max-height: 380px; } }
+.vs-tap { all: unset; position: absolute; z-index: 3; top: 64px; bottom: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.vs-tap-prev { left: 0; width: 34%; }
+.vs-tap-next { right: 0; width: 66%; }
+.vs-next-up { position: absolute; z-index: 5; right: 14px; top: 60px; margin: 0; font-size: 12px; font-weight: 600; opacity: .85; }
+.vs-next-up:empty { display: none; }
+.vs-holding .vs-body, .vs-holding .vs-top, .vs-holding .vs-next-up { opacity: 0; transition: opacity .15s; }
+.vs-paused .vs-bg { animation-play-state: paused; }
+.vs-arrow { display: none; }
+@media (min-width: 700px) {
+  .vs-arrow { all: unset; position: relative; z-index: 2; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,.14); color: #fff; font-size: 30px; cursor: pointer; }
+  .vs-arrow:hover, .vs-arrow:focus-visible { background: rgba(255,255,255,.28); }
+  .vs-arrow:disabled { opacity: .25; cursor: default; }
+  .vs-viewer { grid-template-columns: auto auto auto; gap: 22px; justify-content: center; }
+  .vs-backdrop { cursor: zoom-out; }
+}
+@media (prefers-reduced-motion: reduce) { .vs-bg { animation: none; } .vs-card, .vs-viewer, .vs-ring { transition: none; } }
