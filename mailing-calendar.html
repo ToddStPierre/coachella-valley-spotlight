@@ -55,11 +55,11 @@
 <nav class="crumbs" aria-label="Breadcrumb"><a href="advertise">Advertise</a> &rsaquo; <span>Mailing calendar</span></nav>
 <span class="eyebrow" style="margin-top:24px"><span class="stripe-mini"></span>Postcard mailing calendar</span>
 <h1>Every Upcoming Card, With the Date It <span class="grad">Hits Mailboxes.</span></h1>
-<p>From January on, each 9 x 12 card mails on its date once at least $2,500 of its ads are sold, and you can watch each card fill up below. Book your spot and send your logo and offer by the artwork deadline, and we design the ad for you to approve before it prints. One business per category on every card.</p>
+<p>Every card below shows its mail date, its artwork deadline and how many spots are open. Dates are tentative until a card is marked confirmed to mail. Book your spot and send your logo and offer by the artwork deadline, and we design the ad for you to approve before it prints. One business per category on every card.</p>
 </div></section>
 <section style="padding-bottom:var(--s5)"><div class="wrap">
 <div class="mc-grid" id="mc-grid"><p>Loading the calendar&hellip;</p></div>
-<p style="margin-top:32px"><strong>What if a card doesn&rsquo;t reach 8?</strong> It moves to the next mailing date. Your spot, your category and your payment carry over, or we refund you if you would rather not wait.</p>
+<p style="margin-top:32px"><strong>What if a card doesn&rsquo;t mail on its date?</strong> It moves to the next mailing date. Your spot, your category and your payment carry over, or we refund you if you would rather not wait.</p>
 <p style="margin-top:12px;color:var(--ink-2)">From January on, ads on the 9 x 12 card are $100 (Mini), $150 (Small), $300 (Medium) or $500 (Large) per mailing, with design, printing, postage and QR code tracking included, plus a free Premium listing on this site while your ad runs. See every route on the <a href="coverage-map">coverage map</a>. Want a card in your neighborhood? <a href="contact">Tell us where</a>.</p>
 </div></section>
 </main>
@@ -107,8 +107,8 @@
       var sold = d.positions.filter(function (p) { return st8(p) === "sold"; }).length, held = d.positions.filter(function (p) { return st8(p) === "pending"; }).length, open = total - sold - held, min = m.minSold || 0;
       // 9 x 12 cards (Jan 21, 2027 on) confirm by dollars sold: "$X of $2,500".
       var nine = d.format === "9x12", soldD = d.soldDollars || 0, minD = d.minDollars || m.minDollars || 2500, ok = window.CVS_FMT ? window.CVS_FMT.isConfirmed(nine ? { format: "9x12", minDollars: minD } : m, d.positions) : min && sold >= min;
-      el.querySelector("[data-fill]").innerHTML = (nine ? "<b>$" + Math.min(soldD, minD).toLocaleString("en-US") + " of $" + minD.toLocaleString("en-US") + "</b> in ads sold to confirm this mailing<br>" : min ? "<b>" + Math.min(sold, min) + " of " + min + "</b> spots sold to confirm this mailing<br>" : "") + "<span style='color:var(--ink-2);font-size:15px'>" + sold + " sold &middot; " + held + " on hold &middot; " + open + " open of " + total + (nine ? " (9 x 12 card)" : "") + "</span>";
-      el.querySelector("[data-bar]").style.width = Math.round((nine ? Math.min(soldD / minD, 1) : min ? Math.min(sold / min, 1) : (sold + held) / total) * 100) + "%";
+      el.querySelector("[data-fill]").innerHTML = "<b>" + open + " of " + total + "</b> spots open" + (ok ? " &middot; mail date confirmed" : " &middot; mail date tentative") + "<br><span style='color:var(--ink-2);font-size:15px'>" + sold + " sold &middot; " + held + " on hold &middot; " + open + " open of " + total + (nine ? " (9 x 12 card)" : "") + "</span>";
+      el.querySelector("[data-bar]").style.width = Math.round((sold + held) / total * 100) + "%";
       var st = el.querySelector("[data-status]");
       if (closed) st.className = "mc-status closed";
       else if (open === 0) { st.textContent = "Full"; st.className = "mc-status full"; }

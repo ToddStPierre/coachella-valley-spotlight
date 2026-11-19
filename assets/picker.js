@@ -85,7 +85,7 @@
     if (!m) { dateEl.textContent = "Mailing date coming soon"; return; }
     var d = daysLeft(m.deadline);
     dateEl.innerHTML = "Tentative Mail Date: " + nice(m.mail) + " &middot; Tentative Artwork Date: " + nice(m.deadline) +
-      (d < 0 ? '<span class="picker-left">Booking for this card is closed. ' + (bookable(r).length ? "Pick a later date above." : "The next date is coming soon.") + '</span>' : '<span class="picker-left">' + (d === 0 ? "Last day to book" : d + (d === 1 ? " day" : " days") + " left to book") + (m.format === "9x12" ? " &middot; This card mails once " + money(m.minDollars || 2500) + " of ads are sold" : m.minSold ? " &middot; This card mails once " + m.minSold + " spots are sold" : "") + '</span>');
+      (d < 0 ? '<span class="picker-left">Booking for this card is closed. ' + (bookable(r).length ? "Pick a later date above." : "The next date is coming soon.") + '</span>' : '<span class="picker-left">' + (d === 0 ? "Last day to book" : d + (d === 1 ? " day" : " days") + " left to book") + "" + '</span>');
   }
 
   function state(s) { s = (s || "").toLowerCase(); return s === "open" ? "open" : s === "pending" ? "pending" : "sold"; }
@@ -147,7 +147,7 @@
     });
     fillCats(d);
     var sold = d.soldDollars || 0, min = d.minDollars || F9.minDollars, n = d.positions.filter(function (p) { return state(p.status) !== "open"; }).length;
-    countEl.innerHTML = "<b>" + money(sold) + " of " + money(min) + "</b> sold" + (sold >= min ? " &middot; confirmed to mail" : "") + " &middot; " + n + " of " + F9.spots + " spots taken on " + LABELS[r] + (mail ? ", " + short(mail) + " card" : "");
+    countEl.innerHTML = "<b>" + (F9.spots - n) + " of " + F9.spots + "</b> spots open on " + LABELS[r] + (mail ? ", " + short(mail) + " card" : "") + (sold >= min ? " &middot; mail date confirmed" : "");
     pick9(size9);
   }
   function open9(r, pos) {
