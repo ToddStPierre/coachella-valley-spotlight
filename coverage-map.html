@@ -253,7 +253,7 @@
       '<div class="cm-lc-left">' + big + (z.open != null ? "<small>of " + z.total + " spots open</small>" : "") + "</div>" +
       '<div class="cm-bar" aria-hidden="true"><i style="--p:' + pct + '%"></i></div>' +
       '<p class="cm-lc-meta">Mails ' + esc(nice(m.mail)) + " &middot; artwork due " + esc(nice(m.deadline)) + (d >= 0 ? " &middot; <b>" + daysTxt(d) + "</b>" : "") + "</p>" +
-      '<div class="cm-lc-act">' + (z.state === "closed" || z.state === "full" ? '<a class="btn btn-ghost" href="mailing-calendar">See the next date</a>' : '<a class="btn" href="' + reserveUrl(z.id) + '">Reserve in ' + esc(z.name) + "</a>") +
+      '<div class="cm-lc-act">' + (z.state === "closed" || z.state === "full" ? '<a class="btn btn-ghost" href="mailing-calendar">See the next date</a>' : '<a class="btn" href="' + reserveUrl(z.id) + '" aria-label="Reserve in ' + esc(z.name) + '">RESERVE</a>') +
       (z.area ? '<a class="cov-more" href="' + z.area + '">Who it reaches &rarr;</a>' : "") + "</div></article>";
   }
   function paint() {
@@ -285,7 +285,7 @@
     }
     var cta = z.soon ? '<a class="btn" href="#waitlist" data-wl="' + esc(z.name) + '">Join the ' + esc(z.name) + ' waitlist</a>'
       : z.state === "closed" || z.state === "full" ? '<a class="btn btn-ghost" href="mailing-calendar">See the mailing calendar</a>'
-      : '<a class="btn" href="' + reserveUrl(z.id) + '">Reserve in ' + esc(z.name) + '</a>';
+      : '<a class="btn" href="' + reserveUrl(z.id) + '" aria-label="Reserve in ' + esc(z.name) + '">RESERVE</a>';
     panel.innerHTML = '<span class="cov-badge" data-state="' + st(z) + '">' + esc(label(z)) + '</span><h2>' + esc(z.name) + '</h2><p class="cov-blurb">' + esc(z.blurb) + '</p>' +
       '<dl class="cov-facts">' + rows.map(function (r) { return "<dt>" + r[0] + "</dt><dd>" + r[1] + "</dd>"; }).join("") + "</dl>" +
       '<div class="cov-actions">' + cta + (z.area ? '<a class="cov-more" href="' + z.area + '">Who this route reaches &rarr;</a>' : "") + "</div>" +
