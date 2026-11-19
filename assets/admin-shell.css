@@ -205,8 +205,6 @@ body.is-admin .ck-pill { background: #f4f0ea; border: 0; font-size: 11.5px; heig
 /* The cockpit lives in two sections: Overview shows its cards and Do today; Sales shows Who to pitch */
 body[data-sec=overview] #ck-pitch, body[data-sec=overview] #cockpit-admin > .month-head { display: none; }
 body[data-sec=overview] #cockpit-admin .ck-grid { grid-template-columns: 1fr; }
-body[data-sec=sales] #cockpit-admin > :not(.ck-grid), body[data-sec=sales] #cockpit-admin .ck-grid > :not(#ck-pitch) { display: none; }
-body[data-sec=sales] #cockpit-admin .ck-grid { grid-template-columns: 1fr; }
 
 /* backup panel and tools */
 body.is-admin #admin-tools > a.btn { display: none; } /* Leads now has its own section */

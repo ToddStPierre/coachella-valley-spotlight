@@ -1,7 +1,7 @@
 /* Spotlight HQ shell (stats.html in admin mode; rebuilt 2026-11-09 from the sidebar version).
    Dark sidebar grouped by job, a sticky top bar with the ⌘K command bar and quick actions, and one section at a time.
    Each section is a list of panel ids built by the other admin-*.js files (found by id, never rebuilt). A panel can sit
-   in more than one section (the sales cockpit shows its cards on Overview and Who to pitch on Sales; CSS picks the part).
+   in more than one section (the sales cockpit shows on Overview; Who to call was removed 2026-11-19, Leads covers it).
    The open section lives in the URL hash (#overview, #board...). Old hashes (#today, #setup) and panel ids still work.
    Badges are read from the panels themselves (a MutationObserver). Under 980px the sidebar slides in from a menu button.
    Needs assets/admin-hq.js (window.HQ). If this script fails, every panel just shows in one column. */
@@ -14,7 +14,6 @@
   // id, group, label, icon, panels, title, description, badge, head actions
   var SECTIONS = [
     { id: "overview", group: "", label: "Overview", icon: ic.home, panels: ["ov-admin", "cockpit-admin"], title: "Overview", desc: "Where both cards stand, what needs you today, and how the directory is doing." },
-    { id: "sales", group: "Sell", label: "Who to call", icon: ic.target, panels: ["cockpit-admin"], title: "Who to call next", desc: "Ranked call list, hot free listings and every follow-up. Log each email, call or text and it's saved for good.", badge: function () { return num("#ck-due-todo b"); } },
     { id: "leads", group: "Sell", label: "Leads", icon: ic.users, panels: ["leads-admin"], title: "Leads", desc: "Every business you or the reps have called, emailed or plan to pitch. The same list the reps sign in to.", actions: '<a class="hq-btn ghost" href="leads.html" target="_blank" rel="noopener">' + ic.ext + "<span>Open full screen</span></a>" },
     { id: "board", group: "Advertising", label: "Postcard board", icon: ic.card, panels: ["board-admin"], title: "Postcard board", desc: "Both cards, spot by spot. Click any spot to hold it for someone, mark it paid, or release it.", actions: '<button type="button" class="hq-btn accent" data-act="hold">' + ic.plus + "<span>Hold a spot</span></button>" },
     { id: "routes", group: "Advertising", label: "Mail routes", icon: ic.list, panels: ["routes-admin"], title: "Mail routes", desc: "The USPS carrier routes behind every card, live and waitlist. Copy a card's routes straight into the 9x12 planner or an order.", actions: '<a class="hq-btn ghost" href="https://9x12method.com/eddm-route-planner/" target="_blank" rel="noopener">' + ic.ext + "<span>9x12 planner</span></a>" },
@@ -25,7 +24,7 @@
     { id: "people", group: "Customers", label: "Owners & members", icon: ic.star, panels: ["owners-admin", "own-msg", "signups-admin"], title: "Owners & members", desc: "Claim requests, owner dashboards, My Spotlight members and the email list.", badge: function () { return document.querySelectorAll("#owners-admin [data-claim]").length; } },
     { id: "system", group: "System", label: "Backups & traffic", icon: ic.shield, panels: ["admin-tools", "visitors-admin"], title: "Backups & site traffic", desc: "Back up the whole site to Google Drive from this Mac, and see today's visitors." }
   ];
-  var OLD = { today: "overview", setup: "mailings", "ck-pitch": "sales" };
+  var OLD = { today: "overview", setup: "mailings", sales: "leads", "ck-pitch": "leads" };
 
   // Leads: the Leads page in a frame, loaded the first time the section opens.
   var leads = document.createElement("div"); leads.id = "leads-admin"; out.before(leads);

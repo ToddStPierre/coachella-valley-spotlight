@@ -260,9 +260,8 @@
     box.addEventListener("click", function (e) {
       var t = e.target;
       var fl = t.closest("[data-filter]"); if (fl) { e.preventDefault(); var inTodo = !!fl.closest(".ck-todo"); st.filter = fl.dataset.filter; st.shown = 10; st.openRow = ""; drawLeads(); if (inTodo) {
-        // "Who to pitch" is hidden on Overview, so open the Who to call section first, then scroll to the filtered list.
-        var go = function () { var pk = document.getElementById("ck-pitch"); if (pk) { pk.scrollIntoView({ block: "start" }); window.scrollBy(0, -76); } };
-        if (document.body.dataset.sec && document.body.dataset.sec !== "sales") { location.hash = "sales"; setTimeout(go, 80); } else go();
+        // The Who to call section was removed (2026-11-19); follow-ups and hot listings are worked from Leads.
+        location.hash = "leads";
       } return; }
       var p = t.closest("[data-pitch]"); if (p) { var slug = p.dataset.pitch; setTimeout(function () { openLog(slug, "Email"); }, 300); return; }
       var tel = t.closest("[data-tel]"); if (tel) { var ts = tel.dataset.tel; setTimeout(function () { openLog(ts, "Call"); }, 300); return; }

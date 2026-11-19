@@ -71,7 +71,7 @@
       '<button type="button" data-act="hold">' + ic.card + "Hold a spot</button>" +
       '<a href="#inbox">' + ic.inbox + "Review the inbox</a>" +
       '<a href="#reports">' + ic.mail + "Send monthly reports</a>" +
-      '<a href="#sales">' + ic.target + "Who to call next</a>" +
+      '<a href="#leads">' + ic.users + "Open leads</a>" +
       '<a href="./" target="_blank" rel="noopener">' + ic.globe + "Open the live site</a>" +
       "</div></div></div>";
   }
