@@ -119,7 +119,7 @@
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight, a brand of MoreViews Pro LLC. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
 <script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js?v=20261117tc"></script>
-<script src="data/mailings.js?v=20261118j"></script><script src="data/formats.js?v=20261117p"></script><script src="data/hidden-routes.js?v=20261118i"></script>
+<script src="data/mailings.js?v=20261118m"></script><script src="data/formats.js?v=20261117p"></script><script src="data/hidden-routes.js?v=20261118i"></script>
 <script>
 (function () {
   var API = "https://local-spotlight-reservations.toddstpierre.workers.dev", M = (window.CVS_MAILINGS || []).slice();
@@ -163,7 +163,7 @@
   if (!card) return;
   // One entry per route (the calculator is about homes, not dates).
   M = M.filter(function (m, i) { return M.findIndex(function (x) { return x.route === m.route; }) === i; });
-  if (!M.length) M = [{ route: "el-paseo", name: "El Paseo", homes: "4,968 homes" }];
+  if (!M.length) M = [{ route: "el-paseo", name: "Palm Desert - El Paseo Area", homes: "4,968 homes" }];
   card.innerHTML = M.map(function (m, i) { return '<option value="' + i + '">' + m.name + " (" + (m.homes || "nearly 5,000 homes").replace(/^About /, "about ") + ")</option>"; }).join("");
   var usd = function (n, d) { return "$" + n.toLocaleString("en-US", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); };
   function calc() {

@@ -189,7 +189,7 @@
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight, a brand of MoreViews Pro LLC. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
 <script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js?v=20261117tc"></script>
-<script src="data/mailings.js?v=20261118j"></script><script src="data/formats.js?v=20261117p"></script><script src="data/hidden-routes.js?v=20261118i"></script>
+<script src="data/mailings.js?v=20261118m"></script><script src="data/formats.js?v=20261117p"></script><script src="data/hidden-routes.js?v=20261118i"></script>
 <script>
 (function () {
   var API = "https://local-spotlight-reservations.toddstpierre.workers.dev";
@@ -197,14 +197,14 @@
   /* Routes on the map. Live routes get their dates and homes from data/mailings.js and their spots from the booking Worker.
      x/y = center of the zone on the map (percent), w/h = its size. A planned route (soon: true) needs no mailing entry. All 10 were opened for booking 2026-11-11. */
   var ZONES = [
-    { id: "el-paseo", name: "El Paseo", town: "Palm Desert", zip: "92260", x: 46.5, y: 78, w: 11, h: 15, area: "mailing-area-el-paseo", blurb: "The streets around El Paseo, Palm Desert's shopping and dining strip, south of Highway 111." },
-    { id: "sun-city-palm-desert", name: "Sun City Palm Desert", town: "Palm Desert", zip: "92211", x: 58, y: 42, w: 10, h: 14, area: "mailing-area-sun-city", blurb: "The 55-plus golf community north of I-10, where homeowners stay put and buy local." },
+    { id: "el-paseo", name: "Palm Desert - El Paseo Area", town: "Palm Desert", zip: "92260", x: 46.5, y: 78, w: 11, h: 15, area: "mailing-area-el-paseo", blurb: "The streets around El Paseo, Palm Desert's shopping and dining strip, south of Highway 111." },
+    { id: "sun-city-palm-desert", name: "Palm Desert - Sun City", town: "Palm Desert", zip: "92211", x: 58, y: 42, w: 10, h: 14, area: "mailing-area-sun-city", blurb: "The 55-plus golf community north of I-10, where homeowners stay put and buy local." },
     { id: "palm-springs", name: "Palm Springs", town: "Palm Springs", zip: "92262 &middot; 92264", homes: "4,979", x: 12, y: 45, w: 10, h: 14, area: "mailing-area-palm-springs", blurb: "Seven carrier routes across Palm Springs' north end, east of downtown and the south end of town. Join the waitlist to get first pick of categories." },
     { id: "cathedral-city", name: "Cathedral City", town: "Cathedral City", zip: "92234", homes: "4,993", x: 25, y: 53, w: 9, h: 12, area: "mailing-area-cathedral-city", blurb: "Six carrier routes in Cathedral City's family neighborhoods. Join the waitlist to get first pick of categories." },
     { id: "rancho-mirage", name: "Rancho Mirage", town: "Rancho Mirage", zip: "92270", homes: "4,976", x: 35, y: 67, w: 9, h: 12, area: "mailing-area-rancho-mirage", blurb: "Eight carrier routes in Rancho Mirage's established, higher-income neighborhoods. Join the waitlist to get first pick of categories." },
     { id: "indian-wells", name: "Indian Wells", town: "Indian Wells", zip: "92210", homes: "4,461", x: 56, y: 63, w: 8, h: 10, area: "mailing-area-indian-wells", blurb: "Every home in Indian Wells, all seven carrier routes. Join the waitlist to get first pick of categories." },
     { id: "la-quinta", name: "La Quinta", town: "La Quinta", zip: "92253", homes: "4,995", x: 61, y: 87, w: 10, h: 13, area: "mailing-area-la-quinta", blurb: "Six carrier routes in La Quinta's golf communities and higher-income streets. Join the waitlist to get first pick of categories." },
-    { id: "indio", name: "Indio", town: "Indio", zip: "92203", homes: "4,791", x: 78, y: 52, w: 10, h: 14, area: "mailing-area-indio", blurb: "Six carrier routes in one block of north Indio, Avenue 39 to 42, including Sun City Shadow Hills, where nearly every home is a single-family house its owner lives in." },
+    { id: "indio", name: "Indio - Sun City Shadow Hills", town: "Indio", zip: "92203", homes: "4,791", x: 78, y: 52, w: 10, h: 14, area: "mailing-area-indio", blurb: "Six carrier routes in one block of north Indio, Avenue 39 to 42, including Sun City Shadow Hills, where nearly every home is a single-family house its owner lives in." },
     { id: "coachella", name: "Coachella", town: "Coachella", zip: "92236", homes: "4,998", x: 91, y: 89, w: 9, h: 12, area: "mailing-area-coachella", blurb: "Six carrier routes covering Coachella's family neighborhoods. Join the waitlist to get first pick of categories." },
     { id: "desert-hot-springs", name: "Desert Hot Springs", town: "Desert Hot Springs", zip: "92240 &middot; 92241", homes: "4,977", x: 22, y: 15, w: 11, h: 14, area: "mailing-area-desert-hot-springs", blurb: "Five carrier routes across Desert Hot Springs. Join the waitlist to get first pick of categories." }
   ];
