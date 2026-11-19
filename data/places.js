@@ -42,6 +42,7 @@ window.CVS.places = {
     "Bankruptcy": "Local bankruptcy attorneys help people and businesses with Chapter 7, Chapter 13 and other debt relief.",
     "Personal injury": "Local personal injury attorneys handle car and truck accidents, dog bites, falls and wrongful death claims, usually on a contingency fee.",
     "Business and real estate law": "Local business and real estate attorneys handle company formation, contracts, property deals, landlord and tenant matters, HOAs and business disputes.",
+    "Pet grooming": "Local groomers for baths, haircuts, nail trims and de-shedding, from full salons to small one-groomer studios. Book ahead, especially before the holidays.",
     "Pet stores": "Independent pet stores for food, treats, toys and supplies, with staff who can help you choose the right diet. These are local shops, not the big-box chains.",
     "Nail salons": "Local nail salons for manicures, pedicures, gel, acrylics, dip powder and nail art, many with waxing and lash services too. Walk-ins are often welcome.",
     "Meditation": "Meditation teachers and centers in the valley, from personalized courses to free introductory talks, for stress relief, better sleep and a calmer mind.",

@@ -26,7 +26,7 @@
     "Dentists": "Dental", "Orthodontists": "Dental", "Chiropractors": "Chiropractic", "Med spas": "Med Spa", "Dermatology": "Med Spa", "Weight loss": "Weight Loss",
     "Nail salons": "Salon/Spa", "Hair salons and barbers": "Salon/Spa", "Massage and day spas": "Salon/Spa",
     "Gyms": "Fitness/Gym", "CrossFit gyms": "Fitness/Gym", "Personal training": "Fitness/Gym", "Boxing and martial arts": "Fitness/Gym", "Yoga and pilates": "Fitness/Gym",
-    "Veterinarians": "Veterinary/Pet Care", "Pet stores": "Veterinary/Pet Care", "Pet sitting": "Veterinary/Pet Care",
+    "Veterinarians": "Veterinary/Pet Care", "Pet stores": "Veterinary/Pet Care", "Pet sitting": "Veterinary/Pet Care", "Pet grooming": "Veterinary/Pet Care", "Cleaning services": "House Cleaning",
     "Bakeries": "Bakery & Desserts", "Candy and sweets": "Bakery & Desserts", "Art classes": "Arts & Classes",
     "Gift shops": "Boutique/Retail", "Plant nurseries": "Boutique/Retail", "Custom printing": "Boutique/Retail",
     "Real estate and mortgage": "Real Estate Agent", "Estate planning": "Estate Attorney", "Hearing aids": "Hearing Aids", "Jewelers": "Jewelers",
