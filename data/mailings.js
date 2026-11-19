@@ -19,7 +19,7 @@ window.CVS_MAILINGS = [
   {"route":"rancho-mirage","name":"Rancho Mirage","area":"Rancho Mirage 92270","homes":"4,976 homes","mail":"2027-01-21","deadline":"2027-01-11","minSold":8,"format":"9x12","minDollars":2500},
   {"route":"indian-wells","name":"Indian Wells","area":"Indian Wells 92210","homes":"4,461 homes","mail":"2027-01-21","deadline":"2027-01-11","minSold":8,"format":"9x12","minDollars":2500},
   {"route":"la-quinta","name":"La Quinta","area":"La Quinta 92253","homes":"4,995 homes","mail":"2027-01-21","deadline":"2027-01-11","minSold":8,"format":"9x12","minDollars":2500},
-  {"route":"indio","name":"Indio","area":"Indio 92201 · 92203","homes":"4,994 homes","mail":"2027-01-21","deadline":"2027-01-11","minSold":8,"format":"9x12","minDollars":2500},
+  {"route":"indio","name":"Indio","area":"Indio 92203","homes":"4,791 homes","mail":"2027-01-21","deadline":"2027-01-11","minSold":8,"format":"9x12","minDollars":2500},
   {"route":"coachella","name":"Coachella","area":"Coachella 92236","homes":"4,998 homes","mail":"2027-01-21","deadline":"2027-01-11","minSold":8,"format":"9x12","minDollars":2500},
   {"route":"desert-hot-springs","name":"Desert Hot Springs","area":"Desert Hot Springs 92240 · 92241","homes":"4,977 homes","mail":"2027-01-21","deadline":"2027-01-11","minSold":8,"format":"9x12","minDollars":2500},
   {"route":"el-paseo","name":"El Paseo","area":"Palm Desert 92260, around El Paseo","homes":"4,968 homes","mail":"2027-02-18","deadline":"2027-02-08","minSold":8,"format":"9x12","minDollars":2500},
@@ -29,7 +29,7 @@ window.CVS_MAILINGS = [
   {"route":"rancho-mirage","name":"Rancho Mirage","area":"Rancho Mirage 92270","homes":"4,976 homes","mail":"2027-02-18","deadline":"2027-02-08","minSold":8,"format":"9x12","minDollars":2500},
   {"route":"indian-wells","name":"Indian Wells","area":"Indian Wells 92210","homes":"4,461 homes","mail":"2027-02-18","deadline":"2027-02-08","minSold":8,"format":"9x12","minDollars":2500},
   {"route":"la-quinta","name":"La Quinta","area":"La Quinta 92253","homes":"4,995 homes","mail":"2027-02-18","deadline":"2027-02-08","minSold":8,"format":"9x12","minDollars":2500},
-  {"route":"indio","name":"Indio","area":"Indio 92201 · 92203","homes":"4,994 homes","mail":"2027-02-18","deadline":"2027-02-08","minSold":8,"format":"9x12","minDollars":2500},
+  {"route":"indio","name":"Indio","area":"Indio 92203","homes":"4,791 homes","mail":"2027-02-18","deadline":"2027-02-08","minSold":8,"format":"9x12","minDollars":2500},
   {"route":"coachella","name":"Coachella","area":"Coachella 92236","homes":"4,998 homes","mail":"2027-02-18","deadline":"2027-02-08","minSold":8,"format":"9x12","minDollars":2500},
   {"route":"desert-hot-springs","name":"Desert Hot Springs","area":"Desert Hot Springs 92240 · 92241","homes":"4,977 homes","mail":"2027-02-18","deadline":"2027-02-08","minSold":8,"format":"9x12","minDollars":2500},
   {"route":"el-paseo","name":"El Paseo","area":"Palm Desert 92260, around El Paseo","homes":"4,968 homes","mail":"2027-03-18","deadline":"2027-03-08","minSold":8,"format":"9x12","minDollars":2500},
@@ -39,7 +39,7 @@ window.CVS_MAILINGS = [
   {"route":"rancho-mirage","name":"Rancho Mirage","area":"Rancho Mirage 92270","homes":"4,976 homes","mail":"2027-03-18","deadline":"2027-03-08","minSold":8,"format":"9x12","minDollars":2500},
   {"route":"indian-wells","name":"Indian Wells","area":"Indian Wells 92210","homes":"4,461 homes","mail":"2027-03-18","deadline":"2027-03-08","minSold":8,"format":"9x12","minDollars":2500},
   {"route":"la-quinta","name":"La Quinta","area":"La Quinta 92253","homes":"4,995 homes","mail":"2027-03-18","deadline":"2027-03-08","minSold":8,"format":"9x12","minDollars":2500},
-  {"route":"indio","name":"Indio","area":"Indio 92201 · 92203","homes":"4,994 homes","mail":"2027-03-18","deadline":"2027-03-08","minSold":8,"format":"9x12","minDollars":2500},
+  {"route":"indio","name":"Indio","area":"Indio 92203","homes":"4,791 homes","mail":"2027-03-18","deadline":"2027-03-08","minSold":8,"format":"9x12","minDollars":2500},
   {"route":"coachella","name":"Coachella","area":"Coachella 92236","homes":"4,998 homes","mail":"2027-03-18","deadline":"2027-03-08","minSold":8,"format":"9x12","minDollars":2500},
   {"route":"desert-hot-springs","name":"Desert Hot Springs","area":"Desert Hot Springs 92240 · 92241","homes":"4,977 homes","mail":"2027-03-18","deadline":"2027-03-08","minSold":8,"format":"9x12","minDollars":2500}
 ];
