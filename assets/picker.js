@@ -3,7 +3,7 @@
 (function () {
   var API = "https://local-spotlight-reservations.toddstpierre.workers.dev";
   var NOTIFY = "https://formspree.io/f/myezyype";
-  var LABELS = { "el-paseo": "Palm Desert - El Paseo Area", "sun-city-palm-desert": "Palm Desert - Sun City", "indio": "Indio - Sun City Shadow Hills" };
+  var LABELS = { "el-paseo": "Palm Desert - El Paseo Area", "sun-city-palm-desert": "Palm Desert - Sun City", "indio": "Indio - Sun City Shadow Hills", "la-quinta": "La Quinta", "la-quinta-pga-west": "La Quinta - PGA West" };
   var root = document.getElementById("picker"); if (!root) return;
   // Route tabs come from the calendar (10 routes since 2026-11-11), so a new route needs no HTML change.
   (function () {
