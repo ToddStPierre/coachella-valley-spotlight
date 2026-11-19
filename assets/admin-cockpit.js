@@ -31,6 +31,8 @@
     "Gift shops": "Boutique/Retail", "Plant nurseries": "Boutique/Retail", "Custom printing": "Boutique/Retail",
     "Real estate and mortgage": "Real Estate Agent", "Estate planning": "Estate Attorney", "Hearing aids": "Hearing Aids", "Jewelers": "Jewelers",
     "Cannabis dispensaries": "Cannabis",
+    "Waxing": "Salon/Spa", "Lashes and brows": "Salon/Spa", "Remodeling": "Remodeling", "Desserts and ice cream": "Bakery & Desserts",
+    "Clothing boutiques": "Boutique/Retail", "Florists": "Boutique/Retail", "Furniture and home decor": "Boutique/Retail", "Bike shops": "Boutique/Retail",
     "American restaurants": "Restaurant - American", "Cafes and delis": "Restaurant - Cafe & Deli", "Italian restaurants": "Restaurant - Italian",
     "Mediterranean and European restaurants": "Restaurant - Mediterranean", "Mexican restaurants": "Restaurant - Mexican", "Pizza and burgers": "Restaurant - Pizza",
     "Seafood restaurants": "Restaurant - Seafood", "Steakhouses": "Restaurant - Steakhouse"

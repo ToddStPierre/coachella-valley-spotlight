@@ -30,6 +30,7 @@ window.CVS.places = {
     "Shopping": "Shopping covers local stores around the valley, starting with golf shops: retail stores, club fitters and repair shops for one of the desert's favorite pastimes.",
     "Automotive": "Automotive covers local businesses that sell, service and rent vehicles, including the golf cars that are a common way to get around the valley's country clubs and gated communities.",
     "Home services": "Home services covers the trades that keep a desert home running: plumbing, air conditioning, roofing, pest control, flooring, solar panel cleaning and more. Summer heat, hard water and dust are tough on houses here, so it pays to have a local pro's number before you need it.",
+    "Professional services": "Professional services covers local accountants, tax preparers, insurance agents, photographers and other pros who help households and small businesses.",
     "Health and beauty": "Health and beauty covers local clinics, acupuncture, weight loss, salons, spas and wellness practices. These are independent, locally run practices, not national chains.",
     "Restaurants": "Restaurants covers locally owned places to eat, from long-running family dining rooms to newer spots. Many offer deals listed here when you mention Coachella Valley Spotlight."
   },
@@ -125,6 +126,26 @@ window.CVS.places = {
     "Window cleaning": "Window cleaners for homes and businesses, often with solar panel cleaning too. Dust storms and hard water spots make regular cleaning worth it here.",
     "Carpet cleaning": "Carpet, upholstery and rug cleaners, many also doing tile and grout. A good time to book is before the snowbirds arrive or after they leave.",
     "Blinds and shutters": "Window covering companies for shutters, blinds, solar shades and motorized shades. Blocking the afternoon sun can cut cooling bills noticeably.",
-    "Glass and mirrors": "Glass contractors for shower enclosures, custom mirrors, table tops and glass repair."
+    "Glass and mirrors": "Glass contractors for shower enclosures, custom mirrors, table tops and glass repair.",
+    "Wine and spirits": "Local wine shops and liquor stores, from boutique wine bars with weekly tastings to neighborhood stores with beer, spirits and cigars.",
+    "Desserts and ice cream": "Ice cream, donuts and dessert shops for a treat after dinner or a hot afternoon.",
+    "Waxing": "Waxing and sugaring studios for brows, Brazilians and full-body hair removal. Many book online.",
+    "Orthopedics": "Orthopedic surgeons and sports medicine doctors for joints, bones, hands and sports injuries.",
+    "Remodeling": "Kitchen and bath remodeling help, from appliance and fixture showrooms to design and installation.",
+    "Legal document help": "Paralegal and legal document services for paperwork like divorce filings, deeds and probate, usually for less than a law firm. They can't give legal advice.",
+    "Insurance": "Local insurance agents for home, auto, business, health and Medicare coverage. An independent agent can compare several companies for you.",
+    "Bike shops": "Bike and e-bike shops for sales, rentals and repairs. Cooler months are the best time to ride the valley's bike paths.",
+    "Furniture and home decor": "Furniture and home decor stores, including outdoor and patio furniture built for desert sun.",
+    "Clothing boutiques": "Locally owned clothing boutiques for women, men and kids, from resort wear to custom suits and children's consignment.",
+    "Jewelers": "Local jewelers for fine jewelry, custom pieces, watch service and repairs.",
+    "Florists": "Florists and floral designers for arrangements, weddings and events.",
+    "Dry cleaning and alterations": "Dry cleaners, alterations and shoe and leather repair. Some offer pickup and delivery.",
+    "Golf courses": "Places to play golf, from public courses to indoor golf simulators you can play any time of year.",
+    "Kids' classes": "Classes and programs for kids, from gymnastics and parkour to language lessons, after-school programs and camps.",
+    "Art galleries": "Local art galleries and artist collections.",
+    "Music lessons": "Music teachers and studios for voice, piano, guitar, violin and more, for kids and adults.",
+    "Photographers": "Local photographers for weddings, families, portraits and events.",
+    "Bars and nightclubs": "Local bars and lounges for drinks, games and a night out.",
+    "Accounting and tax": "Local accountants, tax preparers and bookkeepers for individuals and small businesses. Book early in tax season."
   }
 };
