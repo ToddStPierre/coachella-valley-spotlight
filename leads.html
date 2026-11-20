@@ -252,7 +252,8 @@ function visible() {
   var q = $('q').value.trim().toLowerCase(), card = $('card').value, cat = $('cat').value, repF = $('repFilter').value, showD = $('showDnc').checked;
   var fn = CHIPS.filter(function (c) { return c[0] === FILTER; })[0][2];
   var out = ROWS.filter(function (r) {
-    if (!showD && dnc(r) && FILTER !== 'sold') return false;
+    // A typed search always finds do-not-contact leads too (they still show their red pill), so nobody tries to re-add one.
+    if (!showD && !q && dnc(r) && FILTER !== 'sold') return false;
     if (card && !(g(r, 'Card / Route').indexOf(card) > -1 || /both/i.test(g(r, 'Card / Route')))) return false;
     if (cat && catOf(r) !== cat) return false;
     if (repF && (g(r, 'Sales Rep') || 'No rep') !== repF) return false;
