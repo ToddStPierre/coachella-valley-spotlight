@@ -1,5 +1,5 @@
 /* Admin: "Monthly reports" panel on stats.html in admin mode. One row per business that should get its numbers
-   every month: claimed owners (with their email) plus Premium and postcard listings. "Email report" opens a Gmail
+   every month: claimed owners (with their email) plus Premium and postcard listings. "Email report" opens a Zoho Mail
    draft with last month's numbers and their Spotlight Report link. "Sent" marks are kept in this browser only. */
 (function () {
   var API = "https://cvs-tracker.toddstpierre.workers.dev", SITE = "https://coachellavalleyspotlight.com/", FROM = "todd@coachellavalleyspotlight.com";
@@ -46,12 +46,12 @@
         "Your full report, with the month-by-month chart, is here (it's private to you):\n" + link + "\n\n" +
         (acts ? "" : "Want more of those views to turn into calls? A fresh special on your listing gives people a reason to reach out. Reply with one and I'll put it up.\n\n") +
         "Thanks for being part of it.\n\nTodd\nCoachella Valley Spotlight\n(760) 422-5475";
-      return { su: su, body: body, gmail: "https://mail.google.com/mail/?authuser=" + encodeURIComponent(FROM) + "&view=cm&fs=1" + (x.email ? "&to=" + encodeURIComponent(x.email) : "") + "&su=" + encodeURIComponent(su) + "&body=" + encodeURIComponent(body), link: link };
+      return { su: su, body: body, gmail: "https://mail.zoho.com/zm/comp.do?ct=" + encodeURIComponent("mailto:" + (x.email ? encodeURIComponent(x.email) : "") + "?subject=" + encodeURIComponent(su) + "&body=" + encodeURIComponent(body)), link: link };
     }
     function draw() {
       var done = list.filter(function (x) { return sent[x.slug] === ym; }).length;
       box.innerHTML = '<h2 class="month-head"><span class="stripe-mini"></span>Monthly reports: ' + monthName(ym) + ' (' + done + ' of ' + list.length + ' sent)</h2>' +
-        '<p class="risk" style="margin-bottom:16px">Owners and paying businesses get their numbers every month. Email report opens a ready Gmail draft from ' + FROM + '. Postcard and Premium listings without an owner account have no email on file, so fill in the To line.' +
+        '<p class="risk" style="margin-bottom:16px">Owners and paying businesses get their numbers every month. Email report opens a ready Zoho Mail draft from ' + FROM + '. Postcard and Premium listings without an owner account have no email on file, so fill in the To line.' +
         (quiet.length ? ' Only listings with activity in ' + monthName(ym) + ' are shown; ' + quiet.length + ' had none (' + quiet.map(function (x) { return esc(x.b.name); }).join(", ") + ').' : "") + '</p>' +
         '<div class="table-scroll"><table class="stats-table"><thead><tr><th>Business</th><th>' + monthName(ym) + '</th><th>Send to</th><th></th></tr></thead><tbody>' +
         list.map(function (x) {

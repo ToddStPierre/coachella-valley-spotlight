@@ -2,7 +2,7 @@
    1) Each upcoming card's progress toward its sold minimum (live from the reservations Worker),
    2) "Do today": new submissions, claims, the booking deadline, offers and deals about to expire,
    3) "Who to pitch": free listings with recent traffic whose category is still open on a card, each with a
-      ready Gmail draft (no price, per the cold rule) that carries their Spotlight Report link.
+      ready Zoho Mail draft (no price, per the cold rule) that carries their Spotlight Report link.
    Every email, call or text is logged to the tracker (GET /admin/pitches, POST /admin/pitch): status, follow-up date
    and a dated contact history per business. Due follow-ups show up in "Do today". */
 (function () {
@@ -180,7 +180,7 @@
         "\n\nThose are neighbors looking for " + (x.b.service || "local businesses").toLowerCase() + " in the valley. If you'd like to be the name they already know before they search, the " + x.cat.replace(/\//g, " and ").toLowerCase() + " spot on our " + m.name + " postcard is still open. It goes to " + m.homes + " on " + niceLong(m.mail) + ", one business per category, and booking closes " + niceLong(m.deadline) + "." +
         "\n\nWant me to hold it for you? Just reply \"hold it.\"\n\nTodd\nCoachella Valley Spotlight\n(760) 422-5475\n\nIf you'd rather not hear from me, just say so and I won't email again.";
       var to = (contacts[x.b.slug] || {}).email || "";
-      return { su: su, body: body, gmail: "https://mail.google.com/mail/?authuser=" + encodeURIComponent(FROM) + "&view=cm&fs=1" + (to ? "&to=" + encodeURIComponent(to) : "") + "&su=" + encodeURIComponent(su) + "&body=" + encodeURIComponent(body), report: report };
+      return { su: su, body: body, gmail: "https://mail.zoho.com/zm/comp.do?ct=" + encodeURIComponent("mailto:" + (to ? encodeURIComponent(to) : "") + "?subject=" + encodeURIComponent(su) + "&body=" + encodeURIComponent(body)), report: report };
     }
     function when(iso) { return new Date(iso).toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short", day: "numeric" }); }
     function chanLabel(c) { var f = CHANNELS.filter(function (k) { return k[0] === c; })[0]; return f ? f[1] : c; }
@@ -214,7 +214,7 @@
         '<span class="ck-sub">' + (x.routes.length ? esc(x.cat) + ' open on ' + x.routes.map(function (m) { return esc(m.name); }).join(" and ") : x.cat ? esc(x.cat) + ' is taken on the cards' : 'No card category') + '</span>' +
         (r ? '<span class="ck-status">' + statusPill(r) + '</span>' : "") +
         (last ? '<span class="ck-last">Last: ' + esc(chanLabel(last.channel)) + ' ' + when(last.created_at) + ' (' + ago(last.created_at) + ')' + (last.note ? ': ' + esc(last.note.length > 90 ? last.note.slice(0, 90) + "…" : last.note) : "") + '</span>' : "") + '</div>' +
-        '<div class="ck-lead-cta">' + (d ? '<a class="btn' + (r ? " btn-ghost" : "") + '" href="' + esc(d.gmail) + '" target="_blank" rel="noopener" data-pitch="' + esc(x.b.slug) + '">Email in Gmail</a>' : "") +
+        '<div class="ck-lead-cta">' + (d ? '<a class="btn' + (r ? " btn-ghost" : "") + '" href="' + esc(d.gmail) + '" target="_blank" rel="noopener" data-pitch="' + esc(x.b.slug) + '">Email in Zoho</a>' : "") +
         (x.b.phone ? '<a class="btn btn-ghost" href="tel:' + esc(x.b.phone.replace(/[^\d+]/g, "")) + '" data-tel="' + esc(x.b.slug) + '">' + esc(x.b.phone) + '</a>' : "") +
         '<button type="button" class="btn btn-ghost" data-open="' + esc(x.b.slug) + '">' + (r ? "Update" : "Log contact") + '</button>' +
         '<span class="ck-links">' + (d ? '<a href="#" data-copy-pitch="' + esc(x.b.slug) + '">Copy email</a> &middot; ' : "") + (x.s.key ? '<a href="' + esc(SITE + "stats?b=" + x.b.slug + "&key=" + x.s.key) + '" target="_blank" rel="noopener">Their report</a>' : "") + '</span></div>' +
