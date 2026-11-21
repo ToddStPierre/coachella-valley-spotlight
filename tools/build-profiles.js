@@ -67,7 +67,7 @@ for (const b of list) {
   const html = `${head}${metaTags({ title: `${b.name} | ${kind} in ${b.city}, CA`, description: desc, url, image: prem && b.image })}<base href="../../">
 ${headRest}${ldjson(schema)}${ldjson(breadcrumbs(trail))}
 </head>
-<body data-profile="${slug}">
+<body data-profile="${slug}" data-name="${esc(b.name)}" data-city="${esc(b.city || "")}" data-phone="${esc(b.phone || "")}" data-ad="${esc(b.image || "")}" data-paid="${b.premium || b.featured || b.postcard ? 1 : ""}">
 ${header}
 <main id="main" tabindex="-1">
 <div data-biz="${slug}" data-noimp>
@@ -125,7 +125,7 @@ ${related.length ? `<section class="pf-related"><div class="wrap"><h2 class="mon
 <div class="wrap"><div class="biz-band"><p><strong>Own a local business?</strong><br>List it free, or go Premium for photos, hours, offers and monthly stats.</p><a class="btn" href="advertise#plans">See listing plans</a></div></div>
 </main>
 ${footer}
-<script src="assets/app.js?v=20261117tc"></script>
+<script src="assets/app.js?v=20261121op"></script>
 </body>
 </html>
 `;

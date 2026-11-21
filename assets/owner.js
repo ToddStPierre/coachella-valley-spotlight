@@ -4,7 +4,7 @@
   var q = new URLSearchParams(location.search), slug = q.get("b") || "", key = q.get("key") || "";
   var out = document.getElementById("ow-out");
   var flash = "";
-  var LABELS = [["impression", "Listing seen", "Times your listing card showed up on someone's screen while they browsed the directory, search results, a town page or the home page. Visits straight to your profile page are not counted here."], ["profile", "Profile views", "Visits to your profile page, whether people came from our site, Google or a link someone shared."], ["call", "Calls tapped", "Taps on your Call button or phone number on our site."], ["website", "Website visits", "Clicks from our site through to your website."], ["scan", "QR scans", "Times someone scanned the QR code on your postcard ad. Each scan opens your page on our site, and your deal if you have one."], ["claim", "Deals claimed", "Times someone opened your deal to claim it: from your page, the deals page or a postcard scan. Each one shows a code they can show you to redeem."]];
+  var LABELS = [["impression", "Listing seen", "Times your listing card showed up on someone's screen while they browsed the directory, search results, a town page or the home page. Visits straight to your profile page are not counted here."], ["profile", "Profile views", "Visits to your profile page, whether people came from our site, Google or a link someone shared."], ["call", "Calls tapped", "Taps on your Call button or phone number on our site."], ["website", "Website visits", "Clicks from our site through to your website."], ["scan", "QR scans", "Times someone scanned the QR code on your postcard ad. Each scan opens your page on our site, and your deal if you have one."], ["claim", "Deals claimed", "Times someone opened your deal to claim it: from your page, the deals page or a postcard scan. Each one shows a code they can show you to redeem."], ["emailed", "Ad emailed", "Times someone asked for your ad or deal by email, after scanning your postcard or opening your deal. We emailed it to them so they have it when they need you."], ["lead", "New leads", "People who asked for your ad or deal by email and said it's OK for you to contact them. You get an email the moment it happens, and they're listed on your dashboard."], ["share", "Sent to a neighbor", "Times someone tapped Send to a neighbor to pass your ad or deal along to someone else."]];
   function tip(l) { return l[1] + ' <span class="stat-tip" tabindex="0" role="button" aria-label="What does ' + l[1] + ' mean?" data-tip="' + l[2].replace(/"/g, "&quot;") + '">?</span>'; }
   function monthName(ym) { var p = ym.split("-"); return new Date(+p[0], +p[1] - 1, 1).toLocaleString("en-US", { month: "long", year: "numeric" }); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -54,6 +54,17 @@
         '<p class="risk">Counts come from this site only. Bots and people who block tracking are not counted, so real numbers run a little higher. Times are Pacific.</p></details>';
     }
 
+    // Leads (2026-11-21): people who asked for their ad/deal by email and OK'd being contacted (tracker POST /optin).
+    if ((L.premium || L.postcard) && d.stats) {
+      var LD = d.leads || [], SRC = { qr: "Scanned your postcard", share: "Shared link", deal: "Deals page", profile: "Your page" };
+      html += '<h2 class="month-head"><span class="stripe-mini"></span>Your leads' + (LD.length ? " (" + LD.length + ")" : "") + '</h2>';
+      html += LD.length
+        ? '<p style="margin:0 0 10px">These people asked for your ad or deal and said it&rsquo;s OK for you to contact them. You also get an email for each one the moment it comes in. <button type="button" class="btn btn-ghost" id="ow-leads-csv" style="margin-left:6px">Download list (CSV)</button></p>' +
+          '<div class="table-scroll"><table class="stats-table"><thead><tr><th>Email</th><th>How they found you</th><th>When</th></tr></thead><tbody>' +
+          LD.map(function (l) { return '<tr><td><a href="mailto:' + esc(l.email) + '">' + esc(l.email) + '</a></td><td>' + esc(SRC[l.src] || "Our site") + '</td><td>' + esc(new Date(l.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })) + '</td></tr>'; }).join("") + '</tbody></table></div>'
+        : '<p class="risk" style="margin:0 0 16px">When someone scans your postcard, asks for your ad by email and says it&rsquo;s OK for you to contact them, they show up here and you get an email right away.</p>';
+    }
+
     html += '<div class="ow-split"><div class="ow-main">';
     html += '<h2 class="month-head"><span class="stripe-mini"></span>Your details</h2><div class="card" style="padding:28px"><form class="form" id="ow-form">';
     html += field("blurb", "Short description (shows on the directory card)", L.blurb, { full: true, area: true, max: 220, rows: 2, help: "Up to 220 characters." });
@@ -85,6 +96,14 @@
       html += '<div class="biz-band" style="margin-top:32px"><p style="color:#fff"><strong>Want photos, hours, a special offer and monthly stats?</strong><br>Premium is $49 a month or $438 a year, or free while you&rsquo;re on a Spotlight postcard.</p><a class="btn" href="advertise.html#plans">See Premium</a></div>';
     }
     out.innerHTML = html;
+    var csvBtn = document.getElementById("ow-leads-csv");
+    if (csvBtn) csvBtn.addEventListener("click", function () {
+      var q = function (v) { return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; };
+      var rows = [["Email", "How they found you", "Date"]].concat((d.leads || []).map(function (l) { return [l.email, l.src || "", (l.created_at || "").slice(0, 10)]; }));
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([rows.map(function (r) { return r.map(q).join(","); }).join("\n")], { type: "text/csv" }));
+      a.download = L.slug + "-leads.csv"; document.body.appendChild(a); a.click(); a.remove();
+    });
     wire(L);
     badge(L);
   }

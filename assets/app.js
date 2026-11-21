@@ -292,35 +292,117 @@
   function closeDealModal() { var o = document.querySelector(".deal-modal-backdrop"); if (!o) return; o.remove(); if (o._return) o._return.focus(); document.removeEventListener("keydown", escClose); }
   function escClose(e) { if (e.key === "Escape") closeDealModal(); }
 
-  // auto: opened for them after a postcard QR scan. That only counts as a claim once they tap Text, Email or Call.
-  function openDealModal(x, trigger, auto) {
+  // Paid listings (Premium or on the postcard) can collect leads: the "Let <business> contact me" box only shows for them.
+  // Profile pages don't load data/directory.js, so build-profiles.js puts what we need on <body data-...>.
+  function bizBySlug(slug) {
+    if (!slug) return null;
+    var hit = directory.filter(function (b) { return b.slug === slug && !b.sample; })[0]; if (hit) return hit;
+    var bd = document.body, a = function (k) { return bd.getAttribute("data-" + k) || ""; };
+    return a("profile") === slug && a("name") ? { slug: slug, name: a("name"), city: a("city"), phone: a("phone"), image: a("ad"), postcard: !!a("paid") } : null;
+  }
+  function isPaid(b) { return !!(b && (b.premium || b.featured || b.postcard)); }
+
+  // "Email me this" form (2026-11-21). The tracker emails them the ad/deal through Resend. Both boxes start unticked:
+  // share = OK for the business to contact them (a lead, alerted to the business); list = our own local deals list.
+  function optinForm(biz, paid, isDeal) {
+    return '<form class="optin" novalidate>' +
+      '<label class="optin-label" for="op-email">' + (isDeal ? "Email me this deal" : "Email me this ad") + '</label>' +
+      '<div class="optin-row"><input id="op-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required><button type="submit" class="btn">Send it</button></div>' +
+      (paid ? '<label class="optin-check"><input type="checkbox" name="share"> Let ' + esc(biz) + ' contact me about this offer</label>' : '') +
+      '<label class="optin-check"><input type="checkbox" name="list"> Send me local deals from Coachella Valley Spotlight</label>' +
+      '<input class="optin-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">' +
+      '<p class="optin-msg" role="status" aria-live="polite"></p>' +
+      '<p class="optin-fine">We only email you what you asked for. Unsubscribe anytime.</p></form>';
+  }
+  function wireOptin(o, slug, src, mailtoHref, onDone) {
+    var f = o.querySelector(".optin"); if (!f) return;
+    f.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var em = f.email.value.trim(), msg = f.querySelector(".optin-msg"), b = f.querySelector("button");
+      if (!/^[^@\s,;]+@[^@\s,;]+\.[a-z]{2,}$/i.test(em)) { msg.className = "optin-msg is-err"; msg.textContent = "Please check your email address."; f.email.focus(); return; }
+      b.disabled = true; b.textContent = "Sending…"; msg.className = "optin-msg"; msg.textContent = "";
+      var body = { b: slug, email: em, share: !!(f.share && f.share.checked), list: f.list.checked, src: src, website: f.website.value };
+      fetch(TRACK_BASE + "/optin", { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+        .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || "That didn't go through."); return d; }); })
+        .then(function (d) {
+          mailTodd(d.notice);
+          if (onDone) onDone(d);
+          if (!window.CVS_NOTRACK && window.gtag) window.gtag("event", "optin", { business: slug, lead: !!d.lead, list: body.list });
+          f.innerHTML = d.emailed
+            ? '<p class="optin-done"><b>Sent to ' + esc(em) + '.</b> Check your inbox (and spam, just in case).' + (d.lead ? " They may reach out about the offer." : "") + '</p>'
+            : '<p class="optin-done"><b>Saved.</b> ' + (d.lead ? "They may reach out about the offer. " : "") + '<a href="' + mailtoHref.replace(/^mailto:\?/, "mailto:" + encodeURIComponent(em) + "?") + '">Tap here to email it to yourself</a>.</p>';
+        })
+        .catch(function (err) { b.disabled = false; b.textContent = "Send it"; msg.className = "optin-msg is-err"; msg.innerHTML = esc(err.message || "That didn't go through.") + ' <a href="' + mailtoHref + '">Email it to yourself instead</a>.'; });
+    });
+  }
+  // "Send to a neighbor": the phone's share sheet, or copy the link on a computer. Shared links open the same ticket.
+  // Full address of a site page (profile pages use <base href="../../">, other pages use ROOT, so resolve against both).
+  function absUrl(path) { try { return new URL(ROOT + path, document.baseURI).href; } catch (e) { return location.origin + "/" + path; } }
+  function shareBtn(slug, biz, offer) { return slug ? '<button type="button" class="btn btn-ghost" data-share-biz="' + esc(slug) + '" data-share-text="' + esc(offer ? offer + " at " + biz : biz) + '">Send to a neighbor</button>' : ""; }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-share-biz]"); if (!b) return;
+    var slug = b.getAttribute("data-share-biz"), url = absUrl("business/" + slug + "/?from=share"), txt = "Thought you could use this: " + b.getAttribute("data-share-text");
+    track(slug, "share");
+    if (navigator.share) { navigator.share({ title: "Coachella Valley Spotlight", text: txt, url: url }).catch(function () {}); return; }
+    var done = function () { b.textContent = "Link copied. Paste it to a neighbor"; setTimeout(function () { b.textContent = "Send to a neighbor"; }, 2600); };
+    if (navigator.clipboard) navigator.clipboard.writeText(txt + " " + url).then(done, function () { location.href = "sms:?&body=" + encodeURIComponent(txt + " " + url); });
+    else location.href = "sms:?&body=" + encodeURIComponent(txt + " " + url);
+  });
+
+  function openModal(html, trigger) {
+    var o = document.createElement("div"); o.className = "deal-modal-backdrop"; o._return = trigger;
+    o.innerHTML = '<div class="deal-modal" role="dialog" aria-modal="true" aria-labelledby="dm-title"><button type="button" class="deal-modal-close" aria-label="Close">&times;</button>' + html + '</div>';
+    document.body.appendChild(o);
+    o.querySelector(".deal-modal-close").focus();
+    document.addEventListener("keydown", escClose);
+    o.addEventListener("click", function (e) { if (e.target === o || e.target.closest(".deal-modal-close")) closeDealModal(); });
+    return o;
+  }
+
+  // auto: opened for them after a postcard QR scan or a shared link. That only counts as a claim once they act (text, email, call, send).
+  function openDealModal(x, trigger, auto, src) {
     // One code per business (from its slug when known), so the owner has a single code to tally at the counter.
     var key = dealKey(x), code = claimCode(x.slug || key), d = parse(x.expires);
     var phone = phoneIn(x.details) || x.phone || "", tel = phone.replace(/[^\d]/g, "");
-    var body = x.offer + " at " + x.business + " (" + x.details + "). Code " + code + ". " + location.origin + ROOT + "deals";
-    var o = document.createElement("div"); o.className = "deal-modal-backdrop"; o._return = trigger;
-    o.innerHTML = '<div class="deal-modal" role="dialog" aria-modal="true" aria-labelledby="dm-title">' +
-      '<button type="button" class="deal-modal-close" aria-label="Close">&times;</button>' +
+    var body = x.offer + " at " + x.business + " (" + x.details + "). Code " + code + ". " + absUrl("deals");
+    var mailto = "mailto:?subject=" + encodeURIComponent("Your Coachella Valley Spotlight deal") + "&body=" + encodeURIComponent(body);
+    var claimSlug = x.slug || (directory.filter(function (b) { return b.name === x.business && !b.sample; })[0] || {}).slug;
+    var o = openModal(
       '<div class="deal-modal-ticket"><span class="meta">' + esc(x.business) + ' &middot; ' + esc(x.city) + '</span>' +
       '<h3 id="dm-title">' + esc(x.offer) + '</h3><p>' + esc(x.details) + '</p>' +
       '<div class="deal-code"><span>Show this to redeem</span><b>' + code + '</b></div>' +
       '<span class="meta">' + (d ? 'Good through ' + fmt(d) : 'Ongoing') + '</span></div>' +
+      (claimSlug ? optinForm(x.business, isPaid(bizBySlug(claimSlug)), true) : '') +
       '<div class="deal-modal-actions">' +
-      '<a class="btn" href="sms:?&body=' + encodeURIComponent(body) + '">Text me this deal</a>' +
-      '<a class="btn btn-ghost" href="mailto:?subject=' + encodeURIComponent("Your Coachella Valley Spotlight deal") + '&body=' + encodeURIComponent(body) + '">Email it to me</a>' +
+      '<a class="btn' + (claimSlug ? ' btn-ghost' : '') + '" href="sms:?&body=' + encodeURIComponent(body) + '">Text me this deal</a>' +
+      (claimSlug ? '' : '<a class="btn btn-ghost" href="' + mailto + '">Email it to me</a>') +
+      shareBtn(claimSlug, x.business, x.offer) +
       (tel ? '<a class="btn btn-ghost" href="tel:' + tel + '">Call ' + esc(phone) + '</a>' : '') +
       (x.url ? '<a class="btn btn-ghost" href="' + esc(/^https?:/i.test(x.url) ? x.url : ROOT + x.url) + '">View business &rarr;</a>' : '') +
-      '</div></div>';
-    document.body.appendChild(o);
+      '</div>', trigger);
     markClaimed(key); paintClaimed();
     // Counted per business so owners see "Deals claimed" on their dashboard (tracker event "claim").
-    var claimSlug = x.slug || (directory.filter(function (b) { return b.name === x.business && !b.sample; })[0] || {}).slug;
-    if (!auto) track(claimSlug, "claim");
-    else o.querySelector(".deal-modal-actions").addEventListener("click", function once(e) { if (e.target.closest("a")) { track(claimSlug, "claim"); this.removeEventListener("click", once); } });
+    var claimed = false, claimOnce = function () { if (!claimed) { claimed = true; track(claimSlug, "claim"); } };
+    if (!auto) claimOnce();
+    else o.querySelector(".deal-modal-actions").addEventListener("click", function (e) { if (e.target.closest("a, button")) claimOnce(); });
+    if (claimSlug) wireOptin(o, claimSlug, src || (auto ? "qr" : "deal"), mailto, claimOnce);
     if (!window.CVS_NOTRACK && window.gtag) window.gtag("event", "deal_claim", { business: x.business, offer: x.offer });
-    o.querySelector(".deal-modal-close").focus();
-    document.addEventListener("keydown", escClose);
-    o.addEventListener("click", function (e) { if (e.target === o || e.target.closest(".deal-modal-close")) closeDealModal(); });
+  }
+
+  // A postcard scan (or shared link) for a business with no deal: show their ad with the same "Email me this ad" form.
+  function openAdModal(b, src) {
+    var page = absUrl("business/" + b.slug + "/"), tel = String(b.phone || "").replace(/[^\d]/g, "");
+    var mailto = "mailto:?subject=" + encodeURIComponent(b.name + " (Coachella Valley Spotlight)") + "&body=" + encodeURIComponent(b.name + (b.phone ? ", " + b.phone : "") + ". " + page);
+    var o = openModal(
+      '<div class="deal-modal-ticket"><span class="meta">' + esc(b.name) + (b.city ? ' &middot; ' + esc(b.city) : '') + '</span>' +
+      '<h3 id="dm-title">Save this ad for later</h3>' +
+      (b.image ? '<img class="deal-modal-ad" src="' + esc(ROOT + b.image) + '" alt="' + esc(b.imageAlt || b.name + " ad") + '">' : '') + '</div>' +
+      optinForm(b.name, isPaid(b), false) +
+      '<div class="deal-modal-actions">' + shareBtn(b.slug, b.name, "") +
+      (tel ? '<a class="btn btn-ghost" href="tel:' + tel + '" data-track="call">Call ' + esc(b.phone) + '</a>' : '') +
+      '<button type="button" class="btn btn-ghost" data-close-modal>See their page</button></div>', null);
+    o.querySelector("[data-close-modal]").addEventListener("click", closeDealModal);
+    wireOptin(o, b.slug, src, mailto);
   }
   document.addEventListener("click", function (e) {
     var btn = e.target.closest("[data-claim]");
@@ -331,11 +413,13 @@
   // Profile pages: the Deals card's "Claim this deal" (tools/build-profiles.js puts the deal in data- attributes).
   function profileDeal(el) { var a = function (k) { return el.getAttribute("data-" + k) || ""; }; return { slug: a("slug"), business: a("business"), city: a("city"), offer: a("offer"), details: a("details"), expires: a("expires"), phone: a("phone"), url: "" }; }
   document.addEventListener("click", function (e) { var b = e.target.closest("[data-claim-offer]"); if (b) openDealModal(profileDeal(b), b); });
-  // Arrived from a postcard QR code (s.html sends ?from=qr): open their deal ticket right away.
-  if (/[?&]from=qr\b/.test(location.search)) {
-    var qrDeal = document.querySelector("[data-claim-offer]");
-    if (qrDeal) setTimeout(function () { openDealModal(profileDeal(qrDeal), qrDeal, true); }, 350);
-    if (!window.CVS_NOTRACK && window.gtag) window.gtag("event", "qr_scan", { business: document.body.getAttribute("data-profile") || "" });
+  // Arrived from a postcard QR code (s.html sends ?from=qr) or a "Send to a neighbor" link (?from=share):
+  // open their deal ticket right away, or their ad with "Email me this ad" when they have no deal.
+  var fromM = location.search.match(/[?&]from=(qr|share)\b/);
+  if (fromM) {
+    var qrDeal = document.querySelector("[data-claim-offer]"), qrBiz = bizBySlug(document.body.getAttribute("data-profile"));
+    setTimeout(function () { if (qrDeal) openDealModal(profileDeal(qrDeal), qrDeal, true, fromM[1]); else if (qrBiz) openAdModal(qrBiz, fromM[1]); }, 350);
+    if (fromM[1] === "qr" && !window.CVS_NOTRACK && window.gtag) window.gtag("event", "qr_scan", { business: document.body.getAttribute("data-profile") || "" });
   }
 
   function text(item) { return Object.keys(item).map(function (k) { return typeof item[k] === "string" ? item[k] : ""; }).join(" ").toLowerCase(); }
@@ -465,7 +549,7 @@
   }
 
   // Listing tracking: counts views, profile views, calls and website clicks per business.
-  var TRACK = "https://cvs-tracker.toddstpierre.workers.dev/t";
+  var TRACK_BASE = "https://cvs-tracker.toddstpierre.workers.dev", TRACK = TRACK_BASE + "/t";
   function track(slug, type) {
     if (!slug || window.CVS_NOTRACK || /localhost|127\.0\.0\.1|^file/.test(location.href)) return;
     var body = JSON.stringify({ b: slug, e: type });

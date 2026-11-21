@@ -2047,3 +2047,20 @@ html.vs-lock, html.vs-lock body { overflow: hidden; }
   .vs-backdrop { cursor: zoom-out; }
 }
 @media (prefers-reduced-motion: reduce) { .vs-bg { animation: none; } .vs-card, .vs-viewer, .vs-ring { transition: none; } }
+
+/* "Email me this" form on the deal ticket and the QR ad sheet (2026-11-21) */
+.deal-modal-ad { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); margin-top: 6px; }
+.optin { display: grid; gap: 8px; padding: 14px; border-radius: 12px; background: #fff4e8; border: 1px solid var(--line); }
+.optin-label { font-weight: 700; }
+.optin-row { display: flex; gap: 8px; }
+.optin-row input { flex: 1; min-width: 0; font: inherit; font-size: 16px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.optin-row .btn { white-space: nowrap; }
+.optin-check { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; line-height: 1.35; color: var(--ink-2); cursor: pointer; }
+.optin-check input { margin-top: 2px; width: 18px; height: 18px; flex: none; accent-color: var(--sun-deep); }
+.optin-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.optin-msg:empty { display: none; }
+.optin-msg { margin: 0; font-size: 14px; }
+.optin-msg.is-err { color: #a3261b; }
+.optin-fine { margin: 0; font-size: 12px; color: var(--ink-2); }
+.optin-done { margin: 0; }
+.deal-modal { grid-template-columns: minmax(0, 1fr); } /* keeps a wide ad image from stretching the sheet past the screen */
