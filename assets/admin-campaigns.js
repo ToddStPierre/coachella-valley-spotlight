@@ -10,7 +10,7 @@
   var ROUTES = {}; Object.keys(HQ.ROUTES).forEach(function (r) { ROUTES[r] = HQ.ROUTES[r]; });
   var list = JSON.parse(JSON.stringify(window.CVS_MAILINGS || []));
   list.forEach(function (m) { if (m.route && m.name) ROUTES[m.route] = ROUTES[m.route] || m.name; });
-  var lines = [], linesOk = false, board = null, view = "upcoming", tmp = 0, openKey = null;
+  var lines = [], linesOk = false, board = null, tmp = 0, openKey = null;
 
   var box = document.createElement("div"); box.id = "campaigns-admin";
   (document.getElementById("mailings-admin") || document.getElementById("st-out")).before(box);
@@ -42,11 +42,16 @@
     if (nine(m)) return FX.soldDollars("9x12", sp);
     return sp.reduce(function (n, r) { return n + (stOf(r) === "sold" ? 300 : 0); }, 0);
   }
-  // ---- projection (2026-11-21) ----
-  // A card only prints and mails once it reaches its minimum, so a card below it projects $0 income and $0 cost.
-  // booked = sold + held ads at list price (9x12) or $300 a spot (11x6), or the recorded income if that's higher.
-  // cost = recorded expenses, or the standard cost (printing $967 + $0.33 a home) if that's higher, for 9x12 cards.
-  // In dollars. A sold spot counts what was actually paid when the board has it (a joined ad's amount sits on its first spot).
+  // ---- potential vs actual (redesign 2026-11-21) ----
+  // Potential = every spot sold at the advertised price, less the card's costs.
+  //   9x12: $5,600; costs printing $967 + $0.33 a home. 11x6: 16 x $300 = $4,800; costs $615 + $0.26 a home (the old job).
+  //   If more costs are recorded than that, the recorded figure is used.
+  // Actual = the income and expense lines recorded on the campaign (the drawer's Income & expenses).
+  function stdCost(m) { return Math.round((nine(m) ? PRINT + POSTAGE * homesN(m) : 615 + 0.26 * homesN(m)) * 100); }
+  function pot(m) { var t = totals(linesOf(m)), inc = fullValue(m) * 100, exp = Math.max(t.exp, stdCost(m)); return { inc: inc, exp: exp, profit: inc - exp }; }
+  // Costs on a tentative card aren't spent yet (it only prints once it reaches its minimum), so they count as planned, not actual.
+  function act(m) { var t = totals(linesOf(m)); if (isConf(m)) return t; return { inc: t.inc, exp: 0, profit: t.inc, planned: t.exp }; }
+  // Held + sold at list price (sold at what was paid when the board has it), in dollars.
   function bookedValue(m, sp) {
     if (!sp) return 0;
     return sp.reduce(function (n, r) {
@@ -55,48 +60,36 @@
       return n + (nine(m) ? FX.spotPrice("9x12", r.position) || 0 : 300);
     }, 0);
   }
-  function stdCost(m) { return nine(m) ? Math.round((PRINT + POSTAGE * homesN(m)) * 100) : 0; }
-  function proj(m) {
-    var sp = spotsOf(m), t = totals(linesOf(m)), bk = bookedValue(m, sp) * 100, inc = Math.max(bk, t.inc);
-    var need = nine(m) ? (m.minDollars || 2625) * 100 : (m.minSold || 8) * 30000;
-    var cnt = sp ? sp.filter(function (r) { return stOf(r) !== "open"; }).length : 0;
-    var on = days(m.mail) < 0 || confirmed(m, sp) || (nine(m) ? bk >= need : cnt >= (m.minSold || 8));
-    var exp = on ? Math.max(t.exp, stdCost(m)) : 0;
-    return { on: on, inc: on ? inc : 0, exp: exp, profit: (on ? inc : 0) - exp, rec: t, toGo: on ? 0 : (nine(m) ? need - bk : ((m.minSold || 8) - cnt) * 30000), booked: inc };
-  }
-  // Tentative cards (below their minimum) are projected as if they mail at the minimum:
-  // income = what's booked or the minimum, whichever is more; costs = standard cost (or recorded, if more).
-  function tent(m) {
-    var p = proj(m), need = nine(m) ? (m.minDollars || 2625) * 100 : (m.minSold || 8) * 30000;
-    var inc = Math.max(p.booked, need), exp = Math.max(p.rec.exp, stdCost(m));
-    return { inc: inc, exp: exp, profit: inc - exp };
-  }
-  // Sold out: every spot sells at the advertised price (9x12 $5,600, 11x6 16 x $300 = $4,800), less the card's costs.
-  function full(m) {
-    var p = proj(m), inc = fullValue(m) * 100, exp = Math.max(p.rec.exp, stdCost(m));
-    return { inc: inc, exp: exp, profit: inc - exp };
-  }
-  function sumProj(ms) {
-    var s = { c: { inc: 0, exp: 0, profit: 0, n: 0 }, t: { inc: 0, exp: 0, profit: 0, n: 0, booked: 0, toGo: 0 }, f: { inc: 0, exp: 0, profit: 0 }, n: 0, recInc: 0, recExp: 0 };
-    ms.forEach(function (m) {
-      var p = proj(m), fu = full(m); s.n++; s.recInc += p.rec.inc; s.recExp += p.rec.exp; s.f.inc += fu.inc; s.f.exp += fu.exp; s.f.profit += fu.profit;
-      if (p.on) { s.c.n++; s.c.inc += p.inc; s.c.exp += p.exp; s.c.profit += p.profit; }
-      else { var t = tent(m); s.t.n++; s.t.inc += t.inc; s.t.exp += t.exp; s.t.profit += t.profit; s.t.booked += p.booked; s.t.toGo += p.toGo; }
-    });
+  function paidOnBoard(m, sp) { return (sp || []).reduce(function (n, r) { return n + (stOf(r) === "sold" && r.paid && r.paid.amount ? r.paid.amount : 0); }, 0); }
+  function isConf(m) { var k = status(m, spotsOf(m)).k; return k === "ok" || k === "mailed"; }
+  function sum(ms) {
+    var s = { n: 0, conf: 0, pot: { inc: 0, exp: 0, profit: 0 }, act: { inc: 0, exp: 0, profit: 0 } };
+    ms.forEach(function (m) { var p = pot(m), a = act(m); s.n++; if (isConf(m)) s.conf++; ["inc", "exp", "profit"].forEach(function (k) { s.pot[k] += p[k]; s.act[k] += a[k]; }); });
     return s;
   }
-  function trio(label, sub, x, cls) {
-    return '<div class="cp-trio ' + cls + '"><div class="cp-trio-h"><b>' + label + "</b><span>" + sub + "</span></div>" +
-      "<div><span>Income</span><b>" + usd(x.inc) + "</b></div><div><span>Costs</span><b>" + usd(x.exp) + '</b></div><div><span>Profit</span><b class="' + (x.profit < 0 ? "neg" : "pos") + '">' + usd(x.profit) + "</b></div></div>";
+  function pct(a, p) { return p > 0 ? Math.max(0, Math.min(100, Math.round(a / p * 100))) : 0; }
+  function pair(a, p, neg) { return '<span class="cp-pair"><b class="' + (neg && a < 0 ? "neg" : "") + '">' + usd(a) + '</b><span>of ' + usd(p) + '</span><i class="cp-meter"><i style="width:' + pct(a, p) + '%"></i></i></span>'; }
+  function kpis(s) {
+    function tile(lbl, a, p, neg) { return '<div class="cp-kpi"><span>' + lbl + '</span><b class="' + (neg && a < 0 ? "neg" : "") + '">' + usd(a) + '</b><em>actual of ' + usd(p) + ' potential &middot; ' + pct(a, p) + '%</em><i class="cp-meter"><i style="width:' + pct(a, p) + '%"></i></i></div>'; }
+    return '<div class="cp-kpis">' + tile("Income", s.act.inc, s.pot.inc) + tile("Costs", s.act.exp, s.pot.exp) + tile("Profit", s.act.profit, s.pot.profit, true) + "</div>";
   }
-  function projHtml(s, big) {
-    var all = { inc: s.c.inc + s.t.inc, exp: s.c.exp + s.t.exp, profit: s.c.profit + s.t.profit };
-    return '<div class="cp-proj2' + (big ? " big" : "") + '">' +
-      trio("Confirmed", s.c.n + (s.c.n === 1 ? " card" : " cards") + " at or over the minimum", s.c, "conf") +
-      trio("Tentative", s.t.n + (s.t.n === 1 ? " card" : " cards") + (s.t.n ? " &middot; if each mails at its minimum &middot; " + usd(s.t.booked) + " booked, " + usd(s.t.toGo) + " to go" : ""), s.t, "tent") +
-      trio("Sold out", "if every spot on " + (s.n === 1 ? "this card" : "all " + s.n + " cards") + " sells at the advertised price", s.f, "full") +
-      '<p class="cp-both">Confirmed + tentative: income <b>' + usd(all.inc) + "</b> &middot; costs <b>" + usd(all.exp) + '</b> &middot; profit <b class="' + (all.profit < 0 ? "neg" : "pos") + '">' + usd(all.profit) + "</b>" +
-      ' <span>&middot; Recorded so far: income ' + usd(s.recInc) + ", costs " + usd(s.recExp) + "</span></p></div>";
+  function monthKey(m) { return m.mail.slice(0, 7); }
+  function monthName(k) { var p = k.split("-"); return new Date(+p[0], +p[1] - 1, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" }); }
+  function table(ms) {
+    var years = {}, yOrder = [];
+    ms.forEach(function (m) { var y = m.mail.slice(0, 4), k = monthKey(m); if (!years[y]) { years[y] = {}; yOrder.push(y); } (years[y][k] = years[y][k] || []).push(m); });
+    yOrder.sort();
+    function row(label, s, cls, attr) {
+      return "<tr" + (cls ? ' class="' + cls + '"' : "") + (attr || "") + "><th scope=\"row\">" + label + '</th><td class="cp-n">' + s.conf + " of " + s.n + "</td><td>" + pair(s.act.inc, s.pot.inc) + "</td><td>" + pair(s.act.exp, s.pot.exp) + "</td><td>" + pair(s.act.profit, s.pot.profit, true) + "</td></tr>";
+    }
+    var body = "";
+    yOrder.forEach(function (y) {
+      Object.keys(years[y]).sort().forEach(function (k) { body += row('<a href="#cp-m-' + k + '" data-jump="' + k + '">' + esc(monthName(k)) + "</a>", sum(years[y][k]), "", ""); });
+      var all = []; Object.keys(years[y]).forEach(function (k) { all = all.concat(years[y][k]); });
+      body += row(y + " total", sum(all), "cp-ytot");
+    });
+    if (yOrder.length > 1) body += row("All years", sum(ms), "cp-gtot");
+    return '<div class="table-scroll cp-tablewrap"><table class="cp-table"><thead><tr><th>Month</th><th>Confirmed</th><th>Income <span>actual of potential</span></th><th>Costs <span>actual of potential</span></th><th>Profit <span>actual of potential</span></th></tr></thead><tbody>' + body + "</tbody></table></div>";
   }
   function minTxt(m) { return nine(m) ? "$" + (m.minDollars || 2625).toLocaleString("en-US") + " sold" : (m.minSold || 8) + " of 16 sold"; }
   function confirmed(m, sp) { return sp && FX.isConfirmed ? FX.isConfirmed(m, sp) : false; }
@@ -108,37 +101,46 @@
   }
 
   // ---- the grid ----
+  var year = "all", fil = "all";
   function card(m, i) {
-    var sp = spotsOf(m), st = status(m, sp), t = totals(linesOf(m)), n = nine(m) ? 20 : 16, pj = proj(m), fu = full(m);
+    var sp = spotsOf(m), st = status(m, sp), n = nine(m) ? 20 : 16, p = pot(m), a = act(m);
     var sold = sp ? sp.filter(function (r) { return stOf(r) === "sold"; }).length : 0, held = sp ? sp.filter(function (r) { return stOf(r) === "held"; }).length : 0;
-    var segs = ""; for (var p = 1; p <= n; p++) { var r = sp && sp[p - 1]; segs += '<i class="' + (r ? stOf(r) : "open") + '"></i>'; }
-    var dl = days(m.deadline), dm = days(m.mail), sv = soldValue(m, sp);
+    var segs = ""; for (var q = 1; q <= n; q++) { var r = sp && sp[q - 1]; segs += '<i class="' + (r ? stOf(r) : "open") + '"></i>'; }
+    var dl = days(m.deadline), dm = days(m.mail), bk = bookedValue(m, sp), need = nine(m) ? (m.minDollars || 2625) : (m.minSold || 8) * 300;
     var hot = st.k === "tent" && dl >= 0 && dl <= 14; // artwork due within 2 weeks and not confirmed yet
+    var unrec = paidOnBoard(m, sp) - a.inc;
+    var note = unrec > 0 ? '<span class="cp-flag">' + usd(unrec) + " paid on the board isn&rsquo;t in income yet. Open to add it.</span>"
+      : (st.k === "tent" || st.k === "late") && bk < need ? '<span class="cp-togo">$' + (need - bk).toLocaleString("en-US") + " more to sell to mail</span>" : "";
     return '<button type="button" class="cp-card cp-' + st.k + (hot ? " cp-hot" : "") + '" data-i="' + i + '">' +
       '<span class="cp-top"><span class="cp-title">' + esc((zip(m) ? zip(m) + ", " : "") + city(m)) + " &middot; " + esc(short(m.mail)) + '</span><span class="cp-badge">' + st.t + "</span></span>" +
       '<span class="cp-sub">' + esc(m.name) + " &middot; " + (nine(m) ? "9x12" : "11x6") + " &middot; " + esc(m.homes || "") + "</span>" +
       '<span class="cp-bar" aria-hidden="true">' + segs + "</span>" +
-      '<span class="cp-row"><span>' + (sp ? sold + " of " + n + " spots sold" + (held ? " &middot; " + held + " held" : "") : "Loading spots&hellip;") + "</span><span>" + (sv == null ? "" : "$" + sv.toLocaleString("en-US") + " of $" + fullValue(m).toLocaleString("en-US")) + "</span></span>" +
-      '<span class="cp-money"><span>Recorded: income <b>' + usd(t.inc) + "</b></span><span>costs <b>" + usd(t.exp) + "</b></span></span>" +
-      '<span class="cp-fline">Sold out: ' + usd(fu.inc) + ' &middot; profit <b>' + usd(fu.profit) + "</b></span>" +
-      '<span class="cp-pline ' + (pj.on ? "on" : "off") + '">' + (pj.on ? "On track &middot; projected profit <b>" + usd(pj.profit) + "</b>" : usd(pj.toGo) + " more to sell to mail") + "</span>" +
+      '<span class="cp-row"><span>' + (sp ? sold + " of " + n + " sold" + (held ? " &middot; " + held + " held" : "") : "Loading spots&hellip;") + "</span><span>$" + bk.toLocaleString("en-US") + " booked of $" + fullValue(m).toLocaleString("en-US") + "</span></span>" +
+      '<span class="cp-av"><span><em>Income</em>' + pair(a.inc, p.inc) + "</span><span><em>Costs</em>" + pair(a.exp, p.exp) + "</span><span><em>Profit</em>" + pair(a.profit, p.profit, true) + "</span></span>" +
+      note + (a.planned ? '<span class="cp-togo">' + usd(a.planned) + " in costs planned, spent once it confirms</span>" : "") +
       '<span class="cp-foot"><span>In homes ' + esc(long(m.mail)) + ' <em>&middot; ' + (dm < 0 ? Math.abs(dm) + " days ago" : dm === 0 ? "today" : "in " + dm + (dm === 1 ? " day" : " days")) + "</em></span>" +
       '<span class="cp-art">Artwork ' + esc(short(m.deadline)) + (dl >= 0 && dm >= 0 ? " &middot; " + (dl === 0 ? "today" : dl + "d") : "") + "</span></span></button>";
   }
   function draw() {
-    var idx = list.map(function (m, i) { return i; }).filter(function (i) { var d = days(list[i].mail); return view === "all" || (view === "past" ? d < 0 : d >= 0); });
-    idx.sort(function (a, b) { var x = list[a], y = list[b]; return view === "past" ? (y.mail.localeCompare(x.mail) || x.name.localeCompare(y.name)) : (x.mail.localeCompare(y.mail) || x.name.localeCompare(y.name)); });
-    var shown = idx.map(function (i) { return list[i]; });
-    var groups = {}, order = [];
-    idx.forEach(function (i) { var g = ymd(list[i].mail).toLocaleDateString("en-US", { month: "long", year: "numeric" }); if (!groups[g]) { groups[g] = []; order.push(g); } groups[g].push(i); });
-    box.innerHTML = '<div class="cp-tools"><div class="hq-seg cp-view" role="group" aria-label="Which campaigns">' +
-      [["upcoming", "Upcoming"], ["past", "Past"], ["all", "All"]].map(function (v) { return '<button type="button" data-view="' + v[0] + '"' + (view === v[0] ? ' class="on"' : "") + ">" + v[1] + "</button>"; }).join("") + "</div>" +
+    var years = []; list.forEach(function (m) { var y = String(m.mail || "").slice(0, 4); if (y && years.indexOf(y) < 0) years.push(y); }); years.sort();
+    if (year !== "all" && years.indexOf(year) < 0) year = "all";
+    var idx = list.map(function (m, i) { return i; }).filter(function (i) {
+      var m = list[i]; if (!m.mail) return false;
+      if (year !== "all" && m.mail.slice(0, 4) !== year) return false;
+      return fil === "all" || (fil === "conf" ? isConf(m) : !isConf(m));
+    });
+    idx.sort(function (a, b) { var x = list[a], y = list[b]; return x.mail.localeCompare(y.mail) || x.name.localeCompare(y.name); });
+    var shown = idx.map(function (i) { return list[i]; }), groups = {}, order = [];
+    idx.forEach(function (i) { var k = monthKey(list[i]); if (!groups[k]) { groups[k] = []; order.push(k); } groups[k].push(i); });
+    function seg(name, cur, opts) { return '<div class="hq-seg" role="group" aria-label="' + name + '">' + opts.map(function (o) { return '<button type="button" data-' + name + '="' + o[0] + '"' + (cur === o[0] ? ' class="on"' : "") + ">" + o[1] + "</button>"; }).join("") + "</div>"; }
+    box.innerHTML = '<div class="cp-tools">' + seg("year", year, [["all", "All years"]].concat(years.map(function (y) { return [y, y]; }))) +
+      seg("fil", fil, [["all", "All"], ["conf", "Confirmed"], ["tent", "Tentative"]]) +
       '<button type="button" class="hq-btn" data-new>' + HQ.icons.plus + "<span>New campaign</span></button></div>" +
-      (shown.length ? '<h3 class="cp-month">' + (view === "past" ? "All past campaigns" : view === "all" ? "All campaigns" : "All upcoming campaigns") + "</h3>" + projHtml(sumProj(shown), true) : "") +
-      '<p class="bd-note cp-how">Confirmed = held + sold have reached the card&rsquo;s minimum (or it already mailed): income is those ads (sold at what was paid, held at list price, or what&rsquo;s recorded, if more). Tentative = still below the minimum, shown as if it mails at the minimum. Costs are printing $' + PRINT + " + $" + POSTAGE.toFixed(2) + " a home (or what&rsquo;s recorded, if more).</p>" +
       (linesOk ? "" : '<p class="bd-note" style="margin:0 0 12px">Loading income and expenses&hellip;</p>') +
-      (order.length ? order.map(function (g) { return '<h3 class="cp-month">' + esc(g) + "</h3>" + projHtml(sumProj(groups[g].map(function (i) { return list[i]; }))) + '<div class="cp-grid">' + groups[g].map(function (i) { return card(list[i], i); }).join("") + "</div>"; }).join("")
-        : '<p class="bd-note">No ' + (view === "past" ? "past" : "upcoming") + " campaigns.</p>");
+      (shown.length ? kpis(sum(shown)) + table(shown) +
+        '<p class="bd-note cp-how"><b>Potential</b> = every spot sold at the advertised price ($5,600 on a 9 x 12 card), less printing $' + PRINT + " + $" + POSTAGE.toFixed(2) + " a home (or the recorded costs, if more). <b>Actual</b> = the income recorded on each campaign, and its recorded costs once the card is confirmed (a tentative card&rsquo;s costs aren&rsquo;t spent until it reaches its minimum and prints). <b>Confirmed</b> = the card has reached its minimum, or already mailed.</p>" +
+        order.map(function (k) { return '<h3 class="cp-month" id="cp-m-' + k + '">' + esc(monthName(k)) + '</h3><div class="cp-grid">' + groups[k].map(function (i) { return card(list[i], i); }).join("") + "</div>"; }).join("")
+        : '<p class="bd-note">No campaigns match.</p>');
   }
 
   // ---- the drawer ----
@@ -152,7 +154,9 @@
   }
   function moneyHtml(m) {
     var ls = linesOf(m).slice().sort(function (a, b) { return (a.kind === b.kind ? 0 : a.kind === "income" ? -1 : 1) || (String(a.id) > String(b.id) ? 1 : -1); }), t = totals(ls);
-    return '<div class="cp-sum cp-sum-dr"><span>Income <b>' + usd(t.inc) + "</b></span><span>Costs <b>" + usd(t.exp) + '</b></span><span>Profit <b class="' + (t.profit < 0 ? "neg" : "pos") + '">' + usd(t.profit) + "</b></span></div>" +
+    var pp = pot(m);
+    return '<div class="cp-sum cp-sum-dr"><span>Actual income <b>' + usd(t.inc) + "</b></span><span>costs <b>" + usd(t.exp) + '</b></span><span>profit <b class="' + (t.profit < 0 ? "neg" : "pos") + '">' + usd(t.profit) + "</b></span></div>" +
+      '<div class="cp-sum cp-sum-dr cp-pot"><span>Potential income <b>' + usd(pp.inc) + "</b></span><span>costs <b>" + usd(pp.exp) + "</b></span><span>profit <b>" + usd(pp.profit) + "</b></span></div>" +
       '<div class="table-scroll"><table class="cp-lines"><thead><tr><th>Type</th><th>Description</th><th>Amount ($)</th><th>Note</th><th></th></tr></thead><tbody>' +
       (ls.map(lineRow).join("") || '<tr><td colspan="5" class="bd-note">No income or expenses yet.</td></tr>') + "</tbody></table></div>" +
       '<div class="cp-add"><button type="button" class="hq-btn ghost sm" data-add="income">+ Income</button><button type="button" class="hq-btn ghost sm" data-add="expense">+ Expense</button>' +
@@ -299,7 +303,9 @@
 
   // ---- events and data ----
   box.addEventListener("click", function (e) {
-    var v = e.target.closest("[data-view]"); if (v) { view = v.getAttribute("data-view"); draw(); return; }
+    var y = e.target.closest("[data-year]"); if (y) { year = y.getAttribute("data-year"); draw(); return; }
+    var f = e.target.closest("[data-fil]"); if (f) { fil = f.getAttribute("data-fil"); draw(); return; }
+    var j = e.target.closest("[data-jump]"); if (j) { e.preventDefault(); var h = document.getElementById("cp-m-" + j.getAttribute("data-jump")); if (h) { h.scrollIntoView({ block: "start" }); window.scrollBy(0, -80); } return; }
     if (e.target.closest("[data-new]")) {
       var last = list.filter(function (m) { return days(m.mail) >= 0; }).slice(-1)[0] || list[list.length - 1] || { route: "el-paseo", name: "El Paseo", area: "Palm Desert 92260", homes: "4,968 homes" };
       return open({ route: last.route, name: last.name, area: last.area, homes: last.homes, mail: "", deadline: "", minSold: 8, format: "9x12", minDollars: 2625 }, true);
