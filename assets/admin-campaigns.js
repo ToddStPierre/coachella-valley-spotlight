@@ -64,15 +64,33 @@
     var exp = on ? Math.max(t.exp, stdCost(m)) : 0;
     return { on: on, inc: on ? inc : 0, exp: exp, profit: (on ? inc : 0) - exp, rec: t, toGo: on ? 0 : (nine(m) ? need - bk : ((m.minSold || 8) - cnt) * 30000), booked: inc };
   }
+  // Tentative cards (below their minimum) are projected as if they mail at the minimum:
+  // income = what's booked or the minimum, whichever is more; costs = standard cost (or recorded, if more).
+  function tent(m) {
+    var p = proj(m), need = nine(m) ? (m.minDollars || 2625) * 100 : (m.minSold || 8) * 30000;
+    var inc = Math.max(p.booked, need), exp = Math.max(p.rec.exp, stdCost(m));
+    return { inc: inc, exp: exp, profit: inc - exp };
+  }
   function sumProj(ms) {
-    var s = { inc: 0, exp: 0, profit: 0, on: 0, n: 0, toGo: 0, recInc: 0, recExp: 0, pipe: 0 };
-    ms.forEach(function (m) { var p = proj(m); s.n++; if (p.on) s.on++; s.inc += p.inc; s.exp += p.exp; s.profit += p.profit; s.toGo += p.toGo; s.recInc += p.rec.inc; s.recExp += p.rec.exp; if (!p.on) s.pipe += p.booked; });
+    var s = { c: { inc: 0, exp: 0, profit: 0, n: 0 }, t: { inc: 0, exp: 0, profit: 0, n: 0, booked: 0, toGo: 0 }, n: 0, recInc: 0, recExp: 0 };
+    ms.forEach(function (m) {
+      var p = proj(m); s.n++; s.recInc += p.rec.inc; s.recExp += p.rec.exp;
+      if (p.on) { s.c.n++; s.c.inc += p.inc; s.c.exp += p.exp; s.c.profit += p.profit; }
+      else { var t = tent(m); s.t.n++; s.t.inc += t.inc; s.t.exp += t.exp; s.t.profit += t.profit; s.t.booked += p.booked; s.t.toGo += p.toGo; }
+    });
     return s;
   }
+  function trio(label, sub, x, cls) {
+    return '<div class="cp-trio ' + cls + '"><div class="cp-trio-h"><b>' + label + "</b><span>" + sub + "</span></div>" +
+      "<div><span>Income</span><b>" + usd(x.inc) + "</b></div><div><span>Costs</span><b>" + usd(x.exp) + '</b></div><div><span>Profit</span><b class="' + (x.profit < 0 ? "neg" : "pos") + '">' + usd(x.profit) + "</b></div></div>";
+  }
   function projHtml(s, big) {
-    return '<div class="cp-proj' + (big ? " big" : "") + '"><div><span>Projected income</span><b>' + usd(s.inc) + "</b></div><div><span>Projected costs</span><b>" + usd(s.exp) + '</b></div><div><span>Projected profit</span><b class="' + (s.profit < 0 ? "neg" : "pos") + '">' + usd(s.profit) + "</b></div>" +
-      '<p>' + s.on + " of " + s.n + (s.n === 1 ? " card" : " cards") + " on track to mail" + (s.n > s.on ? " &middot; " + usd(s.toGo) + " more to sell to mail the rest" + (s.pipe ? " (" + usd(s.pipe) + " already held or sold on them)" : "") : "") +
-      " &middot; Recorded so far: income " + usd(s.recInc) + ", costs " + usd(s.recExp) + "</p></div>";
+    var all = { inc: s.c.inc + s.t.inc, exp: s.c.exp + s.t.exp, profit: s.c.profit + s.t.profit };
+    return '<div class="cp-proj2' + (big ? " big" : "") + '">' +
+      trio("Confirmed", s.c.n + (s.c.n === 1 ? " card" : " cards") + " at or over the minimum", s.c, "conf") +
+      trio("Tentative", s.t.n + (s.t.n === 1 ? " card" : " cards") + (s.t.n ? " &middot; if each mails at its minimum &middot; " + usd(s.t.booked) + " booked, " + usd(s.t.toGo) + " to go" : ""), s.t, "tent") +
+      '<p class="cp-both">Both: income <b>' + usd(all.inc) + "</b> &middot; costs <b>" + usd(all.exp) + '</b> &middot; profit <b class="' + (all.profit < 0 ? "neg" : "pos") + '">' + usd(all.profit) + "</b>" +
+      ' <span>&middot; Recorded so far: income ' + usd(s.recInc) + ", costs " + usd(s.recExp) + "</span></p></div>";
   }
   function minTxt(m) { return nine(m) ? "$" + (m.minDollars || 2625).toLocaleString("en-US") + " sold" : (m.minSold || 8) + " of 16 sold"; }
   function confirmed(m, sp) { return sp && FX.isConfirmed ? FX.isConfirmed(m, sp) : false; }
@@ -110,7 +128,7 @@
       [["upcoming", "Upcoming"], ["past", "Past"], ["all", "All"]].map(function (v) { return '<button type="button" data-view="' + v[0] + '"' + (view === v[0] ? ' class="on"' : "") + ">" + v[1] + "</button>"; }).join("") + "</div>" +
       '<button type="button" class="hq-btn" data-new>' + HQ.icons.plus + "<span>New campaign</span></button></div>" +
       (shown.length ? '<h3 class="cp-month">' + (view === "past" ? "All past campaigns" : view === "all" ? "All campaigns" : "All upcoming campaigns") + "</h3>" + projHtml(sumProj(shown), true) : "") +
-      '<p class="bd-note cp-how">Projections count a card only once it&rsquo;s on track to mail (held + sold reach its minimum). Income is held and sold ads at list price (or what&rsquo;s recorded, if more). Costs are printing $' + PRINT + " + $" + POSTAGE.toFixed(2) + " a home (or what&rsquo;s recorded, if more).</p>" +
+      '<p class="bd-note cp-how">Confirmed = held + sold have reached the card&rsquo;s minimum (or it already mailed): income is those ads (sold at what was paid, held at list price, or what&rsquo;s recorded, if more). Tentative = still below the minimum, shown as if it mails at the minimum. Costs are printing $' + PRINT + " + $" + POSTAGE.toFixed(2) + " a home (or what&rsquo;s recorded, if more).</p>" +
       (linesOk ? "" : '<p class="bd-note" style="margin:0 0 12px">Loading income and expenses&hellip;</p>') +
       (order.length ? order.map(function (g) { return '<h3 class="cp-month">' + esc(g) + "</h3>" + projHtml(sumProj(groups[g].map(function (i) { return list[i]; }))) + '<div class="cp-grid">' + groups[g].map(function (i) { return card(list[i], i); }).join("") + "</div>"; }).join("")
         : '<p class="bd-note">No ' + (view === "past" ? "past" : "upcoming") + " campaigns.</p>");
