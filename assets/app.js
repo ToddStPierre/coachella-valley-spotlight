@@ -312,7 +312,7 @@
       '<label class="optin-check"><input type="checkbox" name="list"> Send me local deals from Coachella Valley Spotlight</label>' +
       '<input class="optin-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">' +
       '<p class="optin-msg" role="status" aria-live="polite"></p>' +
-      '<p class="optin-fine">We only email you what you asked for. Unsubscribe anytime.</p></form>';
+      '<p class="optin-fine">We only email you what you asked for. Unsubscribe anytime. <a href="' + absUrl("legal#ad-emails") + '">Privacy</a></p></form>';
   }
   function wireOptin(o, slug, src, mailtoHref, onDone) {
     var f = o.querySelector(".optin"); if (!f) return;
