@@ -279,7 +279,7 @@
       rows.push(["Mails", esc(nice(m.mail)) + ' <span class="cov-muted">(' + (z.ok ? "confirmed" : "tentative") + ')</span>']);
       rows.push(["Artwork due", esc(nice(m.deadline)) + (d >= 0 ? ' <span class="cov-muted">(' + daysTxt(d) + ")</span>" : "")]);
       rows.push(["Spots", z.state === "loading" ? "Checking&hellip;" : z.sold == null ? "Call (760) 422-5475" : "<b>" + z.open + " of " + z.total + "</b> open" + (z.ok ? ' <span class="cov-muted">&middot; confirmed to mail</span>' : "")]);
-      rows.push(["Ads from", (m.format === "9x12" ? "$100 per mailing <span class=\"cov-muted\">on the 9 x 12 card (Mini to Large, $100 to $500)" : "$300 per mailing <span class=\"cov-muted\">") + " with design, printing, postage and QR code tracking</span>"]);
+      rows.push(["Ads from", (m.format === "9x12" ? "$175 per mailing <span class=\"cov-muted\">on the 9 x 12 card (Half $175, Full $350)" : "$300 per mailing <span class=\"cov-muted\">") + " with design, printing, postage and QR code tracking</span>"]);
     } else {
       rows.push(["Mail date", "Not set yet"]);
     }
@@ -317,7 +317,7 @@
       z.taken = d.positions.filter(function (p) { return s(p) === "sold" || s(p) === "pending"; }).length;
       z.open = z.total - z.taken;
       // 9 x 12 cards confirm by dollars sold; 11 x 6 cards by spots sold.
-      z.nine = d.format === "9x12"; z.soldD = d.soldDollars || 0; z.minD = d.minDollars || z.mail.minDollars || 2500;
+      z.nine = d.format === "9x12"; z.soldD = d.soldDollars || 0; z.minD = d.minDollars || z.mail.minDollars || 2625;
       z.ok = window.CVS_FMT ? window.CVS_FMT.isConfirmed(z.nine ? { format: "9x12", minDollars: z.minD } : z.mail, d.positions) : !!(z.mail.minSold && z.sold >= z.mail.minSold);
       z.state = left(z.mail.deadline) < 0 ? "closed" : z.open === 0 ? "full" : z.open <= 4 ? "almost" : "open";
       paint();

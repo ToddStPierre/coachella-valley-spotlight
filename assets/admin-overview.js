@@ -40,7 +40,7 @@
       var list = listFor(m), nine = FX && FX.fmtOf(m) === "9x12";
       if (!list) return { s: 0, ratio: 0, txt: "–", nine: nine };
       var s = list.filter(function (r) { return r.status === "Sold"; }).length;
-      if (nine) { var d = FX.soldDollars("9x12", list), md = m.minDollars || 2500; return { s: s, ratio: d / md, txt: "$" + d.toLocaleString("en-US") + "/$" + md.toLocaleString("en-US"), nine: true }; }
+      if (nine) { var d = FX.soldDollars("9x12", list), md = m.minDollars || 2625; return { s: s, ratio: d / md, txt: "$" + d.toLocaleString("en-US") + "/$" + md.toLocaleString("en-US"), nine: true }; }
       return { s: s, ratio: s / (m.minSold || 8), txt: s + "/" + (m.minSold || 8), nine: false };
     }
     mailings.forEach(function (m, i) {

@@ -89,8 +89,8 @@
       var st = function (p) { return (p.status || "").toLowerCase(); };
       var sold = d.positions.filter(function (p) { return st(p) === "sold"; }).length, pend = d.positions.filter(function (p) { return st(p) === "pending"; }).length;
       var need = Math.max(0, (m.minSold || 0) - sold), total = d.positions.length, left = days(m.deadline);
-      // 9 x 12 card: confirmed by dollars sold (list price) against minDollars, out of $5,300 for a full card. usd() takes cents.
-      var nine = d.format === "9x12", soldD = nine ? (d.soldDollars || 0) : 0, minD = nine ? (d.minDollars || m.minDollars || 2500) : 0, needD = Math.max(0, minD - soldD);
+      // 9 x 12 card: confirmed by dollars sold (list price) against minDollars, out of $5,600 for a full card (20 spots, Full $350, Half $175). usd() takes cents.
+      var nine = d.format === "9x12", soldD = nine ? (d.soldDollars || 0) : 0, minD = nine ? (d.minDollars || m.minDollars || 2625) : 0, needD = Math.max(0, minD - soldD);
       var pendD = nine ? d.positions.filter(function (p) { return st(p) === "pending"; }).reduce(function (n, p) { return n + ((window.CVS_FMT && window.CVS_FMT.spotPrice("9x12", p.position)) || 0); }, 0) : 0;
       if (nine) need = needD ? Math.ceil(needD * 100 / SPOT) : 0;
       var taken = d.positions.filter(function (p) { return p.category && st(p) !== "open"; }).map(function (p) { return p.category; });

@@ -15,9 +15,9 @@
       '<input data-f="name" value="' + esc(m.name) + '" placeholder="Card name" style="margin-top:6px"></td>' +
       '<td><input type="date" data-f="mail" value="' + esc(m.mail) + '" required></td>' +
       '<td><input type="date" data-f="deadline" value="' + esc(m.deadline) + '" required></td>' +
-      '<td><select data-f="format"><option value="11x6"' + (m.format === "9x12" ? "" : " selected") + '>11 x 6, 16 spots</option><option value="9x12"' + (m.format === "9x12" ? " selected" : "") + '>9 x 12, 19 spots</option></select>' +
+      '<td><select data-f="format"><option value="11x6"' + (m.format === "9x12" ? "" : " selected") + '>11 x 6, 16 spots</option><option value="9x12"' + (m.format === "9x12" ? " selected" : "") + '>9 x 12, 20 spots (Full/Half)</option></select>' +
       (m.format === "9x12"
-        ? '<label style="display:block;margin-top:6px">$ <input type="number" data-f="minDollars" min="100" max="100000" step="50" value="' + esc(m.minDollars || 2500) + '" style="width:6em"> sold</label><input type="hidden" data-f="minSold" value="' + esc(m.minSold || 8) + '">'
+        ? '<label style="display:block;margin-top:6px">$ <input type="number" data-f="minDollars" min="100" max="100000" step="50" value="' + esc(m.minDollars || 2625) + '" style="width:6em"> sold</label><input type="hidden" data-f="minSold" value="' + esc(m.minSold || 8) + '">'
         : '<label style="display:block;margin-top:6px"><input type="number" data-f="minSold" min="1" max="16" value="' + esc(m.minSold || 8) + '" style="width:5em"> of 16 sold</label>') + '</td>' +
       '<td><input data-f="area" value="' + esc(m.area) + '" placeholder="Area"><input data-f="homes" value="' + esc(m.homes) + '" placeholder="4,968 homes" style="margin-top:6px"></td>' +
       '<td><button type="button" class="btn btn-ghost" data-remove="' + i + '">Remove</button></td></tr>';
@@ -43,7 +43,7 @@
     if (e.target.id === "mail-add") {
       read(); var last = list[list.length - 1] || { route: "el-paseo", name: "El Paseo", area: "Palm Desert 92260, around El Paseo", homes: "4,968 homes", minSold: 8 };
       var add = { route: last.route, name: last.name, area: last.area, homes: last.homes, mail: "", deadline: "", minSold: last.minSold || 8 };
-      if (last.format === "9x12") { add.format = "9x12"; add.minDollars = last.minDollars || 2500; }
+      if (last.format === "9x12") { add.format = "9x12"; add.minDollars = last.minDollars || 2625; }
       list.push(add);
       render("New card added. Fill in its dates, then save.");
     } else if (e.target.hasAttribute("data-remove")) {
@@ -67,7 +67,7 @@
   box.addEventListener("change", function (e) {
     if (e.target.getAttribute("data-f") !== "format") return;
     read(); var m = list[+e.target.closest("tr").getAttribute("data-i")];
-    if (e.target.value === "9x12") { m.format = "9x12"; m.minDollars = m.minDollars || 2500; }
+    if (e.target.value === "9x12") { m.format = "9x12"; m.minDollars = m.minDollars || 2625; }
     render("Format changed. Save to make it stick.");
   });
   render();

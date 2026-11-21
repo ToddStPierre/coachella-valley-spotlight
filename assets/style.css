@@ -839,7 +839,9 @@ body.has-tabbar { padding-bottom: 64px; }
 .pr-included { margin-top: 40px; background: var(--paper); border: 1px solid var(--line); border-radius: 20px; padding: 28px; }
 .pr-included h2 { margin: 0 0 16px; font-size: 22px; }
 .pr-included ul { grid-template-columns: repeat(2, 1fr); margin: 0; }
-@media (max-width: 1000px) { .tiers { grid-template-columns: repeat(2, 1fr); } }
+.tiers.tiers-3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 1000px) { .tiers, .tiers.tiers-3 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .tiers.tiers-3 { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .tiers, .pr-included ul { grid-template-columns: 1fr; } .pr-step { padding: 18px; } }
 
 /* ROI calculator (pricing page) */
@@ -1955,17 +1957,17 @@ h2.h1-size { font-size: clamp(34px, 5vw, 56px); }
 @media (prefers-reduced-motion: reduce) { .hero-title .ht-b::after { animation: none; } }
 .hero.living:is([data-phase="night"], [data-phase="dusk"], [data-phase="dawn"]) .hero-title .ht-b::after { background: linear-gradient(90deg, var(--gold), #ff8a6a 60%, #f2a6c0); }
 
-/* 9 x 12 card picker (2026-11-17): 3 columns; rows are half a Medium spot tall. Row 1 on the front is the masthead; on the back it's the Mini row. */
-.picker-grid.picker-9x12 { grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(52px, auto); }
-.picker-grid.picker-9x12 .spot9-head { grid-column: 1 / span 3; grid-row: 1; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px; background: var(--palm); color: #fff; font-size: 13px; }
+/* 9 x 12 card picker (layout 2026-11-21): 4 columns, a Full spot spans 2. Row 1 on each side is the banner, then 3 rows of Fulls and a row of 4 Halves. */
+.picker-grid.picker-9x12 { grid-template-columns: repeat(4, 1fr); grid-auto-rows: minmax(64px, auto); }
+.picker-grid.picker-9x12 .spot9-head { grid-column: 1 / span 4; grid-row: 1; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px; background: var(--palm); color: #fff; font-size: 13px; min-height: 0; }
 .picker-grid.picker-9x12 .spot9-head span { opacity: .8; font-size: 12px; border: 1px solid rgba(255,255,255,.6); border-radius: 6px; padding: 2px 6px; }
+.picker-sizes[data-fmt="9x12"] { grid-template-columns: repeat(3, 1fr); }
 .spot.spot9 { min-height: 0; padding: 8px 10px; }
-.spot.spot9.sz-mini, .spot.spot9.sz-small { gap: 2px; }
-.spot.spot9.sz-mini .spot-state, .spot.spot9.sz-small .spot-state { display: none; }
-.spot.spot9.sz-large { border-width: 2px; }
+.spot.spot9.sz-half { gap: 2px; }
+.spot.spot9.sz-full { border-width: 2px; }
 .spot.spot9.dim { opacity: .45; }
 .spot.spot9.dim.open:hover, .spot.spot9.dim.open:focus-visible { opacity: .8; }
-@media (max-width: 640px) { .picker-grid.picker-9x12 { grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 6px; } .spot.spot9 { padding: 6px; font-size: 12px; } .spot.spot9 .spot-state { display: none; } .spot.spot9 .spot-n { font-size: 10px; letter-spacing: 0; } .spot.spot9 .spot-cat { font-size: 13px; } }
+@media (max-width: 640px) { .picker-sizes[data-fmt="9x12"] { grid-template-columns: repeat(2, 1fr); } .picker-grid.picker-9x12 { gap: 6px; padding: 6px; grid-auto-rows: minmax(58px, auto); } .spot.spot9 { padding: 6px; font-size: 12px; } .spot.spot9 .spot-state { display: none; } .spot.spot9 .spot-n { font-size: 10px; letter-spacing: 0; } .spot.spot9 .spot-cat { font-size: 13px; } }
 
 /* ===== Valley Stories (2026-11-17): story bubbles at the top of the home hero + full-screen viewer (assets/valley-stories.js) ===== */
 .vs-row { margin: 0 0 var(--s2); }

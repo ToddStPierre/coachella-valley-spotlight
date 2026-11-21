@@ -23,24 +23,31 @@
   // Each link's "after payment" setting redirects to advertise?paid=1#reserve, which forwards to reserve?paid=1 (or point it at /reserve?paid=1 directly)
   var PAY_LINKS = { 1: "https://pay.coachellavalleyspotlight.com/b/aFaaEX6E01cW1Mkg6S9MY0B", 2: "https://pay.coachellavalleyspotlight.com/b/4gM00jaUg3l462AdYK9MY0C", 4: "https://pay.coachellavalleyspotlight.com/b/bJebJ15zW3l4bmU8Eq9MY0D", 8: "https://pay.coachellavalleyspotlight.com/b/eVq4gz0fCdZIbmUcUG9MY0E" };
   var payBtn = root.querySelector("[data-pay]");
-  // 9 x 12 cards (Jan 21, 2027 on): 19 fixed spots in four sizes, from data/formats.js. Each ad is one spot.
+  // 9 x 12 cards (Dec 17, 2026 on; layout 2026-11-21): 20 spots, Full $350 and Half $175, from data/formats.js.
+  // "Bigger ad" lets a buyer tap several spots on one side that make a rectangle (A1+A2, A7+A8, A1+A3...); price = sum.
   var F9 = (window.CVS_FORMATS || {})["9x12"], FMT = window.CVS_FMT || {}, PAY9 = FMT.PAY_9x12 || {};
-  var fmt = "11x6", size9 = "medium", sizesBox = root.querySelector(".picker-sizes"), sizesOld = sizesBox ? sizesBox.innerHTML : "";
+  var fmt = "11x6", size9 = "full", combo = [], sizesBox = root.querySelector(".picker-sizes"), sizesOld = sizesBox ? sizesBox.innerHTML : "";
   var dimsEl = root.querySelector(".picker-dims"), dimsOld = dimsEl ? dimsEl.innerHTML : "";
+  var sideLabels = root.querySelectorAll(".picker-side-label"), sideOld = [].map.call(sideLabels, function (x) { return x.textContent; });
   function S9(k) { return F9.sizes[k]; }
+  function L9(p) { return FMT.spotLabel ? FMT.spotLabel("9x12", p) : String(p); }
   function drawSizes() {
     if (!sizesBox) return;
-    if (fmt !== "9x12") { if (sizesBox.getAttribute("data-fmt") === "9x12") { sizesBox.innerHTML = sizesOld; bindSizes(); } sizesBox.removeAttribute("data-fmt"); if (dimsEl) dimsEl.innerHTML = dimsOld; return; }
+    if (fmt !== "9x12") { if (sizesBox.getAttribute("data-fmt") === "9x12") { sizesBox.innerHTML = sizesOld; bindSizes(); } sizesBox.removeAttribute("data-fmt"); if (dimsEl) dimsEl.innerHTML = dimsOld; sideLabels.forEach(function (x, i) { x.textContent = sideOld[i]; }); return; }
     sizesBox.setAttribute("data-fmt", "9x12");
-    sizesBox.innerHTML = F9.sizeOrder.map(function (k) { var z = S9(k); return '<button type="button" data-size9="' + k + '" aria-pressed="' + (k === size9) + '"><b>' + z.label + " &middot; " + money(z.price) + "</b><span>" + z.dims + " &middot; " + z.perHome + "/home</span></button>"; }).join("");
+    sizesBox.innerHTML = F9.sizeOrder.map(function (k) { var z = S9(k); return '<button type="button" data-size9="' + k + '" aria-pressed="' + (k === size9) + '"><b>' + z.label + " &middot; " + money(z.price) + "</b><span>" + z.dims + " &middot; about " + z.perHome + " a home</span></button>"; }).join("") +
+      '<button type="button" data-size9="combo" aria-pressed="' + (size9 === "combo") + '"><b>Bigger ad</b><span>Join spots side by side &middot; priced per spot</span></button>';
     sizesBox.querySelectorAll("[data-size9]").forEach(function (b) { b.addEventListener("click", function () { pick9(b.getAttribute("data-size9")); }); });
-    if (dimsEl) dimsEl.textContent = "This card is the bigger 9 x 12 size. Pick a size, then tap one of its open spots (they light up).";
+    if (dimsEl) dimsEl.textContent = "This card is the big 9 x 12 size. Pick Full or Half, then tap one of its open spots. For a bigger ad, pick Bigger ad and tap the spots you want joined.";
+    if (sideLabels[0]) sideLabels[0].textContent = "Side A (address side)";
+    if (sideLabels[1]) sideLabels[1].textContent = "Side B";
   }
   function pick9(k) {
-    size9 = k; shell.hidden = true; pending = null; mark(null);
+    size9 = k; combo = []; shell.hidden = true; pending = null; mark(null);
     if (sizesBox) sizesBox.querySelectorAll("[data-size9]").forEach(function (x) { x.setAttribute("aria-pressed", x.getAttribute("data-size9") === k ? "true" : "false"); });
-    root.querySelectorAll(".spot9").forEach(function (el) { el.classList.toggle("dim", el.getAttribute("data-size") !== k); });
-    statusEl.textContent = LABELS[route] + ": tap an open " + S9(k).label + " spot to hold it (" + money(S9(k).price) + ").";
+    root.querySelectorAll(".spot9").forEach(function (el) { el.classList.toggle("dim", k !== "combo" && el.getAttribute("data-size") !== k); });
+    statusEl.textContent = k === "combo" ? LABELS[route] + ": tap the open spots you want joined into one ad. They need to sit next to each other on the same side and make a rectangle."
+      : LABELS[route] + ": tap an open " + S9(k).label + " spot to hold it (" + money(S9(k).price) + ").";
   }
   function money(n) { return "$" + n.toLocaleString("en-US"); }
   function blockFor(pos, n) {
@@ -128,21 +135,20 @@
     var left = d.categories.filter(function (c) { return d.takenCategories.indexOf(c) === -1; });
     cat.innerHTML = '<option value="" disabled selected>Select your category…</option>' + left.map(function (c) { return '<option>' + c.replace(/</g, "&lt;") + '</option>'; }).join("") + (left.length ? "" : '<option value="" disabled>No categories left on this route</option>');
   }
-  // Draw the 9 x 12 card: the masthead and postal block on the front, then each spot where it sits on the printed card.
+  // Draw the 9 x 12 card: the banner on each side, then each spot where it sits on the printed card.
   function draw9(r, d) {
-    var head = document.createElement("div"); head.className = "spot9-head"; head.innerHTML = "<b>Coachella Valley Spotlight</b><span>Postal block</span>"; head.setAttribute("aria-hidden", "true");
-    front.appendChild(head);
+    [front, back].forEach(function (g, i) { var head = document.createElement("div"); head.className = "spot9-head"; head.innerHTML = "<b>Coachella Valley Spotlight</b><span>Side " + (i ? "B" : "A") + "</span>"; head.setAttribute("aria-hidden", "true"); g.appendChild(head); });
     var byPos = {}; d.positions.forEach(function (p) { byPos[p.position] = p; });
     F9.map.forEach(function (s) {
       var p = byPos[s.pos] || { position: s.pos, status: "open" }, k = state(p.status), z = S9(s.size);
       var el = document.createElement(k === "open" ? "button" : "div");
-      el.className = "spot spot9 sz-" + s.size + " " + k + (s.size === size9 ? "" : " dim"); el.setAttribute("data-pos", s.pos); el.setAttribute("data-size", s.size);
+      el.className = "spot spot9 sz-" + s.size + " " + k + (size9 === "combo" || s.size === size9 ? "" : " dim"); el.setAttribute("data-pos", s.pos); el.setAttribute("data-size", s.size);
       el.style.gridColumn = s.col + " / span " + s.colSpan; el.style.gridRow = (s.row + 1) + " / span " + s.rowSpan;
       openNow[s.pos] = k === "open";
-      el.innerHTML = '<span class="spot-n">' + z.label + " &middot; Spot " + s.pos + '</span><span class="spot-cat">' + (p.category ? p.category.replace(/</g, "&lt;") : (k === "open" ? money(z.price) : "")) + '</span><span class="spot-state">' + word(k) + '</span>';
-      el.setAttribute("aria-label", z.label + " spot " + s.pos + ", " + money(z.price) + (p.category ? ", " + p.category : "") + ", " + word(k));
+      el.innerHTML = '<span class="spot-n">' + s.label + " &middot; " + z.label + '</span><span class="spot-cat">' + (p.category ? p.category.replace(/</g, "&lt;") : (k === "open" ? money(z.price) : "")) + '</span><span class="spot-state">' + word(k) + '</span>';
+      el.setAttribute("aria-label", "Spot " + s.label + ", " + z.label + ", " + money(z.price) + (p.category ? ", " + p.category : "") + ", " + word(k));
       if (k === "open" && closed(r)) { el.disabled = true; el.title = "Booking for this card is closed"; }
-      else if (k === "open") { el.type = "button"; el.addEventListener("click", function () { if (s.size !== size9) pick9(s.size); open9(r, s.pos); }); }
+      else if (k === "open") { el.type = "button"; el.addEventListener("click", function () { if (size9 === "combo") return tapCombo(r, s.pos); if (s.size !== size9) pick9(s.size); open9(r, [s.pos]); }); }
       (s.side === "front" ? front : back).appendChild(el);
     });
     fillCats(d);
@@ -150,12 +156,24 @@
     countEl.innerHTML = "<b>" + (F9.spots - n) + " of " + F9.spots + "</b> spots open on " + LABELS[r] + (mail ? ", " + short(mail) + " card" : "") + (sold >= min ? " &middot; mail date confirmed" : "");
     pick9(size9);
   }
-  function open9(r, pos) {
-    var k = FMT.spotSize("9x12", pos), z = S9(k);
-    pending = { route: r, mail: mail, position: pos, positions: [pos], fmt: "9x12", sizeKey: k, label: z.label, price: z.price, link: PAY9[k] || "" };
-    mark([pos]);
-    title.textContent = "Hold Spot " + pos + " on " + LABELS[r] + (mail ? ", " + short(mail) + " card" : "") + " (" + z.label + ", " + money(z.price) + ")";
-    if (payBtn) { payBtn.hidden = !pending.link; payBtn.textContent = "Pay " + money(z.price) + " now and lock it in"; }
+  // Bigger ad: each tap adds or removes a spot. When the spots make one ad, the hold form opens.
+  function tapCombo(r, pos) {
+    var i = combo.indexOf(pos); if (i > -1) combo.splice(i, 1); else combo.push(pos);
+    combo.sort(function (a, b) { return a - b; });
+    mark(combo);
+    if (combo.length > 1 && FMT.isBlock("9x12", combo)) { open9(r, combo.slice()); return; }
+    shell.hidden = true; pending = null;
+    statusEl.textContent = !combo.length ? LABELS[route] + ": tap the open spots you want joined into one ad."
+      : combo.length === 1 ? "Picked " + L9(combo[0]) + ". Now tap a spot next to it on the same side."
+      : "Picked " + combo.map(L9).join(", ") + ". Those don’t make a rectangle yet. Add or remove a spot.";
+  }
+  function open9(r, list) {
+    var one = list.length === 1, k = FMT.spotSize("9x12", list[0]), price = FMT.blockPrice("9x12", list), dims = FMT.blockDims("9x12", list);
+    var label = one ? S9(k).label : "Bigger ad (" + list.length + " spots, " + dims + ")";
+    pending = { route: r, mail: mail, position: list[0], positions: list, fmt: "9x12", sizeKey: one ? k : "combo", label: label, price: price, link: one ? PAY9[k] || "" : "" };
+    mark(list);
+    title.textContent = "Hold " + (one ? "Spot " : "Spots ") + list.map(L9).join(" + ") + " on " + LABELS[r] + (mail ? ", " + short(mail) + " card" : "") + " (" + label + ", " + money(price) + ")";
+    if (payBtn) { payBtn.hidden = !pending.link; payBtn.textContent = "Pay " + money(price) + " now and lock it in"; }
     msg.textContent = ""; shell.hidden = false;
     shell.scrollIntoView({ behavior: "smooth", block: "center" });
   }
@@ -170,7 +188,8 @@
     shell.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
-  document.getElementById("picker-cancel").addEventListener("click", function () { shell.hidden = true; pending = null; mark(null); });
+  document.getElementById("picker-cancel").addEventListener("click", function () { shell.hidden = true; pending = null; combo = []; mark(null); });
+  function spotName(p) { return fmt === "9x12" ? L9(p) : String(p); }
   function bindSizes() {
     root.querySelectorAll("button[data-size]").forEach(function (b) {
       b.setAttribute("aria-pressed", +b.getAttribute("data-size") === size ? "true" : "false");
@@ -201,8 +220,8 @@
       .then(function (r) {
         if (!r.ok) { msg.textContent = r.d.error || "That spot just got taken. Pick another one."; btn.disabled = false; load(route, true); return; }
         fetch(NOTIFY, { method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, body: JSON.stringify({
-          _subject: "Coachella Valley Spotlight: " + p.business + (payNow ? " is paying online for " : " wants ") + (p.positions.length === 1 ? "Spot " + p.position : p.size + " (Spots " + p.positions.join(", ") + ")") + " (" + p.category + ") on " + LABELS[p.route] + (p.mail ? " (" + short(p.mail) + " card)" : ""),
-          name: p.name, business: p.business, email: p.email, phone: p.phone, notes: p.notes, referred_by: (window.CVS_REF && window.CVS_REF()) || "", route: LABELS[p.route], mailing: p.mail || "", spot: p.positions.join(", "), size: p.size, price: p.price + " per mailing", category: p.category,
+          _subject: "Coachella Valley Spotlight: " + p.business + (payNow ? " is paying online for " : " wants ") + (p.positions.length === 1 ? "Spot " + spotName(p.position) : p.size + " (Spots " + p.positions.map(spotName).join(", ") + ")") + " (" + p.category + ") on " + LABELS[p.route] + (p.mail ? " (" + short(p.mail) + " card)" : ""),
+          name: p.name, business: p.business, email: p.email, phone: p.phone, notes: p.notes, referred_by: (window.CVS_REF && window.CVS_REF()) || "", route: LABELS[p.route], mailing: p.mail || "", spot: p.positions.map(spotName).join(", "), size: p.size, price: p.price + " per mailing", category: p.category,
           source: "coachellavalleyspotlight.com / advertise spot picker" }) }).catch(function () {});
         if (window.CVS_GA) window.CVS_GA(payNow ? "spot_pay_now" : "spot_hold", { route: p.route, mail: p.mail || "", spots: p.positions.length, category: p.category, ref: (window.CVS_REF && window.CVS_REF()) || "" });
         if (payNow) {
@@ -226,7 +245,7 @@
   }
   var wantSize = (location.search.match(/[?&]size=([1248])\b/) || [])[1];
   if (wantSize) root.querySelectorAll("button[data-size]").forEach(function (b) { if (b.getAttribute("data-size") === wantSize) b.click(); });
-  var wantSize9 = (location.search.match(/[?&]size=(large|medium|small|mini)\b/) || [])[1]; if (wantSize9) size9 = wantSize9;
+  var wantSize9 = (location.search.match(/[?&]size=(full|half|combo)\b/) || [])[1]; if (wantSize9) size9 = wantSize9;
   var want = (location.search.match(/[?&]route=([a-z-]+)/) || [])[1]; if (want === "sun-city") want = "sun-city-palm-desert";
   tabs.forEach(function (t) { if (want && t.getAttribute("data-route") === want) t.click(); });
   if (wantMail && cards(route).some(function (m) { return m.mail === wantMail; })) { mail = wantMail; load(route); }
