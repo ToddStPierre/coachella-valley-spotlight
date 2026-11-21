@@ -71,10 +71,15 @@
     var inc = Math.max(p.booked, need), exp = Math.max(p.rec.exp, stdCost(m));
     return { inc: inc, exp: exp, profit: inc - exp };
   }
+  // Sold out: every spot sells at the advertised price (9x12 $5,600, 11x6 16 x $300 = $4,800), less the card's costs.
+  function full(m) {
+    var p = proj(m), inc = fullValue(m) * 100, exp = Math.max(p.rec.exp, stdCost(m));
+    return { inc: inc, exp: exp, profit: inc - exp };
+  }
   function sumProj(ms) {
-    var s = { c: { inc: 0, exp: 0, profit: 0, n: 0 }, t: { inc: 0, exp: 0, profit: 0, n: 0, booked: 0, toGo: 0 }, n: 0, recInc: 0, recExp: 0 };
+    var s = { c: { inc: 0, exp: 0, profit: 0, n: 0 }, t: { inc: 0, exp: 0, profit: 0, n: 0, booked: 0, toGo: 0 }, f: { inc: 0, exp: 0, profit: 0 }, n: 0, recInc: 0, recExp: 0 };
     ms.forEach(function (m) {
-      var p = proj(m); s.n++; s.recInc += p.rec.inc; s.recExp += p.rec.exp;
+      var p = proj(m), fu = full(m); s.n++; s.recInc += p.rec.inc; s.recExp += p.rec.exp; s.f.inc += fu.inc; s.f.exp += fu.exp; s.f.profit += fu.profit;
       if (p.on) { s.c.n++; s.c.inc += p.inc; s.c.exp += p.exp; s.c.profit += p.profit; }
       else { var t = tent(m); s.t.n++; s.t.inc += t.inc; s.t.exp += t.exp; s.t.profit += t.profit; s.t.booked += p.booked; s.t.toGo += p.toGo; }
     });
@@ -89,7 +94,8 @@
     return '<div class="cp-proj2' + (big ? " big" : "") + '">' +
       trio("Confirmed", s.c.n + (s.c.n === 1 ? " card" : " cards") + " at or over the minimum", s.c, "conf") +
       trio("Tentative", s.t.n + (s.t.n === 1 ? " card" : " cards") + (s.t.n ? " &middot; if each mails at its minimum &middot; " + usd(s.t.booked) + " booked, " + usd(s.t.toGo) + " to go" : ""), s.t, "tent") +
-      '<p class="cp-both">Both: income <b>' + usd(all.inc) + "</b> &middot; costs <b>" + usd(all.exp) + '</b> &middot; profit <b class="' + (all.profit < 0 ? "neg" : "pos") + '">' + usd(all.profit) + "</b>" +
+      trio("Sold out", "if every spot on " + (s.n === 1 ? "this card" : "all " + s.n + " cards") + " sells at the advertised price", s.f, "full") +
+      '<p class="cp-both">Confirmed + tentative: income <b>' + usd(all.inc) + "</b> &middot; costs <b>" + usd(all.exp) + '</b> &middot; profit <b class="' + (all.profit < 0 ? "neg" : "pos") + '">' + usd(all.profit) + "</b>" +
       ' <span>&middot; Recorded so far: income ' + usd(s.recInc) + ", costs " + usd(s.recExp) + "</span></p></div>";
   }
   function minTxt(m) { return nine(m) ? "$" + (m.minDollars || 2625).toLocaleString("en-US") + " sold" : (m.minSold || 8) + " of 16 sold"; }
@@ -103,7 +109,7 @@
 
   // ---- the grid ----
   function card(m, i) {
-    var sp = spotsOf(m), st = status(m, sp), t = totals(linesOf(m)), n = nine(m) ? 20 : 16, pj = proj(m);
+    var sp = spotsOf(m), st = status(m, sp), t = totals(linesOf(m)), n = nine(m) ? 20 : 16, pj = proj(m), fu = full(m);
     var sold = sp ? sp.filter(function (r) { return stOf(r) === "sold"; }).length : 0, held = sp ? sp.filter(function (r) { return stOf(r) === "held"; }).length : 0;
     var segs = ""; for (var p = 1; p <= n; p++) { var r = sp && sp[p - 1]; segs += '<i class="' + (r ? stOf(r) : "open") + '"></i>'; }
     var dl = days(m.deadline), dm = days(m.mail), sv = soldValue(m, sp);
@@ -114,6 +120,7 @@
       '<span class="cp-bar" aria-hidden="true">' + segs + "</span>" +
       '<span class="cp-row"><span>' + (sp ? sold + " of " + n + " spots sold" + (held ? " &middot; " + held + " held" : "") : "Loading spots&hellip;") + "</span><span>" + (sv == null ? "" : "$" + sv.toLocaleString("en-US") + " of $" + fullValue(m).toLocaleString("en-US")) + "</span></span>" +
       '<span class="cp-money"><span>Recorded: income <b>' + usd(t.inc) + "</b></span><span>costs <b>" + usd(t.exp) + "</b></span></span>" +
+      '<span class="cp-fline">Sold out: ' + usd(fu.inc) + ' &middot; profit <b>' + usd(fu.profit) + "</b></span>" +
       '<span class="cp-pline ' + (pj.on ? "on" : "off") + '">' + (pj.on ? "On track &middot; projected profit <b>" + usd(pj.profit) + "</b>" : usd(pj.toGo) + " more to sell to mail") + "</span>" +
       '<span class="cp-foot"><span>In homes ' + esc(long(m.mail)) + ' <em>&middot; ' + (dm < 0 ? Math.abs(dm) + " days ago" : dm === 0 ? "today" : "in " + dm + (dm === 1 ? " day" : " days")) + "</em></span>" +
       '<span class="cp-art">Artwork ' + esc(short(m.deadline)) + (dl >= 0 && dm >= 0 ? " &middot; " + (dl === 0 ? "today" : dl + "d") : "") + "</span></span></button>";

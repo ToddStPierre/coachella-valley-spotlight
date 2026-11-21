@@ -480,3 +480,7 @@ body.is-admin .bd-mails { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 
 .cp-trio b.neg, .cp-both b.neg { color: var(--hq-red) !important; } .cp-trio b.pos, .cp-both b.pos { color: var(--hq-green) !important; }
 .cp-both { margin: 2px 0 0; font-size: 14px; color: var(--hq-ink-2); } .cp-both b { color: var(--hq-ink); } .cp-both span { color: var(--hq-ink-3); }
 @media (max-width: 760px) { .cp-trio { grid-template-columns: repeat(3, minmax(0, 1fr)); } .cp-trio .cp-trio-h { grid-column: 1 / -1; } }
+/* Sold-out potential (2026-11-21) */
+.cp-trio.full .cp-trio-h { border-left-color: #8a6bc4; }
+.cp-trio.full > div:not(.cp-trio-h) { background: #f8f6fb; }
+.cp-fline { font-size: 13.5px; color: #6b4fa3; } .cp-fline b { color: inherit; }
