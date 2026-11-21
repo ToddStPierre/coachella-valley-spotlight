@@ -457,3 +457,14 @@ body.is-admin .bd-mails { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 
 .cp-ads .cp-st { margin-left: auto; color: var(--hq-ink-3); font-size: 13px; }
 .cp-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--hq-gold); flex: none; } .cp-dot.sold { background: var(--hq-green); }
 @media (max-width: 600px) { .cp-grid { grid-template-columns: 1fr; } .cp-tools .hq-btn { margin-left: 0; } .cp-card { padding: 16px; } }
+/* Projected money per month (2026-11-21) */
+.cp-proj { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0 0 14px; }
+.cp-proj > div { background: var(--hq-card); border: 1px solid var(--hq-line); border-radius: 12px; padding: 10px 14px; display: grid; gap: 2px; }
+.cp-proj span { font-size: 12.5px; color: var(--hq-ink-3); font-weight: 600; }
+.cp-proj b { font-size: 18px; color: var(--hq-ink); } .cp-proj.big b { font-size: 24px; }
+.cp-proj b.neg { color: var(--hq-red); } .cp-proj b.pos { color: var(--hq-green); }
+.cp-proj p { grid-column: 1 / -1; margin: 0; font-size: 13.5px; color: var(--hq-ink-2); }
+.cp-how { margin: -4px 0 6px; }
+.cp-pline { font-size: 13.5px; font-weight: 600; } .cp-pline.on { color: var(--hq-green); } .cp-pline.off { color: var(--hq-ink-3); }
+.cp-pline b { color: inherit; }
+@media (max-width: 600px) { .cp-proj { grid-template-columns: 1fr; } }

@@ -42,6 +42,38 @@
     if (nine(m)) return FX.soldDollars("9x12", sp);
     return sp.reduce(function (n, r) { return n + (stOf(r) === "sold" ? 300 : 0); }, 0);
   }
+  // ---- projection (2026-11-21) ----
+  // A card only prints and mails once it reaches its minimum, so a card below it projects $0 income and $0 cost.
+  // booked = sold + held ads at list price (9x12) or $300 a spot (11x6), or the recorded income if that's higher.
+  // cost = recorded expenses, or the standard cost (printing $967 + $0.33 a home) if that's higher, for 9x12 cards.
+  // In dollars. A sold spot counts what was actually paid when the board has it (a joined ad's amount sits on its first spot).
+  function bookedValue(m, sp) {
+    if (!sp) return 0;
+    return sp.reduce(function (n, r) {
+      var s = stOf(r); if (s === "open") return n;
+      if (s === "sold" && r.paid && r.paid.amount != null) return n + r.paid.amount / 100;
+      return n + (nine(m) ? FX.spotPrice("9x12", r.position) || 0 : 300);
+    }, 0);
+  }
+  function stdCost(m) { return nine(m) ? Math.round((PRINT + POSTAGE * homesN(m)) * 100) : 0; }
+  function proj(m) {
+    var sp = spotsOf(m), t = totals(linesOf(m)), bk = bookedValue(m, sp) * 100, inc = Math.max(bk, t.inc);
+    var need = nine(m) ? (m.minDollars || 2625) * 100 : (m.minSold || 8) * 30000;
+    var cnt = sp ? sp.filter(function (r) { return stOf(r) !== "open"; }).length : 0;
+    var on = days(m.mail) < 0 || confirmed(m, sp) || (nine(m) ? bk >= need : cnt >= (m.minSold || 8));
+    var exp = on ? Math.max(t.exp, stdCost(m)) : 0;
+    return { on: on, inc: on ? inc : 0, exp: exp, profit: (on ? inc : 0) - exp, rec: t, toGo: on ? 0 : (nine(m) ? need - bk : ((m.minSold || 8) - cnt) * 30000), booked: inc };
+  }
+  function sumProj(ms) {
+    var s = { inc: 0, exp: 0, profit: 0, on: 0, n: 0, toGo: 0, recInc: 0, recExp: 0, pipe: 0 };
+    ms.forEach(function (m) { var p = proj(m); s.n++; if (p.on) s.on++; s.inc += p.inc; s.exp += p.exp; s.profit += p.profit; s.toGo += p.toGo; s.recInc += p.rec.inc; s.recExp += p.rec.exp; if (!p.on) s.pipe += p.booked; });
+    return s;
+  }
+  function projHtml(s, big) {
+    return '<div class="cp-proj' + (big ? " big" : "") + '"><div><span>Projected income</span><b>' + usd(s.inc) + "</b></div><div><span>Projected costs</span><b>" + usd(s.exp) + '</b></div><div><span>Projected profit</span><b class="' + (s.profit < 0 ? "neg" : "pos") + '">' + usd(s.profit) + "</b></div>" +
+      '<p>' + s.on + " of " + s.n + (s.n === 1 ? " card" : " cards") + " on track to mail" + (s.n > s.on ? " &middot; " + usd(s.toGo) + " more to sell to mail the rest" + (s.pipe ? " (" + usd(s.pipe) + " already held or sold on them)" : "") : "") +
+      " &middot; Recorded so far: income " + usd(s.recInc) + ", costs " + usd(s.recExp) + "</p></div>";
+  }
   function minTxt(m) { return nine(m) ? "$" + (m.minDollars || 2625).toLocaleString("en-US") + " sold" : (m.minSold || 8) + " of 16 sold"; }
   function confirmed(m, sp) { return sp && FX.isConfirmed ? FX.isConfirmed(m, sp) : false; }
   function status(m, sp) {
@@ -53,7 +85,7 @@
 
   // ---- the grid ----
   function card(m, i) {
-    var sp = spotsOf(m), st = status(m, sp), t = totals(linesOf(m)), n = nine(m) ? 20 : 16;
+    var sp = spotsOf(m), st = status(m, sp), t = totals(linesOf(m)), n = nine(m) ? 20 : 16, pj = proj(m);
     var sold = sp ? sp.filter(function (r) { return stOf(r) === "sold"; }).length : 0, held = sp ? sp.filter(function (r) { return stOf(r) === "held"; }).length : 0;
     var segs = ""; for (var p = 1; p <= n; p++) { var r = sp && sp[p - 1]; segs += '<i class="' + (r ? stOf(r) : "open") + '"></i>'; }
     var dl = days(m.deadline), dm = days(m.mail), sv = soldValue(m, sp);
@@ -63,22 +95,24 @@
       '<span class="cp-sub">' + esc(m.name) + " &middot; " + (nine(m) ? "9x12" : "11x6") + " &middot; " + esc(m.homes || "") + "</span>" +
       '<span class="cp-bar" aria-hidden="true">' + segs + "</span>" +
       '<span class="cp-row"><span>' + (sp ? sold + " of " + n + " spots sold" + (held ? " &middot; " + held + " held" : "") : "Loading spots&hellip;") + "</span><span>" + (sv == null ? "" : "$" + sv.toLocaleString("en-US") + " of $" + fullValue(m).toLocaleString("en-US")) + "</span></span>" +
-      '<span class="cp-money"><span>Income <b>' + usd(t.inc) + "</b></span><span>Costs <b>" + usd(t.exp) + '</b></span><span>Profit <b class="' + (t.profit < 0 ? "neg" : "pos") + '">' + usd(t.profit) + "</b></span></span>" +
+      '<span class="cp-money"><span>Recorded: income <b>' + usd(t.inc) + "</b></span><span>costs <b>" + usd(t.exp) + "</b></span></span>" +
+      '<span class="cp-pline ' + (pj.on ? "on" : "off") + '">' + (pj.on ? "On track &middot; projected profit <b>" + usd(pj.profit) + "</b>" : usd(pj.toGo) + " more to sell to mail") + "</span>" +
       '<span class="cp-foot"><span>In homes ' + esc(long(m.mail)) + ' <em>&middot; ' + (dm < 0 ? Math.abs(dm) + " days ago" : dm === 0 ? "today" : "in " + dm + (dm === 1 ? " day" : " days")) + "</em></span>" +
       '<span class="cp-art">Artwork ' + esc(short(m.deadline)) + (dl >= 0 && dm >= 0 ? " &middot; " + (dl === 0 ? "today" : dl + "d") : "") + "</span></span></button>";
   }
   function draw() {
     var idx = list.map(function (m, i) { return i; }).filter(function (i) { var d = days(list[i].mail); return view === "all" || (view === "past" ? d < 0 : d >= 0); });
     idx.sort(function (a, b) { var x = list[a], y = list[b]; return view === "past" ? (y.mail.localeCompare(x.mail) || x.name.localeCompare(y.name)) : (x.mail.localeCompare(y.mail) || x.name.localeCompare(y.name)); });
-    var shown = idx.map(function (i) { return list[i]; }), all = totals(lines.filter(function (l) { return shown.some(function (m) { return ck(m) === l.campaign; }); }));
+    var shown = idx.map(function (i) { return list[i]; });
     var groups = {}, order = [];
     idx.forEach(function (i) { var g = ymd(list[i].mail).toLocaleDateString("en-US", { month: "long", year: "numeric" }); if (!groups[g]) { groups[g] = []; order.push(g); } groups[g].push(i); });
     box.innerHTML = '<div class="cp-tools"><div class="hq-seg cp-view" role="group" aria-label="Which campaigns">' +
       [["upcoming", "Upcoming"], ["past", "Past"], ["all", "All"]].map(function (v) { return '<button type="button" data-view="' + v[0] + '"' + (view === v[0] ? ' class="on"' : "") + ">" + v[1] + "</button>"; }).join("") + "</div>" +
-      '<div class="cp-sum"><span>Income <b>' + usd(all.inc) + "</b></span><span>Costs <b>" + usd(all.exp) + '</b></span><span>Profit <b class="' + (all.profit < 0 ? "neg" : "pos") + '">' + usd(all.profit) + "</b></span></div>" +
       '<button type="button" class="hq-btn" data-new>' + HQ.icons.plus + "<span>New campaign</span></button></div>" +
+      (shown.length ? '<h3 class="cp-month">' + (view === "past" ? "All past campaigns" : view === "all" ? "All campaigns" : "All upcoming campaigns") + "</h3>" + projHtml(sumProj(shown), true) : "") +
+      '<p class="bd-note cp-how">Projections count a card only once it&rsquo;s on track to mail (held + sold reach its minimum). Income is held and sold ads at list price (or what&rsquo;s recorded, if more). Costs are printing $' + PRINT + " + $" + POSTAGE.toFixed(2) + " a home (or what&rsquo;s recorded, if more).</p>" +
       (linesOk ? "" : '<p class="bd-note" style="margin:0 0 12px">Loading income and expenses&hellip;</p>') +
-      (order.length ? order.map(function (g) { return '<h3 class="cp-month">' + esc(g) + '</h3><div class="cp-grid">' + groups[g].map(function (i) { return card(list[i], i); }).join("") + "</div>"; }).join("")
+      (order.length ? order.map(function (g) { return '<h3 class="cp-month">' + esc(g) + "</h3>" + projHtml(sumProj(groups[g].map(function (i) { return list[i]; }))) + '<div class="cp-grid">' + groups[g].map(function (i) { return card(list[i], i); }).join("") + "</div>"; }).join("")
         : '<p class="bd-note">No ' + (view === "past" ? "past" : "upcoming") + " campaigns.</p>");
   }
 
