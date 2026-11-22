@@ -9,5 +9,6 @@ window.CVS_QR_CODES = [
   {"c":"t8msd","b":"reliable-roofing","m":"sun-city-palm-desert:2026-12-17","made":"2026-11-22"},
   {"c":"72mmv","b":"palm-royale-collective","m":"sun-city-palm-desert:2026-12-17","made":"2026-11-22"},
   {"c":"kd83m","b":"golf-cars-of-the-desert","m":"sun-city-palm-desert:2026-12-17","made":"2026-11-22"},
-  {"c":"pun3q","b":"cleen-x-restoration","m":"sun-city-palm-desert:2026-12-17","made":"2026-11-22"}
+  {"c":"pun3q","b":"cleen-x-restoration","m":"sun-city-palm-desert:2026-12-17","made":"2026-11-22"},
+  {"c":"sfv5f","b":"ranch-house-bar-and-grill","m":"sun-city-palm-desert:2026-12-17","made":"2026-11-22"}
 ];
