@@ -8,6 +8,7 @@
   function tip(l) { return l[1] + ' <span class="stat-tip" tabindex="0" role="button" aria-label="What does ' + l[1] + ' mean?" data-tip="' + l[2].replace(/"/g, "&quot;") + '">?</span>'; }
   function monthName(ym) { var p = ym.split("-"); return new Date(+p[0], +p[1] - 1, 1).toLocaleString("en-US", { month: "long", year: "numeric" }); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function mailName(m) { return window.CVS_MAILING_LABEL ? window.CVS_MAILING_LABEL(m) : m; }
   function fail(m) { out.innerHTML = '<div class="empty">' + m + '</div>'; }
   // Signed-in owners don't need the private link: their Firebase login is sent instead (assets/auth.js).
   var bearer = null;
@@ -54,14 +55,24 @@
         '<p class="risk">Counts come from this site only. Bots and people who block tracking are not counted, so real numbers run a little higher. Times are Pacific.</p></details>';
     }
 
+    // By postcard mailing (2026-11-22): every ad on every card has its own QR code, so each mailing gets its own line.
+    if ((L.premium || L.postcard) && d.stats && (d.mailings || []).length) {
+      var MK = [["scan", "QR scans"], ["emailed", "Ad emailed"], ["lead", "New leads"], ["claim", "Deals claimed"], ["share", "Sent to a neighbor"]];
+      html += '<h2 class="month-head"><span class="stripe-mini"></span>By postcard mailing</h2>' +
+        '<p style="margin:0 0 10px">Your ad has its own QR code on each postcard, so you can see what each mailing brought in.</p>' +
+        '<div class="table-scroll"><table class="stats-table"><thead><tr><th>Postcard</th>' + MK.map(function (k) { return "<th>" + k[1] + "</th>"; }).join("") + '</tr></thead><tbody>' +
+        d.mailings.map(function (x) { return "<tr><td><strong>" + esc(mailName(x.mailing)) + "</strong></td>" + MK.map(function (k) { return "<td>" + (x[k[0]] || 0) + "</td>"; }).join("") + "</tr>"; }).join("") +
+        '</tbody></table></div><p class="risk" style="margin:8px 0 16px">Deals claimed and shares only count here when they came from a postcard scan. Your totals above include everything.</p>';
+    }
+
     // Leads (2026-11-21): people who asked for their ad/deal by email and OK'd being contacted (tracker POST /optin).
     if ((L.premium || L.postcard) && d.stats) {
       var LD = d.leads || [], SRC = { qr: "Scanned your postcard", share: "Shared link", deal: "Deals page", profile: "Your page" };
       html += '<h2 class="month-head"><span class="stripe-mini"></span>Your leads' + (LD.length ? " (" + LD.length + ")" : "") + '</h2>';
       html += LD.length
         ? '<p style="margin:0 0 10px">These people asked for your ad or deal and said it&rsquo;s OK for you to contact them. You also get an email for each one the moment it comes in. <button type="button" class="btn btn-ghost" id="ow-leads-csv" style="margin-left:6px">Download list (CSV)</button></p>' +
-          '<div class="table-scroll"><table class="stats-table"><thead><tr><th>Email</th><th>How they found you</th><th>When</th></tr></thead><tbody>' +
-          LD.map(function (l) { return '<tr><td><a href="mailto:' + esc(l.email) + '">' + esc(l.email) + '</a></td><td>' + esc(SRC[l.src] || "Our site") + '</td><td>' + esc(new Date(l.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })) + '</td></tr>'; }).join("") + '</tbody></table></div>'
+          '<div class="table-scroll"><table class="stats-table"><thead><tr><th>Email</th><th>How they found you</th><th>Postcard</th><th>When</th></tr></thead><tbody>' +
+          LD.map(function (l) { return '<tr><td><a href="mailto:' + esc(l.email) + '">' + esc(l.email) + '</a></td><td>' + esc(SRC[l.src] || "Our site") + '</td><td>' + (l.mailing ? esc(mailName(l.mailing)) : "&mdash;") + '</td><td>' + esc(new Date(l.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })) + '</td></tr>'; }).join("") + '</tbody></table></div>'
         : '<p class="risk" style="margin:0 0 16px">When someone scans your postcard, asks for your ad by email and says it&rsquo;s OK for you to contact them, they show up here and you get an email right away.</p>';
     }
 
@@ -99,7 +110,7 @@
     var csvBtn = document.getElementById("ow-leads-csv");
     if (csvBtn) csvBtn.addEventListener("click", function () {
       var q = function (v) { return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; };
-      var rows = [["Email", "How they found you", "Date"]].concat((d.leads || []).map(function (l) { return [l.email, l.src || "", (l.created_at || "").slice(0, 10)]; }));
+      var rows = [["Email", "How they found you", "Postcard", "Date"]].concat((d.leads || []).map(function (l) { return [l.email, l.src || "", l.mailing ? mailName(l.mailing) : "", (l.created_at || "").slice(0, 10)]; }));
       var a = document.createElement("a");
       a.href = URL.createObjectURL(new Blob([rows.map(function (r) { return r.map(q).join(","); }).join("\n")], { type: "text/csv" }));
       a.download = L.slug + "-leads.csv"; document.body.appendChild(a); a.click(); a.remove();

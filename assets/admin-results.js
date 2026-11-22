@@ -2,7 +2,9 @@
    For each paying business (postcard or Premium): QR scans, ads emailed, leads, shares and deals claimed, all time,
    plus a ready-to-paste results line for outreach emails and the Advertise page. Top row: totals across all of them,
    the size of our own deals list from opt-ins, and whether email sending (Resend) is switched on.
-   Numbers come from the tracker (/stats/all and /admin/optins). Cards aren't linked to listings yet, so lines are per advertiser. */
+   Numbers come from the tracker (/stats/all and /admin/optins).
+   By postcard (2026-11-22): each ad on each card has its own QR code (s?b=<slug>&m=<route>:<mail date>), so there's also a
+   table per mailing with a results line per advertiser and a total for the card. */
 (function () {
   var API = "https://cvs-tracker.toddstpierre.workers.dev";
   var admin = (new URLSearchParams(location.search).get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })()); if (!admin || window.CVS_IS_REPORT) return;
@@ -28,7 +30,11 @@
   Promise.all([j(API + "/stats/all?key=" + encodeURIComponent(admin)), j(API + "/admin/optins?key=" + encodeURIComponent(admin))]).then(function (r) {
     var stats = r[0] && r[0].businesses || [], op = r[1] || {}, optins = op.optins || [];
     var dir = (window.CVS && window.CVS.directory) || [], by = {};
-    stats.forEach(function (s) { by[s.slug] = s.allTime || {}; });
+    var cards = {};
+    stats.forEach(function (s) { by[s.slug] = s.allTime || {}; (s.byMailing || []).forEach(function (m) { (cards[m.mailing] = cards[m.mailing] || []).push({ slug: s.slug, t: m }); }); });
+    var nameOf = function (slug) { var b = dir.filter(function (x) { return x.slug === slug; })[0]; return b ? b.name : slug; };
+    var label = function (m) { return window.CVS_MAILING_LABEL ? window.CVS_MAILING_LABEL(m) : m; };
+    var cardKeys = Object.keys(cards).sort(function (a, z) { return z.split(":")[1].localeCompare(a.split(":")[1]) || a.localeCompare(z); });
     var K = ["scan", "emailed", "lead", "share", "claim"], tot = { scan: 0, emailed: 0, lead: 0, share: 0, claim: 0 };
     var rows = dir.filter(function (b) { return b.slug && !b.sample && (b.postcard || b.premium || b.featured); }).map(function (b) {
       var t = by[b.slug] || {}; K.forEach(function (k) { tot[k] += t[k] || 0; }); return { b: b, t: t, line: line(b.name, t) };
@@ -44,7 +50,18 @@
       '<div class="table-scroll"><table class="stats-table"><thead><tr><th>Business</th><th>QR scans</th><th>Ad emailed</th><th>Leads</th><th>Shared</th><th>Deals claimed</th><th>Results line</th></tr></thead><tbody>' +
       rows.map(function (x) { return '<tr><td><strong>' + esc(x.b.name) + '</strong></td>' + ["scan", "emailed", "lead", "share", "claim"].map(function (k) { return "<td>" + (x.t[k] || 0) + "</td>"; }).join("") + '<td>' + (x.line ? '<span style="display:block;max-width:360px;font-size:13px;margin-bottom:6px">' + esc(x.line) + '</span>' : "") + copyBtn(x.line) + '</td></tr>'; }).join("") +
       '</tbody></table></div>' +
-      '<p class="risk" style="margin-top:10px">Lines are per advertiser, counted since tracking began. Postcard spots aren&rsquo;t linked to listings yet, so there&rsquo;s no per-card total.</p>';
+      '<p class="risk" style="margin-top:10px">Lines are per advertiser, counted since tracking began.</p>' +
+      '<h2 class="month-head" style="margin-top:28px"><span class="stripe-mini"></span>By postcard</h2>' +
+      (cardKeys.length ? cardKeys.map(function (k) {
+        var ct = { scan: 0, emailed: 0, lead: 0, share: 0, claim: 0 }, rs = cards[k].map(function (r) { K.forEach(function (x) { ct[x] += r.t[x] || 0; }); return { name: nameOf(r.slug), t: r.t, line: line(nameOf(r.slug) + " (" + label(k) + ")", r.t) }; })
+          .sort(function (a, z) { return (z.t.lead || 0) - (a.t.lead || 0) || (z.t.scan || 0) - (a.t.scan || 0) || a.name.localeCompare(z.name); });
+        var cl = line("Ads on the " + label(k) + " card", ct);
+        return '<h3 style="margin:18px 0 8px">' + esc(label(k)) + '</h3>' +
+          (cl ? '<div class="card" style="padding:12px 16px;margin-bottom:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:220px">' + esc(cl) + '</span>' + copyBtn(cl) + '</div>' : "") +
+          '<div class="table-scroll"><table class="stats-table"><thead><tr><th>Business</th><th>QR scans</th><th>Ad emailed</th><th>Leads</th><th>Shared</th><th>Deals claimed</th><th>Results line</th></tr></thead><tbody>' +
+          rs.map(function (x) { return '<tr><td><strong>' + esc(x.name) + '</strong></td>' + K.map(function (q) { return "<td>" + (x.t[q] || 0) + "</td>"; }).join("") + '<td>' + copyBtn(x.line) + '</td></tr>'; }).join("") + '</tbody></table></div>';
+      }).join("") : '<p class="risk">No scans from a postcard yet. Each ad&rsquo;s code for a card is under Listings &rarr; QR code (pick the mailing).</p>') +
+      '<p class="risk" style="margin-top:10px">Codes printed before 2026-11-22 (the El Paseo Nov 27 card) have no mailing in them; s.html credits them to that card. Shares and deal claims count for a card only when they came from its scan.</p>';
   });
   box.addEventListener("click", function (e) {
     var b = e.target.closest("[data-copy-line]"); if (!b) return;

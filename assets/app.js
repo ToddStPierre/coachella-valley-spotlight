@@ -322,6 +322,7 @@
       if (!/^[^@\s,;]+@[^@\s,;]+\.[a-z]{2,}$/i.test(em)) { msg.className = "optin-msg is-err"; msg.textContent = "Please check your email address."; f.email.focus(); return; }
       b.disabled = true; b.textContent = "Sending…"; msg.className = "optin-msg"; msg.textContent = "";
       var body = { b: slug, email: em, share: !!(f.share && f.share.checked), list: f.list.checked, src: src, website: f.website.value };
+      var mail = mailFor(slug); if (mail) body.m = mail;
       fetch(TRACK_BASE + "/optin", { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
         .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || "That didn't go through."); return d; }); })
         .then(function (d) {
@@ -341,7 +342,7 @@
   function shareBtn(slug, biz, offer) { return slug ? '<button type="button" class="btn btn-ghost" data-share-biz="' + esc(slug) + '" data-share-text="' + esc(offer ? offer + " at " + biz : biz) + '">Send to a neighbor</button>' : ""; }
   document.addEventListener("click", function (e) {
     var b = e.target.closest("[data-share-biz]"); if (!b) return;
-    var slug = b.getAttribute("data-share-biz"), url = absUrl("business/" + slug + "/?from=share"), txt = "Thought you could use this: " + b.getAttribute("data-share-text");
+    var slug = b.getAttribute("data-share-biz"), sm = mailFor(slug), url = absUrl("business/" + slug + "/?from=share" + (sm ? "&m=" + encodeURIComponent(sm) : "")), txt = "Thought you could use this: " + b.getAttribute("data-share-text");
     track(slug, "share");
     if (navigator.share) { navigator.share({ title: "Coachella Valley Spotlight", text: txt, url: url }).catch(function () {}); return; }
     var done = function () { b.textContent = "Link copied. Paste it to a neighbor"; setTimeout(function () { b.textContent = "Send to a neighbor"; }, 2600); };
@@ -550,9 +551,30 @@
 
   // Listing tracking: counts views, profile views, calls and website clicks per business.
   var TRACK_BASE = "https://cvs-tracker.toddstpierre.workers.dev", TRACK = TRACK_BASE + "/t";
+  // Which postcard mailing brought this visitor to this business (s.html adds &m=<route>:<mail date>, 2026-11-22).
+  // Kept for the browser session, so a claim, share or opt-in a few pages later still counts for that card.
+  var MAIL_RE = /^[a-z0-9-]{2,40}:\d{4}-\d{2}-\d{2}$/;
+  (function () {
+    var m = new URLSearchParams(location.search).get("m") || "", s = document.body && document.body.getAttribute("data-profile");
+    if (s && MAIL_RE.test(m)) try { sessionStorage.setItem("cvs_mail:" + s, m); } catch (e) {}
+  })();
+  // "el-paseo:2026-11-27" -> "Palm Desert - El Paseo Area · Nov 27, 2026" (route names from data/routes.js or data/mailings.js when loaded).
+  window.CVS_MAILING_LABEL = function (m) {
+    var p = String(m || "").split(":"), route = p[0], day = p[1] || "", name = "";
+    [window.CVS_ROUTES || [], window.CVS_MAILINGS || []].forEach(function (list) { list.forEach(function (r) { if (!name && (r.id || r.route) === route && r.name) name = r.name; }); });
+    if (!name) name = route.split("-").map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(" ");
+    var d = new Date(day + "T12:00:00Z");
+    return name + (isNaN(d) ? "" : " \u00b7 " + d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }));
+  };
+  function mailFor(slug) {
+    var m = ""; try { m = sessionStorage.getItem("cvs_mail:" + slug) || ""; } catch (e) {}
+    if (!m && slug && document.body.getAttribute("data-profile") === slug) m = new URLSearchParams(location.search).get("m") || "";
+    return MAIL_RE.test(m) ? m : "";
+  }
   function track(slug, type) {
     if (!slug || window.CVS_NOTRACK || /localhost|127\.0\.0\.1|^file/.test(location.href)) return;
-    var body = JSON.stringify({ b: slug, e: type });
+    var m = (type === "claim" || type === "share") ? mailFor(slug) : "";
+    var body = JSON.stringify(m ? { b: slug, e: type, m: m } : { b: slug, e: type });
     try { if (navigator.sendBeacon && navigator.sendBeacon(TRACK, body)) return; } catch (e) {}
     try { fetch(TRACK, { method: "POST", body: body, keepalive: true, mode: "no-cors" }); } catch (e) {}
   }
