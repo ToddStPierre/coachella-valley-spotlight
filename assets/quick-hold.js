@@ -26,7 +26,8 @@
   function fmtOfMail(id, ml) { var m = MAIL.filter(function (x) { return x.route === id && x.mail === ml; })[0]; return FX.fmtOf ? FX.fmtOf(m) : "11x6"; }
   // What's being bought on (route, card): label, size, price, pass price and pay links.
   function offer(id, ml) {
-    if (fmtOfMail(id, ml) === "9x12" && F9) { var z = F9.sizes[size9]; return { nine: true, label: z.label, dims: z.dims, price: money(z.price), pass: z.pass ? money(z.pass) : "", pass2: z.pass ? money(z.pass * 2) : "", save: z.pass ? money(z.price * 3 - z.pass) : "", pay: PAY9[size9] || "", payPass: PASS9[size9] || "", payPass2: "" }; }
+    if (fmtOfMail(id, ml) === "9x12" && F9) { var z = F9.sizes[size9], off2 = (FX.TWO_OFF || {})[size9] || 0; return { nine: true, label: z.label, dims: z.dims, price: money(z.price), pass: z.pass ? money(z.pass) : "", pass2: z.pass ? money(z.pass * 2) : "", save: z.pass ? money(z.price * 3 - z.pass) : "", pay: PAY9[size9] || "", payPass: PASS9[size9] || "", payPass2: "",
+      two: off2 ? money((z.price - off2) * 2) : "", twoEach: money(z.price - off2), twoSave: money(off2 * 2), payTwo: (FX.TWO_9x12 || {})[size9] || "" }; }
     return { nine: false, label: SIZE, dims: DIMS, price: PRICE, pass: PASS_PRICE, pass2: PASS2_PRICE, save: "$75", pay: PAY_1, payPass: PAY_PASS, payPass2: PAY_PASS2 };
   }
   // Open spots a hold can use on a card: on 9x12 only the chosen size.
@@ -224,23 +225,35 @@
       // A second card for the same 3 dates: any other route where the category and a spot are open on all three.
       // The two-card Season Pass is switched off (2026-11-17, Todd: too confusing). To bring it back, restore the filter below.
       var others = []; // passOn ? ROUTES.filter(function (r) { return r.id !== route && sameDates(r.id) && passSpot(r.id, mail, cat); }) : [];
-      if (route2 && others.every(function (r) { return r.id !== route2; })) route2 = null;
+      if (passOn && route2 && others.every(function (r) { return r.id !== route2; })) route2 = null;
       if (others.length) html += '<div class="qh-pass2"><p><b>Add a second card</b> for ' + of.pass2 + ' total (both cards, all 3 mailings):</p>' +
         others.map(function (r) { return '<label><input type="checkbox" name="qh-r2" value="' + r.id + '"' + (route2 === r.id ? " checked" : "") + "><span>" + esc(r.name) + " · " + esc(r.homes) + "</span></label>"; }).join("") + "</div>";
-    } else { passOn = false; route2 = null; }
-    if (!passOn) route2 = null;
+    } else { passOn = false; }
+    // Two-route deal (Todd, 2026-11-21): the same ad on a second route with the same mail date, about 10,000 homes,
+    // $50 off each Full / $25 off each Half on each route. Single mailing only, never with the Season Pass.
+    var twos = mail && of.nine && of.two && !passOn ? twoRoutes(cat) : [];
+    if (route2 && twos.every(function (r) { return r.id !== route2; })) route2 = null;
+    if (twos.length) html += '<div class="qh-pass2 qh-two"><p><b>Two-route deal: reach about 10,000 homes.</b> Add a second route on the same ' + shortDate(mail) + " card and pay " + of.two + " for both (" + of.twoEach + " each, save " + of.twoSave + "):</p>" +
+      twos.map(function (r) { return '<label><input type="checkbox" name="qh-r2" value="' + r.id + '"' + (route2 === r.id ? " checked" : "") + "><span>" + esc(r.name) + " · " + esc(r.homes) + "</span></label>"; }).join("") + "</div>";
+    if (passOn || !twos.length) route2 = null;
     mailsEl.innerHTML = html;
     mailsEl.querySelectorAll(".qh-mail[data-m]").forEach(function (b) { b.addEventListener("click", function () { mail = b.getAttribute("data-m"); drawRoutes(); }); });
     mailsEl.querySelectorAll("[data-size9]").forEach(function (b) { b.addEventListener("click", function () { size9 = b.getAttribute("data-size9"); ga("quick_hold_size", { size: size9 }); drawRoutes(); }); });
-    var cb = mailsEl.querySelector("#qh-pass-on"); if (cb) cb.addEventListener("change", function () { passOn = cb.checked; ga("season_pass_toggle", { on: passOn, route: route }); drawMails(); });
-    // Only one extra card ("1 spot 2 cards"): ticking one unticks the others.
-    mailsEl.querySelectorAll("[name=qh-r2]").forEach(function (x) { x.addEventListener("change", function () { route2 = x.checked ? x.value : null; ga("season_pass_2card", { on: !!route2, route: route, route2: route2 || "" }); drawMails(); }); });
+    var cb = mailsEl.querySelector("#qh-pass-on"); if (cb) cb.addEventListener("change", function () { passOn = cb.checked; if (passOn) route2 = null; ga("season_pass_toggle", { on: passOn, route: route }); drawMails(); });
+    // Only one extra route: ticking one unticks the others. Picking a second route turns the Season Pass off (they don't combine).
+    mailsEl.querySelectorAll("[name=qh-r2]").forEach(function (x) { x.addEventListener("change", function () { route2 = x.checked ? x.value : null; if (route2) passOn = false; ga("two_route_toggle", { on: !!route2, route: route, route2: route2 || "", size: size9 }); drawMails(); }); });
   }
+  // Other routes with a 9x12 card on the same date where the category and a spot of the chosen size are open.
+  function twoRoutes(cat) { return ROUTES.filter(function (r) { return r.id !== route && card(r.id, mail) && fmtOfMail(r.id, mail) === "9x12" && openOn(r.id, mail, cat) && usable(r.id, mail).length; }); }
   // The second route's pass uses the same 3 dates, so both cards share one checkout.
   function sameDates(id) { var a = passCards(route, mail), b = passCards(id, mail); return !!(a && b) && a.every(function (m, i) { return b[i].mail === m.mail; }); }
   function chosen() {
     var cat = catSel.value, pc = passOn && passCards(route, mail), ps = pc && passSpot(route, mail, cat), of = offer(route, mail);
-    if (!ps) return { pass: false, mails: [mail], price: of.price, pos: null, extra: null, of: of, link: of.pay };
+    if (!ps) {
+      var two = route2 && of.nine && of.two && twoRoutes(cat).some(function (r) { return r.id === route2; }) && usable(route2, mail)[0];
+      if (two) return { pass: false, two: true, mails: [mail], price: of.two, pos: null, extra: { route: route2, pos: two }, of: of, link: of.payTwo };
+      return { pass: false, mails: [mail], price: of.price, pos: null, extra: null, of: of, link: of.pay };
+    }
     var mails = pc.map(function (m) { return m.mail; }), ps2 = route2 && sameDates(route2) && passSpot(route2, mail, cat);
     return { pass: true, mails: mails, price: ps2 ? of.pass2 : of.pass, pos: ps, extra: ps2 ? { route: route2, pos: ps2 } : null, of: of, link: ps2 ? of.payPass2 : of.payPass };
   }
@@ -254,10 +267,10 @@
     if (n === 3) {
       var r = route0(route), c = chosen();
       summary.innerHTML = "<b>" + esc(bizIn.value.trim()) + "</b> · " + esc(catSel.value) + "<br>" + esc(r.name) + (c.extra ? " + " + esc(route0(c.extra.route).name) : ", " + esc(r.homes)) + " · " +
-        (c.pass ? "Season Pass: " + c.mails.map(shortDate).join(", ") + " mailings" : shortDate(mail) + " card") + " · " + c.of.label + " (" + c.of.dims + ") · " + c.price;
+        (c.pass ? "Season Pass: " + c.mails.map(shortDate).join(", ") + " mailings" : shortDate(mail) + " card") + " · " + c.of.label + " (" + c.of.dims + ") · " + c.price + (c.two ? " for both routes (Two-route deal)" : "");
       var payBtn = $("#qh-pay"), canPay = !!c.link;
       payBtn.hidden = !canPay; payBtn.textContent = "Pay " + c.price + " and lock it in";
-      $("#qh-hold").textContent = c.pass ? "Hold my Season Pass free, invoice me" : "Hold my spot free, invoice me";
+      $("#qh-hold").textContent = c.pass ? "Hold my Season Pass free, invoice me" : c.two ? "Hold both routes free, invoice me" : "Hold my spot free, invoice me";
     }
     var f = steps[n - 1].querySelector("input:not([type=hidden]), button.qh-route.on, button");
     if (!first) box.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -279,8 +292,8 @@
     function attempt(tries) {
       var c = chosen(), pos = c.pass ? c.pos : usable(route, mail)[0];
       if (!pos) { fail("That card just filled up. Call (760) 422-5475 and we’ll find you a spot."); return; }
-      var p = Object.assign({}, base, { position: pos, positions: [pos], price: c.price, link: c.link, passPrice: c.of.pass, pass: c.pass, mails: c.mails, mail: c.mails[0], extra: c.extra,
-        notes: (c.pass ? "Quick hold, SEASON PASS " + (c.extra ? "2 cards (" + route + " + " + c.extra.route + ") " : "") + c.mails.join(" + ") + " (" + c.price + ")" : "Quick hold") + (listing ? " (directory listing: " + (listing.slug || listing.name) + ")" : "") + (ref ? " [Referred by: " + ref + "]" : "") });
+      var p = Object.assign({}, base, { position: pos, positions: [pos], price: c.price, link: c.link, passPrice: c.of.pass, pass: c.pass, two: !!c.two, mails: c.mails, mail: c.mails[0], extra: c.extra,
+        notes: (c.pass ? "Quick hold, SEASON PASS " + (c.extra ? "2 cards (" + route + " + " + c.extra.route + ") " : "") + c.mails.join(" + ") + " (" + c.price + ")" : c.two ? "Quick hold, TWO-ROUTE DEAL " + route + " + " + c.extra.route + " on " + c.mails[0] + " (" + c.price + " for both, " + c.of.twoEach + " each; invoice at the deal price)" : "Quick hold") + (listing ? " (directory listing: " + (listing.slug || listing.name) + ")" : "") + (ref ? " [Referred by: " + ref + "]" : "") });
       var body = Object.assign({}, p); delete body.extra; delete body.link; delete body.passPrice; if (!c.pass) delete body.mails;
       fetch(API + "/api/reserve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
         .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, status: res.status, d: d }; }); })
@@ -292,9 +305,10 @@
               .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, d: d }; }); })
               .then(function (r2) {
                 if (r2.ok) return held(p, payNow);
-                p.extra = null; p.price = p.passPrice; p.link = c.of.payPass;
+                p.extra = null; p.two = false; p.price = c.pass ? p.passPrice : c.of.price; p.link = c.pass ? c.of.payPass : c.of.pay;
+                p.notes = p.notes.replace(/TWO-ROUTE DEAL[^)]*\)/, "(two-route deal fell through: " + c.extra.route + " filled; single price " + c.of.price + ")");
                 held(p, false);
-                msg.textContent = ""; done.insertAdjacentHTML("afterbegin", '<p class="qh-warn"><b>Heads up:</b> ' + esc(route0(c.extra.route).name) + " just filled for " + esc(catSel.value) + ", so we held your Season Pass on " + esc(route0(route).name) + " only (" + esc(p.passPrice) + "). We’ll email you about the other card.</p>");
+                msg.textContent = ""; done.insertAdjacentHTML("afterbegin", '<p class="qh-warn"><b>Heads up:</b> ' + esc(route0(c.extra.route).name) + " just filled for " + esc(catSel.value) + ", so we held your " + (c.pass ? "Season Pass" : "spot") + " on " + esc(route0(route).name) + " only (" + esc(p.price) + "). We’ll email you about the other " + (c.pass ? "card" : "route") + ".</p>");
               });
           }
           if (r.ok) return held(p, payNow);
@@ -320,10 +334,10 @@
   }
   function held(p, payNow) {
     var r = route0(p.route), m = card(p.route, p.mails[0]), when = p.pass ? p.mails.map(shortDate).join(", ") + " mailings" : shortDate(p.mails[0]) + " card";
-    var where = p.extra ? r.name + " (Spot " + p.position + ") and " + route0(p.extra.route).name + " (Spot " + p.extra.pos + ")" : r.name;
+    var where = p.extra ? r.name + " (Spot " + spotTxt(p) + ") and " + route0(p.extra.route).name + " (Spot " + spotTxt({ route: p.extra.route, mail: p.mails[0], position: p.extra.pos }) + ")" : r.name;
     fetch(NOTIFY, { method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, body: JSON.stringify({
-      _subject: "Coachella Valley Spotlight: " + p.business + (payNow ? " is paying online for " : " wants ") + (p.pass ? (p.extra ? "a 2-CARD SEASON PASS, " : "a SEASON PASS, ") : "") + (p.extra ? "" : "Spot " + spotTxt(p) + " ") + "(" + p.category + ") on " + where + ", " + when + " [quick hold]",
-      name: p.name, business: p.business, email: p.email, phone: p.phone, notes: p.notes, referred_by: (window.CVS_REF && window.CVS_REF()) || "", route: where, mailing: p.mails.join(", "), spot: spotTxt(p), size: p.size, price: p.pass ? p.price + " for " + p.mails.length + " mailings" + (p.extra ? " on 2 cards" : "") : p.price + " per mailing", category: p.category,
+      _subject: "Coachella Valley Spotlight: " + p.business + (payNow ? " is paying online for " : " wants ") + (p.pass ? (p.extra ? "a 2-CARD SEASON PASS, " : "a SEASON PASS, ") : p.extra ? "a TWO-ROUTE DEAL (" + p.price + "), " : "") +(p.extra ? "" : "Spot " + spotTxt(p) + " ") + "(" + p.category + ") on " + where + ", " + when + " [quick hold]",
+      name: p.name, business: p.business, email: p.email, phone: p.phone, notes: p.notes, referred_by: (window.CVS_REF && window.CVS_REF()) || "", route: where, mailing: p.mails.join(", "), spot: spotTxt(p), size: p.size, price: p.pass ? p.price + " for " + p.mails.length + " mailings" + (p.extra ? " on 2 cards" : "") : p.extra ? p.price + " for both routes, 1 mailing each (two-route deal)" : p.price + " per mailing", category: p.category,
       source: "coachellavalleyspotlight.com / reserve quick hold" }) }).catch(function () {});
     ga(payNow ? "spot_pay_now" : "spot_hold", { route: p.route, mail: p.mails[0], pass: p.pass, cards: p.extra ? 2 : 1, spots: 1, category: p.category, mode: "quick", ref: (window.CVS_REF && window.CVS_REF()) || "" });
     var pay = payUrl(p);
@@ -333,10 +347,10 @@
       return;
     }
     steps.forEach(function (s) { s.hidden = true; }); box.querySelector(".qh-progress").hidden = true;
-    done.innerHTML = '<p class="qh-check" aria-hidden="true">✓</p><h3>' + (p.extra ? "Your Season Pass on both cards is held." : "Spot " + esc(spotTxt(p)) + " on " + esc(r.name) + (p.pass ? " is yours for all 3 mailings." : " is yours.")) + "</h3>" +
+    done.innerHTML = '<p class="qh-check" aria-hidden="true">✓</p><h3>' + (p.extra ? (p.pass ? "Your Season Pass on both cards is held." : "Your ad on both routes is held.") :"Spot " + esc(spotTxt(p)) + " on " + esc(r.name) + (p.pass ? " is yours for all 3 mailings." : " is yours.")) + "</h3>" +
       (p.extra ? "<p>" + esc(where) + ".</p>" : "") +
       "<p>We’re holding it" + (p.pass ? " on the " + esc(when) + ". Your category is locked on all three" : m ? " until " + shortDate(m.deadline) + ", the artwork date" : "") + ". No payment yet.</p>" +
-      '<ol><li><b>Today:</b> we email ' + esc(p.email) + " to confirm.</li><li><b>Within a day:</b> send us your logo and offer. We design the ad.</li><li><b>You approve it</b>, pay the invoice" + (p.pass ? " (" + esc(p.price) + ")" : "") + ", and it mails " + (p.pass ? "on each date" : m ? shortDate(m.mail) : "") + ".</li></ol>" +
+      '<ol><li><b>Today:</b> we email ' + esc(p.email) + " to confirm.</li><li><b>Within a day:</b> send us your logo and offer. We design the ad.</li><li><b>You approve it</b>, pay the invoice" + (p.pass || p.extra ? " (" + esc(p.price) + ")" : "") + ", and it mails " + (p.pass ? "on each date" : m ? shortDate(m.mail) : "") + ".</li></ol>" +
       (pay ? '<p><a class="btn" href="' + pay + '">Pay ' + esc(p.price) + " now instead</a></p>" : "");
     done.hidden = false; done.setAttribute("tabindex", "-1"); done.focus();
     p.mails.forEach(function (ml) { loadCard(p.route, ml); if (p.extra) loadCard(p.extra.route, ml); });

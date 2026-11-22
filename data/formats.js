@@ -35,6 +35,11 @@
   var PASS_OFF = 50;
   // Season Pass Payment Links per size. "" = hold-and-invoice until Todd makes the $900 and $375 links.
   var PASS_9x12 = { full: "", half: "" };
+  // Two-route deal (Todd, 2026-11-21): the same ad on 2 different routes on the same mailing date (about 10,000 homes).
+  // $50 off each Full spot and $25 off each Half spot on each route: Full $600 for both ($100 off), Half $300 for both ($50 off).
+  // Not combined with the Season Pass. Hold-and-invoice until Todd makes Payment Links (and the Worker's expected amount is updated).
+  var TWO_OFF = { full: 50, half: 25 };
+  var TWO_9x12 = { full: "", half: "" };
 
   function st(p) { return String((p && p.status) || "open").toLowerCase(); }
   function fmtOf(m) { return m && m.format === "9x12" ? "9x12" : "11x6"; }
@@ -55,6 +60,8 @@
     return n === (r1 - r0 + 1) * (c1 - c0 + 1);
   }
   function passPrice(fmt, list) { return (list || []).reduce(function (n, p) { var q = spotPrice(fmt, p); return n + (q ? (q - PASS_OFF) * 3 : 0); }, 0); }
+  // Two-route deal total for an ad on both routes (one mailing each).
+  function twoPrice(fmt, list) { return (list || []).reduce(function (n, p) { var q = spotPrice(fmt, p), s = spotSize(fmt, p); return n + (q ? (q - (TWO_OFF[s] || 0)) * 2 : 0); }, 0); }
   function blockPrice(fmt, list) { return (list || []).reduce(function (n, p) { return n + (spotPrice(fmt, p) || 0); }, 0); }
   // Printed size of a block: a grid column is 2.2 in (a Half alone is 2.1), a row is 2.6 in.
   function blockDims(fmt, list) {
@@ -75,7 +82,7 @@
     var open = {}; (positions || []).forEach(function (p) { if (st(p) === "open") open[p.position] = 1; });
     return (FORMATS[fmt].map || []).filter(function (s) { return s.size === size && open[s.pos]; }).map(function (s) { return s.pos; });
   }
-  var FMT = { fmtOf: fmtOf, spotOf: spotOf, spotSize: spotSize, spotPrice: spotPrice, spotLabel: spotLabel, isBlock: isBlock, blockPrice: blockPrice, passPrice: passPrice, PASS_OFF: PASS_OFF, blockDims: blockDims, soldDollars: soldDollars, isConfirmed: isConfirmed, openOfSize: openOfSize, PAY_9x12: PAY_9x12, PASS_9x12: PASS_9x12 };
+  var FMT = { fmtOf: fmtOf, spotOf: spotOf, spotSize: spotSize, spotPrice: spotPrice, spotLabel: spotLabel, isBlock: isBlock, blockPrice: blockPrice, passPrice: passPrice, PASS_OFF: PASS_OFF, twoPrice: twoPrice, TWO_OFF: TWO_OFF, TWO_9x12: TWO_9x12, blockDims: blockDims, soldDollars: soldDollars, isConfirmed: isConfirmed, openOfSize: openOfSize, PAY_9x12: PAY_9x12, PASS_9x12: PASS_9x12 };
   root.CVS_FORMATS = FORMATS; root.CVS_FMT = FMT;
   if (typeof module !== "undefined" && module.exports) module.exports = { CVS_FORMATS: FORMATS, CVS_FMT: FMT };
 })(typeof window !== "undefined" ? window : globalThis);
