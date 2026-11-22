@@ -169,8 +169,10 @@
   }
   function open9(r, list) {
     var one = list.length === 1, k = FMT.spotSize("9x12", list[0]), price = FMT.blockPrice("9x12", list), dims = FMT.blockDims("9x12", list);
-    var label = one ? S9(k).label : "Bigger ad (" + list.length + " spots, " + dims + ")";
-    pending = { route: r, mail: mail, position: list[0], positions: list, fmt: "9x12", sizeKey: one ? k : "combo", label: label, price: price, link: one ? PAY9[k] || "" : "" };
+    // A whole side ($2,500) or half a side ($1,250) is a page ad with its own price and pay link (2026-11-22).
+    var pg = !one && FMT.pageOf ? FMT.pageOf("9x12", list) : null;
+    var label = one ? S9(k).label : pg ? pg.label + ", " + dims : "Bigger ad (" + list.length + " spots, " + dims + ")";
+    pending = { route: r, mail: mail, position: list[0], positions: list, fmt: "9x12", sizeKey: one ? k : pg ? pg.key : "combo", label: label, price: price, link: one ? PAY9[k] || "" : pg ? (FMT.PAGE_9x12 || {})[pg.key] || "" : "" };
     mark(list);
     title.textContent = "Hold " + (one ? "Spot " : "Spots ") + list.map(L9).join(" + ") + " on " + LABELS[r] + (mail ? ", " + short(mail) + " card" : "") + " (" + label + ", " + money(price) + ")";
     if (payBtn) { payBtn.hidden = !pending.link; payBtn.textContent = "Pay " + money(price) + " now and lock it in"; }
