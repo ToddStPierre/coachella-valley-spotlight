@@ -2339,3 +2339,15 @@ h1 { font-weight: 700; line-height: 1.02; }
 /* Small pill links act like the home chips */
 :is(.cat-jump a, .pr-chip, .ss-chip, .feat-pills li) { border: 1.5px solid var(--line); font-weight: 600; }
 :is(.cat-jump a, .pr-chip, .ss-chip):hover { border-color: var(--ink); }
+
+/* ---------- 2026-11-23 Todd's tweaks: home page full width + sponsored box raised ---------- */
+/* Home page uses the whole window on desktop (header, sections and footer), with a 32px gutter each side. */
+@media (min-width: 921px) {
+  body.home .wrap { width: calc(100% - 64px); max-width: none; }
+  body.home .h-hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 48px; }
+  /* The art and the rotating box share one cell: the box's top lines up with the top of the arch. */
+  .h-hero-side { display: grid; align-items: start; }
+  .h-hero-side > * { grid-area: 1 / 1; }
+  .h-hero-side .h-art { justify-self: start; width: min(100%, 600px); }
+  .h-hero-side .h-panel { justify-self: end; margin: 8px 0 0; width: min(80%, 440px); }
+}
