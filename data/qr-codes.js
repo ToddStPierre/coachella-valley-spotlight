@@ -11,5 +11,7 @@ window.CVS_QR_CODES = [
   {"c":"kd83m","b":"golf-cars-of-the-desert","m":"sun-city-palm-desert:2026-12-17","made":"2026-11-22"},
   {"c":"pun3q","b":"cleen-x-restoration","m":"sun-city-palm-desert:2026-12-17","made":"2026-11-22"},
   {"c":"sfv5f","b":"ranch-house-bar-and-grill","m":"sun-city-palm-desert:2026-12-17","made":"2026-11-22"},
-  {"c":"kj5py","b":"next-level-air-conditioning","m":"sun-city-palm-desert:2026-12-17","made":"2026-11-23"}
+  {"c":"kj5py","b":"next-level-air-conditioning","m":"sun-city-palm-desert:2026-12-17","made":"2026-11-23"},
+  {"c":"r7kwz","b":"cvs-home","m":"sun-city-palm-desert:2026-12-17","made":"2026-11-23"},
+  {"c":"pha46","b":"cvs-postcard","m":"sun-city-palm-desert:2026-12-17","made":"2026-11-23"}
 ];

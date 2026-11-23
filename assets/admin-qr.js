@@ -5,7 +5,9 @@
    Per mailing (2026-11-22): pick the card and you get that ad's short code for that card, s?c=<5 characters>, from
    data/qr-codes.js, or a new one made by the tracker (POST /admin/qrcode commits it to that file). Short codes keep the
    printed QR small (33 x 33). Scans and leads then show per mailing. The old s?b=<slug> codes printed on the El Paseo
-   Nov 27, 2026 card keep working unchanged; "Not for a postcard" still makes that kind of code. */
+   Nov 27, 2026 card keep working unchanged; "Not for a postcard" still makes that kind of code.
+   Our own codes (2026-11-23): CVS_QR.open("cvs-home" | "cvs-postcard") makes the home-page / postcard-page code for a card
+   (buttons in Postcard results). The tracker allows those two reserved slugs without a listing. */
 (function () {
   var BASE = "https://coachellavalleyspotlight.com/s?b=", SHORT = "https://coachellavalleyspotlight.com/s?c=", QUIET = 4, lib = null;
   var TRACKER = "https://cvs-tracker.toddstpierre.workers.dev";
@@ -56,6 +58,8 @@
     return ((window.CVS_MAILINGS) || []).slice().sort(function (a, z) { return a.mail.localeCompare(z.mail) || a.name.localeCompare(z.name); })
       .map(function (m) { return { key: m.route + ":" + m.mail, label: (window.CVS_MAILING_LABEL ? window.CVS_MAILING_LABEL(m.route + ":" + m.mail) : m.name + " " + m.mail), open: m.deadline >= today }; });
   }
+  // Our own codes (2026-11-23): the home page and the postcard advertising page, one code per mailing, same as an ad.
+  var HOUSE = { "cvs-home": "the home page", "cvs-postcard": "the postcard advertising section (advertise#postcard)" };
   function close() { var o = document.querySelector(".qr-backdrop"); if (o) { o.remove(); document.removeEventListener("keydown", onKey); } }
   function onKey(e) { if (e.key === "Escape") close(); }
 
@@ -63,7 +67,7 @@
     close();
     var cards = cardList(), chosen = pick != null;
     if (!chosen) pick = "";
-    var url = BASE + slug, deal = dealFor(slug), file = slug + (pick ? "-" + pick.replace(":", "-") : "") + "-qr";
+    var house = HOUSE[slug], url = BASE + slug, deal = house ? "" : dealFor(slug), file = slug + (pick ? "-" + pick.replace(":", "-") : "") + "-qr";
     var o = document.createElement("div"); o.className = "qr-backdrop";
     o.innerHTML = '<div class="qr-modal" role="dialog" aria-modal="true" aria-labelledby="qr-title"><button type="button" class="qr-x" aria-label="Close">&times;</button>' +
       '<h3 id="qr-title">' + esc(name) + '</h3><p class="qr-sub">Postcard QR code</p>' +
@@ -72,8 +76,8 @@
       '<option value="-"' + (chosen && !pick ? " selected" : "") + '>Not for a postcard (no mailing)</option></select></label>' +
       '<div class="qr-img">' + (chosen ? "Making the code&hellip;" : "Pick the postcard this ad is going on. Each card gets its own code.") + '</div>' +
       '<p class="qr-link"><code>' + esc(url) + '</code></p>' +
-      '<p class="qr-note">' + (deal ? "A scan opens their page with their deal ready to claim: <b>" + esc(deal) + "</b>." : "No deal yet, so a scan opens their page. Add an offer to their listing (or the deals list) and the scan opens a deal ticket.") +
-      " Scans show on their dashboard and Spotlight Report as <b>QR scans</b>" + (pick ? ", and under <b>By postcard mailing</b> for this card only. Make a new code for each card they&rsquo;re on." : ", not tied to any card.") + "</p>" +
+      '<p class="qr-note">' + (house ? "A scan opens " + house + ". Scans show in <b>Postcard results &rarr; Our own QR codes</b>" + (pick ? ", under this card only. Make a new code for each card." : ".") + "</p>" : (deal ? "A scan opens their page with their deal ready to claim: <b>" + esc(deal) + "</b>." : "No deal yet, so a scan opens their page. Add an offer to their listing (or the deals list) and the scan opens a deal ticket.") +
+      " Scans show on their dashboard and Spotlight Report as <b>QR scans</b>" + (pick ? ", and under <b>By postcard mailing</b> for this card only. Make a new code for each card they&rsquo;re on." : ", not tied to any card.") + "</p>") +
       '<div class="qr-btns"><button type="button" class="btn" data-qr-svg disabled>Download SVG (print)</button><button type="button" class="btn btn-ghost" data-qr-png disabled>Download PNG</button><button type="button" class="btn btn-ghost" data-qr-copy>Copy link</button></div>' +
       '<p class="qr-tip">For the designer: at least 0.75 in square, keep the white border, black on white, nothing on top of it.</p></div>';
     document.body.appendChild(o);
@@ -106,5 +110,5 @@
     var a = e.target.closest("[data-qr]"); if (!a) return;
     e.preventDefault(); open(a.getAttribute("data-qr"), a.getAttribute("data-qr-name") || a.getAttribute("data-qr"));
   });
-  window.CVS_QR = { svg: function (url) { return load().then(function (q) { return svgFor(matrix(q, url)); }); } }; // for testing
+  window.CVS_QR = { open: function (slug, name) { open(slug, name); }, svg: function (url) { return load().then(function (q) { return svgFor(matrix(q, url)); }); } }; // for testing
 })();

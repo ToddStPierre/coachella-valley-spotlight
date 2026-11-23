@@ -14,7 +14,9 @@
      business and the mailing ("<route>:<mail date>"), so each ad on each card has its own small QR and scans, claims and
      leads are counted for that mailing too. (/s?b=<slug>&m=<mailing> also works, but isn't printed anywhere.)
      Codes made before then have no m and are already printed, so they must keep working exactly as they are:
-     PRINTED below credits them to the one card they were printed on. Never change or remove an entry once its card is out. -->
+     PRINTED below credits them to the one card they were printed on. Never change or remove an entry once its card is out.
+     Our own codes (2026-11-23): the reserved slugs cvs-home and cvs-postcard get a short code per mailing too (HQ > Postcard
+     results > "Our own QR codes"). A scan counts for that mailing and opens the home page or advertise#postcard. -->
 <script src="data/qr-codes.js"></script>
 <script>
 (function () {
@@ -41,6 +43,14 @@
       if (!(navigator.sendBeacon && navigator.sendBeacon("https://cvs-tracker.toddstpierre.workers.dev/t", body)))
         fetch("https://cvs-tracker.toddstpierre.workers.dev/t", { method: "POST", body: body, keepalive: true });
     } catch (e) {}
+  }
+  // Our own codes (2026-11-23): cvs-home opens the home page, cvs-postcard the postcard advertising section. The scan is
+  // counted above like any ad's; the utm tags let Google Analytics see these visits too, by card.
+  var HOUSE = { "cvs-home": "./", "cvs-postcard": "advertise#postcard" };
+  if (ok && HOUSE.hasOwnProperty(b)) {
+    var to = HOUSE[b].split("#"), utm = "utm_source=postcard&utm_medium=qr&utm_campaign=" + encodeURIComponent(m || "no-mailing") + "&utm_content=" + b.slice(4);
+    location.replace(to[0] + "?" + utm + (to[1] ? "#" + to[1] : ""));
+    return;
   }
   location.replace(ok ? "business/" + b + "/?from=qr" + (m ? "&m=" + encodeURIComponent(m) : "") : "./");
 })();

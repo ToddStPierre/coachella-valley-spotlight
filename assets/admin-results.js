@@ -4,7 +4,8 @@
    the size of our own deals list from opt-ins, and whether email sending (Resend) is switched on.
    Numbers come from the tracker (/stats/all and /admin/optins).
    By postcard (2026-11-22): each ad on each card has its own QR code (s?b=<slug>&m=<route>:<mail date>), so there's also a
-   table per mailing with a results line per advertiser and a total for the card. */
+   table per mailing with a results line per advertiser and a total for the card.
+   Our own QR codes (2026-11-23): scans per card for our home-page and postcard-page codes (tracker returns them as `house`). */
 (function () {
   var API = "https://cvs-tracker.toddstpierre.workers.dev";
   var admin = (new URLSearchParams(location.search).get("admin") || (function () { try { return sessionStorage.getItem("cvs_admin"); } catch (e) { return null; } })()); if (!admin || window.CVS_IS_REPORT) return;
@@ -25,6 +26,21 @@
     if (!parts.length) return "";
     var last = parts.pop();
     return name + ": " + (parts.length ? parts.join(", ") + " and " + last : last) + ".";
+  }
+  // Our own QR codes (2026-11-23): the home page and the postcard advertising page, one code per mailing.
+  // Scans per card for each, plus buttons that open the QR maker (pick the card there).
+  function houseHtml(house, label) {
+    var by = {}, all = { "cvs-home": 0, "cvs-postcard": 0 };
+    house.forEach(function (h) { all[h.slug] = (h.allTime || {}).scan || 0; (h.byMailing || []).forEach(function (m) { (by[m.mailing] = by[m.mailing] || { "cvs-home": 0, "cvs-postcard": 0 })[h.slug] = m.scan || 0; }); });
+    var keys = Object.keys(by).sort(function (a, z) { return z.split(":")[1].localeCompare(a.split(":")[1]) || a.localeCompare(z); });
+    return '<h2 class="month-head" style="margin-top:28px"><span class="stripe-mini"></span>Our own QR codes</h2>' +
+      '<p class="risk" style="margin-bottom:12px">A code for the home page and one for the postcard advertising page, made for each card so you can see which mailing brought people in. ' +
+      '<button type="button" class="btn" data-house-qr="cvs-home" style="padding:6px 12px;font-size:13px">Home page QR</button> ' +
+      '<button type="button" class="btn btn-ghost" data-house-qr="cvs-postcard" style="padding:6px 12px;font-size:13px">Postcard page QR</button></p>' +
+      '<div class="table-scroll"><table class="stats-table"><thead><tr><th>Postcard</th><th>Home page scans</th><th>Postcard page scans</th></tr></thead><tbody>' +
+      (keys.length ? keys.map(function (k) { return '<tr><td><strong>' + esc(label(k)) + '</strong></td><td>' + by[k]["cvs-home"] + '</td><td>' + by[k]["cvs-postcard"] + '</td></tr>'; }).join("") :
+        '<tr><td colspan="3" class="risk">No scans yet.</td></tr>') +
+      '<tr><td>All time</td><td>' + all["cvs-home"] + '</td><td>' + all["cvs-postcard"] + '</td></tr></tbody></table></div>';
   }
   function j(url) { return fetch(url).then(function (r) { return r.json(); }).catch(function () { return null; }); }
   Promise.all([j(API + "/stats/all?key=" + encodeURIComponent(admin)), j(API + "/admin/optins?key=" + encodeURIComponent(admin))]).then(function (r) {
@@ -61,9 +77,12 @@
           '<div class="table-scroll"><table class="stats-table"><thead><tr><th>Business</th><th>QR scans</th><th>Ad emailed</th><th>Leads</th><th>Shared</th><th>Deals claimed</th><th>Results line</th></tr></thead><tbody>' +
           rs.map(function (x) { return '<tr><td><strong>' + esc(x.name) + '</strong></td>' + K.map(function (q) { return "<td>" + (x.t[q] || 0) + "</td>"; }).join("") + '<td>' + copyBtn(x.line) + '</td></tr>'; }).join("") + '</tbody></table></div>';
       }).join("") : '<p class="risk">No scans from a postcard yet. Each ad&rsquo;s code for a card is under Listings &rarr; QR code (pick the mailing).</p>') +
+      houseHtml(r[0] && r[0].house || [], label) +
       '<p class="risk" style="margin-top:10px">Codes printed before 2026-11-22 (the El Paseo Nov 27 card) have no mailing in them; s.html credits them to that card. Shares and deal claims count for a card only when they came from its scan.</p>';
   });
   box.addEventListener("click", function (e) {
+    var h = e.target.closest("[data-house-qr]");
+    if (h && window.CVS_QR) return window.CVS_QR.open(h.getAttribute("data-house-qr"), h.getAttribute("data-house-qr") === "cvs-home" ? "Home page" : "Postcard advertising page");
     var b = e.target.closest("[data-copy-line]"); if (!b) return;
     var txt = b.getAttribute("data-copy-line"), done = function () { b.textContent = "Copied"; setTimeout(function () { b.textContent = "Copy line"; }, 1800); };
     if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, function () { window.prompt("Copy this:", txt); }); else window.prompt("Copy this:", txt);
