@@ -4,7 +4,7 @@
    - A live line (time, temperature from Open-Meteo, sunrise/sunset) and a CTA picked for the hour.
    Preview any phase with ?sky=dawn|day|golden|dusk|night. */
 (function () {
-  var hero = document.querySelector(".hero.living");
+  var hero = document.querySelector(".hero.living, .h-hero");
   if (!hero) return;
   var LAT = 33.72, LON = -116.37, TZ = "America/Los_Angeles", RAD = Math.PI / 180;
   var forced = (location.search.match(/[?&]sky=(dawn|day|golden|dusk|night)\b/) || [])[1] || "";
