@@ -12,7 +12,6 @@
 window.CVS_MAILINGS = [
   {"route":"el-paseo","name":"Palm Desert - El Paseo Area","area":"Palm Desert 92260, around El Paseo","homes":"4,968 homes","mail":"2026-11-27","deadline":"2026-11-16","minSold":8},
   {"route":"sun-city-palm-desert","name":"Palm Desert - Sun City","area":"Sun City Palm Desert, 92211","homes":"4,829 homes","mail":"2026-12-17","deadline":"2026-12-07","minSold":8},
-  {"route":"la-quinta-pga-west","name":"La Quinta - PGA West","area":"La Quinta 92253, PGA West","homes":"4,677 homes","mail":"2026-12-17","deadline":"2026-12-07","minSold":8,"format":"9x12","minDollars":2625},
   {"route":"el-paseo","name":"Palm Desert - El Paseo Area","area":"Palm Desert 92260, around El Paseo","homes":"4,968 homes","mail":"2027-01-21","deadline":"2027-01-11","minSold":8,"format":"9x12","minDollars":2625},
   {"route":"sun-city-palm-desert","name":"Palm Desert - Sun City","area":"Sun City Palm Desert, 92211","homes":"4,829 homes","mail":"2027-01-21","deadline":"2027-01-11","minSold":8,"format":"9x12","minDollars":2625},
   {"route":"palm-springs","name":"Palm Springs","area":"Palm Springs 92262 · 92264","homes":"4,979 homes","mail":"2027-01-21","deadline":"2027-01-11","minSold":8,"format":"9x12","minDollars":2625},
