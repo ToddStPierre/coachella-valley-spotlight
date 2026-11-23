@@ -2313,3 +2313,29 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 600; }
 @media (max-width: 860px) { .h-biz-card { grid-template-columns: minmax(0, 1fr); } .h-stack { height: 300px; } }
 .h-sec + .owner-band { margin-top: 0; }
 @media (prefers-reduced-motion: reduce) { .h-art *, .h-spin, .h-float, .h-rise, .h-reveal { animation: none !important; } }
+
+/* ---------- Part 3 (2026-11-23): inner pages ---------- */
+/* Gradient headline word becomes the concept's italic accent word */
+.grad, .final .grad, .vc .grad { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--sun); -webkit-text-fill-color: currentColor; font-style: italic; font-weight: 600; }
+.final .grad, .vc .grad, .owner-band .grad, .sponsor-band .grad { color: var(--gold); }
+h1 { font-weight: 700; line-height: 1.02; }
+
+/* Activities menu: same active look as the other links */
+.sub-toggle { font-weight: 600; }
+.sub-toggle:hover, .has-sub.open .sub-toggle, .sub-toggle.current { background: var(--ink); color: var(--paper); }
+
+/* Boxes that act like cards get the ink outline and round corners */
+:is(.plan, .advertiser-card, .gr-card, .pf-card, .mc-card, .pr-step, .tier, .pr-included, .way, .mk-card, .cov-card, .cov-panel, .rp-card, .stats, .profile-ad, .route-map, .city-photo, .ol-step) { border: 1.5px solid var(--ink); box-shadow: none; }
+:is(.plan, .gr-card, .pf-card, .mc-card, .pr-step, .tier, .pr-included, .way, .mk-card, .cov-card, .cov-panel, .rp-card) { border-radius: var(--radius); }
+.faq details { border: 1.5px solid var(--ink); border-radius: 16px; }
+.faq details[open] { box-shadow: 0 5px 0 var(--ink); }
+.tier-hot, .way.way-mid { border: 2px solid var(--ink); box-shadow: 0 0 0 3px var(--gold), 0 8px 0 3px var(--ink); }
+.advertiser-card { border-radius: 16px; }
+
+/* Form fields: ink outline, 44px tall, gold focus ring */
+:is(.filters, .quote-form, .form, .pr-step) :is(input:not([type=checkbox]):not([type=radio]), select, textarea) { border: 1.5px solid var(--ink); border-radius: 12px; min-height: 44px; background-color: var(--paper); }
+:is(.filters, .quote-form, .form, .pr-step) :is(input, select, textarea):focus { outline: none; box-shadow: 0 0 0 4px var(--gold); }
+
+/* Small pill links act like the home chips */
+:is(.cat-jump a, .pr-chip, .ss-chip, .feat-pills li) { border: 1.5px solid var(--line); font-weight: 600; }
+:is(.cat-jump a, .pr-chip, .ss-chip):hover { border-color: var(--ink); }
