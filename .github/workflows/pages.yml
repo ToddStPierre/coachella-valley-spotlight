@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -38,7 +38,16 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
+      # GitHub sometimes can't list a just-finished upload yet ("No artifacts named github-pages"),
+      # so wait a moment, and if the first deploy still misses it, wait longer and try once more.
+      - run: sleep 10
       - id: deployment
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - if: steps.deployment.outcome == 'failure'
+        run: sleep 45
+      - id: deployment_retry
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v4
       # Tell Bing/IndexNow what changed: every page on a push or manual run; on the schedule, only the self-refreshing
       # pages, once a day (the 08:xx UTC run, just after midnight Pacific when the weekend window can move).
