@@ -595,17 +595,35 @@
     if (host && (type === "call" || type === "website")) track(host.getAttribute("data-biz"), type);
   });
 
-  // Mobile sticky call bar: on a business profile page, dock the Call / Directions actions
-  // to the bottom of the screen so they stay one tap away while the visitor scrolls the page
-  // on a phone — that's where "who do I call" searches actually happen.
+  // Mobile sticky action bar on business profiles: Call / Directions / Website / Save docked to the bottom
+  // of a phone screen once the visitor scrolls past the top. Rebuilt 2026-11-24 (TripAdvisor-style): the bar
+  // carries data-biz so Call and Website taps count in the owner's stats like the buttons at the top
+  // (the old bar's calls only reached Google Analytics). data-noimp keeps it out of "Listing seen".
   (function () {
+    var slug = document.body.getAttribute("data-profile");
     var callLink = document.querySelector(".cta-row a[data-track=\"call\"]");
+    var webLink = document.querySelector(".cta-row a[data-track=\"website\"]");
     var dirLink = document.querySelector(".pf-dir");
-    if (!callLink && !dirLink) return;
+    var favBtn = document.querySelector(".cta-row [data-fav]");
+    if (!slug || (!callLink && !dirLink && !webLink)) return;
+    var ico = function (d) { return '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>'; };
+    var I = {
+      call: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/>',
+      dir: '<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/>',
+      web: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+      fav: '<path d="M12 20.5s-7.5-4.6-9.4-9.3C1.4 8.3 3.2 4.8 6.6 4.5c2-.2 3.7.9 5.4 2.9 1.7-2 3.4-3.1 5.4-2.9 3.4.3 5.2 3.8 4 6.7-1.9 4.7-9.4 9.3-9.4 9.3Z"/>'
+    };
+    var ext = ' target="_blank" rel="noopener"';
+    var html = '';
+    if (callLink) html += '<a class="btn sc-call" href="' + esc(callLink.getAttribute("href")) + '" data-track="call">' + ico(I.call) + '<span>Call</span></a>';
+    if (dirLink) html += '<a class="btn btn-ghost sc-ico" href="' + esc(dirLink.getAttribute("href")) + '"' + ext + '>' + ico(I.dir) + '<span>Directions</span></a>';
+    if (webLink) html += '<a class="btn btn-ghost sc-ico" href="' + esc(webLink.getAttribute("href")) + '"' + ext + ' data-track="website">' + ico(I.web) + '<span>Website</span></a>';
+    if (favBtn) html += '<button type="button" class="btn btn-ghost sc-ico fav-btn" data-fav="' + esc(favBtn.getAttribute("data-fav")) + '" aria-pressed="false">' + ico(I.fav) + '<span>Save</span></button>';
     var bar = document.createElement("div");
     bar.className = "sticky-cta";
-    if (callLink) bar.innerHTML += '<a class="btn" href="' + callLink.getAttribute("href") + '">' + callLink.textContent.replace(/^Call\s*/, "📞 Call ") + "</a>";
-    if (dirLink) bar.innerHTML += '<a class="btn btn-ghost" href="' + dirLink.getAttribute("href") + '" target="_blank" rel="noopener">📍 Directions</a>';
+    bar.setAttribute("data-biz", slug); bar.setAttribute("data-noimp", "");
+    bar.setAttribute("role", "region"); bar.setAttribute("aria-label", "Quick actions");
+    bar.innerHTML = html;
     document.body.appendChild(bar);
     document.body.classList.add("has-sticky-cta");
     var hero = document.querySelector(".pf-hero");
