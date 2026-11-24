@@ -2371,3 +2371,7 @@ h1 { font-weight: 700; line-height: 1.02; }
   .h-hero .search { margin-top: 18px; }
   .h-hero .chips { margin-top: 18px; }
 }
+
+/* Home hero: "Support Local." on one line (2026-11-24). Shrinks with the screen on phones instead of wrapping. */
+.h-hero h1 { white-space: nowrap; }
+@media (max-width: 920px) { .h-hero h1 { font-size: min(clamp(60px, 9vw, 124px), 12.5vw); } }
