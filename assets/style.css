@@ -2375,3 +2375,11 @@ h1 { font-weight: 700; line-height: 1.02; }
 /* Home hero: "Support Local." on one line (2026-11-24). Shrinks with the screen on phones instead of wrapping. */
 .h-hero h1 { white-space: nowrap; }
 @media (max-width: 920px) { .h-hero h1 { font-size: min(clamp(60px, 9vw, 124px), 12.5vw); } }
+
+/* Google star ratings (2026-11-24): profile line under the name, small line on Premium/postcard cards. */
+.pf-rating { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; font-size: 16px; }
+.pf-rating b { font-size: 18px; }
+.pf-rating a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.card-rating { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; margin: 4px 0 6px; font-size: 14px; }
+.card-rating .gr-stars { font-size: 15px; letter-spacing: 1px; }
+.card-rating .cr-src { opacity: .7; white-space: nowrap; }

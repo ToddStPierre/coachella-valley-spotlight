@@ -185,7 +185,8 @@
       var name = slug ? '<a href="' + ROOT + 'business/' + slug + '/" data-track="profile-link" style="color:inherit;text-decoration:none">' + esc(b.name) + '</a>' : esc(b.name);
       var prem = b.premium || b.featured, off = prem && liveOffer(b.offer);
       return '<article class="card' + (prem ? ' featured' : '') + '"' + (slug ? ' data-biz="' + slug + '"' : '') + '>' + sample(b) + (slug ? favBtn("biz:" + slug, b.name) : '') + cardArt(b, prem) + '<span class="meta">' + esc(b.service || b.category) + ' &middot; ' + esc(b.city) + '</span>' +
-        '<h3>' + name + '</h3>' + (b.claimed && !b.public ? '<span class="verified" title="The owner has claimed this listing and keeps it up to date">&#10003; Verified by owner</span>' : '') + '<p>' + esc(b.blurb) + '</p>' + (b.courts && b.size ? '<p class="hh"><b>Courts:</b> ' + esc(b.size) + '</p>' : '') + (b.trail && b.trail.summary ? '<p class="hh"><b>Trail:</b> ' + esc(b.trail.summary) + '</p>' : '') + featPills(b.features) + (b.happyHour ? '<p class="hh"><b>Happy hour:</b> ' + esc(b.happyHour) + '</p>' : '') +
+        '<h3>' + name + '</h3>' + (b.claimed && !b.public ? '<span class="verified" title="The owner has claimed this listing and keeps it up to date">&#10003; Verified by owner</span>' : '') +
+        (slug && (prem || b.postcard) && b.googlePlaceId ? '<span class="card-rating" data-card-rating="' + slug + '" hidden></span>' : '') + '<p>' + esc(b.blurb) + '</p>' + (b.courts && b.size ? '<p class="hh"><b>Courts:</b> ' + esc(b.size) + '</p>' : '') + (b.trail && b.trail.summary ? '<p class="hh"><b>Trail:</b> ' + esc(b.trail.summary) + '</p>' : '') + featPills(b.features) + (b.happyHour ? '<p class="hh"><b>Happy hour:</b> ' + esc(b.happyHour) + '</p>' : '') +
         (b.postcard ? '<span class="tag tag-sponsor" title="This business pays to advertise on the Spotlight postcard">Sponsor &middot; On the Spotlight postcard</span>' : prem ? '<span class="tag">Premium listing</span>' : '') +
         (off ? '<div class="offer-box"><b>' + esc(off.title) + '</b>' + (off.details ? '<span>' + esc(off.details) + '</span>' : '') + '</div>' : '') +
         (slug ? '<a class="card-link" href="' + ROOT + 'business/' + slug + '/">View profile &rarr;</a>' : '') + '</article>';
@@ -695,24 +696,55 @@
     else if (/pay\.coachellavalleyspotlight\.com|buy\.stripe\.com/.test(h)) { p.link_url = h; ga("begin_checkout", p); }
     else if (a.getAttribute("data-track") === "website" || /utm_source=coachellavalleyspotlight/.test(h)) ga("website_click", p);
   }, true);
-  // Google reviews on Premium profiles: fetched live from the tracker each visit (never stored, per Google's terms).
-  var grBox = document.querySelector("[data-reviews]");
-  if (grBox) {
-    var stars = function (n) { var w = Math.max(0, Math.min(5, n)) / 5 * 100; return '<span class="gr-stars" role="img" aria-label="' + n + ' out of 5 stars"><span style="width:' + w + '%"></span></span>'; };
-    fetch("https://cvs-tracker.toddstpierre.workers.dev/reviews?b=" + encodeURIComponent(grBox.getAttribute("data-reviews"))).then(function (r) { return r.json(); }).then(function (g) {
-      if (!g || !g.ok) return;
-      var ext = ' target="_blank" rel="noopener"';
-      var html = '<h2 class="month-head" style="margin-top:48px"><span class="stripe-mini"></span>Google reviews</h2>' +
-        '<p class="gr-summary"><b>' + g.rating.toFixed(1) + '</b>' + stars(g.rating) + '<span>' + g.count.toLocaleString() + ' review' + (g.count === 1 ? '' : 's') + ' on Google</span></p>';
-      if (g.reviews.length) html += '<div class="gr-list">' + g.reviews.map(function (r) {
-        var who = r.authorUrl ? '<a href="' + esc(r.authorUrl) + '"' + ext + '>' + esc(r.author) + '</a>' : esc(r.author);
-        return '<article class="gr-card"><div class="gr-head">' + (r.photo ? '<img src="' + esc(r.photo) + '" alt="' + esc((r.author || "Reviewer") + " profile photo") + '" width="36" height="36" loading="lazy" referrerpolicy="no-referrer">' : '') +
-          '<div><b>' + who + '</b><span>' + stars(r.rating) + ' ' + esc(r.when) + '</span></div></div>' +
-          '<p>' + esc(r.text) + '</p>' + (r.url ? '<a class="gr-more" href="' + esc(r.url) + '"' + ext + '>Read on Google &rarr;</a>' : '') + '</article>';
-      }).join("") + '</div>';
-      html += '<p class="gr-foot">Reviews from <b>Google Maps</b>' + (g.mapsUrl ? ' &middot; <a href="' + esc(g.mapsUrl) + '"' + ext + '>See all reviews &rarr;</a>' : '') + '</p>';
-      grBox.innerHTML = html; grBox.hidden = false;
-    }).catch(function () {});
+  // Google star ratings (2026-11-24): every profile with a Place ID, plus Premium/postcard cards once they scroll into view.
+  // Premium profiles also get up to 3 reviews. Fetched live from the tracker each time (never stored, per Google's terms);
+  // RATING remembers a lookup only for this page view, so re-rendered cards don't ask twice.
+  var RATING = {};
+  function getRating(slug, lite) {
+    var k = slug + (lite ? ":lite" : "");
+    if (!RATING[k]) RATING[k] = fetch("https://cvs-tracker.toddstpierre.workers.dev/reviews?b=" + encodeURIComponent(slug) + (lite ? "&lite=1" : ""))
+      .then(function (r) { return r.json(); }).then(function (g) { return g && g.ok && g.rating ? g : null; }).catch(function () { return null; });
+    return RATING[k];
+  }
+  var stars = function (n) { var w = Math.max(0, Math.min(5, n)) / 5 * 100; return '<span class="gr-stars" role="img" aria-label="' + n + ' out of 5 stars"><span style="width:' + w + '%"></span></span>'; };
+  var plural = function (n) { return n.toLocaleString() + ' Google review' + (n === 1 ? '' : 's'); };
+  var ext = ' target="_blank" rel="noopener"';
+  var pfSlug = document.body.getAttribute("data-profile");
+  var rtLine = document.querySelector("[data-rating]"), grBox = document.querySelector("[data-reviews]");
+  if (pfSlug && (rtLine || grBox)) getRating(pfSlug, !grBox).then(function (g) {
+    if (!g) return;
+    if (rtLine) {
+      rtLine.innerHTML = '<b>' + g.rating.toFixed(1) + '</b>' + stars(g.rating) + (g.mapsUrl ? '<a href="' + esc(g.mapsUrl) + '"' + ext + ' data-track="google-reviews">' + plural(g.count) + '</a>' : '<span>' + plural(g.count) + '</span>');
+      rtLine.hidden = false;
+    }
+    if (!grBox) return;
+    var html = '<h2 class="month-head" style="margin-top:48px"><span class="stripe-mini"></span>Google reviews</h2>' +
+      '<p class="gr-summary"><b>' + g.rating.toFixed(1) + '</b>' + stars(g.rating) + '<span>' + g.count.toLocaleString() + ' review' + (g.count === 1 ? '' : 's') + ' on Google</span></p>';
+    if (g.reviews && g.reviews.length) html += '<div class="gr-list">' + g.reviews.map(function (r) {
+      var who = r.authorUrl ? '<a href="' + esc(r.authorUrl) + '"' + ext + '>' + esc(r.author) + '</a>' : esc(r.author);
+      return '<article class="gr-card"><div class="gr-head">' + (r.photo ? '<img src="' + esc(r.photo) + '" alt="' + esc((r.author || "Reviewer") + " profile photo") + '" width="36" height="36" loading="lazy" referrerpolicy="no-referrer">' : '') +
+        '<div><b>' + who + '</b><span>' + stars(r.rating) + ' ' + esc(r.when) + '</span></div></div>' +
+        '<p>' + esc(r.text) + '</p>' + (r.url ? '<a class="gr-more" href="' + esc(r.url) + '"' + ext + '>Read on Google &rarr;</a>' : '') + '</article>';
+    }).join("") + '</div>';
+    html += '<p class="gr-foot">Reviews from <b>Google Maps</b>' + (g.mapsUrl ? ' &middot; <a href="' + esc(g.mapsUrl) + '"' + ext + '>See all reviews &rarr;</a>' : '') + '</p>';
+    grBox.innerHTML = html; grBox.hidden = false;
+  });
+  // Card stars: only looked up when the card is on screen. Cards are re-rendered by filters, so watch for new slots.
+  if ("IntersectionObserver" in window) {
+    var rtSeen = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var el = en.target; rtSeen.unobserve(el);
+        getRating(el.getAttribute("data-card-rating"), true).then(function (g) {
+          if (!g) return;
+          el.innerHTML = stars(g.rating) + '<b>' + g.rating.toFixed(1) + '</b><span class="cr-src">(' + g.count.toLocaleString() + ') on Google</span>';
+          el.setAttribute("title", g.rating.toFixed(1) + " stars from " + plural(g.count)); el.hidden = false;
+        });
+      });
+    }, { rootMargin: "200px 0px" });
+    var rtScan = function () { document.querySelectorAll("[data-card-rating]:not([data-rt])").forEach(function (el) { el.setAttribute("data-rt", "1"); rtSeen.observe(el); }); };
+    rtScan();
+    var rtTimer; new MutationObserver(function () { clearTimeout(rtTimer); rtTimer = setTimeout(rtScan, 50); }).observe(document.body, { childList: true, subtree: true });
   }
   // Seasonal pieces: anything with data-until="YYYY-MM-DD" is removed after that day (the Halloween hero slide and chip).
   document.querySelectorAll("[data-until]").forEach(function (el) { if (iso(today) > el.getAttribute("data-until")) el.parentNode.removeChild(el); });

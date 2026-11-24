@@ -80,6 +80,7 @@ ${header}
 <div class="pf-head">
 <h1>${esc(b.name)}</h1>
 ${b.claimed && owner ? '<span class="verified verified-lg">&#10003; Verified by owner</span>' : ""}
+${b.googlePlaceId ? '<p class="pf-rating" data-rating hidden></p>' : ""}
 ${b.postcard || prem ? '<span class="pf-badge">' + (b.postcard ? "Sponsor &middot; On the Spotlight postcard" : "Premium listing") + '</span>' : ""}
 <p class="pf-lede">${esc(b.blurb)}</p>
 <div class="cta-row">
@@ -125,7 +126,7 @@ ${related.length ? `<section class="pf-related"><div class="wrap"><h2 class="mon
 <div class="wrap"><div class="biz-band"><p><strong>Own a local business?</strong><br>List it free, or go Premium for photos, hours, offers and monthly stats.</p><a class="btn" href="advertise#plans">See listing plans</a></div></div>
 </main>
 ${footer}
-<script src="assets/app.js?v=20261122mq"></script>
+<script src="assets/app.js?v=20261124r"></script>
 </body>
 </html>
 `;
