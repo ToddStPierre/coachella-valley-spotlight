@@ -2436,3 +2436,7 @@ h1 { font-weight: 700; line-height: 1.02; }
   .brand span { font-size: 17px; }
   .brand-mark { width: 34px; height: 34px; }
 }
+
+/* Home trim (2026-11-24): postcard pitch folded into the owner band */
+.owner-band-card { margin-top: 22px; padding: 14px 16px; border: 1px solid rgba(240,163,58,.45); border-radius: 12px; color: #f5ede1; }
+.owner-band-card a { color: var(--gold); font-weight: 700; white-space: nowrap; }

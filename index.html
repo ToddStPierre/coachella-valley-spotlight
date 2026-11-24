@@ -39,7 +39,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..900,100;1,9..144,400..900,100&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=20261124x">
+<link rel="stylesheet" href="assets/style.css?v=20261124trim">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://coachellavalleyspotlight.com/#org","name":"Coachella Valley Spotlight","url":"https://coachellavalleyspotlight.com/","telephone":"+1-760-422-5475","areaServed":{"@type":"Place","name":"Coachella Valley, California"},"description":"A local guide to the Coachella Valley: a free business directory, events calendar and local deals, plus the Spotlight shared postcard mailed to Palm Desert homes."},{"@type":"WebSite","@id":"https://coachellavalleyspotlight.com/#website","name":"Coachella Valley Spotlight","url":"https://coachellavalleyspotlight.com/","publisher":{"@id":"https://coachellavalleyspotlight.com/#org"}}]}</script>
 </head>
 <body class="home">
@@ -56,7 +56,6 @@
 
 <section class="h-hero" data-phase="day"><div class="wrap h-hero-grid"><div class="hero-inner">
 <div class="vs-row" id="valley-stories" hidden></div>
-<p class="hero-now" id="hero-now" hidden></p>
 <p class="h-mono h-kicker h-rise h-d1"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#d9552b"/></svg>Desert Hot Springs to Coachella</p>
 <h1 class="h-rise h-d2">Support <em>Local.</em></h1>
 <p class="lede h-rise h-d3">What&rsquo;s on this weekend, deals from local shops, and the businesses your neighbors call.</p>
@@ -66,8 +65,7 @@
 <input id="hq" name="q" type="search" placeholder="Tacos, plumbers, tree lightings&hellip;">
 <button class="btn" type="submit">Search</button></form>
 <div class="chips h-rise h-d5">
-<a class="chip chip-feature" href="holidays" data-until="2027-01-02"><i aria-hidden="true"></i>Holiday guide</a><a class="chip chip-feature" href="bnp-paribas-open" data-until="2027-03-14"><i aria-hidden="true"></i>BNP Paribas Open</a><a class="chip" href="this-weekend/" style="--c:#f0a33a"><i aria-hidden="true"></i>This weekend</a><a class="chip" href="directory?category=Happy%20hours" style="--c:#c9667a"><i aria-hidden="true"></i>Happy hours</a><a class="chip" href="deals" style="--c:#d9552b"><i aria-hidden="true"></i>Deals</a><a class="chip" href="directory?category=Restaurants" style="--c:#5b4a7a"><i aria-hidden="true"></i>Restaurants</a><a class="chip" href="directory?category=Home%20services" style="--c:#2e5c4f"><i aria-hidden="true"></i>Home services</a></div>
-<a class="now-cta" id="now-cta" href="this-weekend/" hidden></a>
+<a class="chip chip-feature" href="holidays" data-until="2027-01-02"><i aria-hidden="true"></i>Holiday guide</a><a class="chip" href="this-weekend/" style="--c:#f0a33a"><i aria-hidden="true"></i>This weekend</a><a class="chip" href="directory?category=Restaurants" style="--c:#5b4a7a"><i aria-hidden="true"></i>Restaurants</a><a class="chip" href="directory?category=Home%20services" style="--c:#2e5c4f"><i aria-hidden="true"></i>Home services</a></div>
 <a class="hero-byline" href="about"><img src="assets/img/todd-avatar.jpg" alt="" width="40" height="40"><span>Run by Todd St. Pierre, a Palm Desert neighbor. <b>Who&rsquo;s behind Spotlight&nbsp;&rarr;</b></span></a>
 </div>
 
@@ -108,10 +106,6 @@
 </div>
 </div>
 
-<div class="h-marq" aria-hidden="true"><div class="h-marq-track">
-<span>Palm Springs<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#f0a33a"/></svg></span><span>Desert Hot Springs<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#d9552b"/></svg></span><span>Cathedral City<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#c9667a"/></svg></span><span>Rancho Mirage<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#7fc4c0"/></svg></span><span>Thousand Palms<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#f0a33a"/></svg></span><span>Palm Desert<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#d9552b"/></svg></span><span>Indian Wells<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#c9667a"/></svg></span><span>Bermuda Dunes<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#7fc4c0"/></svg></span><span>La Quinta<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#f0a33a"/></svg></span><span>Indio<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#d9552b"/></svg></span><span>Coachella<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#c9667a"/></svg></span>
-<span>Palm Springs<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#f0a33a"/></svg></span><span>Desert Hot Springs<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#d9552b"/></svg></span><span>Cathedral City<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#c9667a"/></svg></span><span>Rancho Mirage<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#7fc4c0"/></svg></span><span>Thousand Palms<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#f0a33a"/></svg></span><span>Palm Desert<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#d9552b"/></svg></span><span>Indian Wells<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#c9667a"/></svg></span><span>Bermuda Dunes<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#7fc4c0"/></svg></span><span>La Quinta<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#f0a33a"/></svg></span><span>Indio<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#d9552b"/></svg></span><span>Coachella<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="#c9667a"/></svg></span>
-</div></div>
 </section>
 
 <div class="wrap"><section id="search-results" class="section" hidden></section></div>
@@ -143,16 +137,11 @@
 </div></section>
 
 <section class="h-sec" id="weekend"><div class="wrap">
-<div data-until="2027-01-02">
-<div class="h-head h-reveal"><div><p class="h-mono">Holidays in the valley</p><h2>Lights, parades &amp; <em style="color:var(--palm)">a lot of cocoa.</em></h2></div><a class="more" href="holidays">See the full holiday guide &rarr;</a></div>
-<div class="h-bento" data-list="events" data-tag="holidays" data-limit="4"><noscript><div class="empty">Turn on JavaScript to see the listings.</div></noscript></div>
-</div>
 <div class="h-coming">
-<div class="h-head h-reveal"><div><p class="h-mono">On the calendar</p><h2>Coming up around the valley</h2><p class="h-sub">Markets, shows, games and more after this weekend.</p></div><a class="more" href="events">Open the calendar &rarr;</a></div>
+<div class="h-head h-reveal"><div><p class="h-mono">On the calendar</p><h2>Coming up around the valley</h2><p class="h-sub">Markets, shows, games and more after this weekend.</p></div><span class="more-links"><a class="more" href="events#valley-calendar">Add to my calendar</a><a class="more" href="events">All events &rarr;</a></span></div>
 <div class="grid-2" data-when="after-weekend" data-list="events" data-limit="6"><noscript><div class="empty">Turn on JavaScript to see the listings.</div></noscript></div>
 </div>
 </div></section>
-<section class="vc-section vc-home"><div class="wrap"><div data-cal-sub id="valley-calendar"></div></div></section>
 
 <section class="h-deals" id="deals"><div class="wrap">
 <div class="h-head h-reveal"><div><p class="h-mono">Local deals</p><h2>Specials worth <em style="color:var(--sun)">the drive.</em></h2></div><a class="more" href="deals">All deals &rarr;</a></div>
@@ -236,30 +225,13 @@
 </div></div>
 </div></section>
 
-<section class="h-sec" id="business"><div class="wrap">
-<div class="h-biz-card h-reveal">
-<svg width="520" height="520" viewBox="0 0 200 200" aria-hidden="true"><g fill="none" stroke="#f0a33a" stroke-width="10"><circle cx="100" cy="100" r="90"/><circle cx="100" cy="100" r="64"/><circle cx="100" cy="100" r="38"/></g></svg>
-<div class="h-copy">
-<p class="h-mono">For business owners</p>
-<h2>Put your name in nearly <em>5,000</em> valley mailboxes.</h2>
-<p class="h-sub">One business per category on the Spotlight postcard, from $175 to $350 with the design, print &amp; postage included. Your free directory listing stays free for good.</p>
-<div class="h-btns"><a class="btn btn-ink" href="advertise">See how the card works <span class="arr">&rarr;</span></a><a class="btn btn-gold" href="#find-your-business">Claim my listing</a></div>
-</div>
-<div class="h-stack" aria-hidden="true">
-<div class="back h-float b"></div>
-<div class="front h-float">
-<div class="pc-top"><span>Coachella Valley<small>Spotlight</small></span><span class="pc-stamp"><svg width="34" height="34" viewBox="0 0 40 40"><circle cx="20" cy="20" r="13" fill="#f0a33a"/><rect x="7" y="21" width="26" height="3" fill="#d9552b"/><rect x="7" y="26" width="26" height="4" fill="#d9552b"/></svg></span></div>
-<div class="pc-grid"><span style="--c:#f0a33a"></span><span style="--c:#2e5c4f"></span><span style="--c:#c9667a"></span><span style="--c:#7fc4c0"></span><span style="--c:#221c18"></span><span class="yours">Your ad</span></div>
-</div>
-</div>
-</div>
-</div></section>
 
 <section class="owner-band" id="find-your-business"><div class="wrap owner-band-grid">
 <div class="owner-band-copy"><span class="eyebrow" style="color:var(--gold)"><span class="stripe-mini"></span>For business owners</span>
 <h2>Is your business on Spotlight? <em style="color:var(--gold)">Check in 5 seconds.</em></h2>
 <p><span data-count="businesses"></span> local businesses are already listed, most of them for free. Look yours up to see exactly what customers see, claim it, and put your name in front of the whole valley.</p>
-<ul class="owner-band-points"><li>Free listing, free for good</li><li>See your views and calls</li><li>One business per category on the postcard</li></ul></div>
+<ul class="owner-band-points"><li>Free listing, free for good</li><li>See your views and calls</li><li>One business per category on the postcard</li></ul>
+<p class="owner-band-card">Want more than a listing? Put your name in nearly 5,000 valley mailboxes on the Spotlight postcard. <a href="advertise">See how the card works &rarr;</a></p></div>
 <div class="owner-band-tool"><div data-owner-lookup></div></div>
 </div></section>
 </main>
