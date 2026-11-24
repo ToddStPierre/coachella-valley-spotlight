@@ -25,7 +25,7 @@ ${header}
 ${body}
 </main>
 ${footer}
-<script src="data/events.js"></script><script src="assets/app.js?v=20261124r"></script>
+<script src="data/events.js"></script><script src="assets/app.js?v=20261124m"></script>
 </body>
 </html>
 `;
@@ -246,7 +246,7 @@ ${typeMenu}
       mainEntity: { "@type": "ItemList", itemListElement: biz.slice(0, 8).map((b, i) => ({ "@type": "ListItem", position: i + 1, url: `${SITE}/business/${b.slug}/`, name: b.name })) } },
       breadcrumbs([["Home", ""], [city, url]])],
     body
-  }).replace('<script src="data/events.js"></script><script src="assets/app.js?v=20261124r"></script>', DATA_SCRIPTS + '<script src="assets/app.js?v=20261124r"></script>'));
+  }).replace('<script src="data/events.js"></script><script src="assets/app.js?v=20261124m"></script>', DATA_SCRIPTS + '<script src="assets/app.js?v=20261124m"></script>'));
   cityPaths.push(url);
 }
 
@@ -309,7 +309,7 @@ const weekendPaths = [];
         mainEntity: { "@type": "ItemList", itemListElement: shown.slice(0, 30).map((e, i) => ({ "@type": "ListItem", position: i + 1, name: e.title, url: e.feed ? e.url || undefined : `${SITE}/event/${C.eventSlug(e)}/` })) } },
         breadcrumbs([["Home", ""], ["Events", "events"], ["This weekend", "this-weekend/"]].concat(city ? [[city, url]] : []))],
       body
-    }).replace('<script src="data/events.js"></script><script src="assets/app.js?v=20261124r"></script>', DATA_SCRIPTS + '<script src="assets/app.js?v=20261124r"></script>'));
+    }).replace('<script src="data/events.js"></script><script src="assets/app.js?v=20261124m"></script>', DATA_SCRIPTS + '<script src="assets/app.js?v=20261124m"></script>'));
     if (!city || items.length >= INDEX_MIN_WEEKEND) weekendPaths.push(url);
   };
   const INDEX_MIN_WEEKEND = 3;

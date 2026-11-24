@@ -838,7 +838,13 @@
   document.querySelectorAll(".sub-toggle").forEach(function (btn) {
     var li = btn.parentNode;
     function set(open) { li.classList.toggle("open", open); btn.setAttribute("aria-expanded", open); }
-    btn.addEventListener("click", function (ev) { ev.stopPropagation(); set(!li.classList.contains("open")); });
+    btn.addEventListener("click", function (ev) {
+      ev.stopPropagation();
+      var open = !li.classList.contains("open");
+      // Only one menu open at a time (Events and Things to do, 2026-11-24).
+      if (open) document.querySelectorAll(".has-sub.open").forEach(function (o) { if (o !== li) { o.classList.remove("open"); var b = o.querySelector(".sub-toggle"); if (b) b.setAttribute("aria-expanded", "false"); } });
+      set(open);
+    });
     document.addEventListener("click", function (ev) { if (!li.contains(ev.target)) set(false); });
     li.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && li.classList.contains("open")) { set(false); btn.focus(); } });
     // Mark the current page inside the dropdown (city pages, events, golf and its course pages, dog parks) and light up its button.
