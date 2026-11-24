@@ -76,7 +76,7 @@ ${submitBand}
 </div></section>
 </main>
 ${footer}
-<script src="assets/app.js?v=20261124t"></script>
+<script src="assets/app.js?v=20261124u"></script>
 <script>
 (function () {
   var q = document.getElementById("g-q"), city = document.getElementById("g-city"), acc = document.getElementById("g-access"), count = document.getElementById("g-count");
@@ -157,7 +157,7 @@ ${c.url ? `<a class="btn btn-ghost" href="${esc(outbound(c.url))}" target="_blan
 ${others.length ? `<section class="section" style="padding-top:0"><div class="wrap"><h2 class="month-head"><span class="stripe-mini"></span>More golf in ${esc(c.city)}</h2><div class="grid">${others.map(card).join("\n")}</div><p style="margin-top:16px"><a class="more" href="golf/">All valley golf courses &rarr;</a></p></div></section>` : ""}
 </main>
 ${footer}
-<script src="assets/app.js?v=20261124t"></script>
+<script src="assets/app.js?v=20261124u"></script>
 </body>
 </html>`);
 }

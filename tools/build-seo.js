@@ -25,7 +25,7 @@ ${header}
 ${body}
 </main>
 ${footer}
-<script src="data/events.js"></script><script src="assets/app.js?v=20261124t"></script>
+<script src="data/events.js"></script><script src="assets/app.js?v=20261124u"></script>
 </body>
 </html>
 `;
@@ -199,6 +199,16 @@ const DATA_SCRIPTS = '<script src="data/events.js"></script><script src="data/fe
 fs.rmSync(path.join(root, "city"), { recursive: true, force: true });
 const cityPaths = [];
 const GOLF = (() => { const g = { window: {} }; const f = path.join(root, "data", "golf.js"); if (fs.existsSync(f)) require("vm").runInNewContext(fs.readFileSync(f, "utf8"), g); return (g.window.CVS || {}).golf || []; })();
+// Town hub sections (2026-11-24): "Things to do in <City>" and "Where to eat in <City>" link tiles, and an optional
+// "Know before you go" block from places.js guides (with FAQPage schema). Tiles link to the city+service page under
+// local/ when one exists (2+ listings), or straight to the one business.
+const THINGS = ["Hiking trails", "Dog parks", "Pickleball", "Tennis", "Swimming & water parks", "Skate parks", "Disc golf", "Bowling",
+  "Museums & attractions", "Tours", "Theaters and performing arts", "Art galleries", "Libraries", "Art classes", "Kids' classes"];
+const townTile = (name, n, href) => `<a class="town-tile" href="${href}"><b>${esc(name)}</b><span>${n} ${n === 1 ? "place" : "places"}</span></a>`;
+const tileFor = (city, service, items) => {
+  const page = landing.find(o => o.kind === "combo" && o.city === city && o.category === service);
+  return townTile(service, items.length, page ? page.path : `business/${items[0].slug}/`);
+};
 for (const city of CITY_PAGES) {
   const slug = slugify(city), url = `city/${slug}/`, q = encodeURIComponent(city);
   const ev = C.events.filter(e => e.city === city), dl = C.deals.filter(d => d.city === city), biz = C.directory.filter(b => b.city === city && !b.sample);
@@ -230,6 +240,20 @@ ${typeMenu}
 </div>${fig}</div></section>`;
   if (ev.length) body += sec("On the calendar", `Coming up in ${esc(city)}`, `<a class="more" href="events?city=${q}">All ${esc(city)} events &rarr;</a>`,
     block(`class="grid-2" data-city="${esc(city)}" data-list="events" data-limit="6"`, cards("events", ev.slice(0, 6))), true);
+  // Things to do: activity listings plus golf courses (golf.js), then Where to eat: restaurant services plus happy hours.
+  const thingTiles = [];
+  for (const sv of THINGS) { const it = biz.filter(b => b.service === sv); if (it.length) thingTiles.push(tileFor(city, sv, it)); }
+  if (nGolf) thingTiles.splice(1, 0, townTile("Golf courses", nGolf, `golf/?city=${q}`).replace(/places?<\/span>/, nGolf === 1 ? "course</span>" : "courses</span>"));
+  if (thingTiles.length >= 2) body += sec("Get out there", `Things to do in ${esc(city)}`, ev.length ? `<a class="more" href="this-weekend/${slug}/">This weekend &rarr;</a>` : "",
+    `<div class="town-tiles">${thingTiles.join("")}</div>`, !ev.length);
+  const eatCount = {};
+  biz.filter(b => b.category === "Restaurants").forEach(b => { (eatCount[b.service] = eatCount[b.service] || []).push(b); });
+  const eatTiles = Object.keys(eatCount).sort((a, b) => eatCount[b].length - eatCount[a].length || a.localeCompare(b)).map(sv => tileFor(city, sv, eatCount[sv]));
+  const hh = biz.filter(b => b.happyHour);
+  if (hh.length) eatTiles.unshift(townTile("Happy hours", hh.length, `directory?city=${q}&category=Happy%20hours`));
+  const eatHub = landing.find(o => o.kind === "combo" && o.city === city && o.category === "Restaurants");
+  if (eatTiles.length >= 2) body += sec("Eat and drink", `Where to eat in ${esc(city)}`, eatHub ? `<a class="more" href="${eatHub.path}">All restaurants &rarr;</a>` : "",
+    `<div class="town-tiles">${eatTiles.join("")}</div>`, false);
   if (dl.length) body += sec('Local deals<span id="deals"></span>', `Deals in ${esc(city)}`, '<a class="more" href="deals">All deals &rarr;</a>',
     block(`class="grid" data-city="${esc(city)}" data-list="deals" data-limit="6"`, cards("deals", dl.slice(0, 6))), !ev.length);
   if (biz.length) body += sec("Local directory", `Businesses in ${esc(city)}`, `<a class="more" href="directory?city=${q}">All ${biz.length} in ${esc(city)} &rarr;</a>`,
@@ -238,15 +262,22 @@ ${typeMenu}
   const hl = C.pickList("news", n => ({ "data-city": city, "data-limit": "3" })[n] || null);
   if (hl.length) body += sec("Local headlines", `News from ${esc(city)}`, '<a class="more" href="news">All headlines &rarr;</a>',
     block(`class="grid" data-city="${esc(city)}" data-list="news" data-limit="3" data-hide-empty`, cards("news", hl)), false);
+  const guide = (places.guides || {})[city];
+  if (guide) {
+    const tips = (guide.tips || []).map(t => `<li>${esc(t)}</li>`).join("");
+    const faq = (guide.faq || []).map(f => `<details class="town-faq"><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join("");
+    body += sec("Plan your visit", `Know before you go`, "", `<div class="town-guide">${tips ? `<ul class="town-tips">${tips}</ul>` : ""}${faq ? `<div>${faq}</div>` : ""}</div>`, false);
+  }
   body += `<div class="wrap" style="padding-bottom:var(--s5)"><div class="biz-band"><p><strong>Own a business in ${esc(city)}?</strong><br>Listing it here is free.</p><a class="btn" href="submit?plan=basic#form">Add my business</a></div></div>`;
   const title = `${city}, CA: Things to Do, Deals and Local Businesses`;
   write(url, page({
     meta: { title, description: `What's on in ${city}: upcoming events, local deals and ${biz.length} local businesses. ${intro}`.slice(0, 300), url },
     schema: [{ "@context": "https://schema.org", "@type": "CollectionPage", name: title, about: { "@type": "City", name: city, containedInPlace: { "@type": "State", name: "California" } },
       mainEntity: { "@type": "ItemList", itemListElement: biz.slice(0, 8).map((b, i) => ({ "@type": "ListItem", position: i + 1, url: `${SITE}/business/${b.slug}/`, name: b.name })) } },
-      breadcrumbs([["Home", ""], [city, url]])],
+      breadcrumbs([["Home", ""], [city, url]])].concat(((places.guides || {})[city] || {}).faq ? [{ "@context": "https://schema.org", "@type": "FAQPage",
+        mainEntity: places.guides[city].faq.map(f => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) }] : []),
     body
-  }).replace('<script src="data/events.js"></script><script src="assets/app.js?v=20261124t"></script>', DATA_SCRIPTS + '<script src="assets/app.js?v=20261124t"></script>'));
+  }).replace('<script src="data/events.js"></script><script src="assets/app.js?v=20261124u"></script>', DATA_SCRIPTS + '<script src="assets/app.js?v=20261124u"></script>'));
   cityPaths.push(url);
 }
 
@@ -309,7 +340,7 @@ const weekendPaths = [];
         mainEntity: { "@type": "ItemList", itemListElement: shown.slice(0, 30).map((e, i) => ({ "@type": "ListItem", position: i + 1, name: e.title, url: e.feed ? e.url || undefined : `${SITE}/event/${C.eventSlug(e)}/` })) } },
         breadcrumbs([["Home", ""], ["Events", "events"], ["This weekend", "this-weekend/"]].concat(city ? [[city, url]] : []))],
       body
-    }).replace('<script src="data/events.js"></script><script src="assets/app.js?v=20261124t"></script>', DATA_SCRIPTS + '<script src="assets/app.js?v=20261124t"></script>'));
+    }).replace('<script src="data/events.js"></script><script src="assets/app.js?v=20261124u"></script>', DATA_SCRIPTS + '<script src="assets/app.js?v=20261124u"></script>'));
     if (!city || items.length >= INDEX_MIN_WEEKEND) weekendPaths.push(url);
   };
   const INDEX_MIN_WEEKEND = 3;

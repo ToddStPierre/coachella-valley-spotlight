@@ -19,6 +19,26 @@ window.CVS.places = {
     "Bermuda Dunes": "Bermuda Dunes is an unincorporated community between Palm Desert and Indio, built around the Bermuda Dunes Country Club and the small Bermuda Dunes Airport.",
     "Thousand Palms": "Thousand Palms is an unincorporated community north of Interstate 10. It is home to Acrisure Arena and the Coachella Valley Preserve."
   },
+  /* Town guides (2026-11-24): "Know before you go" on city/<slug>/ pages. tips = short plain sentences;
+     faq = questions people search for, answered plainly (also sent to Google as FAQPage). Only facts that are true
+     year after year: no prices, hours or dates that change. */
+  guides: {
+    "Palm Desert": {
+      tips: [
+        "The best weather runs from about October through April: warm days, cool nights. January through March is peak season, so restaurants and golf tee times fill up fast. Book ahead.",
+        "Summer, roughly June through September, regularly passes 105 degrees. Do outdoor plans early in the morning, carry more water than you think you need, and expect some places to keep shorter summer hours.",
+        "El Paseo is the town's main shopping and dining street, just south of Highway 111. It's busiest on winter evenings and weekends.",
+        "Highway 111 runs through the middle of town and Interstate 10 runs along the north side. Most of the valley is a 10 to 30 minute drive away.",
+        "Palm Springs International Airport (PSP) is the closest airport, about 25 minutes away by car."
+      ],
+      faq: [
+        { q: "When is the best time to visit Palm Desert?", a: "October through April, when days are warm and nights are cool. January through March is the busiest stretch. Summer (June through September) is very hot, often over 105 degrees, but quieter." },
+        { q: "How far is Palm Desert from the Palm Springs airport?", a: "About 15 miles, or roughly 25 minutes by car, from Palm Springs International Airport (PSP)." },
+        { q: "What is El Paseo in Palm Desert?", a: "El Paseo is Palm Desert's main shopping and dining street, lined with shops, art galleries and restaurants just south of Highway 111." },
+        { q: "What is there to do in Palm Desert?", a: "Shopping and dining on El Paseo, The Living Desert Zoo and Gardens, shows at the McCallum Theatre, golf, pickleball and tennis, and hiking trails in the hills on the south side of town. This page lists the trails, parks, courts and restaurants we have listed." }
+      ]
+    }
+  },
   categories: {
     "Legal": "Legal covers locally based law firms and attorneys: estate planning, family law, criminal defense, bankruptcy, personal injury and business and real estate law. These are firms based in the valley, not national advertising networks. A listing here is not a recommendation or legal advice.",
     "Recreation": "Recreation covers places to play around the valley: free public pickleball and tennis courts at city parks, plus clubs you can join. Most public courts are first come, first served, and many are lit for evening play when it's cooler.",

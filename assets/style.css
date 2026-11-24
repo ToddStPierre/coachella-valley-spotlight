@@ -2399,3 +2399,40 @@ h1 { font-weight: 700; line-height: 1.02; }
 .sticky-cta .sc-ico { flex: 0 0 72px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 7px 2px 6px; font-size: 11px; font-weight: 600; line-height: 1.1; }
 .sticky-cta .sc-ico svg { flex: none; }
 .sticky-cta .fav-btn.on { color: var(--sun-deep); }
+
+/* Town hub pages (2026-11-24): link tiles for Things to do / Where to eat, and the Know before you go block. */
+.town-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+.town-tile { display: flex; flex-direction: column; gap: 4px; padding: 16px 18px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; text-decoration: none; color: var(--ink); transition: border-color .15s ease, transform .15s ease; }
+.town-tile:hover { border-color: var(--palm); transform: translateY(-1px); }
+.town-tile b { font-size: 16.5px; line-height: 1.25; }
+.town-tile span { font-size: 14px; opacity: .65; }
+.town-guide { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.town-tips { margin: 0; padding-left: 20px; display: grid; gap: 10px; font-size: 16.5px; line-height: 1.5; }
+.town-faq { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px; margin-bottom: 10px; }
+.town-faq summary { cursor: pointer; font-weight: 600; font-size: 16.5px; }
+.town-faq p { margin: 10px 0 0; line-height: 1.5; }
+@media (max-width: 760px) { .town-guide { grid-template-columns: 1fr; } .town-tiles { grid-template-columns: 1fr 1fr; gap: 10px; } .town-tile { padding: 14px; } }
+
+/* Top bar fit with the Towns menu (2026-11-24): 7 items + Advertise on laptop widths without wrapping.
+   921 px and up: tighter padding, no wrapping (pages are capped at 1180 px wide). 921-1139 px: "My Spotlight" shows as a person icon (its title still says
+   what it is) and the wordmark is a touch smaller. Phones (920 and under) use the Menu button as before. */
+@media (min-width: 921px) {
+  .nav-links { gap: 0; }
+  .nav-links > li > a, .nav-links .sub-toggle { padding: 8px 9px; font-size: 15px; white-space: nowrap; }
+  .nav .btn-nav { white-space: nowrap; }
+  .brand span { white-space: nowrap; }
+}
+@media (min-width: 921px) and (max-width: 1139px) {
+  .nav-links > li > a.nav-account { font-size: 0; width: 40px; height: 40px; padding: 0; display: grid; place-items: center; }
+  .nav-links > li > a.nav-account::before { content: ""; width: 22px; height: 22px; background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21a8 8 0 0 1 16 0'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21a8 8 0 0 1 16 0'/%3E%3C/svg%3E") center / contain no-repeat; }
+  .brand span { font-size: 19px; }
+}
+@media (min-width: 921px) and (max-width: 1023px) {
+  .nav-links > li > a, .nav-links .sub-toggle { padding: 8px 7px; font-size: 14.5px; }
+  .nav-links .sub-toggle { gap: 4px; }
+  .nav .btn-nav { padding: 9px 14px; font-size: 14.5px; }
+  .brand span { font-size: 17px; }
+  .brand-mark { width: 34px; height: 34px; }
+}
