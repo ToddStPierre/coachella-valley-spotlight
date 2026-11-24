@@ -37,7 +37,107 @@ window.CVS.places = {
         { q: "What is El Paseo in Palm Desert?", a: "El Paseo is Palm Desert's main shopping and dining street, lined with shops, art galleries and restaurants just south of Highway 111." },
         { q: "What is there to do in Palm Desert?", a: "Shopping and dining on El Paseo, The Living Desert Zoo and Gardens, shows at the McCallum Theatre, golf, pickleball and tennis, and hiking trails in the hills on the south side of town. This page lists the trails, parks, courts and restaurants we have listed." }
       ]
-    }
+    },
+    "Palm Springs": { tips: [
+        "Downtown runs along Palm Canyon Drive, with shops, galleries, restaurants and mid-century architecture all within walking distance.",
+        "VillageFest, the weekly street fair, closes Palm Canyon Drive downtown on Thursday nights all year.",
+        "The Palm Springs Aerial Tramway climbs to the top of Mount San Jacinto, where it's usually much cooler than the valley floor. Bring a jacket, even in summer.",
+        "Palm Springs International Airport (PSP) is in town, about 10 minutes from downtown."
+      ], faq: [
+        {"q": "What is there to do in Palm Springs?", "a": "Walk Palm Canyon Drive downtown, go to VillageFest on a Thursday night, ride the Aerial Tramway up Mount San Jacinto, tour mid-century modern neighborhoods and hike nearby canyons. This page lists the trails, parks, courts and restaurants we have listed."},
+        {"q": "When is VillageFest in Palm Springs?", "a": "Every Thursday night on Palm Canyon Drive downtown. Hours shift a little between summer and the rest of the year, so check the start time before you go."},
+        {"q": "Is the top of the Palm Springs Aerial Tramway cooler?", "a": "Yes. The mountain station is high on Mount San Jacinto and is usually far cooler than the valley below, so a jacket is a good idea."}
+      ] },
+    "Desert Hot Springs": { tips: [
+        "Desert Hot Springs sits on natural hot mineral water. Many small spa hotels here have mineral pools, and many sell day passes to people who aren't staying overnight.",
+        "Cabot's Pueblo Museum is a hand-built, Hopi-inspired pueblo from the town's homestead days, owned by the city.",
+        "The town is north of Interstate 10, so most of the valley is a short drive away on Palm Drive or Indian Canyon Drive.",
+        "Palm Springs International Airport (PSP) is about 20 minutes away by car."
+      ], faq: [
+        {"q": "What is Desert Hot Springs known for?", "a": "Natural hot mineral water. The town grew up around it, and many spa hotels have pools filled with it."},
+        {"q": "Can you visit the hot spring spas in Desert Hot Springs without staying overnight?", "a": "Many spa hotels in town sell day passes to their mineral pools. Call ahead, since rules and times vary by spa."},
+        {"q": "What is there to do in Desert Hot Springs?", "a": "Soak at a mineral spa, tour Cabot's Pueblo Museum and enjoy wide desert views to the mountains. This page lists the parks, courts and restaurants we have listed."}
+      ] },
+    "Cathedral City": { tips: [
+        "Cathedral City sits between Palm Springs and Rancho Mirage, along Highway 111 and Date Palm Drive.",
+        "The downtown area near Highway 111 has the Mary Pickford movie theater, restaurants and the city's civic center.",
+        "It's a central base for exploring the west valley: Palm Springs and Rancho Mirage are each just a few minutes away.",
+        "Palm Springs International Airport (PSP) is about 15 minutes away by car."
+      ], faq: [
+        {"q": "Where is Cathedral City?", "a": "Between Palm Springs and Rancho Mirage in the western Coachella Valley, along Highway 111 and Date Palm Drive."},
+        {"q": "How far is Cathedral City from the Palm Springs airport?", "a": "About 15 minutes by car from Palm Springs International Airport (PSP)."},
+        {"q": "What is there to do in Cathedral City?", "a": "Catch a movie downtown, eat at family-run restaurants and use it as a central base for the rest of the west valley. This page lists the parks, courts and restaurants we have listed."}
+      ] },
+    "Thousand Palms": { tips: [
+        "Acrisure Arena, home of the Coachella Valley Firebirds hockey team and big concerts, is in Thousand Palms near Interstate 10.",
+        "The Coachella Valley Preserve has palm oases and desert trails on the San Andreas Fault. Entry is free (donations welcome). In summer the Thousand Palms Oasis area is open weekends only, so check hours first.",
+        "Thousand Palms is unincorporated, north of Interstate 10 between Rancho Mirage and Palm Desert.",
+        "Palm Springs International Airport (PSP) is about 20 minutes away by car."
+      ], faq: [
+        {"q": "Is Acrisure Arena in Palm Desert or Thousand Palms?", "a": "Acrisure Arena is in Thousand Palms, just north of Interstate 10. It's often described as being in Palm Desert because it's close by."},
+        {"q": "Is the Coachella Valley Preserve free?", "a": "Yes, there is no admission fee, though donations are welcome. Summer hours are shorter, so check before you go."},
+        {"q": "What is there to do in Thousand Palms?", "a": "See a Firebirds game or concert at Acrisure Arena and hike the palm oases at the Coachella Valley Preserve. This page lists the places and restaurants we have listed."}
+      ] },
+    "Rancho Mirage": { tips: [
+        "Sunnylands Center and Gardens, the former Annenberg estate, has free admission and parking. It closes every summer, roughly early June to mid-September. The historic house is by ticketed tour only.",
+        "Highway 111 through Rancho Mirage is lined with restaurants, resorts and shopping.",
+        "Much of the city is country club and gated communities, so many golf courses here are private.",
+        "Palm Springs International Airport (PSP) is about 20 minutes away by car."
+      ], faq: [
+        {"q": "Is Sunnylands free to visit?", "a": "Yes. The Center and Gardens have free admission and parking. They close for summer, roughly early June to mid-September, and tours of the historic house need a ticket."},
+        {"q": "What is Rancho Mirage known for?", "a": "Resorts, country clubs, Sunnylands and Eisenhower Health. It has long been a getaway for celebrities and presidents."},
+        {"q": "What is there to do in Rancho Mirage?", "a": "Walk the Sunnylands gardens in season, eat along Highway 111 and play golf at the resort courses. This page lists the parks, courts and restaurants we have listed."}
+      ] },
+    "Indian Wells": { tips: [
+        "The Indian Wells Tennis Garden hosts the BNP Paribas Open every March, one of the biggest tennis tournaments in the world. Hotels and restaurants across the valley fill up that month.",
+        "Indian Wells Golf Resort is the city's public golf resort, so you don't need a club membership to play.",
+        "Resort hotels line Highway 111 through the city.",
+        "Palm Springs International Airport (PSP) is about 25 to 30 minutes away by car."
+      ], faq: [
+        {"q": "When is the BNP Paribas Open in Indian Wells?", "a": "Every March, at the Indian Wells Tennis Garden. Book hotels and dinner reservations early that month."},
+        {"q": "Can the public play golf in Indian Wells?", "a": "Yes. Indian Wells Golf Resort is open to the public. Many other courses in the city are private clubs."},
+        {"q": "What is there to do in Indian Wells?", "a": "Watch tennis at the Tennis Garden, play golf at the public golf resort and relax at the resorts along Highway 111. This page lists the places and restaurants we have listed."}
+      ] },
+    "Bermuda Dunes": { tips: [
+        "Bermuda Dunes is a small, mostly residential unincorporated community between Palm Desert and Indio, near Interstate 10 at Washington Street.",
+        "It's built around the Bermuda Dunes Country Club and the small Bermuda Dunes Airport.",
+        "Shopping and dining in Palm Desert, La Quinta and Indio are each a short drive away.",
+        "Palm Springs International Airport (PSP) is about 25 to 30 minutes away by car."
+      ], faq: [
+        {"q": "Where is Bermuda Dunes?", "a": "Between Palm Desert and Indio, near Interstate 10 at Washington Street. It's an unincorporated part of Riverside County."},
+        {"q": "Is Bermuda Dunes its own city?", "a": "No. It's an unincorporated community in Riverside County, served by county services."},
+        {"q": "What is there to do in Bermuda Dunes?", "a": "It's mostly quiet neighborhoods and golf, with Palm Desert, La Quinta and Indio close by. This page lists the businesses and restaurants we have listed."}
+      ] },
+    "La Quinta": { tips: [
+        "Old Town La Quinta has walkable shops, restaurants and events in the heart of the city.",
+        "The Cove neighborhood backs up to the Santa Rosa Mountains, with popular hiking trails starting right from the streets. Start early, since there's little shade.",
+        "La Quinta is a golf town. PGA West and La Quinta Country Club host the PGA Tour's American Express tournament every January.",
+        "Palm Springs International Airport (PSP) is about 35 to 40 minutes away by car."
+      ], faq: [
+        {"q": "What is there to do in La Quinta?", "a": "Stroll Old Town La Quinta, hike the trails in the Cove, play golf at PGA West and other resort courses, and eat along Highway 111. This page lists the trails, parks, courts and restaurants we have listed."},
+        {"q": "When is the golf tournament in La Quinta?", "a": "The PGA Tour's American Express is played every January at PGA West and La Quinta Country Club."},
+        {"q": "How far is La Quinta from the Palm Springs airport?", "a": "About 35 to 40 minutes by car from Palm Springs International Airport (PSP)."}
+      ] },
+    "Indio": { tips: [
+        "Indio is the largest city in the valley and calls itself the City of Festivals. Coachella and Stagecoach take over the Empire Polo Club each April, with heavy traffic and booked hotels across the valley on those weekends.",
+        "The Riverside County Fair and National Date Festival is held at the fairgrounds in Indio every February.",
+        "Most of the country's dates are grown in the Coachella Valley. Shields Date Garden in Indio, open since 1924, is famous for its date shake.",
+        "Joshua Tree National Park's south entrance is about 25 miles east of Indio on Interstate 10."
+      ], faq: [
+        {"q": "Is the Coachella festival in Indio or Coachella?", "a": "Indio. The Coachella and Stagecoach festivals are held at the Empire Polo Club in Indio, not in the city of Coachella."},
+        {"q": "When are the Coachella and Stagecoach festivals?", "a": "Every April at the Empire Polo Club in Indio: Coachella runs two weekends, then Stagecoach follows. Book hotels well ahead and expect heavy traffic."},
+        {"q": "What is there to do in Indio?", "a": "Go to the festivals and the Date Festival, have a date shake at Shields Date Garden and head out to Joshua Tree's south entrance. This page lists the parks, courts and restaurants we have listed."}
+      ] },
+    "Coachella": { tips: [
+        "The city of Coachella is in the east valley, surrounded by farms and date groves. The famous music festival is actually held next door in Indio.",
+        "Downtown along Sixth Street and Pueblo Viejo has local restaurants, panaderias and markets.",
+        "Joshua Tree National Park's south entrance is about 30 minutes away via Interstate 10.",
+        "Palm Springs International Airport (PSP) is about 40 minutes away by car."
+      ], faq: [
+        {"q": "Is the Coachella festival held in the city of Coachella?", "a": "No. The festival is held at the Empire Polo Club in Indio, the city next door."},
+        {"q": "What is the city of Coachella known for?", "a": "Farming. Dates, grapes, peppers and other crops are grown around the city, and it has a close-knit, mostly full-time community."},
+        {"q": "What is there to do in Coachella?", "a": "Eat at local restaurants downtown, shop the markets and use it as a base for Joshua Tree's south entrance. This page lists the parks, courts and restaurants we have listed."}
+      ] }
   },
   categories: {
     "Legal": "Legal covers locally based law firms and attorneys: estate planning, family law, criminal defense, bankruptcy, personal injury and business and real estate law. These are firms based in the valley, not national advertising networks. A listing here is not a recommendation or legal advice.",
