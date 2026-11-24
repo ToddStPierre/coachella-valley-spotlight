@@ -2247,6 +2247,7 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 600; }
 .h-bento .card:nth-child(1):hover { box-shadow: 0 8px 0 var(--gold); }
 @media (max-width: 860px) { .h-bento { grid-template-columns: minmax(0, 1fr); } .h-bento .card:nth-child(n) { grid-column: auto; } }
 .h-coming { margin-top: 72px; }
+.h-coming:first-child { margin-top: 0; }
 .h-coming .h-head h2 { font-size: clamp(30px, 3.6vw, 44px); }
 
 /* Deals as tickets */
