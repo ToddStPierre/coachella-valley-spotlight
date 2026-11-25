@@ -2441,3 +2441,13 @@ h1 { font-weight: 700; line-height: 1.02; }
 /* Home trim (2026-11-24): postcard pitch folded into the owner band */
 .owner-band-card { margin-top: 22px; padding: 14px 16px; border: 1px solid rgba(240,163,58,.45); border-radius: 12px; color: #f5ede1; }
 .owner-band-card a { color: var(--gold); font-weight: 700; white-space: nowrap; }
+
+/* Promise band (pricing + advertise, 2026-11-24) */
+.promise-band { margin-top: 32px; background: var(--palm-soft); border: 2px solid var(--ink); border-radius: 22px; padding: 26px 28px 22px; }
+.promise-band h2 { margin: 0 0 14px; font-size: clamp(22px, 2.6vw, 28px); }
+.promise-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+.promise-grid h3 { margin: 0 0 6px; font-size: 17px; color: var(--palm); font-family: var(--body); font-weight: 700; }
+.promise-grid p { margin: 0; color: var(--ink); font-size: 15px; }
+.promise-pay { margin: 16px 0 0; padding-top: 12px; border-top: 1px dashed var(--line); color: var(--ink-2); font-size: 15px; }
+@media (max-width: 860px) { .promise-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+@media (max-width: 520px) { .promise-grid { grid-template-columns: minmax(0, 1fr); } .promise-band { padding: 22px 18px 18px; } }
