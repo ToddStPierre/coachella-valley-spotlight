@@ -982,6 +982,10 @@ body.has-tabbar { padding-bottom: 64px; }
 .way-price { font-family: var(--display); font-size: 34px; font-weight: 700; line-height: 1.1; margin-top: 4px; }
 .way-price small { font-family: var(--body); font-size: 15px; font-weight: 500; color: var(--ink-2); }
 .way-best { font-size: 14.5px; color: var(--ink-2); }
+.way .way-result { color: var(--ink); font-size: 17px; line-height: 1.5; }
+.way-from { font-size: 14.5px; font-weight: 600; color: var(--ink-2); border-top: 1px solid var(--line); padding-top: 10px; margin-top: 4px; }
+.ways-hero .cta-row { margin-top: var(--s3); }
+.grid.grid-fit { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 .way-go { margin-top: auto; padding-top: 6px; font-weight: 600; color: var(--sun-deep); }
 .bundle { display: flex; gap: var(--s3); align-items: center; justify-content: space-between; margin-top: var(--s3); background: var(--sand); border: 1px dashed var(--gold); border-radius: 16px; padding: 16px 20px; }
 .bundle > div { max-width: 760px; }
