@@ -39,7 +39,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..900,100;1,9..144,400..900,100&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=20261124z">
+<link rel="stylesheet" href="assets/style.css?v=20261125a">
 </head>
 <body>
 <header class="site-header"><a class="skip-link" href="#main">Skip to main content</a><div class="stripe"></div><nav class="nav wrap" aria-label="Main">
@@ -104,6 +104,14 @@
 <div class="advertiser-card" aria-hidden="true"><img src="assets/img/advertisers/bathplanet.jpg?v=20261111" width="440" height="424" loading="lazy" decoding="async" alt="BathPlanet Inland Empire ad from a Spotlight card"></div>
 </div></div>
 </section>
+<section class="section proof" id="results" hidden aria-labelledby="proof-h"><div class="wrap">
+<span class="eyebrow"><span class="stripe-mini"></span>Results</span>
+<h2 id="proof-h">What happened when the card landed.</h2>
+<p class="lede" style="color:var(--ink-2)">Real numbers and real words from the businesses on the card.</p>
+<div class="stats proof-totals" hidden></div>
+<p class="proof-since" hidden></p>
+<div class="proof-grid"></div>
+</div></section>
 <section id="postcard" class="postcard-head"><div class="wrap ad-hero">
 <div>
 <span class="eyebrow"><span class="stripe-mini"></span>Option 1 &middot; The Spotlight postcard</span>
@@ -225,6 +233,41 @@
 <div class="footer-base"><span>&copy; 2026 Coachella Valley Spotlight, a brand of MoreViews Pro LLC. Made in the desert.</span><span><a href="legal#privacy">Privacy</a> &middot; <a href="legal#terms">Terms</a> &middot; <a href="legal#disclaimer">Disclaimer</a></span></div>
 </div></footer>
 <script src="data/events.js"></script><script src="data/feed-events.js"></script><script src="data/deals.js"></script><script src="data/news.js"></script><script src="data/headlines.js"></script><script src="data/directory.js"></script><script src="assets/app.js?v=20261124u"></script>
+<script src="data/proof.js?v=20261125"></script>
+<script>
+(function () {
+  var P = window.CVS_PROOF, sec = document.getElementById("results");
+  if (!P || !sec) return;
+  var t = P.totals || {}, res = (P.results || []).filter(function (r) { return r && r.business && (r.number || r.quote); });
+  var boxes = [[t.scans, "QR scans from the cards"], [t.cards, "cards mailed"], [t.homes, "homes reached"]].filter(function (b) { return typeof b[0] === "number" && b[0] > 0; });
+  if (!boxes.length && !res.length) return;
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  if (boxes.length) {
+    var tot = sec.querySelector(".proof-totals");
+    boxes.forEach(function (b) { var d = el("div", "stat"); d.appendChild(el("b", "", b[0].toLocaleString("en-US"))); d.appendChild(el("span", "", b[1])); tot.appendChild(d); });
+    tot.style.gridTemplateColumns = "repeat(" + boxes.length + ", 1fr)";
+    tot.hidden = false;
+    if (t.sinceLabel) { var since = sec.querySelector(".proof-since"); since.textContent = t.sinceLabel; since.hidden = false; }
+  }
+  var grid = sec.querySelector(".proof-grid");
+  res.forEach(function (r) {
+    var c = el("figure", "proof-card");
+    if (r.number) c.appendChild(el("div", "proof-number", r.number));
+    if (r.detail) c.appendChild(el("p", "proof-detail", r.detail));
+    if (r.quote) { var q = el("blockquote", "proof-quote"); q.appendChild(el("p", "", "\u201C" + r.quote + "\u201D")); c.appendChild(q); }
+    var cap = el("figcaption", "proof-who");
+    if (r.photo) { var img = el("img"); img.src = r.photo; img.alt = ""; img.width = 48; img.height = 48; img.loading = "lazy"; cap.appendChild(img); }
+    var who = el("span");
+    var name = r.slug ? el("a", "", r.business) : el("strong", "", r.business);
+    if (r.slug) name.href = "business/" + encodeURIComponent(r.slug) + "/";
+    who.appendChild(name);
+    var sub = [r.person, r.card].filter(Boolean).join(" \u00B7 ");
+    if (sub) who.appendChild(el("small", "", sub));
+    cap.appendChild(who); c.appendChild(cap); grid.appendChild(c);
+  });
+  sec.hidden = false;
+})();
+</script>
 <script src="data/mailings.js?v=20261121fh"></script><script src="data/formats.js?v=20261122pl"></script><script src="data/hidden-routes.js?v=20261118q"></script>
 </body>
 </html>

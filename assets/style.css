@@ -2455,3 +2455,19 @@ h1 { font-weight: 700; line-height: 1.02; }
 .promise-pay { margin: 16px 0 0; padding-top: 12px; border-top: 1px dashed var(--line); color: var(--ink-2); font-size: 15px; }
 @media (max-width: 860px) { .promise-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 @media (max-width: 520px) { .promise-grid { grid-template-columns: minmax(0, 1fr); } .promise-band { padding: 22px 18px 18px; } }
+
+/* Advertise: advertiser results (filled from data/proof.js, hidden while empty) */
+.proof .proof-totals { margin-top: var(--s3); }
+.proof-since { color: var(--ink-2); font-size: 14.5px; margin-top: 10px; }
+.proof-grid { display: grid; gap: var(--s3); grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); margin-top: var(--s4); }
+.proof-grid:empty { display: none; }
+.proof-card { margin: 0; display: flex; flex-direction: column; gap: 12px; background: var(--paper); border: 1.5px solid var(--ink); border-radius: var(--radius); padding: var(--s3); }
+.proof-number { font-family: var(--display); font-size: 44px; font-weight: 700; line-height: 1.05; color: var(--sun-deep); }
+.proof-detail { margin: 0; color: var(--ink-2); }
+.proof-quote { margin: 0; }
+.proof-quote p { margin: 0; font-family: var(--display); font-size: 21px; line-height: 1.4; }
+.proof-who { margin-top: auto; display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.proof-who img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+.proof-who span { display: flex; flex-direction: column; }
+.proof-who a, .proof-who strong { font-weight: 700; color: var(--ink); }
+.proof-who small { color: var(--ink-2); font-size: 14px; }
