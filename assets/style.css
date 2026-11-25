@@ -2471,3 +2471,4 @@ h1 { font-weight: 700; line-height: 1.02; }
 .proof-who span { display: flex; flex-direction: column; }
 .proof-who a, .proof-who strong { font-weight: 700; color: var(--ink); }
 .proof-who small { color: var(--ink-2); font-size: 14px; }
+.sp-fine { font-size: 13.5px; color: var(--ink-2); margin-top: 8px; }
