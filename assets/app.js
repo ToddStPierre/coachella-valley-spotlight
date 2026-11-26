@@ -420,6 +420,8 @@
   var fromM = location.search.match(/[?&]from=(qr|share)\b/);
   if (fromM) {
     var qrDeal = document.querySelector("[data-claim-offer]"), qrBiz = bizBySlug(document.body.getAttribute("data-profile"));
+    // Postcard scans always show the ad they scanned, never the deal ticket (Todd, 2026-11-26). Shared links still open the deal.
+    if (fromM[1] === "qr" && qrBiz) qrDeal = null;
     setTimeout(function () { if (qrDeal) openDealModal(profileDeal(qrDeal), qrDeal, true, fromM[1]); else if (qrBiz) openAdModal(qrBiz, fromM[1]); }, 350);
     if (fromM[1] === "qr" && !window.CVS_NOTRACK && window.gtag) window.gtag("event", "qr_scan", { business: document.body.getAttribute("data-profile") || "" });
   }
