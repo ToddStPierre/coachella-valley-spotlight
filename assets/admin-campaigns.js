@@ -6,7 +6,7 @@
 (function () {
   var HQ = window.HQ; if (!HQ) return;
   var esc = HQ.esc, API = HQ.TRACKER, KEY = HQ.key, FX = window.CVS_FMT || {}, F9 = (window.CVS_FORMATS || {})["9x12"];
-  var PRINT = 967, POSTAGE = 0.26; // printing 5,000 cards (Todd, 2026-11-21); USPS EDDM Retail postage per piece (rate checked 2026-11-27)
+  var PRINT = 967, POSTAGE = 0.26, HANDLING = 0.07; // printing 5,000 cards (Todd, 2026-11-21); USPS EDDM Retail postage per piece (rate checked 2026-11-27); print-team handling per piece (Todd, 2026-11-27)
   var ROUTES = {}; Object.keys(HQ.ROUTES).forEach(function (r) { ROUTES[r] = HQ.ROUTES[r]; });
   var list = JSON.parse(JSON.stringify(window.CVS_MAILINGS || []));
   list.forEach(function (m) { if (m.route && m.name) ROUTES[m.route] = ROUTES[m.route] || m.name; });
@@ -44,10 +44,10 @@
   }
   // ---- potential vs actual (redesign 2026-11-21) ----
   // Potential = every spot sold at the advertised price, less the card's costs.
-  //   9x12: $5,600; costs printing $967 + $0.26 a home (USPS EDDM). 11x6: 16 x $300 = $4,800; costs $615 + $0.26 a home (the old job).
+  //   9x12: $5,600; costs printing $967 + $0.26 a home (USPS EDDM) + $0.07 a home handling. 11x6: 16 x $300 = $4,800; costs $615 + $0.26 a home (the old job).
   //   If more costs are recorded than that, the recorded figure is used.
   // Actual = the income and expense lines recorded on the campaign (the drawer's Income & expenses).
-  function stdCost(m) { return Math.round((nine(m) ? PRINT + POSTAGE * homesN(m) : 615 + 0.26 * homesN(m)) * 100); }
+  function stdCost(m) { return Math.round((nine(m) ? PRINT + (POSTAGE + HANDLING) * homesN(m) : 615 + 0.26 * homesN(m)) * 100); }
   function pot(m) { var t = totals(linesOf(m)), inc = fullValue(m) * 100, exp = Math.max(t.exp, stdCost(m)); return { inc: inc, exp: exp, profit: inc - exp }; }
   // Costs on a tentative card aren't spent yet (it only prints once it reaches its minimum), so they count as planned, not actual.
   function act(m) { var t = totals(linesOf(m)); if (isConf(m)) return t; return { inc: t.inc, exp: 0, profit: t.inc, planned: t.exp }; }
@@ -138,7 +138,7 @@
       '<button type="button" class="hq-btn" data-new>' + HQ.icons.plus + "<span>New campaign</span></button></div>" +
       (linesOk ? "" : '<p class="bd-note" style="margin:0 0 12px">Loading income and expenses&hellip;</p>') +
       (shown.length ? kpis(sum(shown)) + table(shown) +
-        '<p class="bd-note cp-how"><b>Potential</b> = every spot sold at the advertised price ($5,600 on a 9 x 12 card), less printing $' + PRINT + " + $" + POSTAGE.toFixed(2) + " a home (or the recorded costs, if more). <b>Actual</b> = the income recorded on each campaign, and its recorded costs once the card is confirmed (a tentative card&rsquo;s costs aren&rsquo;t spent until it reaches its minimum and prints). <b>Confirmed</b> = the card has reached its minimum, or already mailed.</p>" +
+        '<p class="bd-note cp-how"><b>Potential</b> = every spot sold at the advertised price ($5,600 on a 9 x 12 card), less printing $' + PRINT + " + $" + POSTAGE.toFixed(2) + " postage + $" + HANDLING.toFixed(2) + " handling a home (or the recorded costs, if more). <b>Actual</b> = the income recorded on each campaign, and its recorded costs once the card is confirmed (a tentative card&rsquo;s costs aren&rsquo;t spent until it reaches its minimum and prints). <b>Confirmed</b> = the card has reached its minimum, or already mailed.</p>" +
         order.map(function (k) { return '<h3 class="cp-month" id="cp-m-' + k + '">' + esc(monthName(k)) + '</h3><div class="cp-grid">' + groups[k].map(function (i) { return card(list[i], i); }).join("") + "</div>"; }).join("")
         : '<p class="bd-note">No campaigns match.</p>');
   }
@@ -161,7 +161,7 @@
       (ls.map(lineRow).join("") || '<tr><td colspan="5" class="bd-note">No income or expenses yet.</td></tr>') + "</tbody></table></div>" +
       '<div class="cp-add"><button type="button" class="hq-btn ghost sm" data-add="income">+ Income</button><button type="button" class="hq-btn ghost sm" data-add="expense">+ Expense</button>' +
       '<button type="button" class="hq-btn ghost sm" data-costs>+ Printing &amp; postage</button><button type="button" class="hq-btn ghost sm" data-fromspots>+ Income from sold spots</button></div>' +
-      '<p class="bd-note">Changes save when you click away from a field. Printing &amp; postage adds $' + PRINT + " printing and $" + POSTAGE.toFixed(2) + " a home for " + homesN(m).toLocaleString("en-US") + " homes.</p>";
+      '<p class="bd-note">Changes save when you click away from a field. Printing &amp; postage adds $' + PRINT + " printing, $" + POSTAGE.toFixed(2) + " postage and $" + HANDLING.toFixed(2) + " handling a home for " + homesN(m).toLocaleString("en-US") + " homes.</p>";
   }
   function spotsHtml(m) {
     var sp = spotsOf(m); if (!sp) return '<p class="bd-note">Spot data is still loading from the Postcard board.</p>';
@@ -272,8 +272,9 @@
         var have = linesOf(m).map(function (l) { return l.label.toLowerCase(); }), todo = [];
         if (!have.some(function (x) { return /print/.test(x); })) todo.push({ kind: "expense", label: "Printing", amount: PRINT.toFixed(2), note: "5,000 cards" });
         if (!have.some(function (x) { return /postage/.test(x); })) todo.push({ kind: "expense", label: "Postage (USPS EDDM)", amount: (POSTAGE * homesN(m)).toFixed(2), note: homesN(m).toLocaleString("en-US") + " homes x $" + POSTAGE.toFixed(2) + " EDDM Retail, order Homes only" });
-        if (!todo.length) return HQ.toast("Printing and postage are already on this campaign.");
-        return chain(todo, m).then(function () { redrawMoney(mb, m); HQ.toast("Added printing and postage."); });
+        if (!have.some(function (x) { return /handling/.test(x); })) todo.push({ kind: "expense", label: "Handling", amount: (HANDLING * homesN(m)).toFixed(2), note: homesN(m).toLocaleString("en-US") + " homes x $" + HANDLING.toFixed(2) + " (print team handling)" });
+        if (!todo.length) return HQ.toast("Printing, postage and handling are already on this campaign.");
+        return chain(todo, m).then(function () { redrawMoney(mb, m); HQ.toast("Added printing, postage and handling."); });
       }
       if (e.target.closest("[data-fromspots]")) {
         var sp = spotsOf(m); if (!sp) return HQ.toast("Spot data is still loading.");
