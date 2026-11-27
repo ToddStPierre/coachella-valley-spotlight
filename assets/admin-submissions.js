@@ -12,13 +12,17 @@
   function row(s) {
     var d = s.data, when = new Date(s.created_at).toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
     var title = d.business || d.title || (d.topic && d.about ? d.topic + ": " + d.about : d.topic) || d.name || "(no name)";
+    // A listing added by hand (before the Publish button, or straight in directory.js) has no "published" stamp.
+    // If a listing with this business name is already live, say so and don't offer Publish again.
+    var listed = s.form === "submit" && !d.published && kindOf(d) === "listing" ? findBiz(d.business || d.title) : null;
     var fields = Object.keys(d).filter(function (k) { return SKIP.indexOf(k) < 0 && d[k]; }).map(function (k) {
       return "<dt>" + esc(k.replace(/_/g, " ")) + "</dt><dd>" + (k === "email" ? '<a href="mailto:' + esc(d[k]) + '">' + esc(d[k]) + "</a>" : esc(d[k])) + "</dd>";
     }).join("");
     return '<div class="card" style="margin-bottom:12px;' + (s.done ? "opacity:.55" : "") + '"><span class="meta">' + esc(LABEL[s.form] || s.form) + " &middot; " + esc(when) + (s.done ? " &middot; DONE" : "") + "</span>" +
       "<h3>" + esc(title) + "</h3><details><summary style=\"cursor:pointer;font-weight:600\">All details</summary><dl class=\"facts\" style=\"margin-top:10px\">" + fields + "</dl></details>" +
       (d.published ? '<p class="pub-done">&#10003; Published as ' + esc(d.published) + '</p>' : "") +
-      '<p style="margin:8px 0 0;display:flex;gap:8px;flex-wrap:wrap">' + (s.form === "submit" && !d.published ? '<button class="btn" data-pub="' + s.id + '">Publish&hellip;</button>' : "") +
+      (listed ? '<p class="pub-done">&#10003; Already listed: <a href="business/' + esc(listed.slug) + '/" target="_blank" rel="noopener">' + esc(listed.name) + "</a> (business/" + esc(listed.slug) + "/)</p>" : "") +
+      '<p style="margin:8px 0 0;display:flex;gap:8px;flex-wrap:wrap">' + (s.form === "submit" && !d.published && !listed ? '<button class="btn" data-pub="' + s.id + '">Publish&hellip;</button>' : "") +
       '<button class="btn btn-ghost" data-done="' + s.id + '" data-to="' + (s.done ? 0 : 1) + '">' + (s.done ? "Mark not done" : "Mark done") + "</button></p>" +
       (openPub === s.id ? pubForm(s) : "") + "</div>";
   }
