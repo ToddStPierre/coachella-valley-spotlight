@@ -6,7 +6,7 @@
 (function () {
   var HQ = window.HQ; if (!HQ) return;
   var esc = HQ.esc, API = HQ.TRACKER, KEY = HQ.key, FX = window.CVS_FMT || {}, F9 = (window.CVS_FORMATS || {})["9x12"];
-  var PRINT = 967, POSTAGE = 0.33; // Todd's campaign costs, 2026-11-21: printing 5,000 cards, postage + handling per piece
+  var PRINT = 967, POSTAGE = 0.26; // printing 5,000 cards (Todd, 2026-11-21); USPS EDDM Retail postage per piece (rate checked 2026-11-27)
   var ROUTES = {}; Object.keys(HQ.ROUTES).forEach(function (r) { ROUTES[r] = HQ.ROUTES[r]; });
   var list = JSON.parse(JSON.stringify(window.CVS_MAILINGS || []));
   list.forEach(function (m) { if (m.route && m.name) ROUTES[m.route] = ROUTES[m.route] || m.name; });
@@ -44,7 +44,7 @@
   }
   // ---- potential vs actual (redesign 2026-11-21) ----
   // Potential = every spot sold at the advertised price, less the card's costs.
-  //   9x12: $5,600; costs printing $967 + $0.33 a home. 11x6: 16 x $300 = $4,800; costs $615 + $0.26 a home (the old job).
+  //   9x12: $5,600; costs printing $967 + $0.26 a home (USPS EDDM). 11x6: 16 x $300 = $4,800; costs $615 + $0.26 a home (the old job).
   //   If more costs are recorded than that, the recorded figure is used.
   // Actual = the income and expense lines recorded on the campaign (the drawer's Income & expenses).
   function stdCost(m) { return Math.round((nine(m) ? PRINT + POSTAGE * homesN(m) : 615 + 0.26 * homesN(m)) * 100); }
@@ -271,7 +271,7 @@
       if (e.target.closest("[data-costs]")) {
         var have = linesOf(m).map(function (l) { return l.label.toLowerCase(); }), todo = [];
         if (!have.some(function (x) { return /print/.test(x); })) todo.push({ kind: "expense", label: "Printing", amount: PRINT.toFixed(2), note: "5,000 cards" });
-        if (!have.some(function (x) { return /postage/.test(x); })) todo.push({ kind: "expense", label: "Postage & handling", amount: (POSTAGE * homesN(m)).toFixed(2), note: homesN(m).toLocaleString("en-US") + " homes x $" + POSTAGE.toFixed(2) });
+        if (!have.some(function (x) { return /postage/.test(x); })) todo.push({ kind: "expense", label: "Postage (USPS EDDM)", amount: (POSTAGE * homesN(m)).toFixed(2), note: homesN(m).toLocaleString("en-US") + " homes x $" + POSTAGE.toFixed(2) + " EDDM Retail, order Homes only" });
         if (!todo.length) return HQ.toast("Printing and postage are already on this campaign.");
         return chain(todo, m).then(function () { redrawMoney(mb, m); HQ.toast("Added printing and postage."); });
       }
